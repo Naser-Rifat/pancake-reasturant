@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book a Table | KRUSH Pancakes & Stacks</title>
+  <meta name="description" content="Book a table at KRUSH online — free, instant confirmation, open 7 days. Large groups welcome by phone." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Pacifico&family=DM+Sans:wght@400;500;700&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥞</text></svg>" />
+</head>
+<body>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="nav" id="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo">🥞 krush</a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="menu.html">Menu</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="index.html#reviews">Reviews</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+
+      <div class="nav-cta">
+        <a href="booking.html" class="btn btn-primary">Book a Table</a>
+        <button class="burger-toggle" id="burgerToggle" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= PAGE HERO ================= -->
+  <section class="page-hero">
+    <div class="container">
+      <p class="kicker">Reserve Online — Free &amp; Instant</p>
+      <h1>Book a <span class="accent">Table.</span></h1>
+      <p>Pick a date, pick a time — we'll have the griddle hot when you arrive.</p>
+    </div>
+  </section>
+
+  <!-- ================= BOOKING (FR-20/21/26) ================= -->
+  <main class="container booking-grid">
+    <div class="widget-card reveal">
+      <h3>📅 Online Reservation</h3>
+      <p>Powered by GloriaFood — instant email confirmation, no fees.</p>
+
+      <!--
+        GloriaFood embed (FR-20):
+        1. Create the free restaurant account at www.gloriafood.com (in the restaurant's name).
+        2. In the GloriaFood admin, go to Setup → Publishing → "Add table reservations to your website".
+        3. Copy the two data attributes into the span below and remove the .widget-slot placeholder.
+
+        <span class="glf-button reservation"
+              data-glf-cuid="YOUR-CUID-HERE"
+              data-glf-ruid="YOUR-RUID-HERE">Book a Table</span>
+        <script src="https://www.fbgcdn.com/embedder/js/ewm2.js" defer async></script>
+      -->
+      <div class="widget-slot">
+        <span class="big">🍽️</span>
+        <b>GloriaFood widget goes here</b>
+        <span>Once the restaurant's free GloriaFood account is connected,<br />the "Book a Table" reservation button will appear in this spot —<br />styled to match the site.</span>
+      </div>
+    </div>
+
+    <aside class="fallback-card reveal">
+      <h3>👥 Big Group or Special Event?</h3>
+      <p>
+        For groups of 10+, functions, or birthday bookings, give us a call and
+        we'll sort you out directly — cake smuggling encouraged.
+      </p>
+      <a class="phone" href="tel:+61255501234">(02) 5550 1234</a>
+      <p style="margin-top:1.2rem; margin-bottom:0;">
+        Open 7 days · 123 George Street, Sydney NSW 2000<br />
+        <a href="mailto:hello@krushpancakes.com.au" style="color:var(--yellow); font-weight:600;">hello@krushpancakes.com.au</a>
+      </p>
+    </aside>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <a href="index.html" class="logo">🥞 krush</a>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="booking.html">Book a Table</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="index.html#reviews">Reviews</a></li>
+        </ul>
+        <div class="footer-icons">
+          <span>🥞</span><span>🍯</span><span>🍓</span><span>🧈</span>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 KRUSH — All rights reserved. ABN 00 000 000 000</span>
+        <span>Fluffy stacks · real maple · est. 1999</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

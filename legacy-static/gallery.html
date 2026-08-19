@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery | KRUSH Pancakes & Stacks</title>
+  <meta name="description" content="Photos from KRUSH — our food, our space, and the good times in between." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Pacifico&family=DM+Sans:wght@400;500;700&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥞</text></svg>" />
+</head>
+<body>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="nav" id="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo">🥞 krush</a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="menu.html">Menu</a></li>
+        <li><a href="gallery.html" class="active">Gallery</a></li>
+        <li><a href="index.html#reviews">Reviews</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+
+      <div class="nav-cta">
+        <a href="booking.html" class="btn btn-primary">Book a Table</a>
+        <button class="burger-toggle" id="burgerToggle" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= PAGE HERO ================= -->
+  <section class="page-hero">
+    <div class="container">
+      <p class="kicker">Feast Your Eyes</p>
+      <h1>The <span class="accent">Gallery.</span></h1>
+      <p>Our food, our space, and the good times in between.</p>
+
+      <div class="album-tabs" id="albumTabs">
+        <button class="album-tab active" data-album="all">All</button>
+        <button class="album-tab" data-album="food">🥞 Food</button>
+        <button class="album-tab" data-album="interior">🪑 Interior</button>
+        <button class="album-tab" data-album="events">🎉 Events</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GALLERY GRID (FR-30/31) ================= -->
+  <main class="container" style="padding-bottom:6rem;">
+    <div class="gallery-grid" id="galleryGrid" style="margin-top:1rem;">
+      <a href="#" data-album="food" data-caption="The Classic Buttermilk, fresh off the griddle"><img src="https://images.unsplash.com/photo-1575853121743-60c24f0a7502?w=700&q=70" alt="Classic buttermilk pancake stack" loading="lazy" /></a>
+      <a href="#" data-album="food" data-caption="Berry Bliss — piled high"><img src="https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=700&q=70" alt="Berry pancake stack" loading="lazy" /></a>
+      <a href="#" data-album="interior" data-caption="Our main dining room"><img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=700&q=70" alt="Restaurant interior" loading="lazy" /></a>
+      <a href="#" data-album="food" data-caption="Honey drizzle in slow motion"><img src="https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=700&q=70" alt="Pancakes with honey drizzle" loading="lazy" /></a>
+      <a href="#" data-album="events" data-caption="Birthday night at KRUSH"><img src="https://images.unsplash.com/photo-1530023367847-a683933f4172?w=700&q=70" alt="Friends celebrating at dinner" loading="lazy" /></a>
+      <a href="#" data-album="interior" data-caption="Window seats for people-watching"><img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=700&q=70" alt="Cosy dining space" loading="lazy" /></a>
+      <a href="#" data-album="food" data-caption="Banana Caramel, salted-caramel heaven"><img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=700&q=70" alt="Banana caramel pancakes" loading="lazy" /></a>
+      <a href="#" data-album="events" data-caption="Cheers to the weekend"><img src="https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=700&q=70" alt="Group toast at the table" loading="lazy" /></a>
+      <a href="#" data-album="interior" data-caption="The bar, ready for service"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=700&q=70" alt="Restaurant bar area" loading="lazy" /></a>
+      <a href="#" data-album="food" data-caption="Choc Overload — no regrets"><img src="https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=700&q=70" alt="Chocolate pancakes" loading="lazy" /></a>
+      <a href="#" data-album="events" data-caption="Family dinners done right"><img src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=700&q=70" alt="Family dining event" loading="lazy" /></a>
+      <a href="#" data-album="interior" data-caption="Warm lights, warmer welcomes"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=700&q=70" alt="Restaurant seating area" loading="lazy" /></a>
+      <a href="#" data-album="food" data-caption="The full brekkie spread"><img src="https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=700&q=70" alt="Breakfast pancake spread" loading="lazy" /></a>
+      <a href="#" data-album="events" data-caption="Date night, sorted"><img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=700&q=70" alt="Dinner table for two" loading="lazy" /></a>
+      <a href="#" data-album="food" data-caption="Lemon Ricotta under a snowfall of sugar"><img src="https://images.unsplash.com/photo-1519676867240-f03562e64548?w=700&q=70" alt="Lemon ricotta pancakes" loading="lazy" /></a>
+      <a href="#" data-album="interior" data-caption="Room for the whole crew"><img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&q=70" alt="Large dining area" loading="lazy" /></a>
+    </div>
+  </main>
+
+  <!-- ================= LIGHTBOX ================= -->
+  <div class="lightbox" id="lightbox">
+    <button class="lb-btn lb-close" id="lbClose" aria-label="Close">✕</button>
+    <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">←</button>
+    <img id="lbImg" src="" alt="Gallery photo" />
+    <div class="lb-caption" id="lbCaption"></div>
+    <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">→</button>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <a href="index.html" class="logo">🥞 krush</a>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="booking.html">Book a Table</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="index.html#reviews">Reviews</a></li>
+        </ul>
+        <div class="footer-icons">
+          <span>🥞</span><span>🍯</span><span>🍓</span><span>🧈</span>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 KRUSH — All rights reserved. ABN 00 000 000 000</span>
+        <span>Fluffy stacks · real maple · est. 1999</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/gallery.js"></script>
+</body>
+</html>

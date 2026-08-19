@@ -1,0 +1,199 @@
+// Typed client for the Django REST backend.
+// Server components use the read helpers (with graceful fallbacks so the
+// storefront renders even when the API is down); client components use the
+// POST helpers, which surface backend validation errors.
+
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+
+export interface ApiMenuItem {
+  slug: string;
+  name: string;
+  description: string;
+  price: string; // decimal string, e.g. "17.00"
+  tag: "sweet" | "savoury" | "choc";
+  heat: "none" | "medium" | "hot";
+  kcal: number | null;
+  protein_g: number | null;
+  prep_time: string;
+  image: string;
+  is_featured: boolean;
+}
+
+export interface ApiReview {
+  name: string;
+  suburb: string;
+  rating: number;
+  quote: string;
+  avatar: string;
+}
+
+export interface ApiGalleryPhoto {
+  album: "food" | "interior" | "events";
+  caption: string;
+  image: string;
+  alt: string;
+}
+
+export interface ApiAnnouncement {
+  message: string;
+  link_text: string;
+  link_url: string;
+}
+
+export interface ApiOpeningHours {
+  label: string;
+  opens: string; // "11:00:00"
+  closes: string;
+}
+
+export interface ApiOrder {
+  public_id: string;
+  status: string;
+  total: string;
+  items: { slug: string; name: string; quantity: number; unit_price: string; line_total: string }[];
+}
+
+export interface ApiBooking {
+  public_id: string;
+  status: string;
+  date: string;
+  time: string;
+  party_size: number;
+}
+
+// ---------- display helpers ----------
+
+export const TAG_LABEL: Record<ApiMenuItem["tag"], string> = {
+  sweet: "Sweet",
+  savoury: "Savoury",
+  choc: "Choc Loaded",
+};
+
+export const heatClass = (heat: ApiMenuItem["heat"]) => (heat === "none" ? "" : heat);
+
+export const stars = (rating: number) => "★".repeat(rating) + "☆".repeat(5 - rating);
+
+/** "21:30:00" -> "9:30pm" */
+export function formatTime(t: string) {
+  const [h, m] = t.split(":").map(Number);
+  const ampm = h >= 12 ? "pm" : "am";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${String(m).padStart(2, "0")}${ampm}`;
+}
+
+// ---------- server-side reads (fallback on failure) ----------
+
+async function get<T>(path: string, fallback: T): Promise<T> {
+  try {
+    const res = await fetch(`${API_URL}${path}`, { cache: "no-store" });
+    if (!res.ok) return fallback;
+    return (await res.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+export async function getMenu(): Promise<ApiMenuItem[]> {
+  const { FALLBACK_MENU } = await import("./fallback-data");
+  return get("/menu/", FALLBACK_MENU);
+}
+
+export async function getFeaturedMenu(): Promise<ApiMenuItem[]> {
+  const { FALLBACK_MENU } = await import("./fallback-data");
+  return get("/menu/?featured=1", FALLBACK_MENU.filter((m) => m.is_featured));
+}
+
+export async function getReviews(): Promise<ApiReview[]> {
+  const { FALLBACK_REVIEWS } = await import("./fallback-data");
+  const data = await get<{ results: ApiReview[] } | null>("/reviews/", null);
+  return data?.results ?? FALLBACK_REVIEWS;
+}
+
+export async function getGallery(): Promise<ApiGalleryPhoto[]> {
+  const { FALLBACK_GALLERY } = await import("./fallback-data");
+  return get("/gallery/", FALLBACK_GALLERY);
+}
+
+export async function getHours(): Promise<ApiOpeningHours[]> {
+  const { FALLBACK_HOURS } = await import("./fallback-data");
+  return get("/hours/", FALLBACK_HOURS);
+}
+
+export async function getAnnouncement(): Promise<ApiAnnouncement | null> {
+  const { FALLBACK_ANNOUNCEMENT } = await import("./fallback-data");
+  try {
+    const res = await fetch(`${API_URL}/announcement/`, { cache: "no-store" });
+    if (res.status === 204) return null; // deliberately no announcement
+    if (!res.ok) return FALLBACK_ANNOUNCEMENT;
+    return (await res.json()) as ApiAnnouncement;
+  } catch {
+    return FALLBACK_ANNOUNCEMENT;
+  }
+}
+
+// ---------- client-side writes ----------
+
+function firstError(body: unknown): string | null {
+  if (!body || typeof body !== "object") return null;
+  for (const value of Object.values(body as Record<string, unknown>)) {
+    if (typeof value === "string") return value;
+    if (Array.isArray(value) && typeof value[0] === "string") return value[0];
+    const nested = firstError(value);
+    if (nested) return nested;
+  }
+  return null;
+}
+
+async function post<T>(path: string, payload: unknown): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    throw new Error("Can't reach the kitchen right now — please try again or call us.");
+  }
+  if (!res.ok) {
+    let detail: string | null = null;
+    try {
+      detail = firstError(await res.json());
+    } catch {
+      /* non-JSON error body */
+    }
+    throw new Error(detail ?? "Something went wrong — please try again.");
+  }
+  return (await res.json()) as T;
+}
+
+export function placeOrder(payload: {
+  customer_name: string;
+  phone?: string;
+  email?: string;
+  notes?: string;
+  items: { slug: string; quantity: number }[];
+}): Promise<ApiOrder> {
+  return post("/orders/", payload);
+}
+
+export function submitReview(payload: {
+  name: string;
+  suburb?: string;
+  rating: number;
+  quote: string;
+}): Promise<unknown> {
+  return post("/reviews/", payload);
+}
+
+export function createBooking(payload: {
+  name: string;
+  email: string;
+  phone?: string;
+  date: string;
+  time: string;
+  party_size: number;
+  notes?: string;
+}): Promise<ApiBooking> {
+  return post("/bookings/", payload);
+}

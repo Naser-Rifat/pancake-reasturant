@@ -1,0 +1,187 @@
+import uuid
+
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from django.utils import timezone
+
+
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class MenuItem(TimeStampedModel):
+    class Tag(models.TextChoices):
+        SWEET = "sweet", "Sweet"
+        SAVOURY = "savoury", "Savoury"
+        CHOC = "choc", "Choc Loaded"
+
+    class Heat(models.TextChoices):
+        NONE = "none", "None"
+        MEDIUM = "medium", "Medium"
+        HOT = "hot", "Hot"
+
+    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=120)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0)])
+    tag = models.CharField(max_length=12, choices=Tag.choices, default=Tag.SWEET)
+    heat = models.CharField(max_length=12, choices=Heat.choices, default=Heat.NONE)
+    kcal = models.PositiveIntegerField(null=True, blank=True)
+    protein_g = models.PositiveIntegerField(null=True, blank=True)
+    prep_time = models.CharField(max_length=30, blank=True)
+    image = models.CharField(
+        max_length=300,
+        blank=True,
+        help_text="Path or URL the storefront can render, e.g. /menu/berry.png",
+    )
+    is_featured = models.BooleanField(default=False)
+    is_available = models.BooleanField(default=True)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["sort_order", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class Booking(TimeStampedModel):
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        CONFIRMED = "confirmed", "Confirmed"
+        CANCELLED = "cancelled", "Cancelled"
+
+    public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    name = models.CharField(max_length=120)
+    # blank allowed for staff-entered phone bookings; the public form requires it
+    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=30, blank=True)
+    date = models.DateField()
+    time = models.TimeField()
+    party_size = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)])
+    notes = models.TextField(blank=True)
+    status = models.CharField(max_length=12, choices=Status.choices, default=Status.PENDING)
+
+    class Meta:
+        ordering = ["-date", "-time"]
+
+    def __str__(self):
+        return f"{self.name} — {self.date} {self.time} x{self.party_size}"
+
+
+class Order(TimeStampedModel):
+    class Status(models.TextChoices):
+        RECEIVED = "received", "Received"
+        PREPARING = "preparing", "Preparing"
+        READY = "ready", "Ready for pickup"
+        COMPLETED = "completed", "Completed"
+        CANCELLED = "cancelled", "Cancelled"
+
+    public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    customer_name = models.CharField(max_length=120)
+    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=30, blank=True)
+    notes = models.TextField(blank=True)
+    status = models.CharField(max_length=12, choices=Status.choices, default=Status.RECEIVED)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    @property
+    def total(self):
+        return sum((item.unit_price * item.quantity for item in self.items.all()), start=0)
+
+    def __str__(self):
+        return f"Order {self.public_id} ({self.get_status_display()})"
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)
+    menu_item = models.ForeignKey(MenuItem, related_name="order_items", on_delete=models.PROTECT)
+    quantity = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)])
+    # snapshot of the price at order time; menu price changes must not rewrite history
+    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
+
+    @property
+    def line_total(self):
+        return self.unit_price * self.quantity
+
+    def __str__(self):
+        return f"{self.quantity} × {self.menu_item.name}"
+
+
+class Review(TimeStampedModel):
+    name = models.CharField(max_length=120)
+    suburb = models.CharField(max_length=80, blank=True)
+    rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    quote = models.TextField()
+    avatar = models.CharField(max_length=8, blank=True, help_text="Emoji shown next to the name")
+    is_approved = models.BooleanField(default=False, help_text="Only approved reviews are public")
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.name} ({self.rating}★)"
+
+
+class GalleryPhoto(TimeStampedModel):
+    class Album(models.TextChoices):
+        FOOD = "food", "Food"
+        INTERIOR = "interior", "Interior"
+        EVENTS = "events", "Events"
+
+    album = models.CharField(max_length=12, choices=Album.choices)
+    caption = models.CharField(max_length=200)
+    image = models.CharField(max_length=300)
+    alt = models.CharField(max_length=200)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["sort_order", "id"]
+
+    def __str__(self):
+        return self.caption
+
+
+class Announcement(TimeStampedModel):
+    message = models.CharField(max_length=200)
+    link_text = models.CharField(max_length=60, blank=True)
+    link_url = models.CharField(max_length=200, blank=True)
+    starts_at = models.DateTimeField(null=True, blank=True)
+    ends_at = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.message
+
+    @classmethod
+    def current(cls):
+        now = timezone.now()
+        return (
+            cls.objects.filter(is_active=True)
+            .exclude(starts_at__gt=now)
+            .exclude(ends_at__lt=now)
+            .first()
+        )
+
+
+class OpeningHours(models.Model):
+    label = models.CharField(max_length=60, help_text='e.g. "Monday – Thursday"')
+    opens = models.TimeField()
+    closes = models.TimeField()
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["sort_order"]
+        verbose_name_plural = "Opening hours"
+
+    def __str__(self):
+        return f"{self.label}: {self.opens}–{self.closes}"

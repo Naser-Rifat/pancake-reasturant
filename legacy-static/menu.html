@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menu | KRUSH Pancakes &amp; Stacks</title>
+  <meta name="description" content="Six signature pancake stacks — fluffy, fresh, and griddled to order. See the menu and book a table." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Pacifico&family=DM+Sans:wght@400;500;700&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥞</text></svg>" />
+</head>
+<body>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="nav" id="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo">🥞 krush</a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="menu.html" class="active">Menu</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="index.html#reviews">Reviews</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+
+      <div class="nav-cta">
+        <a href="booking.html" class="btn btn-primary">Book a Table</a>
+        <button class="burger-toggle" id="burgerToggle" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MENU HERO ================= -->
+  <section class="menu-hero">
+    <div class="container">
+      <p class="kicker">The Lineup</p>
+      <h1>Stacks On <span class="accent">Stacks.</span></h1>
+      <p>Six signature pancake stacks. Griddled to order. Zero regrets.</p>
+    </div>
+  </section>
+
+  <!-- ================= MENU GRID ================= -->
+  <main class="container">
+    <div class="menu-grid" id="menuGrid"><!-- cards injected by js/menu.js --></div>
+  </main>
+
+  <!-- ================= CART ================= -->
+  <button class="cart-fab" id="cartFab" aria-label="Open cart">
+    🛒
+    <span class="count" id="cartCount">0</span>
+  </button>
+
+  <div class="cart-backdrop" id="cartBackdrop"></div>
+
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Shopping cart">
+    <div class="cart-head">
+      <h3>Your Order 🥞</h3>
+      <button class="cart-close" id="cartClose" aria-label="Close cart">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-foot">
+      <div class="cart-total"><span>Total</span><b id="cartTotal">$0.00</b></div>
+      <button class="btn btn-primary" id="checkoutBtn">Checkout →</button>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <a href="index.html" class="logo">🥞 krush</a>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="booking.html">Book a Table</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="index.html#reviews">Reviews</a></li>
+        </ul>
+        <div class="footer-icons">
+          <span>🥞</span><span>🍯</span><span>🍓</span><span>🧈</span>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 KRUSH — All rights reserved.</span>
+        <span>Fluffy stacks · real maple · est. 1999</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KRUSH | Pancakes &amp; Stacks — Sydney</title>
+  <meta name="description" content="Fluffy homemade pancakes in Sydney. View the menu, book a table online, and see why locals love KRUSH. Real maple, fresh berries, zero guilt." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Pacifico&family=DM+Sans:wght@400;500;700&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥞</text></svg>" />
+</head>
+<body class="has-announce">
+
+  <!-- ================= ANNOUNCEMENT BAR (FR-08) ================= -->
+  <div class="announce" id="announceBar">
+    <span>🎉 Tuesday Special — 2-for-1 Classic Buttermilk Stack all day! <a href="booking.html">Book your table</a></span>
+    <button class="announce-close" id="announceClose" aria-label="Dismiss announcement">✕</button>
+  </div>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="nav" id="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo">🥞 krush</a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="menu.html">Menu</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="#reviews">Reviews</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+
+      <div class="nav-cta">
+        <a href="booking.html" class="btn btn-primary">Book a Table</a>
+        <button class="burger-toggle" id="burgerToggle" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HERO (FR-01) ================= -->
+  <section class="hero">
+    <div class="container hero-cards">
+      <div class="hero-card-left">
+        <h1>Stack<br />Into <span class="script">Happiness</span></h1>
+        <p class="lead">We flip the best homemade pancakes in Sydney — griddled to order, stacked high, drowned in real maple.</p>
+        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+          <a href="booking.html" class="btn btn-primary">Book a Table</a>
+          <a href="menu.html" class="btn btn-ghost" style="border-color:#fff; color:#fff;">Explore Our Menu</a>
+        </div>
+      </div>
+
+      <div class="hero-card-right">
+        <img src="https://images.unsplash.com/photo-1554520735-0a6b8b6ce8b7?w=1200&q=80" alt="Maple syrup pouring over a golden pancake stack with walnuts" />
+      </div>
+
+      <a href="booking.html" class="round-badge" aria-label="Book a table — open 7 days">
+        <span class="disc"></span>
+        <svg viewBox="0 0 120 120">
+          <defs>
+            <path id="badgeCircle" d="M 60,60 m -44,0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0" />
+          </defs>
+          <text><textPath href="#badgeCircle">Book a table &#8226; open 7 days &#8226;</textPath></text>
+        </svg>
+        <span class="center-ic">🥞</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= MARQUEE ================= -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Fluffy Stacks</span><span>✦</span><span>Real Maple</span><span>✦</span>
+      <span>Est. 1999</span><span>✦</span><span>Fresh Berries</span><span>✦</span>
+      <span>Zero Guilt</span><span>✦</span><span>Griddled Daily</span><span>✦</span>
+      <span>Fluffy Stacks</span><span>✦</span><span>Real Maple</span><span>✦</span>
+      <span>Est. 1999</span><span>✦</span><span>Fresh Berries</span><span>✦</span>
+      <span>Zero Guilt</span><span>✦</span><span>Griddled Daily</span><span>✦</span>
+    </div>
+  </div>
+
+  <!-- ================= FEATURED DISHES (FR-02) ================= -->
+  <section class="block" id="featured">
+    <div class="container">
+      <div class="reveal" style="text-align:center;">
+        <p class="kicker">Crowd Favourites</p>
+        <h2 class="title">Featured <span class="accent">Stacks</span></h2>
+        <p class="section-lead" style="margin-inline:auto;">Hand-picked by the chef. Griddled to order, gone in minutes.</p>
+      </div>
+
+      <div class="featured-grid reveal">
+        <article class="menu-card">
+          <div class="thumb">
+            <img src="https://images.unsplash.com/photo-1575853121743-60c24f0a7502?w=800&q=75" alt="Classic Buttermilk pancake stack" loading="lazy" />
+            <span class="spice-tag">🥞 Sweet</span>
+          </div>
+          <div class="body">
+            <div class="row1"><h3>Classic Buttermilk Stack</h3><span class="price">$14</span></div>
+            <p class="desc">Four fluffy buttermilk pancakes with pure maple syrup and whipped butter.</p>
+            <a href="menu.html" class="btn btn-primary">See on Menu →</a>
+          </div>
+        </article>
+        <article class="menu-card">
+          <div class="thumb">
+            <img src="https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&q=75" alt="Berry Bliss pancakes" loading="lazy" />
+            <span class="spice-tag">🥞 Sweet</span>
+          </div>
+          <div class="body">
+            <div class="row1"><h3>Berry Bliss</h3><span class="price">$17</span></div>
+            <p class="desc">Blueberries and strawberries piled high with berry compote and vanilla cream.</p>
+            <a href="menu.html" class="btn btn-primary">See on Menu →</a>
+          </div>
+        </article>
+        <article class="menu-card">
+          <div class="thumb">
+            <img src="https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=800&q=75" alt="Choc Overload pancakes" loading="lazy" />
+            <span class="spice-tag hot">🥞 Choc Loaded</span>
+          </div>
+          <div class="body">
+            <div class="row1"><h3>Choc Overload</h3><span class="price">$18</span></div>
+            <p class="desc">Chocolate pancakes, hazelnut spread, brownie bits and a warm chocolate drizzle.</p>
+            <a href="menu.html" class="btn btn-primary">See on Menu →</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="section-foot reveal">
+        <a href="menu.html" class="btn btn-ghost">View Full Menu 🥞</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ABOUT / WELCOME (FR-03) ================= -->
+  <section class="block" id="about" style="padding-top:1rem;">
+    <div class="container about-grid">
+      <div class="about-collage reveal">
+        <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&q=75" alt="KRUSH restaurant interior" />
+        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=75" alt="Banana pancake stack" />
+        <img src="https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&q=75" alt="Pancakes with honey drizzle" />
+      </div>
+      <div class="reveal">
+        <p class="kicker">Welcome to KRUSH</p>
+        <h2 class="title">Fluffy. Golden.<br /><span class="accent">Fully Stacked.</span></h2>
+        <p class="section-lead">
+          G'day! Every pancake at KRUSH is ladled to order onto a buttered griddle,
+          flipped at exactly the right bubble, and stacked warm with real maple.
+          No shortcuts, no pre-mix — just food that feels good.
+        </p>
+        <ul class="checklist">
+          <li>Batter whisked fresh every morning</li>
+          <li>100% pure Canadian maple — never syrup-flavoured</li>
+          <li>Berries &amp; fruit from local NSW growers</li>
+          <li>Cloud-light ricotta &amp; buttermilk stacks</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GALLERY PREVIEW (FR-04) ================= -->
+  <section class="block" id="gallery" style="padding-top:1rem;">
+    <div class="container">
+      <div class="reveal" style="text-align:center;">
+        <p class="kicker">Feast Your Eyes</p>
+        <h2 class="title">From Our <span class="accent">Gallery</span></h2>
+      </div>
+
+      <div class="gallery-grid reveal">
+        <a href="gallery.html"><img src="https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=600&q=70" alt="Berry pancake stack" loading="lazy" /></a>
+        <a href="gallery.html"><img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&q=70" alt="Restaurant interior" loading="lazy" /></a>
+        <a href="gallery.html"><img src="https://images.unsplash.com/photo-1598214886806-c87b84b7078b?w=600&q=70" alt="Golden pancake stack" loading="lazy" /></a>
+        <a href="gallery.html"><img src="https://images.unsplash.com/photo-1530023367847-a683933f4172?w=600&q=70" alt="Friends dining together" loading="lazy" /></a>
+        <a href="gallery.html"><img src="https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&q=70" alt="Pancakes with honey drizzle" loading="lazy" /></a>
+        <a href="gallery.html"><img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&q=70" alt="Cosy dining space" loading="lazy" /></a>
+        <a href="gallery.html"><img src="https://images.unsplash.com/photo-1519676867240-f03562e64548?w=600&q=70" alt="Pancakes with syrup pour" loading="lazy" /></a>
+        <a href="gallery.html"><img src="https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=600&q=70" alt="Celebration at the restaurant" loading="lazy" /></a>
+      </div>
+
+      <div class="section-foot reveal">
+        <a href="gallery.html" class="btn btn-ghost">See Full Gallery 📸</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= REVIEWS CAROUSEL (FR-05) ================= -->
+  <section class="block" id="reviews" style="padding-top:1rem;">
+    <div class="container">
+      <div class="reveal" style="text-align:center;">
+        <p class="kicker">⭐ 4.8 Average Rating</p>
+        <h2 class="title">What Our <span class="accent">Guests Say</span></h2>
+      </div>
+
+      <div class="reviews-wrap reveal">
+        <div class="rev-track" id="revTrack">
+          <article class="rev-card">
+            <div class="rev-stars">★★★★★</div>
+            <p class="quote">"Best pancakes I've had in Sydney, hands down. The stack is cloud-fluffy and the warm maple butter is addictive."</p>
+            <div class="who"><span class="avatar">😀</span> Sarah M. · Surry Hills</div>
+          </article>
+          <article class="rev-card">
+            <div class="rev-stars">★★★★★</div>
+            <p class="quote">"Booked online for a birthday brunch — table was ready on the dot, staff were lovely, and the Choc Overload is a monster. We'll be back!"</p>
+            <div class="who"><span class="avatar">🎉</span> Daniel K. · Parramatta</div>
+          </article>
+          <article class="rev-card">
+            <div class="rev-stars">★★★★☆</div>
+            <p class="quote">"Great vibe, colourful fit-out, quick service. The Lemon Ricotta is genuinely special — light as air and not too sweet."</p>
+            <div class="who"><span class="avatar">🌱</span> Priya S. · Newtown</div>
+          </article>
+          <article class="rev-card">
+            <div class="rev-stars">★★★★★</div>
+            <p class="quote">"Took the kids on a Tuesday for the special. Fast, friendly, and the banana caramel stack is dangerously good. Our new family regular."</p>
+            <div class="who"><span class="avatar">👨‍👧</span> Tom B. · Manly</div>
+          </article>
+          <article class="rev-card">
+            <div class="rev-stars">★★★★★</div>
+            <p class="quote">"The Big Brekkie Stack lives up to its name. Loved that they do gluten-free batter too — my partner was stoked."</p>
+            <div class="who"><span class="avatar">🔥</span> Jess W. · Bondi</div>
+          </article>
+        </div>
+        <div class="rev-nav">
+          <button class="rev-btn" id="revPrev" aria-label="Previous reviews">←</button>
+          <button class="rev-btn" id="revNext" aria-label="Next reviews">→</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CERTIFICATIONS STRIP (FR-06) ================= -->
+  <section class="block certs" id="certifications">
+    <div class="container">
+      <div class="reveal" style="text-align:center;">
+        <p class="kicker">Dine With Confidence</p>
+        <h2 class="title">Certified &amp; <span class="accent">Award-Winning</span></h2>
+      </div>
+
+      <div class="cert-strip reveal">
+        <div class="cert-badge"><span class="ic">🛡️</span><span><b>Food Safety Certified</b><small>NSW Food Authority</small></span></div>
+        <div class="cert-badge"><span class="ic">⭐</span><span><b>5-Star Hygiene Rating</b><small>Local Council Inspection</small></span></div>
+        <div class="cert-badge"><span class="ic">🏆</span><span><b>Best Pancakes — Sydney 2025</b><small>Local Eats Awards</small></span></div>
+        <div class="cert-badge"><span class="ic">✅</span><span><b>HACCP Compliant</b><small>Certified Kitchen</small></span></div>
+        <div class="cert-badge"><span class="ic">🌱</span><span><b>Local Produce Partner</b><small>NSW Farmers' Network</small></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= HOURS + LOCATION (FR-07) ================= -->
+  <section class="block" id="contact">
+    <div class="container">
+      <div class="reveal" style="text-align:center;">
+        <p class="kicker">Come Say Hi</p>
+        <h2 class="title">Hours &amp; <span class="accent">Location</span></h2>
+      </div>
+
+      <div class="hours-grid reveal">
+        <div class="hours-card">
+          <h3>🕐 Opening Hours</h3>
+          <ul class="hours-list">
+            <li><span>Monday – Thursday</span><span>11:00am – 9:00pm</span></li>
+            <li><span>Friday – Saturday</span><span>11:00am – 11:00pm</span></li>
+            <li><span>Sunday</span><span>11:00am – 8:00pm</span></li>
+            <li><span>Public Holidays</span><span>12:00pm – 8:00pm</span></li>
+          </ul>
+          <h3>📍 Find Us</h3>
+          <div class="contact-lines">
+            <span>123 George Street, Sydney NSW 2000</span>
+            <span>Phone: <a href="tel:+61255501234">(02) 5550 1234</a></span>
+            <span>Email: <a href="mailto:hello@krushpancakes.com.au">hello@krushpancakes.com.au</a></span>
+          </div>
+        </div>
+        <div class="map-card">
+          <iframe
+            title="KRUSH location map"
+            src="https://www.google.com/maps?q=George%20Street%20Sydney%20NSW&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BOOKING CTA (FR-25) ================= -->
+  <section class="cta">
+    <div class="container reveal">
+      <h2>Hungry? <span class="accent">Book a Table.</span></h2>
+      <p>Reserve online in seconds — free, instant confirmation, open 7 days.</p>
+      <a href="booking.html" class="btn btn-primary">Book a Table 🍽</a>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <a href="index.html" class="logo">🥞 krush</a>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="booking.html">Book a Table</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="#reviews">Reviews</a></li>
+        </ul>
+        <div class="footer-icons">
+          <span>🥞</span><span>🍯</span><span>🍓</span><span>🧈</span>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 KRUSH — All rights reserved. ABN 00 000 000 000</span>
+        <span>Fluffy stacks · real maple · est. 1999</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
