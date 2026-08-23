@@ -224,6 +224,24 @@ class AdminApiTests(TestCase):
         self.assertEqual(mail.outbox[0].to, ["alex@example.com"])
         self.assertIn("ready", mail.outbox[0].subject.lower())
 
+    def test_phone_booking_with_email_sends_confirmation(self):
+        from django.core import mail
+
+        token = self.login("boss").json()["token"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
+        res = self.client.post(
+            "/api/admin/bookings/",
+            {
+                "name": "Phone Guest", "phone": "0400 999 888", "email": "guest@example.com",
+                "date": "2030-01-15", "time": "19:00", "party_size": 4, "status": "confirmed",
+            },
+            format="json",
+        )
+        self.assertEqual(res.status_code, 201, res.content)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["guest@example.com"])
+        self.assertIn("confirmed", mail.outbox[0].subject)
+
     def test_staff_can_record_phone_booking_without_email(self):
         token = self.login("boss").json()["token"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")

@@ -111,6 +111,12 @@ class AdminBookingViewSet(
             qs = qs.filter(status=status)
         return qs
 
+    def perform_create(self, serializer):
+        # phone bookings are created already confirmed — the guest still
+        # deserves their confirmation email
+        booking = serializer.save()
+        emails.booking_status_changed(booking)
+
     def perform_update(self, serializer):
         old_status = serializer.instance.status
         booking = serializer.save()

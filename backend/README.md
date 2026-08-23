@@ -4,7 +4,7 @@ REST API for the KRUSH pancake restaurant storefront (Next.js app in the repo ro
 
 ## Stack
 
-- Django 4.2 LTS + Django REST Framework
+- Django 5.2 LTS + Django REST Framework
 - SQLite in development (swap `DATABASES` for Postgres in production)
 - `django-cors-headers` configured for the Next.js dev server on port 3000
 
@@ -12,10 +12,12 @@ REST API for the KRUSH pancake restaurant storefront (Next.js app in the repo ro
 
 ```bash
 cd backend
-python3 -m venv .venv
+python3.12 -m venv .venv  # needs Python 3.10+ (Django 5.2)
 .venv/bin/pip install -r requirements.txt
 .venv/bin/python manage.py migrate
 .venv/bin/python manage.py seed_demo        # demo content matching the storefront
+# ⚠️ seed_demo resets the seeded items to their demo values — run it ONCE at
+# setup. Re-running later will overwrite any staff edits to those items.
 .venv/bin/python manage.py createsuperuser  # for /admin/
 .venv/bin/python manage.py runserver 8000
 ```

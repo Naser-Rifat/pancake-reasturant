@@ -16,7 +16,12 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+def _env_list(name, default):
+    """Comma-separated env var → list, tolerating stray spaces and trailing commas."""
+    return [v.strip() for v in os.environ.get(name, default).split(",") if v.strip()]
+
+
+ALLOWED_HOSTS = _env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -127,7 +132,7 @@ DEFAULT_FROM_EMAIL = os.environ.get(
 )
 
 # ---------- CORS (Next.js dev server) ----------
-CORS_ALLOWED_ORIGINS = os.environ.get(
+CORS_ALLOWED_ORIGINS = _env_list(
     "DJANGO_CORS_ORIGINS",
     "http://localhost:3000,http://127.0.0.1:3000",
-).split(",")
+)
