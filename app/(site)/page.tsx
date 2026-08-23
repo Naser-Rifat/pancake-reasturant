@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LogoMark from "@/components/LogoMark";
 import Announce from "@/components/Announce";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewsCarousel from "@/components/ReviewsCarousel";
@@ -63,7 +64,7 @@ export default async function Home() {
                 <textPath href="#badgeCircle">Book a table • open 7 days •</textPath>
               </text>
             </svg>
-            <span className="center-ic">🥞</span>
+            <span className="center-ic"><LogoMark size={30} /></span>
           </Link>
         </div>
       </section>
@@ -97,7 +98,7 @@ export default async function Home() {
               <article className="menu-card" key={f.slug}>
                 <div className="thumb">
                   <img src={f.image} alt={`${f.name} pancakes`} loading="lazy" />
-                  <span className={`spice-tag ${heatClass(f.heat)}`}>🥞 {TAG_LABEL[f.tag]}</span>
+                  <span className={`spice-tag ${heatClass(f.heat)}`}>{TAG_LABEL[f.tag]}</span>
                 </div>
                 <div className="body">
                   <div className="row1">
@@ -112,7 +113,7 @@ export default async function Home() {
           </div>
 
           <div className="section-foot reveal">
-            <Link href="/menu" className="btn btn-ghost">View Full Menu 🥞</Link>
+            <Link href="/menu" className="btn btn-ghost">View Full Menu</Link>
           </div>
         </div>
       </section>
@@ -158,7 +159,7 @@ export default async function Home() {
           </div>
 
           <div className="section-foot reveal">
-            <Link href="/gallery" className="btn btn-ghost">See Full Gallery 📸</Link>
+            <Link href="/gallery" className="btn btn-ghost">See Full Gallery</Link>
           </div>
         </div>
       </section>
@@ -167,7 +168,7 @@ export default async function Home() {
       <section className="block" id="reviews" style={{ paddingTop: "1rem" }}>
         <div className="container">
           <div className="reveal" style={{ textAlign: "center" }}>
-            <p className="kicker">⭐ 4.8 Average Rating</p>
+            <p className="kicker">★ 4.8 Average Rating</p>
             <h2 className="title">What Our <span className="accent">Guests Say</span></h2>
           </div>
           <ReviewsCarousel reviews={reviews} />
@@ -204,7 +205,7 @@ export default async function Home() {
 
           <div className="hours-grid reveal">
             <div className="hours-card">
-              <h3>🕐 Opening Hours</h3>
+              <h3>Opening Hours</h3>
               <ul className="hours-list">
                 {hours.map((h) => (
                   <li key={h.label}>
@@ -213,7 +214,7 @@ export default async function Home() {
                   </li>
                 ))}
               </ul>
-              <h3>📍 Find Us</h3>
+              <h3>Find Us</h3>
               <div className="contact-lines">
                 <span>{site.address}</span>
                 <span>Phone: <a href={telHref(site.phone)}>{site.phone}</a></span>
@@ -237,7 +238,7 @@ export default async function Home() {
         <div className="container reveal">
           <h2>Hungry? <span className="accent">Book a Table.</span></h2>
           <p>Reserve online in seconds — free, instant confirmation, open 7 days.</p>
-          <Link href="/booking" className="btn btn-primary">Book a Table 🍽</Link>
+          <Link href="/booking" className="btn btn-primary">Book a Table</Link>
         </div>
       </section>
     </main>

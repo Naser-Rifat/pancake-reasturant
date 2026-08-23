@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ShoppingCart } from "lucide-react";
 import {
   TAG_LABEL,
   heatClass,
@@ -115,7 +116,7 @@ export default function MenuClient({
             <article className="menu-card reveal" key={b.slug} style={{ transitionDelay: `${(i % 3) * 0.08}s` }}>
               <div className="thumb">
                 <img src={b.image} alt={`${b.name} pancakes`} loading="lazy" />
-                <span className={`spice-tag ${heatClass(b.heat)}`}>🥞 {TAG_LABEL[b.tag]}</span>
+                <span className={`spice-tag ${heatClass(b.heat)}`}>{TAG_LABEL[b.tag]}</span>
               </div>
               <div className="body">
                 <div className="row1">
@@ -141,7 +142,7 @@ export default function MenuClient({
 
       {live && (
         <button className="cart-fab" aria-label="Open cart" onClick={() => setOpen(true)}>
-          🛒
+          <ShoppingCart size={26} strokeWidth={2.2} aria-hidden="true" />
           <span className={`count${pop ? " pop" : ""}`}>{count}</span>
         </button>
       )}
@@ -150,7 +151,7 @@ export default function MenuClient({
 
       <aside className={`cart-drawer${open ? " open" : ""}`} aria-label="Shopping cart">
         <div className="cart-head">
-          <h3>Your Order 🥞</h3>
+          <h3>Your Order</h3>
           <button className="cart-close" aria-label="Close cart" onClick={() => setOpen(false)}>✕</button>
         </div>
         <div className="cart-items">

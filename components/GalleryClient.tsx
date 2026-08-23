@@ -7,9 +7,9 @@ type Album = ApiGalleryPhoto["album"];
 
 const ALBUMS: [Album | "all", string][] = [
   ["all", "All"],
-  ["food", "🥞 Food"],
-  ["interior", "🪑 Interior"],
-  ["events", "🎉 Events"],
+  ["food", "Food"],
+  ["interior", "Interior"],
+  ["events", "Events"],
 ];
 
 export default function GalleryClient({ photos }: { photos: ApiGalleryPhoto[] }) {

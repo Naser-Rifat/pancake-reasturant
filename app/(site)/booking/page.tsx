@@ -24,13 +24,13 @@ export default async function BookingPage() {
 
       <main className="container booking-grid">
         <div className="widget-card reveal">
-          <h3>📅 Online Reservation</h3>
+          <h3>Online Reservation</h3>
           <p>Tell us when — we&apos;ll confirm by email. No fees, ever.</p>
           <BookingForm />
         </div>
 
         <aside className="fallback-card reveal">
-          <h3>👥 Big Group or Special Event?</h3>
+          <h3>Big Group or Special Event?</h3>
           <p>
             For groups of 10+, functions, or birthday bookings, give us a call and
             we&apos;ll sort you out directly — cake smuggling encouraged.

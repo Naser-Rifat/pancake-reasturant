@@ -32,7 +32,7 @@ export default function ReviewForm() {
       <div className="rev-form-wrap">
         <div className="rev-form" role="status">
           <p className="rev-thanks">
-            🥞 Thanks, {name.split(" ")[0]}! Your review is in — it&apos;ll appear here
+            Thanks, {name.split(" ")[0]}! Your review is in — it&apos;ll appear here
             once our team gives it a quick look.
           </p>
         </div>
@@ -44,7 +44,7 @@ export default function ReviewForm() {
     <div className="rev-form-wrap">
       {!open ? (
         <button className="btn btn-ghost" onClick={() => setOpen(true)}>
-          ✍️ Write a Review
+          Write a Review
         </button>
       ) : (
         <form className="rev-form" onSubmit={submit}>

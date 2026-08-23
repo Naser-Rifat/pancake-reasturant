@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LogoMark from "@/components/LogoMark";
 import { getSite } from "@/lib/api";
 
 export default async function Footer() {
@@ -12,7 +13,7 @@ export default async function Footer() {
     <footer>
       <div className="container">
         <div className="footer-grid">
-          <Link href="/" className="logo">🥞 krush</Link>
+          <Link href="/" className="logo"><LogoMark /> krush</Link>
           <ul className="footer-links">
             <li><Link href="/">Home</Link></li>
             <li><Link href="/menu">Menu</Link></li>
@@ -30,8 +31,8 @@ export default async function Footer() {
               ))}
             </ul>
           ) : (
-            <div className="footer-icons">
-              <span>🥞</span><span>🍯</span><span>🍓</span><span>🧈</span>
+            <div className="footer-icons" aria-hidden="true">
+              <LogoMark size={34} />
             </div>
           )}
         </div>
