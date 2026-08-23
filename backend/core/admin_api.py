@@ -40,7 +40,8 @@ class AdminLoginView(APIView):
 
 class AdminOrderSerializer(OrderSerializer):
     class Meta(OrderSerializer.Meta):
-        read_only_fields = ["public_id", "created_at"]  # status becomes writable
+        # status and cancel_reason become writable for staff
+        read_only_fields = ["public_id", "created_at"]
 
 
 class AdminBookingSerializer(serializers.ModelSerializer):

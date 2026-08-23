@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import MenuClient from "@/components/MenuClient";
-import { getMenu } from "@/lib/api";
+import { getMenuWithStatus } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function MenuPage() {
-  const items = await getMenu();
+  const { items, live } = await getMenuWithStatus();
 
   return (
     <>
@@ -22,7 +22,7 @@ export default async function MenuPage() {
           <p>Signature pancake stacks. Griddled to order. Zero regrets.</p>
         </div>
       </section>
-      <MenuClient items={items} />
+      <MenuClient items={items} live={live} />
     </>
   );
 }

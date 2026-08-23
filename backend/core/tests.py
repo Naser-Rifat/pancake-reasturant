@@ -60,6 +60,50 @@ class OrderApiTests(TestCase):
         res2 = self.client.get(f"/api/orders/{body['public_id']}/")
         self.assertEqual(res2.status_code, 200)
 
+    def test_order_placement_sends_confirmation_with_abn(self):
+        from django.core import mail
+
+        res = self.client.post(
+            "/api/orders/",
+            {
+                "customer_name": "Alex", "email": "alex@example.com",
+                "items": [{"slug": "berry", "quantity": 1}],
+            },
+            format="json",
+        )
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("got your order", mail.outbox[0].subject)
+        self.assertIn("ABN", mail.outbox[0].body)
+        self.assertIn("incl. GST", mail.outbox[0].body)
+
+    def test_cancel_with_reason_emails_customer(self):
+        from django.contrib.auth.models import User
+        from django.core import mail
+
+        order = self.client.post(
+            "/api/orders/",
+            {
+                "customer_name": "Alex", "email": "alex@example.com",
+                "items": [{"slug": "berry", "quantity": 1}],
+            },
+            format="json",
+        ).json()
+        mail.outbox.clear()
+        User.objects.create_user("chef", password="pw", is_staff=True)
+        token = self.client.post(
+            "/api/admin/login/", {"username": "chef", "password": "pw"}, format="json"
+        ).json()["token"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
+        res = self.client.patch(
+            f"/api/admin/orders/{order['public_id']}/",
+            {"status": "cancelled", "cancel_reason": "Out of blueberries tonight"},
+            format="json",
+        )
+        self.assertEqual(res.status_code, 200, res.content)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("Out of blueberries tonight", mail.outbox[0].body)
+
     def test_rejects_oversized_orders(self):
         res = self.client.post(
             "/api/orders/",
@@ -215,6 +259,7 @@ class AdminApiTests(TestCase):
             },
             format="json",
         ).json()
+        mail.outbox.clear()  # drop the placement-confirmation email
         token = self.login("boss").json()["token"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
         self.client.patch(f"/api/admin/orders/{order['public_id']}/", {"status": "preparing"}, format="json")

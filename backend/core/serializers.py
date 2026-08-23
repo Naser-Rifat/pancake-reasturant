@@ -70,9 +70,9 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             "public_id", "customer_name", "email", "phone", "notes",
-            "status", "items", "total", "created_at",
+            "status", "cancel_reason", "items", "total", "created_at",
         ]
-        read_only_fields = ["public_id", "status", "created_at"]
+        read_only_fields = ["public_id", "status", "cancel_reason", "created_at"]
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):

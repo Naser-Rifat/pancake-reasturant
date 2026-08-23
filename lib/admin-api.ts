@@ -17,6 +17,7 @@ export interface AdminOrder {
   phone: string;
   notes: string;
   status: "received" | "preparing" | "ready" | "completed" | "cancelled";
+  cancel_reason: string;
   total: string;
   created_at: string;
   items: { slug: string; name: string; quantity: number; unit_price: string; line_total: string }[];

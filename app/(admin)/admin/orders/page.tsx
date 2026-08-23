@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { listOrders, updateOrder, type AdminOrder } from "@/lib/admin-api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,39 +10,90 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ORDER_STATUSES, STATUS_BADGE } from "../status";
 
 const FILTERS = ["all", ...ORDER_STATUSES] as const;
+const POLL_MS = 15_000;
+
+/** Two short rising beeps — no audio asset needed. */
+function newOrderChime() {
+  try {
+    const ctx = new AudioContext();
+    [0, 0.18].forEach((delay, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = i === 0 ? 880 : 1320;
+      gain.gain.setValueAtTime(0.15, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.15);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + 0.16);
+    });
+    // release the context — browsers cap live AudioContexts per page
+    setTimeout(() => ctx.close(), 600);
+  } catch { /* audio blocked until first user interaction — fine */ }
+}
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [error, setError] = useState("");
+  const knownIds = useRef<Set<string> | null>(null);
 
-  const load = useCallback(() => {
-    listOrders(filter === "all" ? undefined : filter)
-      .then(setOrders)
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"));
-  }, [filter]);
+  const load = useCallback(async () => {
+    try {
+      // always fetch ALL orders so new ones are detected regardless of filter
+      const all = await listOrders();
+      if (knownIds.current !== null) {
+        const fresh = all.filter((o) => !knownIds.current!.has(o.public_id));
+        if (fresh.length > 0) newOrderChime();
+      }
+      knownIds.current = new Set(all.map((o) => o.public_id));
+      setOrders(all);
+      setError("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load");
+    }
+  }, []);
 
-  useEffect(load, [load]);
+  useEffect(() => {
+    load();
+    const id = setInterval(load, POLL_MS);
+    return () => clearInterval(id);
+  }, [load]);
 
   const setStatus = async (o: AdminOrder, status: AdminOrder["status"]) => {
+    let cancel_reason = o.cancel_reason;
+    if (status === "cancelled") {
+      const input = window.prompt(
+        "Reason for cancelling (this is emailed to the customer):",
+        cancel_reason || ""
+      );
+      if (input === null) return; // staff backed out — keep current status
+      cancel_reason = input.trim();
+    }
     const prev = orders;
-    setOrders((os) => os.map((x) => (x.public_id === o.public_id ? { ...x, status } : x)));
+    setOrders((os) =>
+      os.map((x) => (x.public_id === o.public_id ? { ...x, status, cancel_reason } : x))
+    );
     try {
-      await updateOrder(o.public_id, { status });
+      await updateOrder(o.public_id, { status, cancel_reason });
     } catch (e) {
       setOrders(prev); // roll back optimistic update
       setError(e instanceof Error ? e.message : "Update failed");
     }
   };
 
+  const visible = filter === "all" ? orders : orders.filter((o) => o.status === filter);
+
   return (
     <div className="grid gap-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Orders</h1>
-          <p className="text-sm text-muted-foreground">Advance orders as the kitchen works through them</p>
+          <p className="text-sm text-muted-foreground">
+            New orders appear automatically with a chime — checked every 15 seconds
+          </p>
         </div>
-        <Button variant="outline" size="sm" onClick={load}>Refresh</Button>
+        <Button variant="outline" size="sm" onClick={load}>Refresh now</Button>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -76,12 +127,15 @@ export default function OrdersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {orders.map((o) => (
+              {visible.map((o) => (
                 <TableRow key={o.public_id}>
                   <TableCell className="font-medium">{o.customer_name}</TableCell>
                   <TableCell className="text-muted-foreground">{o.phone || o.email || "—"}</TableCell>
                   <TableCell className="max-w-64 text-muted-foreground">
                     {o.items.map((i) => `${i.quantity}× ${i.name}`).join(", ")}
+                    {o.status === "cancelled" && o.cancel_reason && (
+                      <div className="text-xs text-destructive">Reason: {o.cancel_reason}</div>
+                    )}
                   </TableCell>
                   <TableCell className="font-medium">${o.total}</TableCell>
                   <TableCell className="text-muted-foreground">
@@ -102,7 +156,7 @@ export default function OrdersPage() {
                   </TableCell>
                 </TableRow>
               ))}
-              {orders.length === 0 && (
+              {visible.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center text-muted-foreground">
                     No orders{filter !== "all" ? ` with status “${filter}”` : " yet"}

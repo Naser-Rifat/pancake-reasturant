@@ -1,4 +1,4 @@
-import type { ApiAnnouncement, ApiGalleryPhoto, ApiMenuItem, ApiOpeningHours, ApiReview } from "./api";
+import type { ApiGalleryPhoto, ApiMenuItem, ApiOpeningHours, ApiReview } from "./api";
 
 // Snapshot of the seeded backend content. Used when the API is unreachable so
 // the storefront still renders — keep in sync with `backend seed_demo`.
@@ -45,9 +45,3 @@ export const FALLBACK_HOURS: ApiOpeningHours[] = [
   { label: "Sunday", opens: "11:00:00", closes: "20:00:00" },
   { label: "Public Holidays", opens: "12:00:00", closes: "20:00:00" },
 ];
-
-export const FALLBACK_ANNOUNCEMENT: ApiAnnouncement = {
-  message: "🎉 Tuesday Special — 2-for-1 Classic Buttermilk Stack all day!",
-  link_text: "Book your table",
-  link_url: "/booking",
-};

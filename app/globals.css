@@ -1282,6 +1282,31 @@ textarea.input { resize: vertical; }
 .cart-form { display: grid; gap: 0.6rem; margin-bottom: 1rem; }
 .btn:disabled { opacity: 0.6; cursor: wait; transform: none; }
 
+/* ---------- legal pages ---------- */
+.legal { max-width: 46rem; padding-bottom: 5rem; }
+.legal h2 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  margin: 2.2rem 0 0.7rem;
+  color: var(--ink);
+}
+.legal p, .legal li { color: var(--muted); font-size: 1rem; }
+.legal ul { padding-left: 1.3rem; margin: 0.6rem 0; display: grid; gap: 0.4rem; }
+.legal a { color: var(--pink-deep); font-weight: 600; }
+.legal strong, .legal em { color: var(--ink); }
+
+/* ---------- ordering paused banner ---------- */
+.ordering-paused {
+  background: var(--lav-soft);
+  border: 2px dashed var(--lavender);
+  border-radius: 20px;
+  padding: 1rem 1.4rem;
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 1.8rem;
+}
+.ordering-paused a { color: var(--pink-deep); font-weight: 700; text-decoration: underline; }
+
 /* ---------- public review form ---------- */
 .rev-form-wrap { text-align: center; margin-top: 1.6rem; }
 .rev-form {

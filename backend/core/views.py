@@ -67,6 +67,12 @@ class OrderViewSet(
     def get_serializer_class(self):
         return OrderCreateSerializer if self.action == "create" else OrderSerializer
 
+    def perform_create(self, serializer):
+        from . import emails
+
+        order = serializer.save()
+        emails.order_status_changed(order)  # "we've got your order" confirmation
+
 
 class ReviewViewSet(
     ThrottleWritesOnlyMixin, mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet

@@ -12,7 +12,7 @@ const CART_KEY = "krush-cart-v2";
 
 type Cart = Record<string, number>;
 
-export default function MenuClient({ items }: { items: ApiMenuItem[] }) {
+export default function MenuClient({ items, live = true }: { items: ApiMenuItem[]; live?: boolean }) {
   const [cart, setCart] = useState<Cart>({});
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
@@ -95,6 +95,12 @@ export default function MenuClient({ items }: { items: ApiMenuItem[] }) {
   return (
     <>
       <main className="container">
+        {!live && (
+          <p className="ordering-paused" role="status">
+            ⏸️ Online ordering is taking a quick break — please call us on{" "}
+            <a href="tel:+61255501234">(02) 5550 1234</a> to order. The menu below is still up to date.
+          </p>
+        )}
         <div className="menu-grid">
           {items.map((b, i) => (
             <article className="menu-card reveal" key={b.slug} style={{ transitionDelay: `${(i % 3) * 0.08}s` }}>
@@ -113,19 +119,23 @@ export default function MenuClient({ items }: { items: ApiMenuItem[] }) {
                   {b.protein_g != null && <span className="chip">💪 {b.protein_g}g protein</span>}
                   {b.prep_time && <span className="chip">⏱ {b.prep_time}</span>}
                 </div>
-                <button className="btn btn-primary" onClick={() => add(b.slug)}>
-                  Add to Order +
-                </button>
+                {live && (
+                  <button className="btn btn-primary" onClick={() => add(b.slug)}>
+                    Add to Order +
+                  </button>
+                )}
               </div>
             </article>
           ))}
         </div>
       </main>
 
-      <button className="cart-fab" aria-label="Open cart" onClick={() => setOpen(true)}>
-        🛒
-        <span className={`count${pop ? " pop" : ""}`}>{count}</span>
-      </button>
+      {live && (
+        <button className="cart-fab" aria-label="Open cart" onClick={() => setOpen(true)}>
+          🛒
+          <span className={`count${pop ? " pop" : ""}`}>{count}</span>
+        </button>
+      )}
 
       <div className={`cart-backdrop${open ? " show" : ""}`} onClick={() => setOpen(false)} />
 

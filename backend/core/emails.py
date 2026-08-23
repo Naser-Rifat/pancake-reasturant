@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 RESTAURANT = "KRUSH Pancakes & Stacks"
 ADDRESS = "123 George Street, Sydney NSW 2000"
 PHONE = "(02) 5550 1234"
+ABN = "ABN 00 000 000 000"  # replace with the restaurant's real ABN at handover
 
 
 def _send(to: str, subject: str, body: str) -> None:
@@ -63,23 +64,37 @@ def booking_status_changed(booking) -> None:
 def order_status_changed(order) -> None:
     items = ", ".join(f"{i.quantity}× {i.menu_item.name}" for i in order.items.all())
 
-    if order.status == "ready":
+    if order.status == "received":
+        _send(
+            order.email,
+            f"We've got your order — {RESTAURANT} 🥞",
+            f"G'day {order.customer_name},\n\n"
+            f"Thanks — your order is in and the kitchen is on it!\n\n"
+            f"  Order:  {items}\n"
+            f"  Total:  ${order.total} (incl. GST)\n"
+            f"  Pickup: {ADDRESS}\n\n"
+            f"We'll email you the moment it's ready to collect.\n\n"
+            f"{RESTAURANT} · {ABN}",
+        )
+    elif order.status == "ready":
         _send(
             order.email,
             f"Your order is ready for pickup — {RESTAURANT} 🥞",
             f"G'day {order.customer_name},\n\n"
             f"Your order is hot off the griddle and ready to collect!\n\n"
             f"  Order:  {items}\n"
-            f"  Total:  ${order.total}\n"
+            f"  Total:  ${order.total} (incl. GST)\n"
             f"  Where:  {ADDRESS}\n\n"
-            f"See you in a minute,\n{RESTAURANT}",
+            f"See you in a minute,\n{RESTAURANT} · {ABN}",
         )
     elif order.status == "cancelled":
+        reason = f"\n  Reason: {order.cancel_reason}\n" if order.cancel_reason else "\n"
         _send(
             order.email,
             f"About your order — {RESTAURANT}",
             f"Hi {order.customer_name},\n\n"
-            f"We're sorry — we had to cancel your order ({items}, ${order.total}).\n"
+            f"We're sorry — we had to cancel your order ({items}, ${order.total} incl. GST).\n"
+            f"{reason}"
             f"Please call us on {PHONE} if you'd like to sort something out.\n\n"
-            f"Apologies,\n{RESTAURANT}",
+            f"Apologies,\n{RESTAURANT} · {ABN}",
         )

@@ -17,10 +17,38 @@ export const metadata: Metadata = {
     "Fluffy homemade pancakes in Sydney. View the menu, book a table online, and see why locals love KRUSH. Real maple, fresh berries, zero guilt.",
 };
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+// Restaurant schema markup for Google's local results
+const RESTAURANT_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  name: "KRUSH Pancakes & Stacks",
+  url: SITE_URL,
+  servesCuisine: "Pancakes, Breakfast, Dessert",
+  priceRange: "$$",
+  telephone: "+61-2-5550-1234",
+  email: "hello@krushpancakes.com.au",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "123 George Street",
+    addressLocality: "Sydney",
+    addressRegion: "NSW",
+    postalCode: "2000",
+    addressCountry: "AU",
+  },
+  menu: `${SITE_URL}/menu`,
+  acceptsReservations: `${SITE_URL}/booking`,
+};
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en-AU">
       <body className={`${serif.variable} ${script.variable} ${body.variable} ${round.variable}`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(RESTAURANT_SCHEMA) }}
+        />
         <Nav />
         {children}
         <Footer />

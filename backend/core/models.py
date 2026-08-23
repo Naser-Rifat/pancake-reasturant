@@ -87,6 +87,8 @@ class Order(TimeStampedModel):
     phone = models.CharField(max_length=30, blank=True)
     notes = models.TextField(blank=True)
     status = models.CharField(max_length=12, choices=Status.choices, default=Status.RECEIVED)
+    # shown to the customer in the cancellation email
+    cancel_reason = models.CharField(max_length=200, blank=True)
 
     class Meta:
         ordering = ["-created_at"]

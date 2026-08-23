@@ -93,9 +93,16 @@ async function get<T>(path: string, fallback: T): Promise<T> {
   }
 }
 
-export async function getMenu(): Promise<ApiMenuItem[]> {
+/** Menu + a liveness flag so the storefront can pause ordering when the API is down. */
+export async function getMenuWithStatus(): Promise<{ items: ApiMenuItem[]; live: boolean }> {
   const { FALLBACK_MENU } = await import("./fallback-data");
-  return get("/menu/", FALLBACK_MENU);
+  try {
+    const res = await fetch(`${API_URL}/menu/`, { cache: "no-store" });
+    if (!res.ok) return { items: FALLBACK_MENU, live: false };
+    return { items: (await res.json()) as ApiMenuItem[], live: true };
+  } catch {
+    return { items: FALLBACK_MENU, live: false };
+  }
 }
 
 export async function getFeaturedMenu(): Promise<ApiMenuItem[]> {
@@ -120,14 +127,14 @@ export async function getHours(): Promise<ApiOpeningHours[]> {
 }
 
 export async function getAnnouncement(): Promise<ApiAnnouncement | null> {
-  const { FALLBACK_ANNOUNCEMENT } = await import("./fallback-data");
+  // No fallback here on purpose: better to show no promo than a stale one
+  // the restaurant may have already ended.
   try {
     const res = await fetch(`${API_URL}/announcement/`, { cache: "no-store" });
-    if (res.status === 204) return null; // deliberately no announcement
-    if (!res.ok) return FALLBACK_ANNOUNCEMENT;
+    if (!res.ok) return null; // includes 204 = deliberately no announcement
     return (await res.json()) as ApiAnnouncement;
   } catch {
-    return FALLBACK_ANNOUNCEMENT;
+    return null;
   }
 }
 

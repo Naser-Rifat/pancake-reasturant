@@ -12,6 +12,7 @@ export default function Footer() {
             <li><Link href="/booking">Book a Table</Link></li>
             <li><Link href="/gallery">Gallery</Link></li>
             <li><Link href="/#reviews">Reviews</Link></li>
+            <li><Link href="/privacy">Privacy</Link></li>
           </ul>
           <div className="footer-icons">
             <span>🥞</span><span>🍯</span><span>🍓</span><span>🧈</span>
