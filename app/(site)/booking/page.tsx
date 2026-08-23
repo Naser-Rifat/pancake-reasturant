@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import BookingForm from "@/components/BookingForm";
+import { getSite, telHref } from "@/lib/api";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Book a Table | KRUSH Pancakes & Stacks",
@@ -7,7 +10,8 @@ export const metadata: Metadata = {
     "Book a table at KRUSH online — free, instant confirmation, open 7 days. Large groups welcome by phone.",
 };
 
-export default function BookingPage() {
+export default async function BookingPage() {
+  const site = await getSite();
   return (
     <>
       <section className="page-hero">
@@ -31,10 +35,10 @@ export default function BookingPage() {
             For groups of 10+, functions, or birthday bookings, give us a call and
             we&apos;ll sort you out directly — cake smuggling encouraged.
           </p>
-          <a className="phone" href="tel:+61255501234">(02) 5550 1234</a>
+          <a className="phone" href={telHref(site.phone)}>{site.phone}</a>
           <p style={{ marginTop: "1.2rem", marginBottom: 0 }}>
-            Open 7 days · 123 George Street, Sydney NSW 2000<br />
-            <a href="mailto:hello@krushpancakes.com.au">hello@krushpancakes.com.au</a>
+            Open 7 days · {site.address}<br />
+            <a href={`mailto:${site.email}`}>{site.email}</a>
           </p>
         </aside>
       </main>

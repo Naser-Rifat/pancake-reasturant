@@ -3,12 +3,14 @@ from django.contrib import admin
 from .models import (
     Announcement,
     Booking,
+    Certification,
     GalleryPhoto,
     MenuItem,
     OpeningHours,
     Order,
     OrderItem,
     Review,
+    SiteSettings,
 )
 
 
@@ -72,3 +74,18 @@ class AnnouncementAdmin(admin.ModelAdmin):
 class OpeningHoursAdmin(admin.ModelAdmin):
     list_display = ["label", "opens", "closes", "sort_order"]
     list_editable = ["sort_order"]
+
+
+@admin.register(Certification)
+class CertificationAdmin(admin.ModelAdmin):
+    list_display = ["icon", "title", "subtitle", "is_active", "sort_order"]
+    list_editable = ["is_active", "sort_order"]
+
+
+@admin.register(SiteSettings)
+class SiteSettingsAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request):
+        return not SiteSettings.objects.exists()  # singleton
+
+    def has_delete_permission(self, request, obj=None):
+        return False

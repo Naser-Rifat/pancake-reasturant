@@ -14,13 +14,20 @@ admin_router.register("orders", admin_api.AdminOrderViewSet, basename="admin-ord
 admin_router.register("bookings", admin_api.AdminBookingViewSet, basename="admin-booking")
 admin_router.register("reviews", admin_api.AdminReviewViewSet, basename="admin-review")
 admin_router.register("menu", admin_api.AdminMenuItemViewSet, basename="admin-menu")
+admin_router.register("certifications", admin_api.AdminCertificationViewSet, basename="admin-cert")
+admin_router.register("gallery", admin_api.AdminGalleryViewSet, basename="admin-gallery")
+admin_router.register("announcements", admin_api.AdminAnnouncementViewSet, basename="admin-announcement")
+admin_router.register("hours", admin_api.AdminOpeningHoursViewSet, basename="admin-hours")
 
 urlpatterns = [
     path("", include(router.urls)),
     path("gallery/", views.GalleryPhotoListView.as_view(), name="gallery"),
     path("announcement/", views.AnnouncementView.as_view(), name="announcement"),
     path("hours/", views.OpeningHoursListView.as_view(), name="hours"),
+    path("certifications/", views.CertificationListView.as_view(), name="certifications"),
+    path("site/", views.SiteSettingsView.as_view(), name="site"),
     path("admin/login/", admin_api.AdminLoginView.as_view(), name="admin-login"),
     path("admin/stats/", admin_api.AdminStatsView.as_view(), name="admin-stats"),
+    path("admin/site/", admin_api.AdminSiteSettingsView.as_view(), name="admin-site"),
     path("admin/", include(admin_router.urls)),
 ]

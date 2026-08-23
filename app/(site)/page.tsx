@@ -6,30 +6,27 @@ import {
   TAG_LABEL,
   formatTime,
   getAnnouncement,
+  getCertifications,
   getFeaturedMenu,
   getGallery,
   getHours,
   getReviews,
+  getSite,
   heatClass,
+  telHref,
 } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
-const CERTS = [
-  ["🛡️", "Food Safety Certified", "NSW Food Authority"],
-  ["⭐", "5-Star Hygiene Rating", "Local Council Inspection"],
-  ["🏆", "Best Pancakes — Sydney 2025", "Local Eats Awards"],
-  ["✅", "HACCP Compliant", "Certified Kitchen"],
-  ["🌱", "Local Produce Partner", "NSW Farmers' Network"],
-];
-
 export default async function Home() {
-  const [announcement, featured, gallery, reviews, hours] = await Promise.all([
+  const [announcement, featured, gallery, reviews, hours, certs, site] = await Promise.all([
     getAnnouncement(),
     getFeaturedMenu(),
     getGallery(),
     getReviews(),
     getHours(),
+    getCertifications(),
+    getSite(),
   ]);
 
   return (
@@ -41,12 +38,9 @@ export default async function Home() {
         <div className="container hero-cards">
           <div className="hero-card-left">
             <h1>
-              Stack<br />Into <span className="script">Happiness</span>
+              {site.hero_heading} <span className="script">{site.hero_script}</span>
             </h1>
-            <p className="lead">
-              We flip the best homemade pancakes in Sydney — griddled to order,
-              stacked high, drowned in real maple.
-            </p>
+            <p className="lead">{site.hero_lead}</p>
             <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
               <Link href="/booking" className="btn btn-primary">Book a Table</Link>
               <Link href="/menu" className="btn btn-ghost" style={{ borderColor: "#fff", color: "#fff" }}>
@@ -56,10 +50,7 @@ export default async function Home() {
           </div>
 
           <div className="hero-card-right">
-            <img
-              src="https://images.unsplash.com/photo-1554520735-0a6b8b6ce8b7?w=1200&q=80"
-              alt="Maple syrup pouring over a golden pancake stack with walnuts"
-            />
+            <img src={site.hero_image} alt="Signature dish at KRUSH" />
           </div>
 
           <Link href="/booking" className="round-badge" aria-label="Book a table — open 7 days">
@@ -139,11 +130,7 @@ export default async function Home() {
             <h2 className="title">
               Fluffy. Golden.<br /><span className="accent">Fully Stacked.</span>
             </h2>
-            <p className="section-lead">
-              G&apos;day! Every pancake at KRUSH is ladled to order onto a buttered
-              griddle, flipped at exactly the right bubble, and stacked warm with
-              real maple. No shortcuts, no pre-mix — just food that feels good.
-            </p>
+            <p className="section-lead">{site.about_text}</p>
             <ul className="checklist">
               <li>Batter whisked fresh every morning</li>
               <li>100% pure Canadian maple — never syrup-flavoured</li>
@@ -197,10 +184,10 @@ export default async function Home() {
           </div>
 
           <div className="cert-strip reveal">
-            {CERTS.map(([ic, title, sub]) => (
-              <div className="cert-badge" key={title}>
-                <span className="ic">{ic}</span>
-                <span><b>{title}</b><small>{sub}</small></span>
+            {certs.map((c) => (
+              <div className="cert-badge" key={c.title}>
+                <span className="ic">{c.icon}</span>
+                <span><b>{c.title}</b><small>{c.subtitle}</small></span>
               </div>
             ))}
           </div>
@@ -228,15 +215,15 @@ export default async function Home() {
               </ul>
               <h3>📍 Find Us</h3>
               <div className="contact-lines">
-                <span>123 George Street, Sydney NSW 2000</span>
-                <span>Phone: <a href="tel:+61255501234">(02) 5550 1234</a></span>
-                <span>Email: <a href="mailto:hello@krushpancakes.com.au">hello@krushpancakes.com.au</a></span>
+                <span>{site.address}</span>
+                <span>Phone: <a href={telHref(site.phone)}>{site.phone}</a></span>
+                <span>Email: <a href={`mailto:${site.email}`}>{site.email}</a></span>
               </div>
             </div>
             <div className="map-card">
               <iframe
                 title="KRUSH location map"
-                src="https://www.google.com/maps?q=George%20Street%20Sydney%20NSW&output=embed"
+                src={site.map_embed}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               ></iframe>

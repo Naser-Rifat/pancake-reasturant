@@ -5,12 +5,14 @@ from rest_framework import serializers
 from .models import (
     Announcement,
     Booking,
+    Certification,
     GalleryPhoto,
     MenuItem,
     OpeningHours,
     Order,
     OrderItem,
     Review,
+    SiteSettings,
 )
 
 
@@ -143,3 +145,19 @@ class OpeningHoursSerializer(serializers.ModelSerializer):
     class Meta:
         model = OpeningHours
         fields = ["label", "opens", "closes"]
+
+
+class CertificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Certification
+        fields = ["icon", "title", "subtitle"]
+
+
+class SiteSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SiteSettings
+        fields = [
+            "hero_heading", "hero_script", "hero_lead", "hero_image",
+            "about_text", "address", "phone", "email", "abn",
+            "map_embed", "instagram_url", "facebook_url", "timezone",
+        ]

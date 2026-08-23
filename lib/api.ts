@@ -46,6 +46,28 @@ export interface ApiOpeningHours {
   closes: string;
 }
 
+export interface ApiCertification {
+  icon: string;
+  title: string;
+  subtitle: string;
+}
+
+export interface ApiSiteSettings {
+  hero_heading: string;
+  hero_script: string;
+  hero_lead: string;
+  hero_image: string;
+  about_text: string;
+  address: string;
+  phone: string;
+  email: string;
+  abn: string;
+  map_embed: string;
+  instagram_url: string;
+  facebook_url: string;
+  timezone: string;
+}
+
 export interface ApiOrder {
   public_id: string;
   status: string;
@@ -72,6 +94,9 @@ export const TAG_LABEL: Record<ApiMenuItem["tag"], string> = {
 export const heatClass = (heat: ApiMenuItem["heat"]) => (heat === "none" ? "" : heat);
 
 export const stars = (rating: number) => "★".repeat(rating) + "☆".repeat(5 - rating);
+
+/** "(02) 5550 1234" -> "tel:0255501234" */
+export const telHref = (phone: string) => `tel:${phone.replace(/[^+\d]/g, "")}`;
 
 /** "21:30:00" -> "9:30pm" */
 export function formatTime(t: string) {
@@ -124,6 +149,16 @@ export async function getGallery(): Promise<ApiGalleryPhoto[]> {
 export async function getHours(): Promise<ApiOpeningHours[]> {
   const { FALLBACK_HOURS } = await import("./fallback-data");
   return get("/hours/", FALLBACK_HOURS);
+}
+
+export async function getCertifications(): Promise<ApiCertification[]> {
+  const { FALLBACK_CERTS } = await import("./fallback-data");
+  return get("/certifications/", FALLBACK_CERTS);
+}
+
+export async function getSite(): Promise<ApiSiteSettings> {
+  const { FALLBACK_SITE } = await import("./fallback-data");
+  return get("/site/", FALLBACK_SITE);
 }
 
 export async function getAnnouncement(): Promise<ApiAnnouncement | null> {

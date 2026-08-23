@@ -1,4 +1,11 @@
-import type { ApiGalleryPhoto, ApiMenuItem, ApiOpeningHours, ApiReview } from "./api";
+import type {
+  ApiCertification,
+  ApiGalleryPhoto,
+  ApiMenuItem,
+  ApiOpeningHours,
+  ApiReview,
+  ApiSiteSettings,
+} from "./api";
 
 // Snapshot of the seeded backend content. Used when the API is unreachable so
 // the storefront still renders — keep in sync with `backend seed_demo`.
@@ -28,7 +35,7 @@ export const FALLBACK_GALLERY: ApiGalleryPhoto[] = [
   { album: "events", caption: "Birthday night at KRUSH", image: "https://images.unsplash.com/photo-1530023367847-a683933f4172?w=700&q=70", alt: "Friends celebrating at dinner" },
   { album: "interior", caption: "Window seats for people-watching", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=700&q=70", alt: "Cosy dining space" },
   { album: "food", caption: "Banana Caramel, salted-caramel heaven", image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=700&q=70", alt: "Banana caramel pancakes" },
-  { album: "events", caption: "Cheers to the weekend", image: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=700&q=70", alt: "Group toast at the table" },
+  { album: "food", caption: "Weekend special — cinnamon swirls", image: "https://images.unsplash.com/photo-1509365465985-25d11c17e812?w=700&q=70", alt: "Cinnamon scrolls dusted with sugar" },
   { album: "interior", caption: "The bar, ready for service", image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=700&q=70", alt: "Restaurant bar area" },
   { album: "food", caption: "Choc Overload — no regrets", image: "https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=700&q=70", alt: "Chocolate pancakes" },
   { album: "events", caption: "Family dinners done right", image: "https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=700&q=70", alt: "Family dining event" },
@@ -38,6 +45,32 @@ export const FALLBACK_GALLERY: ApiGalleryPhoto[] = [
   { album: "food", caption: "Lemon Ricotta under a snowfall of sugar", image: "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=700&q=70", alt: "Lemon ricotta pancakes" },
   { album: "interior", caption: "Room for the whole crew", image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&q=70", alt: "Large dining area" },
 ];
+
+export const FALLBACK_CERTS: ApiCertification[] = [
+  { icon: "🛡️", title: "Food Safety Certified", subtitle: "NSW Food Authority" },
+  { icon: "⭐", title: "5-Star Hygiene Rating", subtitle: "Local Council Inspection" },
+  { icon: "🏆", title: "Best Pancakes — Sydney 2025", subtitle: "Local Eats Awards" },
+  { icon: "✅", title: "HACCP Compliant", subtitle: "Certified Kitchen" },
+  { icon: "🌱", title: "Local Produce Partner", subtitle: "NSW Farmers' Network" },
+];
+
+export const FALLBACK_SITE: ApiSiteSettings = {
+  hero_heading: "Stack Into",
+  hero_script: "Happiness",
+  hero_lead:
+    "We flip the best homemade pancakes in Sydney — griddled to order, stacked high, drowned in real maple.",
+  hero_image: "https://images.unsplash.com/photo-1554520735-0a6b8b6ce8b7?w=1200&q=80",
+  about_text:
+    "G'day! Every pancake at KRUSH is ladled to order onto a buttered griddle, flipped at exactly the right bubble, and stacked warm with real maple. No shortcuts, no pre-mix — just food that feels good.",
+  address: "123 George Street, Sydney NSW 2000",
+  phone: "(02) 5550 1234",
+  email: "hello@krushpancakes.com.au",
+  abn: "ABN 00 000 000 000",
+  map_embed: "https://www.google.com/maps?q=George%20Street%20Sydney%20NSW&output=embed",
+  instagram_url: "",
+  facebook_url: "",
+  timezone: "Australia/Sydney",
+};
 
 export const FALLBACK_HOURS: ApiOpeningHours[] = [
   { label: "Monday – Thursday", opens: "11:00:00", closes: "21:00:00" },

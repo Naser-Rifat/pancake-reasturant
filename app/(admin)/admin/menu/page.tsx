@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { UploadButton } from "@/components/ui/upload-button";
 import { Textarea } from "@/components/ui/textarea";
 
 const TAG_LABEL: Record<AdminMenuItem["tag"], string> = {
@@ -209,8 +210,11 @@ export default function MenuAdminPage() {
                 <Input id="mi-prep" placeholder="12–14 min" value={form.prep_time} onChange={set("prep_time")} />
               </div>
               <div className="grid gap-1.5">
-                <Label htmlFor="mi-image">Image path/URL</Label>
-                <Input id="mi-image" placeholder="/menu/waffle.png" value={form.image} onChange={set("image")} />
+                <Label htmlFor="mi-image">Image</Label>
+                <div className="flex items-center gap-2">
+                  <Input id="mi-image" placeholder="/menu/waffle.png" value={form.image} onChange={set("image")} />
+                  <UploadButton onUploaded={(url) => setForm((f) => ({ ...f, image: url }))} />
+                </div>
               </div>
               <div className="flex items-center gap-6 sm:col-span-2">
                 <label className="flex items-center gap-2 text-sm font-medium">

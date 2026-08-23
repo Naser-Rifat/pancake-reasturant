@@ -175,6 +175,70 @@ class Announcement(TimeStampedModel):
         )
 
 
+class Certification(TimeStampedModel):
+    icon = models.CharField(max_length=8, default="🏅", help_text="Emoji shown on the badge")
+    title = models.CharField(max_length=80)
+    subtitle = models.CharField(max_length=120, blank=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["sort_order", "id"]
+
+    def __str__(self):
+        return self.title
+
+
+class SiteSettings(models.Model):
+    """Singleton holding every editable content block and business detail
+    shown on the public site and in customer emails."""
+
+    hero_heading = models.CharField(max_length=60, default="Stack Into")
+    hero_script = models.CharField(max_length=60, default="Happiness")
+    hero_lead = models.TextField(
+        default="We flip the best homemade pancakes in Sydney — griddled to order, "
+                "stacked high, drowned in real maple."
+    )
+    hero_image = models.CharField(
+        max_length=300,
+        default="https://images.unsplash.com/photo-1554520735-0a6b8b6ce8b7?w=1200&q=80",
+    )
+    about_text = models.TextField(
+        default="G'day! Every pancake at KRUSH is ladled to order onto a buttered "
+                "griddle, flipped at exactly the right bubble, and stacked warm with "
+                "real maple. No shortcuts, no pre-mix — just food that feels good."
+    )
+    address = models.CharField(max_length=200, default="123 George Street, Sydney NSW 2000")
+    phone = models.CharField(max_length=30, default="(02) 5550 1234")
+    email = models.EmailField(default="hello@krushpancakes.com.au")
+    abn = models.CharField(max_length=40, default="ABN 00 000 000 000")
+    map_embed = models.CharField(
+        max_length=500,
+        default="https://www.google.com/maps?q=George%20Street%20Sydney%20NSW&output=embed",
+    )
+    instagram_url = models.CharField(max_length=200, blank=True)
+    facebook_url = models.CharField(max_length=200, blank=True)
+    timezone = models.CharField(max_length=50, default="Australia/Sydney")
+
+    class Meta:
+        verbose_name_plural = "Site settings"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1  # enforce the singleton
+        super().save(*args, **kwargs)
+        from django.core.cache import cache
+
+        cache.delete("site-timezone")  # middleware picks up changes immediately
+
+    @classmethod
+    def load(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+    def __str__(self):
+        return "Site settings"
+
+
 class OpeningHours(models.Model):
     label = models.CharField(max_length=60, help_text='e.g. "Monday – Thursday"')
     opens = models.TimeField()

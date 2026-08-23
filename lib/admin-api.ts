@@ -159,3 +159,87 @@ export const deleteMenuItem = (slug: string) =>
 
 export const createAdminBooking = (data: Partial<AdminBooking>) =>
   adminFetch<AdminBooking>("/bookings/", { method: "POST", body: JSON.stringify(data) });
+
+// ---------- site content & settings ----------
+
+export interface AdminCertification {
+  id: number;
+  icon: string;
+  title: string;
+  subtitle: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export interface AdminGalleryPhoto {
+  id: number;
+  album: "food" | "interior" | "events";
+  caption: string;
+  image: string;
+  alt: string;
+  sort_order: number;
+}
+
+export interface AdminAnnouncement {
+  id: number;
+  message: string;
+  link_text: string;
+  link_url: string;
+  is_active: boolean;
+}
+
+export interface AdminHours {
+  id: number;
+  label: string;
+  opens: string;
+  closes: string;
+  sort_order: number;
+}
+
+export interface AdminSiteSettings {
+  hero_heading: string;
+  hero_script: string;
+  hero_lead: string;
+  hero_image: string;
+  about_text: string;
+  address: string;
+  phone: string;
+  email: string;
+  abn: string;
+  map_embed: string;
+  instagram_url: string;
+  facebook_url: string;
+  timezone: string;
+}
+
+export const getSiteSettings = () => adminFetch<AdminSiteSettings>("/site/");
+export const updateSiteSettings = (patch: Partial<AdminSiteSettings>) =>
+  adminFetch<AdminSiteSettings>("/site/", { method: "PATCH", body: JSON.stringify(patch) });
+
+export const listCertifications = () => adminFetch<AdminCertification[]>("/certifications/");
+export const createCertification = (d: Partial<AdminCertification>) =>
+  adminFetch<AdminCertification>("/certifications/", { method: "POST", body: JSON.stringify(d) });
+export const updateCertification = (id: number, d: Partial<AdminCertification>) =>
+  adminFetch<AdminCertification>(`/certifications/${id}/`, { method: "PATCH", body: JSON.stringify(d) });
+export const deleteCertification = (id: number) =>
+  adminFetch<void>(`/certifications/${id}/`, { method: "DELETE" });
+
+export const listGalleryAdmin = () => adminFetch<AdminGalleryPhoto[]>("/gallery/");
+export const createGalleryPhoto = (d: Partial<AdminGalleryPhoto>) =>
+  adminFetch<AdminGalleryPhoto>("/gallery/", { method: "POST", body: JSON.stringify(d) });
+export const deleteGalleryPhoto = (id: number) =>
+  adminFetch<void>(`/gallery/${id}/`, { method: "DELETE" });
+
+export const listAnnouncements = () => adminFetch<AdminAnnouncement[]>("/announcements/");
+export const createAnnouncement = (d: Partial<AdminAnnouncement>) =>
+  adminFetch<AdminAnnouncement>("/announcements/", { method: "POST", body: JSON.stringify(d) });
+export const updateAnnouncement = (id: number, d: Partial<AdminAnnouncement>) =>
+  adminFetch<AdminAnnouncement>(`/announcements/${id}/`, { method: "PATCH", body: JSON.stringify(d) });
+
+export const listHoursAdmin = () => adminFetch<AdminHours[]>("/hours/");
+export const createHours = (d: Partial<AdminHours>) =>
+  adminFetch<AdminHours>("/hours/", { method: "POST", body: JSON.stringify(d) });
+export const updateHours = (id: number, d: Partial<AdminHours>) =>
+  adminFetch<AdminHours>(`/hours/${id}/`, { method: "PATCH", body: JSON.stringify(d) });
+export const deleteHours = (id: number) =>
+  adminFetch<void>(`/hours/${id}/`, { method: "DELETE" });

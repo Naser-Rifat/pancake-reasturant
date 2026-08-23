@@ -11,8 +11,19 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from . import emails
-from .models import Booking, MenuItem, Order, OrderItem, Review
-from .serializers import OrderSerializer
+from .models import (
+    Announcement,
+    Booking,
+    Certification,
+    GalleryPhoto,
+    MenuItem,
+    OpeningHours,
+    Order,
+    OrderItem,
+    Review,
+    SiteSettings,
+)
+from .serializers import OrderSerializer, SiteSettingsSerializer
 
 
 # ---------- auth ----------
@@ -150,6 +161,73 @@ class AdminMenuItemViewSet(viewsets.ModelViewSet):
                            "Mark it unavailable instead."},
                 status=400,
             )
+
+
+# ---------- site content & settings ----------
+
+class AdminCertificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Certification
+        fields = ["id", "icon", "title", "subtitle", "sort_order", "is_active"]
+
+
+class AdminGalleryPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GalleryPhoto
+        fields = ["id", "album", "caption", "image", "alt", "sort_order"]
+
+
+class AdminAnnouncementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcement
+        fields = ["id", "message", "link_text", "link_url", "is_active"]
+
+
+class AdminOpeningHoursSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OpeningHours
+        fields = ["id", "label", "opens", "closes", "sort_order"]
+
+
+class AdminCertificationViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminCertificationSerializer
+    queryset = Certification.objects.all()
+    pagination_class = None
+
+
+class AdminGalleryViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminGalleryPhotoSerializer
+    queryset = GalleryPhoto.objects.all()
+    pagination_class = None
+
+
+class AdminAnnouncementViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminAnnouncementSerializer
+    queryset = Announcement.objects.all()
+    pagination_class = None
+
+
+class AdminOpeningHoursViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminOpeningHoursSerializer
+    queryset = OpeningHours.objects.all()
+    pagination_class = None
+
+
+class AdminSiteSettingsView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        return Response(SiteSettingsSerializer(SiteSettings.load()).data)
+
+    def patch(self, request):
+        serializer = SiteSettingsSerializer(SiteSettings.load(), data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 # ---------- dashboard stats ----------

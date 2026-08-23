@@ -1,6 +1,13 @@
 import Link from "next/link";
+import { getSite } from "@/lib/api";
 
-export default function Footer() {
+export default async function Footer() {
+  const site = await getSite();
+  const socials = [
+    ["Instagram", site.instagram_url],
+    ["Facebook", site.facebook_url],
+  ].filter(([, url]) => url);
+
   return (
     <footer>
       <div className="container">
@@ -14,12 +21,22 @@ export default function Footer() {
             <li><Link href="/#reviews">Reviews</Link></li>
             <li><Link href="/privacy">Privacy</Link></li>
           </ul>
-          <div className="footer-icons">
-            <span>🥞</span><span>🍯</span><span>🍓</span><span>🧈</span>
-          </div>
+          {socials.length > 0 ? (
+            <ul className="footer-links">
+              {socials.map(([label, url]) => (
+                <li key={label}>
+                  <a href={url} target="_blank" rel="noopener noreferrer">{label}</a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="footer-icons">
+              <span>🥞</span><span>🍯</span><span>🍓</span><span>🧈</span>
+            </div>
+          )}
         </div>
         <div className="footer-bottom">
-          <span>© 2026 KRUSH — All rights reserved. ABN 00 000 000 000</span>
+          <span>© 2026 KRUSH — All rights reserved. {site.abn}</span>
           <span>Fluffy stacks · real maple · est. 1999</span>
         </div>
       </div>

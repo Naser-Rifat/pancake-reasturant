@@ -1,0 +1,218 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Plus, Trash2 } from "lucide-react";
+import {
+  createHours,
+  deleteHours,
+  getSiteSettings,
+  listHoursAdmin,
+  updateHours,
+  updateSiteSettings,
+  type AdminHours,
+  type AdminSiteSettings,
+} from "@/lib/admin-api";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+
+const AU_TIMEZONES = [
+  "Australia/Sydney",
+  "Australia/Melbourne",
+  "Australia/Brisbane",
+  "Australia/Adelaide",
+  "Australia/Perth",
+  "Australia/Hobart",
+  "Australia/Darwin",
+];
+
+const EMPTY_ROW = { label: "", opens: "09:00", closes: "17:00" };
+
+export default function SettingsPage() {
+  const [site, setSite] = useState<AdminSiteSettings | null>(null);
+  const [hours, setHours] = useState<AdminHours[]>([]);
+  const [newRow, setNewRow] = useState(EMPTY_ROW);
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState("");
+
+  useEffect(() => {
+    Promise.all([getSiteSettings(), listHoursAdmin()])
+      .then(([s, h]) => {
+        setSite(s);
+        setHours(h);
+      })
+      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"));
+  }, []);
+
+  const flash = (what: string) => {
+    setSaved(what);
+    setTimeout(() => setSaved(""), 1800);
+  };
+
+  const run = async (fn: () => Promise<void>, what: string) => {
+    setError("");
+    try {
+      await fn();
+      flash(what);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Save failed");
+    }
+  };
+
+  if (!site) return error ? <p className="text-sm font-medium text-destructive">{error}</p> : null;
+
+  const setS = (key: keyof AdminSiteSettings) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+      setSite((s) => (s ? { ...s, [key]: e.target.value } : s));
+
+  return (
+    <div className="grid gap-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+          <p className="text-sm text-muted-foreground">
+            Business details shown on the website and in customer emails
+          </p>
+        </div>
+        {saved && <span className="text-sm font-medium text-emerald-600">{saved} saved ✓</span>}
+      </div>
+
+      {error && <p className="text-sm font-medium text-destructive">{error}</p>}
+
+      {/* ---------- contact & business ---------- */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Contact &amp; business</CardTitle>
+          <CardDescription>Used on the site, in the footer, and in every customer email</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-1.5 sm:col-span-2">
+              <Label htmlFor="s-address">Address</Label>
+              <Input id="s-address" value={site.address} onChange={setS("address")} />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="s-phone">Phone</Label>
+              <Input id="s-phone" value={site.phone} onChange={setS("phone")} />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="s-email">Email</Label>
+              <Input id="s-email" type="email" value={site.email} onChange={setS("email")} />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="s-abn">ABN (shown on order emails)</Label>
+              <Input id="s-abn" value={site.abn} onChange={setS("abn")} />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="s-tz">Restaurant timezone</Label>
+              <Select id="s-tz" className="h-9" value={site.timezone} onChange={setS("timezone")}>
+                {AU_TIMEZONES.map((tz) => (
+                  <option key={tz} value={tz}>{tz}</option>
+                ))}
+              </Select>
+            </div>
+            <div className="grid gap-1.5 sm:col-span-2">
+              <Label htmlFor="s-map">Google Maps embed URL</Label>
+              <Input id="s-map" value={site.map_embed} onChange={setS("map_embed")} />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="s-insta">Instagram URL</Label>
+              <Input id="s-insta" placeholder="https://instagram.com/…" value={site.instagram_url} onChange={setS("instagram_url")} />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="s-fb">Facebook URL</Label>
+              <Input id="s-fb" placeholder="https://facebook.com/…" value={site.facebook_url} onChange={setS("facebook_url")} />
+            </div>
+          </div>
+          <Button
+            className="mt-4"
+            onClick={() =>
+              run(async () => {
+                await updateSiteSettings({
+                  address: site.address,
+                  phone: site.phone,
+                  email: site.email,
+                  abn: site.abn,
+                  timezone: site.timezone,
+                  map_embed: site.map_embed,
+                  instagram_url: site.instagram_url,
+                  facebook_url: site.facebook_url,
+                });
+              }, "Settings")
+            }
+          >
+            Save settings
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* ---------- opening hours ---------- */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Opening hours</CardTitle>
+          <CardDescription>Shown on the home page — one row per day range</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-3">
+          {hours.map((h) => (
+            <div key={h.id} className="flex flex-wrap items-center gap-2 rounded-md border p-2">
+              <Input
+                className="min-w-44 flex-1"
+                value={h.label}
+                onChange={(e) => setHours((xs) => xs.map((x) => (x.id === h.id ? { ...x, label: e.target.value } : x)))}
+              />
+              <Input
+                type="time"
+                className="w-32"
+                value={h.opens.slice(0, 5)}
+                onChange={(e) => setHours((xs) => xs.map((x) => (x.id === h.id ? { ...x, opens: e.target.value } : x)))}
+              />
+              <span className="text-muted-foreground">–</span>
+              <Input
+                type="time"
+                className="w-32"
+                value={h.closes.slice(0, 5)}
+                onChange={(e) => setHours((xs) => xs.map((x) => (x.id === h.id ? { ...x, closes: e.target.value } : x)))}
+              />
+              <Button size="sm" variant="outline" onClick={() =>
+                run(async () => {
+                  await updateHours(h.id, { label: h.label, opens: h.opens, closes: h.closes });
+                }, "Hours")
+              }>
+                Save
+              </Button>
+              <Button size="icon" variant="ghost" aria-label={`Delete ${h.label}`} onClick={() =>
+                run(async () => {
+                  if (!confirm(`Delete “${h.label}”?`)) return;
+                  await deleteHours(h.id);
+                  setHours((xs) => xs.filter((x) => x.id !== h.id));
+                }, "Hours")
+              }>
+                <Trash2 className="text-destructive" />
+              </Button>
+            </div>
+          ))}
+          <div className="flex flex-wrap items-center gap-2 rounded-md border border-dashed p-2">
+            <Input className="min-w-44 flex-1" placeholder="e.g. Monday – Thursday"
+              value={newRow.label} onChange={(e) => setNewRow((n) => ({ ...n, label: e.target.value }))} />
+            <Input type="time" className="w-32" value={newRow.opens}
+              onChange={(e) => setNewRow((n) => ({ ...n, opens: e.target.value }))} />
+            <span className="text-muted-foreground">–</span>
+            <Input type="time" className="w-32" value={newRow.closes}
+              onChange={(e) => setNewRow((n) => ({ ...n, closes: e.target.value }))} />
+            <Button size="sm" disabled={!newRow.label.trim()} onClick={() =>
+              run(async () => {
+                const created = await createHours({ ...newRow, sort_order: hours.length });
+                setHours((xs) => [...xs, created]);
+                setNewRow(EMPTY_ROW);
+              }, "Hours")
+            }>
+              <Plus /> Add
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

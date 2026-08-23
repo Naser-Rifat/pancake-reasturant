@@ -6,8 +6,10 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   CalendarCheck,
   ExternalLink,
+  Images,
   LayoutDashboard,
   LogOut,
+  Settings,
   ShoppingBag,
   Star,
   UtensilsCrossed,
@@ -21,6 +23,8 @@ const NAV = [
   { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
   { href: "/admin/menu", label: "Menu", icon: UtensilsCrossed },
   { href: "/admin/reviews", label: "Reviews", icon: Star },
+  { href: "/admin/content", label: "Site content", icon: Images },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export default function AdminShell({ children }: { children: ReactNode }) {

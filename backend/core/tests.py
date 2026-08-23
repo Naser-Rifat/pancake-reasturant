@@ -347,6 +347,69 @@ class AdminApiTests(TestCase):
         self.assertIn("revenue_today", stats)
 
 
+class SiteContentApiTests(TestCase):
+    def setUp(self):
+        from django.contrib.auth.models import User
+
+        self.client = APIClient()
+        User.objects.create_user("boss", password="pw", is_staff=True)
+
+    def auth(self):
+        token = self.client.post(
+            "/api/admin/login/", {"username": "boss", "password": "pw"}, format="json"
+        ).json()["token"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
+
+    def test_public_site_settings_and_certifications(self):
+        from core.models import Certification
+
+        Certification.objects.create(title="Shown", icon="⭐")
+        Certification.objects.create(title="Hidden", icon="⭐", is_active=False)
+        site = self.client.get("/api/site/").json()
+        self.assertIn("George Street", site["address"])
+        certs = self.client.get("/api/certifications/").json()
+        self.assertEqual([c["title"] for c in certs], ["Shown"])
+
+    def test_admin_settings_patch_requires_staff_and_flows_into_emails(self):
+        from django.core import mail
+        from core.models import Booking
+
+        # anonymous PATCH rejected
+        self.assertEqual(
+            self.client.patch("/api/admin/site/", {"phone": "x"}, format="json").status_code, 401
+        )
+        self.auth()
+        res = self.client.patch(
+            "/api/admin/site/", {"phone": "(02) 9999 8888"}, format="json"
+        )
+        self.assertEqual(res.status_code, 200)
+        # a booking confirmation email must now carry the NEW phone number
+        booking = Booking.objects.create(
+            name="A", email="a@b.co", date="2030-01-01", time="18:00", party_size=2
+        )
+        res = self.client.patch(
+            f"/api/admin/bookings/{booking.public_id}/", {"status": "confirmed"}, format="json"
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertIn("(02) 9999 8888", mail.outbox[-1].body)
+
+    def test_admin_gallery_and_certification_crud(self):
+        self.auth()
+        photo = self.client.post(
+            "/api/admin/gallery/",
+            {"album": "food", "caption": "c", "image": "/x.jpg", "alt": "a"},
+            format="json",
+        )
+        self.assertEqual(photo.status_code, 201)
+        self.assertEqual(
+            self.client.delete(f"/api/admin/gallery/{photo.json()['id']}/").status_code, 204
+        )
+        cert = self.client.post(
+            "/api/admin/certifications/", {"title": "New Award", "icon": "🏆"}, format="json"
+        )
+        self.assertEqual(cert.status_code, 201)
+
+
 class ReviewApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()

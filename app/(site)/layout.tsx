@@ -5,6 +5,7 @@ import "../globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ScrollFx from "@/components/ScrollFx";
+import { getSite } from "@/lib/api";
 
 const serif = DM_Serif_Display({ weight: "400", subsets: ["latin"], variable: "--font-serif" });
 const script = Pacifico({ weight: "400", subsets: ["latin"], variable: "--font-script" });
@@ -19,35 +20,30 @@ export const metadata: Metadata = {
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-// Restaurant schema markup for Google's local results
-const RESTAURANT_SCHEMA = {
-  "@context": "https://schema.org",
-  "@type": "Restaurant",
-  name: "KRUSH Pancakes & Stacks",
-  url: SITE_URL,
-  servesCuisine: "Pancakes, Breakfast, Dessert",
-  priceRange: "$$",
-  telephone: "+61-2-5550-1234",
-  email: "hello@krushpancakes.com.au",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "123 George Street",
-    addressLocality: "Sydney",
-    addressRegion: "NSW",
-    postalCode: "2000",
-    addressCountry: "AU",
-  },
-  menu: `${SITE_URL}/menu`,
-  acceptsReservations: `${SITE_URL}/booking`,
-};
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const site = await getSite();
+  // Restaurant schema markup for Google's local results — kept in sync with
+  // the business details staff manage in the admin panel
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    name: "KRUSH Pancakes & Stacks",
+    url: SITE_URL,
+    servesCuisine: "Pancakes, Breakfast, Dessert",
+    priceRange: "$$",
+    telephone: site.phone,
+    email: site.email,
+    address: { "@type": "PostalAddress", streetAddress: site.address, addressCountry: "AU" },
+    menu: `${SITE_URL}/menu`,
+    acceptsReservations: `${SITE_URL}/booking`,
+  };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en-AU">
       <body className={`${serif.variable} ${script.variable} ${body.variable} ${round.variable}`}>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(RESTAURANT_SCHEMA) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
         <Nav />
         {children}

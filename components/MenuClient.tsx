@@ -5,6 +5,7 @@ import {
   TAG_LABEL,
   heatClass,
   placeOrder,
+  telHref,
   type ApiMenuItem,
 } from "@/lib/api";
 
@@ -12,7 +13,15 @@ const CART_KEY = "krush-cart-v2";
 
 type Cart = Record<string, number>;
 
-export default function MenuClient({ items, live = true }: { items: ApiMenuItem[]; live?: boolean }) {
+export default function MenuClient({
+  items,
+  live = true,
+  phone: restaurantPhone = "(02) 5550 1234",
+}: {
+  items: ApiMenuItem[];
+  live?: boolean;
+  phone?: string;
+}) {
   const [cart, setCart] = useState<Cart>({});
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
@@ -98,7 +107,7 @@ export default function MenuClient({ items, live = true }: { items: ApiMenuItem[
         {!live && (
           <p className="ordering-paused" role="status">
             ⏸️ Online ordering is taking a quick break — please call us on{" "}
-            <a href="tel:+61255501234">(02) 5550 1234</a> to order. The menu below is still up to date.
+            <a href={telHref(restaurantPhone)}>{restaurantPhone}</a> to order. The menu below is still up to date.
           </p>
         )}
         <div className="menu-grid">

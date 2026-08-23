@@ -3,16 +3,28 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Announcement, Booking, GalleryPhoto, MenuItem, OpeningHours, Order, Review
+from .models import (
+    Announcement,
+    Booking,
+    Certification,
+    GalleryPhoto,
+    MenuItem,
+    OpeningHours,
+    Order,
+    Review,
+    SiteSettings,
+)
 from .serializers import (
     AnnouncementSerializer,
     BookingSerializer,
+    CertificationSerializer,
     GalleryPhotoSerializer,
     MenuItemSerializer,
     OpeningHoursSerializer,
     OrderCreateSerializer,
     OrderSerializer,
     ReviewSerializer,
+    SiteSettingsSerializer,
 )
 
 
@@ -117,3 +129,16 @@ class OpeningHoursListView(ListAPIView):
     serializer_class = OpeningHoursSerializer
     queryset = OpeningHours.objects.all()
     pagination_class = None
+
+
+class CertificationListView(ListAPIView):
+    serializer_class = CertificationSerializer
+    queryset = Certification.objects.filter(is_active=True)
+    pagination_class = None
+
+
+class SiteSettingsView(APIView):
+    """Public content blocks + business details (address, phone, socials…)."""
+
+    def get(self, request):
+        return Response(SiteSettingsSerializer(SiteSettings.load()).data)

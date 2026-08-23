@@ -11,9 +11,13 @@ from django.core.mail import send_mail
 logger = logging.getLogger(__name__)
 
 RESTAURANT = "KRUSH Pancakes & Stacks"
-ADDRESS = "123 George Street, Sydney NSW 2000"
-PHONE = "(02) 5550 1234"
-ABN = "ABN 00 000 000 000"  # replace with the restaurant's real ABN at handover
+
+
+def _info():
+    """Live business details — managed by staff in the admin panel Settings page."""
+    from .models import SiteSettings
+
+    return SiteSettings.load()
 
 
 def _send(to: str, subject: str, body: str) -> None:
@@ -34,6 +38,7 @@ def _nice_date(d) -> str:
 
 
 def booking_status_changed(booking) -> None:
+    s = _info()
     when = f"{_nice_date(booking.date)} at {_nice_time(booking.time)}"
     guests = f"{booking.party_size} {'guest' if booking.party_size == 1 else 'guests'}"
 
@@ -45,8 +50,8 @@ def booking_status_changed(booking) -> None:
             f"Great news — your table is confirmed!\n\n"
             f"  When:   {when}\n"
             f"  Party:  {guests}\n"
-            f"  Where:  {ADDRESS}\n\n"
-            f"Running late or need to change plans? Call us on {PHONE}.\n\n"
+            f"  Where:  {s.address}\n\n"
+            f"Running late or need to change plans? Call us on {s.phone}.\n\n"
             f"See you soon,\n{RESTAURANT}",
         )
     elif booking.status == "cancelled":
@@ -55,13 +60,14 @@ def booking_status_changed(booking) -> None:
             f"About your booking — {RESTAURANT}",
             f"Hi {booking.name},\n\n"
             f"Unfortunately we couldn't take your booking for {when} ({guests}).\n\n"
-            f"Please call us on {PHONE} and we'll do our best to find you "
+            f"Please call us on {s.phone} and we'll do our best to find you "
             f"another time that works.\n\n"
             f"Sorry for the trouble,\n{RESTAURANT}",
         )
 
 
 def order_status_changed(order) -> None:
+    s = _info()
     items = ", ".join(f"{i.quantity}× {i.menu_item.name}" for i in order.items.all())
 
     if order.status == "received":
@@ -72,9 +78,9 @@ def order_status_changed(order) -> None:
             f"Thanks — your order is in and the kitchen is on it!\n\n"
             f"  Order:  {items}\n"
             f"  Total:  ${order.total} (incl. GST)\n"
-            f"  Pickup: {ADDRESS}\n\n"
+            f"  Pickup: {s.address}\n\n"
             f"We'll email you the moment it's ready to collect.\n\n"
-            f"{RESTAURANT} · {ABN}",
+            f"{RESTAURANT} · {s.abn}",
         )
     elif order.status == "ready":
         _send(
@@ -84,8 +90,8 @@ def order_status_changed(order) -> None:
             f"Your order is hot off the griddle and ready to collect!\n\n"
             f"  Order:  {items}\n"
             f"  Total:  ${order.total} (incl. GST)\n"
-            f"  Where:  {ADDRESS}\n\n"
-            f"See you in a minute,\n{RESTAURANT} · {ABN}",
+            f"  Where:  {s.address}\n\n"
+            f"See you in a minute,\n{RESTAURANT} · {s.abn}",
         )
     elif order.status == "cancelled":
         reason = f"\n  Reason: {order.cancel_reason}\n" if order.cancel_reason else "\n"
@@ -95,6 +101,6 @@ def order_status_changed(order) -> None:
             f"Hi {order.customer_name},\n\n"
             f"We're sorry — we had to cancel your order ({items}, ${order.total} incl. GST).\n"
             f"{reason}"
-            f"Please call us on {PHONE} if you'd like to sort something out.\n\n"
-            f"Apologies,\n{RESTAURANT} · {ABN}",
+            f"Please call us on {s.phone} if you'd like to sort something out.\n\n"
+            f"Apologies,\n{RESTAURANT} · {s.abn}",
         )

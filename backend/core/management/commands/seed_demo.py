@@ -3,7 +3,15 @@ from datetime import time
 
 from django.core.management.base import BaseCommand
 
-from core.models import Announcement, GalleryPhoto, MenuItem, OpeningHours, Review
+from core.models import (
+    Announcement,
+    Certification,
+    GalleryPhoto,
+    MenuItem,
+    OpeningHours,
+    Review,
+    SiteSettings,
+)
 
 MENU = [
     ("buttermilk", "Classic Buttermilk Stack", 14, "Four fluffy buttermilk pancakes with pure maple syrup and whipped butter.", "sweet", "none", 680, 14, "10–12 min", True),
@@ -30,7 +38,7 @@ GALLERY = [
     ("events", "Birthday night at KRUSH", "https://images.unsplash.com/photo-1530023367847-a683933f4172?w=700&q=70", "Friends celebrating at dinner"),
     ("interior", "Window seats for people-watching", "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=700&q=70", "Cosy dining space"),
     ("food", "Banana Caramel, salted-caramel heaven", "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=700&q=70", "Banana caramel pancakes"),
-    ("events", "Cheers to the weekend", "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=700&q=70", "Group toast at the table"),
+    ("food", "Weekend special — cinnamon swirls", "https://images.unsplash.com/photo-1509365465985-25d11c17e812?w=700&q=70", "Cinnamon scrolls dusted with sugar"),
     ("interior", "The bar, ready for service", "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=700&q=70", "Restaurant bar area"),
     ("food", "Choc Overload — no regrets", "https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=700&q=70", "Chocolate pancakes"),
     ("events", "Family dinners done right", "https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=700&q=70", "Family dining event"),
@@ -39,6 +47,14 @@ GALLERY = [
     ("events", "Date night, sorted", "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=700&q=70", "Dinner table for two"),
     ("food", "Lemon Ricotta under a snowfall of sugar", "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=700&q=70", "Lemon ricotta pancakes"),
     ("interior", "Room for the whole crew", "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&q=70", "Large dining area"),
+]
+
+CERTS = [
+    ("🛡️", "Food Safety Certified", "NSW Food Authority"),
+    ("⭐", "5-Star Hygiene Rating", "Local Council Inspection"),
+    ("🏆", "Best Pancakes — Sydney 2025", "Local Eats Awards"),
+    ("✅", "HACCP Compliant", "Certified Kitchen"),
+    ("🌱", "Local Produce Partner", "NSW Farmers' Network"),
 ]
 
 HOURS = [
@@ -79,6 +95,13 @@ class Command(BaseCommand):
             OpeningHours.objects.update_or_create(
                 label=label, defaults=dict(opens=opens, closes=closes, sort_order=i)
             )
+
+        for i, (icon, title, subtitle) in enumerate(CERTS):
+            Certification.objects.update_or_create(
+                title=title, defaults=dict(icon=icon, subtitle=subtitle, sort_order=i)
+            )
+
+        SiteSettings.load()  # create the singleton with its defaults
 
         Announcement.objects.update_or_create(
             message="🎉 Tuesday Special — 2-for-1 Classic Buttermilk Stack all day!",
