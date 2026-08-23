@@ -41,3 +41,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# internal business documents — never ship to client or public repo
+docs/PROJECT_PROPOSAL.md
