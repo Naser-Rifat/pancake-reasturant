@@ -204,13 +204,13 @@ class SiteSettings(models.Model):
         default="https://images.unsplash.com/photo-1554520735-0a6b8b6ce8b7?w=1200&q=80",
     )
     about_text = models.TextField(
-        default="G'day! Every pancake at KRUSH is ladled to order onto a buttered "
+        default="G'day! Every pancake at The Pancake Club is ladled to order onto a buttered "
                 "griddle, flipped at exactly the right bubble, and stacked warm with "
                 "real maple. No shortcuts, no pre-mix — just food that feels good."
     )
     address = models.CharField(max_length=200, default="123 George Street, Sydney NSW 2000")
     phone = models.CharField(max_length=30, default="(02) 5550 1234")
-    email = models.EmailField(default="hello@krushpancakes.com.au")
+    email = models.EmailField(default="hello@thepancakeclub.com.au")
     abn = models.CharField(max_length=40, default="ABN 00 000 000 000")
     map_embed = models.CharField(
         max_length=500,

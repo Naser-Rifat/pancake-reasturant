@@ -14,6 +14,7 @@ import {
   Star,
   UtensilsCrossed,
 } from "lucide-react";
+import LogoMark from "@/components/LogoMark";
 import { clearToken, getToken } from "@/lib/admin-api";
 import { cn } from "@/lib/utils";
 
@@ -48,7 +49,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen">
       <aside className="fixed inset-y-0 left-0 z-20 flex w-56 flex-col bg-sidebar text-sidebar-foreground">
         <div className="flex h-14 items-center gap-2 px-5 text-lg font-bold tracking-tight">
-          🥞 KRUSH <span className="text-xs font-medium opacity-60">admin</span>
+          <LogoMark size={22} /> Pancake Club <span className="text-xs font-medium opacity-60">admin</span>
         </div>
         <nav className="flex flex-1 flex-col gap-1 px-3 py-2">
           {NAV.map(({ href, label, icon: Icon }) => (

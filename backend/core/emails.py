@@ -10,7 +10,7 @@ from django.core.mail import send_mail
 
 logger = logging.getLogger(__name__)
 
-RESTAURANT = "KRUSH Pancakes & Stacks"
+RESTAURANT = "The Pancake Club"
 
 
 def _info():

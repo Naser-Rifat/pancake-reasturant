@@ -13,9 +13,9 @@ const body = DM_Sans({ weight: ["400", "500", "700"], subsets: ["latin"], variab
 const round = Baloo_2({ weight: ["700", "800"], subsets: ["latin"], variable: "--font-round" });
 
 export const metadata: Metadata = {
-  title: "KRUSH | Pancakes & Stacks — Sydney",
+  title: "The Pancake Club — Pancakes & Stacks, Sydney",
   description:
-    "Fluffy homemade pancakes in Sydney. View the menu, book a table online, and see why locals love KRUSH. Real maple, fresh berries, zero guilt.",
+    "Fluffy homemade pancakes in Sydney. View the menu, book a table online, and see why locals love The Pancake Club. Real maple, fresh berries, zero guilt.",
 };
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -27,7 +27,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const schema = {
     "@context": "https://schema.org",
     "@type": "Restaurant",
-    name: "KRUSH Pancakes & Stacks",
+    name: "The Pancake Club",
     url: SITE_URL,
     servesCuisine: "Pancakes, Breakfast, Dessert",
     priceRange: "$$",

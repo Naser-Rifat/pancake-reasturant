@@ -5,7 +5,7 @@ import { getMenuWithStatus, getSite } from "@/lib/api";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Menu | KRUSH Pancakes & Stacks",
+  title: "Menu | The Pancake Club",
   description:
     "Six signature pancake stacks — fluffy, fresh, and griddled to order. See the menu and book a table.",
 };

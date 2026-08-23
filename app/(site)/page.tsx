@@ -51,7 +51,7 @@ export default async function Home() {
           </div>
 
           <div className="hero-card-right">
-            <img src={site.hero_image} alt="Signature dish at KRUSH" />
+            <img src={site.hero_image} alt="Signature dish at The Pancake Club" />
           </div>
 
           <Link href="/booking" className="round-badge" aria-label="Book a table — open 7 days">
@@ -122,12 +122,12 @@ export default async function Home() {
       <section className="block" id="about" style={{ paddingTop: "1rem" }}>
         <div className="container about-grid">
           <div className="about-collage reveal">
-            <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&q=75" alt="KRUSH restaurant interior" />
+            <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=75" alt="Inside The Pancake Club" />
             <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=75" alt="Banana pancake stack" />
             <img src="https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&q=75" alt="Pancakes with honey drizzle" />
           </div>
           <div className="reveal">
-            <p className="kicker">Welcome to KRUSH</p>
+            <p className="kicker">Welcome to the Club</p>
             <h2 className="title">
               Fluffy. Golden.<br /><span className="accent">Fully Stacked.</span>
             </h2>
@@ -223,7 +223,7 @@ export default async function Home() {
             </div>
             <div className="map-card">
               <iframe
-                title="KRUSH location map"
+                title="The Pancake Club location map"
                 src={site.map_embed}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"

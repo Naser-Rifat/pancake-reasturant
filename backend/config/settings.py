@@ -1,5 +1,5 @@
 """
-Django settings for the KRUSH restaurant backend.
+Django settings for the The Pancake Club backend.
 
 Secrets and environment-specific values come from environment variables;
 the defaults below are development-only.
@@ -129,7 +129,7 @@ EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_PASSWORD", "")
 EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_TLS", "1") == "1"
 DEFAULT_FROM_EMAIL = os.environ.get(
-    "DJANGO_FROM_EMAIL", "KRUSH Pancakes <hello@krushpancakes.com.au>"
+    "DJANGO_FROM_EMAIL", "The Pancake Club <hello@thepancakeclub.com.au>"
 )
 
 # ---------- CORS (Next.js dev server) ----------

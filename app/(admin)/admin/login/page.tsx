@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import LogoMark from "@/components/LogoMark";
 import { adminLogin } from "@/lib/admin-api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,8 +34,8 @@ export default function AdminLoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="text-3xl">🥞</div>
-          <CardTitle className="text-xl">KRUSH Admin</CardTitle>
+          <div className="flex justify-center"><LogoMark size={40} /></div>
+          <CardTitle className="text-xl">Pancake Club Admin</CardTitle>
           <CardDescription>Sign in with your staff account</CardDescription>
         </CardHeader>
         <CardContent>

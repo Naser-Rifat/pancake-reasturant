@@ -33,20 +33,20 @@ REVIEWS = [
 GALLERY = [
     ("food", "The Classic Buttermilk, fresh off the griddle", "https://images.unsplash.com/photo-1575853121743-60c24f0a7502?w=700&q=70", "Classic buttermilk pancake stack"),
     ("food", "Berry Bliss — piled high", "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=700&q=70", "Berry pancake stack"),
-    ("interior", "Our main dining room", "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=700&q=70", "Restaurant interior"),
+    ("interior", "Our main dining room", "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=700&q=70", "Bright cafe dining room"),
     ("food", "Honey drizzle in slow motion", "https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=700&q=70", "Pancakes with honey drizzle"),
-    ("events", "Birthday night at KRUSH", "https://images.unsplash.com/photo-1530023367847-a683933f4172?w=700&q=70", "Friends celebrating at dinner"),
-    ("interior", "Window seats for people-watching", "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=700&q=70", "Cosy dining space"),
+    ("events", "Sunday brunch club", "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=700&q=70", "Brunch table spread with waffles and juice"),
+    ("interior", "Window seats for people-watching", "https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=700&q=70", "Sunny window table with coffee"),
     ("food", "Banana Caramel, salted-caramel heaven", "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=700&q=70", "Banana caramel pancakes"),
     ("food", "Weekend special — cinnamon swirls", "https://images.unsplash.com/photo-1509365465985-25d11c17e812?w=700&q=70", "Cinnamon scrolls dusted with sugar"),
-    ("interior", "The bar, ready for service", "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=700&q=70", "Restaurant bar area"),
+    ("interior", "The brew bar, ready for service", "https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=700&q=70", "Pour-over coffee being brewed"),
     ("food", "Choc Overload — no regrets", "https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=700&q=70", "Chocolate pancakes"),
-    ("events", "Family dinners done right", "https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=700&q=70", "Family dining event"),
-    ("interior", "Warm lights, warmer welcomes", "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=700&q=70", "Restaurant seating area"),
+    ("events", "Birthday parties welcome", "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=700&q=70", "Pastel party balloons"),
+    ("interior", "Sunny seats out the front", "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=700&q=70", "Street-side cafe tables with flowers"),
     ("food", "The full brekkie spread", "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=700&q=70", "Breakfast pancake spread"),
-    ("events", "Date night, sorted", "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=700&q=70", "Dinner table for two"),
+    ("events", "Coffee dates welcome", "https://images.unsplash.com/photo-1543269664-56d93c1b41a6?w=700&q=70", "Guest laughing over coffee"),
     ("food", "Lemon Ricotta under a snowfall of sugar", "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=700&q=70", "Lemon ricotta pancakes"),
-    ("interior", "Room for the whole crew", "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&q=70", "Large dining area"),
+    ("interior", "Room for the whole crew", "https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=700&q=70", "Long communal tables in the cafe"),
 ]
 
 CERTS = [

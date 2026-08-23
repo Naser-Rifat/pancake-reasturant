@@ -1,20 +1,12 @@
-/** Hand-drawn pancake-stack mark — inherits the text colour around it. */
+/** The Pancake Club brand mark — syrup-butter wedge over a pancake stack,
+ * recreated as SVG from the supplied logo (drop the original export in
+ * /public/logo.svg to use it instead). */
 export default function LogoMark({ size = 26 }: { size?: number }) {
   return (
-    <svg
-      viewBox="0 0 48 48"
-      width={size}
-      height={size}
-      aria-hidden="true"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={3}
-      strokeLinecap="round"
-    >
-      <ellipse cx="24" cy="33" rx="17" ry="6" />
-      <ellipse cx="24" cy="25" rx="14" ry="5.5" />
-      <ellipse cx="24" cy="17" rx="11" ry="5" />
-      <rect x="19" y="9" width="10" height="6" rx="1.5" fill="currentColor" stroke="none" />
+    <svg viewBox="0 0 48 48" width={size} height={size} aria-hidden="true">
+      <path d="M24 5 L37 21 L11 21 Z" fill="#F0B03C" />
+      <rect x="10" y="24" width="28" height="8" rx="4" fill="#E8993B" />
+      <rect x="10" y="35" width="28" height="8" rx="4" fill="#C0761F" />
     </svg>
   );
 }

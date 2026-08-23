@@ -36,7 +36,7 @@ export default function DashboardPage() {
     <div className="grid gap-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">What&apos;s happening at KRUSH right now</p>
+        <p className="text-sm text-muted-foreground">What&apos;s happening at The Pancake Club right now</p>
       </div>
 
       {error && <p className="text-sm font-medium text-destructive">{error}</p>}

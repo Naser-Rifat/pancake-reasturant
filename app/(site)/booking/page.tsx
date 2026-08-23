@@ -5,9 +5,9 @@ import { getSite, telHref } from "@/lib/api";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Book a Table | KRUSH Pancakes & Stacks",
+  title: "Book a Table | The Pancake Club",
   description:
-    "Book a table at KRUSH online — free, instant confirmation, open 7 days. Large groups welcome by phone.",
+    "Book a table at The Pancake Club online — free, instant confirmation, open 7 days. Large groups welcome by phone.",
 };
 
 export default async function BookingPage() {

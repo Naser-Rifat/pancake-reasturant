@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | KRUSH Pancakes & Stacks",
-  description: "How KRUSH collects, uses and protects your personal information.",
+  title: "Privacy Policy | The Pancake Club",
+  description: "How The Pancake Club collects, uses and protects your personal information.",
 };
 
 export default function PrivacyPage() {
@@ -18,7 +18,7 @@ export default function PrivacyPage() {
 
       <main className="container legal">
         <p>
-          KRUSH Pancakes &amp; Stacks (&ldquo;we&rdquo;, &ldquo;us&rdquo;) is committed to protecting
+          The Pancake Club (&ldquo;we&rdquo;, &ldquo;us&rdquo;) is committed to protecting
           your personal information in accordance with the <em>Privacy Act 1988</em> (Cth) and the
           Australian Privacy Principles (APPs). This policy explains what we collect, why, and your rights.
         </p>
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
         <h2>Access, correction &amp; complaints</h2>
         <p>
           You can ask us to access, correct or delete the personal information we hold about you —
-          email <a href="mailto:hello@krushpancakes.com.au">hello@krushpancakes.com.au</a> or call{" "}
+          email <a href="mailto:hello@thepancakeclub.com.au">hello@thepancakeclub.com.au</a> or call{" "}
           <a href="tel:+61255501234">(02) 5550 1234</a>. If you have a privacy concern we can&rsquo;t
           resolve, you can contact the Office of the Australian Information Commissioner (oaic.gov.au).
         </p>

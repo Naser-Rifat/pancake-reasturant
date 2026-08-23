@@ -5,8 +5,8 @@ import { getGallery } from "@/lib/api";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Gallery | KRUSH Pancakes & Stacks",
-  description: "Photos from KRUSH — our food, our space, and the good times in between.",
+  title: "Gallery | The Pancake Club",
+  description: "Photos from The Pancake Club — our food, our space, and the good times in between.",
 };
 
 export default async function GalleryPage() {

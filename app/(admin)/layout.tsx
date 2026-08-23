@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import "./admin.css";
 
 export const metadata: Metadata = {
-  title: "KRUSH Admin",
-  description: "Staff dashboard for KRUSH Pancakes & Stacks",
+  title: "Pancake Club Admin",
+  description: "Staff dashboard for The Pancake Club",
   robots: { index: false, follow: false },
 };
 

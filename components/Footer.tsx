@@ -13,7 +13,7 @@ export default async function Footer() {
     <footer>
       <div className="container">
         <div className="footer-grid">
-          <Link href="/" className="logo"><LogoMark /> krush</Link>
+          <Link href="/" className="logo"><LogoMark /> the pancake club</Link>
           <ul className="footer-links">
             <li><Link href="/">Home</Link></li>
             <li><Link href="/menu">Menu</Link></li>
@@ -37,7 +37,7 @@ export default async function Footer() {
           )}
         </div>
         <div className="footer-bottom">
-          <span>© 2026 KRUSH — All rights reserved. {site.abn}</span>
+          <span>© 2026 The Pancake Club — All rights reserved. {site.abn}</span>
           <span>Fluffy stacks · real maple · est. 1999</span>
         </div>
       </div>
