@@ -5,6 +5,7 @@ import Announce from "@/components/Announce";
 import FeaturedSlider from "@/components/FeaturedSlider";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewsCarousel from "@/components/ReviewsCarousel";
+import Sticker from "@/components/Sticker";
 import {
   formatTime,
   getAnnouncement,
@@ -96,6 +97,8 @@ export default async function Home() {
 
       {/* ================= FEATURED DISHES (FR-02) ================= */}
       <section className="block" id="featured">
+        <Sticker kind="sparkle" color="var(--pink)" size={56} style={{ top: "4rem", left: "3%", transform: "rotate(12deg)" }} />
+        <Sticker kind="squiggle" color="var(--yellow)" size={84} style={{ top: "6rem", right: "4%", transform: "rotate(-8deg)" }} />
         <div className="container">
           <div className="reveal" style={{ textAlign: "center" }}>
             <p className="kicker">Crowd Favourites</p>
@@ -110,7 +113,8 @@ export default async function Home() {
       </section>
 
       {/* ================= ABOUT / WELCOME (FR-03) ================= */}
-      <section className="block" id="about" style={{ paddingTop: "1rem" }}>
+      <section className="block band-butter" id="about">
+        <Sticker kind="arc" color="var(--pink)" size={90} style={{ bottom: "3rem", right: "5%", transform: "rotate(180deg)" }} />
         <div className="container about-grid">
           <div className="about-collage reveal">
             <Image src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=75" alt="Inside The Pancake Club" width={800} height={600} sizes="(min-width: 1024px) 25vw, 50vw" />
@@ -134,7 +138,9 @@ export default async function Home() {
       </section>
 
       {/* ================= GALLERY PREVIEW (FR-04) ================= */}
-      <section className="block" id="gallery" style={{ paddingTop: "1rem" }}>
+      <section className="block band-lavender" id="gallery">
+        <Sticker kind="sparkle" color="var(--yellow)" size={44} style={{ top: "5rem", right: "6%", transform: "rotate(-15deg)" }} />
+        <Sticker kind="ring" color="var(--pink)" size={60} style={{ bottom: "5rem", left: "4%" }} />
         <div className="container">
           <div className="reveal" style={{ textAlign: "center" }}>
             <p className="kicker">Feast Your Eyes</p>
@@ -156,7 +162,9 @@ export default async function Home() {
       </section>
 
       {/* ================= REVIEWS CAROUSEL (FR-05) ================= */}
-      <section className="block" id="reviews" style={{ paddingTop: "1rem" }}>
+      <section className="block band-blush" id="reviews">
+        <Sticker kind="squiggle" color="var(--lavender)" size={80} style={{ top: "4rem", left: "4%", transform: "rotate(10deg)" }} />
+        <Sticker kind="sparkle" color="var(--green)" size={40} style={{ bottom: "6rem", right: "5%" }} />
         <div className="container">
           <div className="reveal" style={{ textAlign: "center" }}>
             <p className="kicker">★ 4.8 Average Rating</p>
@@ -187,7 +195,9 @@ export default async function Home() {
       </section>
 
       {/* ================= HOURS + LOCATION (FR-07) ================= */}
-      <section className="block" id="contact">
+      <section className="block band-mint" id="contact">
+        <Sticker kind="arc" color="var(--yellow)" size={80} style={{ top: "3rem", left: "3%", transform: "rotate(-20deg)" }} />
+        <Sticker kind="ring" color="var(--lavender)" size={52} style={{ bottom: "4rem", right: "4%" }} />
         <div className="container">
           <div className="reveal" style={{ textAlign: "center" }}>
             <p className="kicker">Come Say Hi</p>
