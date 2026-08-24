@@ -66,6 +66,7 @@ export interface ApiSiteSettings {
   instagram_url: string;
   facebook_url: string;
   timezone: string;
+  theme: string;
 }
 
 export interface ApiOrder {

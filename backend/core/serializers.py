@@ -160,4 +160,5 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             "hero_heading", "hero_script", "hero_lead", "hero_image",
             "about_text", "address", "phone", "email", "abn",
             "map_embed", "instagram_url", "facebook_url", "timezone",
+            "theme",
         ]

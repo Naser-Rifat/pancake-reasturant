@@ -210,6 +210,7 @@ export interface AdminSiteSettings {
   instagram_url: string;
   facebook_url: string;
   timezone: string;
+  theme: string;
 }
 
 export const getSiteSettings = () => adminFetch<AdminSiteSettings>("/site/");

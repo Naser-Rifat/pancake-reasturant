@@ -220,6 +220,14 @@ class SiteSettings(models.Model):
     facebook_url = models.CharField(max_length=200, blank=True)
     timezone = models.CharField(max_length=50, default="Australia/Sydney")
 
+    THEME_CHOICES = [
+        ("golden", "Golden Morning"),
+        ("berry", "Berry Crush"),
+        ("mint", "Minty Fresh"),
+        ("choco", "Choc Latte"),
+    ]
+    theme = models.CharField(max_length=20, choices=THEME_CHOICES, default="golden")
+
     class Meta:
         verbose_name_plural = "Site settings"
 

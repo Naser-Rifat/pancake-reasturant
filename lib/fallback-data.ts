@@ -70,6 +70,7 @@ export const FALLBACK_SITE: ApiSiteSettings = {
   instagram_url: "",
   facebook_url: "",
   timezone: "Australia/Sydney",
+  theme: "golden",
 };
 
 export const FALLBACK_HOURS: ApiOpeningHours[] = [

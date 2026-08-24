@@ -34,6 +34,34 @@
   --doodle-strong: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='%23fff' fill-opacity='0.26'%3E%3Cg transform='translate(18 16) rotate(-10 8 10)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3Cg transform='translate(92 26)'%3E%3Ccircle cx='9' cy='9' r='9'/%3E%3Ccircle cx='9' cy='9' r='3.2' fill='%23fff' fill-opacity='0.5'/%3E%3C/g%3E%3Cg transform='translate(56 66) rotate(8 6 8)'%3E%3Cpath d='M6 0 C6 0 0 8 0 12 a6 6 0 0 0 12 0 C12 8 6 0 6 0 Z'/%3E%3C/g%3E%3Cg transform='translate(118 88) rotate(15 8 10)'%3E%3Cpath d='M8 5 C12 5 15 9 13.5 14 C12 18 8 21 8 21 C8 21 4 18 2.5 14 C1 9 4 5 8 5 Z'/%3E%3Cpath d='M4 5 L8 0 L12 5 Z'/%3E%3C/g%3E%3Cg transform='translate(28 108) rotate(8 6 6)'%3E%3Crect width='12' height='12' rx='3'/%3E%3C/g%3E%3Cg transform='translate(74 124) rotate(-25 6 12)'%3E%3Crect x='4.5' y='8' width='3' height='16' rx='1.5'/%3E%3Crect x='1' width='2.2' height='9' rx='1'/%3E%3Crect x='4.9' width='2.2' height='9' rx='1'/%3E%3Crect x='8.8' width='2.2' height='9' rx='1'/%3E%3C/g%3E%3Cg transform='translate(138 44)'%3E%3Cpath d='M7 0 L8.5 5.5 L14 7 L8.5 8.5 L7 14 L5.5 8.5 L0 7 L5.5 5.5 Z'/%3E%3C/g%3E%3Cg transform='translate(112 138) rotate(12 6 7) scale(0.75)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
+/* ---------- admin-selectable colour themes (Settings → Website theme) ----------
+   Same-lightness hue swaps only, so every existing ink-on-surface pairing keeps
+   its contrast. --lavender page frame + --ink stay brand-fixed across themes. */
+[data-theme="berry"] {
+  --yellow: #f6aec6;
+  --yellow-deep: #e88bab;
+  --pink: #c7abf3;
+  --pink-deep: #ab8ce6;
+  --berry: #a12857;
+  --blush: #f8cdd9;
+}
+[data-theme="mint"] {
+  --yellow: #b8e6c4;
+  --yellow-deep: #93d6a8;
+  --pink: #f2be45;
+  --pink-deep: #dfa32b;
+  --berry: #1f7a52;
+  --blush: #dff0d0;
+}
+[data-theme="choco"] {
+  --yellow: #e9c99b;
+  --yellow-deep: #d9ad72;
+  --pink: #eda45f;
+  --pink-deep: #d98a3f;
+  --berry: #7a4520;
+  --blush: #f0dcc3;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }

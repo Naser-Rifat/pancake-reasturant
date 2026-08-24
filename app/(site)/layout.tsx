@@ -40,7 +40,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   return (
     <html lang="en-AU">
-      <body className={`${serif.variable} ${script.variable} ${body.variable} ${round.variable}`}>
+      <body
+        data-theme={site.theme}
+        className={`${serif.variable} ${script.variable} ${body.variable} ${round.variable}`}
+      >
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}

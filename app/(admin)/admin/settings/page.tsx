@@ -30,6 +30,13 @@ const AU_TIMEZONES = [
 
 const EMPTY_ROW = { label: "", opens: "09:00", closes: "17:00" };
 
+const THEMES = [
+  { value: "golden", label: "Golden Morning", swatches: ["#f2be45", "#f2789c", "#c7abf3"] },
+  { value: "berry", label: "Berry Crush", swatches: ["#f6aec6", "#c7abf3", "#a12857"] },
+  { value: "mint", label: "Minty Fresh", swatches: ["#b8e6c4", "#f2be45", "#1f7a52"] },
+  { value: "choco", label: "Choc Latte", swatches: ["#e9c99b", "#eda45f", "#7a4520"] },
+] as const;
+
 export default function SettingsPage() {
   const [site, setSite] = useState<AdminSiteSettings | null>(null);
   const [hours, setHours] = useState<AdminHours[]>([]);
@@ -145,6 +152,52 @@ export default function SettingsPage() {
           >
             Save settings
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* ---------- website theme ---------- */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Website theme</CardTitle>
+          <CardDescription>
+            Colour palette for the public website — click to apply (visitors see it on their next page load)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {THEMES.map((t) => (
+              <button
+                key={t.value}
+                type="button"
+                aria-pressed={site.theme === t.value}
+                onClick={() =>
+                  run(async () => {
+                    await updateSiteSettings({ theme: t.value });
+                    setSite((s) => (s ? { ...s, theme: t.value } : s));
+                  }, "Theme")
+                }
+                className={`rounded-lg border-2 p-3 text-left transition ${
+                  site.theme === t.value
+                    ? "border-zinc-900 bg-zinc-50"
+                    : "border-border hover:border-zinc-400"
+                }`}
+              >
+                <div className="mb-2 flex gap-1.5">
+                  {t.swatches.map((c) => (
+                    <span
+                      key={c}
+                      className="h-5 w-5 rounded-full border border-black/10"
+                      style={{ background: c }}
+                    />
+                  ))}
+                </div>
+                <div className="text-sm font-semibold">{t.label}</div>
+                <div className="text-xs text-muted-foreground">
+                  {site.theme === t.value ? "Active" : " "}
+                </div>
+              </button>
+            ))}
+          </div>
         </CardContent>
       </Card>
 

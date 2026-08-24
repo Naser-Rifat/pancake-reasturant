@@ -393,6 +393,17 @@ class SiteContentApiTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertIn("(02) 9999 8888", mail.outbox[-1].body)
 
+    def test_theme_roundtrip_and_validation(self):
+        # default ships as golden and is public
+        self.assertEqual(self.client.get("/api/site/").json()["theme"], "golden")
+        self.auth()
+        res = self.client.patch("/api/admin/site/", {"theme": "berry"}, format="json")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(self.client.get("/api/site/").json()["theme"], "berry")
+        # unknown palettes are rejected, so the frontend can trust the value
+        res = self.client.patch("/api/admin/site/", {"theme": "neon"}, format="json")
+        self.assertEqual(res.status_code, 400)
+
     def test_admin_gallery_and_certification_crud(self):
         self.auth()
         photo = self.client.post(
