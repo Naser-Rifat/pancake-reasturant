@@ -15,6 +15,7 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import LogoMark from "@/components/LogoMark";
+import { ToastProvider } from "@/components/ui/toast";
 import { clearToken, getToken } from "@/lib/admin-api";
 import { cn } from "@/lib/utils";
 
@@ -42,10 +43,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     setReady(true);
   }, [isLogin, pathname, router]);
 
-  if (isLogin) return <>{children}</>;
+  if (isLogin) return <ToastProvider>{children}</ToastProvider>;
   if (!ready) return null;
 
   return (
+    <ToastProvider>
     <div className="flex min-h-screen">
       <aside className="fixed inset-y-0 left-0 z-20 flex w-56 flex-col bg-sidebar text-sidebar-foreground">
         <div className="flex h-14 items-center gap-2 px-5 text-lg font-bold tracking-tight">
@@ -91,5 +93,6 @@ export default function AdminShell({ children }: { children: ReactNode }) {
       </aside>
       <main className="ml-56 flex-1 bg-muted/40 p-8">{children}</main>
     </div>
+    </ToastProvider>
   );
 }

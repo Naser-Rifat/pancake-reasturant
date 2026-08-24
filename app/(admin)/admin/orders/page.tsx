@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ORDER_STATUSES, STATUS_BADGE } from "../status";
+import { useToast } from "@/components/ui/toast";
 
 const FILTERS = ["all", ...ORDER_STATUSES] as const;
 const POLL_MS = 15_000;
@@ -37,6 +38,7 @@ export default function OrdersPage() {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [error, setError] = useState("");
   const knownIds = useRef<Set<string> | null>(null);
+  const { toast } = useToast();
 
   const load = useCallback(async () => {
     try {
@@ -44,7 +46,14 @@ export default function OrdersPage() {
       const all = await listOrders();
       if (knownIds.current !== null) {
         const fresh = all.filter((o) => !knownIds.current!.has(o.public_id));
-        if (fresh.length > 0) newOrderChime();
+        if (fresh.length > 0) {
+          newOrderChime();
+          toast({
+            variant: "info",
+            title: fresh.length === 1 ? "New order received 🎉" : `${fresh.length} new orders received 🎉`,
+            description: fresh.map((o) => o.customer_name).join(", "),
+          });
+        }
       }
       knownIds.current = new Set(all.map((o) => o.public_id));
       setOrders(all);
@@ -52,7 +61,7 @@ export default function OrdersPage() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     load();
@@ -76,9 +85,22 @@ export default function OrdersPage() {
     );
     try {
       await updateOrder(o.public_id, { status, cancel_reason });
+      toast({
+        variant: "success",
+        title:
+          status === "cancelled"
+            ? "Order cancelled — customer emailed the reason"
+            : status === "ready"
+              ? "Order marked ready — customer notified"
+              : `Order moved to “${status}”`,
+      });
     } catch (e) {
       setOrders(prev); // roll back optimistic update
-      setError(e instanceof Error ? e.message : "Update failed");
+      toast({
+        variant: "error",
+        title: "Status update failed",
+        description: e instanceof Error ? e.message : undefined,
+      });
     }
   };
 

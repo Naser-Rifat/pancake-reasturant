@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { useToast, type ToastInput } from "@/components/ui/toast";
 
 const AU_TIMEZONES = [
   "Australia/Sydney",
@@ -42,7 +43,8 @@ export default function SettingsPage() {
   const [hours, setHours] = useState<AdminHours[]>([]);
   const [newRow, setNewRow] = useState(EMPTY_ROW);
   const [error, setError] = useState("");
-  const [saved, setSaved] = useState("");
+  const [busy, setBusy] = useState("");
+  const { toast } = useToast();
 
   useEffect(() => {
     Promise.all([getSiteSettings(), listHoursAdmin()])
@@ -53,18 +55,19 @@ export default function SettingsPage() {
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"));
   }, []);
 
-  const flash = (what: string) => {
-    setSaved(what);
-    setTimeout(() => setSaved(""), 1800);
-  };
-
-  const run = async (fn: () => Promise<void>, what: string) => {
-    setError("");
+  const run = async (fn: () => Promise<void>, what: string, success?: ToastInput) => {
+    setBusy(what);
     try {
       await fn();
-      flash(what);
+      toast({ variant: "success", title: `${what} saved`, ...success });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Save failed");
+      toast({
+        variant: "error",
+        title: `${what} — action failed`,
+        description: e instanceof Error ? e.message : undefined,
+      });
+    } finally {
+      setBusy("");
     }
   };
 
@@ -83,10 +86,7 @@ export default function SettingsPage() {
             Business details shown on the website and in customer emails
           </p>
         </div>
-        {saved && <span className="text-sm font-medium text-emerald-600">{saved} saved ✓</span>}
       </div>
-
-      {error && <p className="text-sm font-medium text-destructive">{error}</p>}
 
       {/* ---------- contact & business ---------- */}
       <Card>
@@ -135,6 +135,7 @@ export default function SettingsPage() {
           </div>
           <Button
             className="mt-4"
+            loading={busy === "Settings"}
             onClick={() =>
               run(async () => {
                 await updateSiteSettings({
@@ -171,10 +172,18 @@ export default function SettingsPage() {
                 type="button"
                 aria-pressed={site.theme === t.value}
                 onClick={() =>
-                  run(async () => {
-                    await updateSiteSettings({ theme: t.value });
-                    setSite((s) => (s ? { ...s, theme: t.value } : s));
-                  }, "Theme")
+                  run(
+                    async () => {
+                      await updateSiteSettings({ theme: t.value });
+                      setSite((s) => (s ? { ...s, theme: t.value } : s));
+                    },
+                    "Theme",
+                    {
+                      title: `${t.label} theme applied`,
+                      description: "Visitors see it on their next page load",
+                      action: { label: "View site", href: "/" },
+                    }
+                  )
                 }
                 className={`rounded-lg border-2 p-3 text-left transition ${
                   site.theme === t.value
@@ -197,6 +206,62 @@ export default function SettingsPage() {
                 </div>
               </button>
             ))}
+          </div>
+          <div
+            className={`mt-3 rounded-lg border-2 p-3 ${
+              site.theme === "custom" ? "border-zinc-900 bg-zinc-50" : "border-border"
+            }`}
+          >
+            <div className="flex flex-wrap items-end gap-4">
+              <div className="grid gap-1.5">
+                <Label htmlFor="c-primary">Custom — main colour</Label>
+                <Input
+                  id="c-primary"
+                  type="color"
+                  className="h-10 w-16 p-1"
+                  value={site.custom_primary}
+                  onChange={setS("custom_primary")}
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="c-accent">Button colour</Label>
+                <Input
+                  id="c-accent"
+                  type="color"
+                  className="h-10 w-16 p-1"
+                  value={site.custom_accent}
+                  onChange={setS("custom_accent")}
+                />
+              </div>
+              <Button
+                loading={busy === "Theme"}
+                onClick={() =>
+                  run(
+                    async () => {
+                      await updateSiteSettings({
+                        theme: "custom",
+                        custom_primary: site.custom_primary,
+                        custom_accent: site.custom_accent,
+                      });
+                      setSite((s) => (s ? { ...s, theme: "custom" } : s));
+                    },
+                    "Theme",
+                    {
+                      title: "Custom theme applied",
+                      description: "Shades derived — readability auto-checked",
+                      action: { label: "View site", href: "/" },
+                    }
+                  )
+                }
+              >
+                Apply custom
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                {site.theme === "custom"
+                  ? "Active — shades & readability are auto-adjusted"
+                  : "Pick any two colours — we derive the rest and keep text readable"}
+              </span>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -231,7 +296,7 @@ export default function SettingsPage() {
               <Button size="sm" variant="outline" onClick={() =>
                 run(async () => {
                   await updateHours(h.id, { label: h.label, opens: h.opens, closes: h.closes });
-                }, "Hours")
+                }, "Hours", { title: "Opening hours saved" })
               }>
                 Save
               </Button>
@@ -240,7 +305,7 @@ export default function SettingsPage() {
                   if (!confirm(`Delete “${h.label}”?`)) return;
                   await deleteHours(h.id);
                   setHours((xs) => xs.filter((x) => x.id !== h.id));
-                }, "Hours")
+                }, "Hours", { title: "Opening-hours row deleted" })
               }>
                 <Trash2 className="text-destructive" />
               </Button>
@@ -259,7 +324,7 @@ export default function SettingsPage() {
                 const created = await createHours({ ...newRow, sort_order: hours.length });
                 setHours((xs) => [...xs, created]);
                 setNewRow(EMPTY_ROW);
-              }, "Hours")
+              }, "Hours", { title: "Opening hours added" })
             }>
               <Plus /> Add
             </Button>

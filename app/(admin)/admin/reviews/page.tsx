@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/components/ui/toast";
 
 export default function ReviewsAdminPage() {
   const [reviews, setReviews] = useState<AdminReview[]>([]);
@@ -18,14 +19,24 @@ export default function ReviewsAdminPage() {
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"));
   }, []);
 
+  const { toast } = useToast();
+
   const approve = async (r: AdminReview, is_approved: boolean) => {
     const prev = reviews;
     setReviews((rs) => rs.map((x) => (x.id === r.id ? { ...x, is_approved } : x)));
     try {
       await updateReview(r.id, { is_approved });
+      toast({
+        variant: "success",
+        title: is_approved ? `${r.name}'s review is now public` : `${r.name}'s review hidden`,
+      });
     } catch (e) {
       setReviews(prev);
-      setError(e instanceof Error ? e.message : "Update failed");
+      toast({
+        variant: "error",
+        title: "Update failed",
+        description: e instanceof Error ? e.message : undefined,
+      });
     }
   };
 
@@ -35,9 +46,14 @@ export default function ReviewsAdminPage() {
     setReviews((rs) => rs.filter((x) => x.id !== r.id));
     try {
       await deleteReview(r.id);
+      toast({ variant: "success", title: "Review deleted" });
     } catch (e) {
       setReviews(prev);
-      setError(e instanceof Error ? e.message : "Delete failed");
+      toast({
+        variant: "error",
+        title: "Delete failed",
+        description: e instanceof Error ? e.message : undefined,
+      });
     }
   };
 

@@ -30,6 +30,7 @@ import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadButton } from "@/components/ui/upload-button";
+import { useToast, type ToastInput } from "@/components/ui/toast";
 
 const EMPTY_PHOTO: Pick<AdminGalleryPhoto, "album" | "caption" | "image" | "alt"> = {
   album: "food",
@@ -47,7 +48,8 @@ export default function ContentPage() {
   const [newPhoto, setNewPhoto] = useState(EMPTY_PHOTO);
   const [newCert, setNewCert] = useState(EMPTY_CERT);
   const [error, setError] = useState("");
-  const [saved, setSaved] = useState("");
+  const [busy, setBusy] = useState("");
+  const { toast } = useToast();
 
   useEffect(() => {
     Promise.all([getSiteSettings(), listAnnouncements(), listCertifications(), listGalleryAdmin()])
@@ -60,18 +62,19 @@ export default function ContentPage() {
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"));
   }, []);
 
-  const flash = (what: string) => {
-    setSaved(what);
-    setTimeout(() => setSaved(""), 1800);
-  };
-
-  const run = async (fn: () => Promise<void>, what: string) => {
-    setError("");
+  const run = async (fn: () => Promise<void>, what: string, success?: ToastInput) => {
+    setBusy(what);
     try {
       await fn();
-      flash(what);
+      toast({ variant: "success", title: `${what} saved`, ...success });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Save failed");
+      toast({
+        variant: "error",
+        title: `${what} — action failed`,
+        description: e instanceof Error ? e.message : undefined,
+      });
+    } finally {
+      setBusy("");
     }
   };
 
@@ -90,10 +93,7 @@ export default function ContentPage() {
             Everything shown on the public website — changes go live immediately
           </p>
         </div>
-        {saved && <span className="text-sm font-medium text-emerald-600">{saved} saved ✓</span>}
       </div>
-
-      {error && <p className="text-sm font-medium text-destructive">{error}</p>}
 
       {/* ---------- hero + about ---------- */}
       <Card>
@@ -129,6 +129,7 @@ export default function ContentPage() {
           </div>
           <Button
             className="mt-4"
+            loading={busy === "Hero & about"}
             onClick={() =>
               run(async () => {
                 await updateSiteSettings({
@@ -191,12 +192,13 @@ export default function ContentPage() {
               Show on website
             </label>
             <Button
+              loading={busy === "Announcement"}
               onClick={() =>
                 run(async () => {
                   if (!announcement) return;
                   if (announcement.id) await updateAnnouncement(announcement.id, announcement);
                   else setAnnouncement(await createAnnouncement(announcement));
-                }, "Announcement")
+                }, "Announcement", { title: "Announcement saved", description: "Live at the top of the website" })
               }
             >
               Save announcement
@@ -235,14 +237,14 @@ export default function ContentPage() {
                   run(async () => {
                     await updateCertification(c.id, { is_active: v });
                     setCerts((xs) => xs.map((x) => (x.id === c.id ? { ...x, is_active: v } : x)));
-                  }, "Certification")
+                  }, "Certification", { title: v ? "Certification shown on site" : "Certification hidden" })
                 } />
                 Shown
               </label>
               <Button size="sm" variant="outline" onClick={() =>
                 run(async () => {
                   await updateCertification(c.id, { icon: c.icon, title: c.title, subtitle: c.subtitle });
-                }, "Certification")
+                }, "Certification", { title: "Certification saved" })
               }>
                 Save
               </Button>
@@ -251,7 +253,7 @@ export default function ContentPage() {
                   if (!confirm(`Delete “${c.title}”?`)) return;
                   await deleteCertification(c.id);
                   setCerts((xs) => xs.filter((x) => x.id !== c.id));
-                }, "Certification")
+                }, "Certification", { title: "Certification deleted" })
               }>
                 <Trash2 className="text-destructive" />
               </Button>
@@ -269,7 +271,7 @@ export default function ContentPage() {
                 const created = await createCertification({ ...newCert, sort_order: certs.length });
                 setCerts((xs) => [...xs, created]);
                 setNewCert(EMPTY_CERT);
-              }, "Certification")
+              }, "Certification", { title: "Certification added" })
             }>
               <Plus /> Add
             </Button>
@@ -297,7 +299,7 @@ export default function ContentPage() {
                       if (!confirm("Remove this photo from the gallery?")) return;
                       await deleteGalleryPhoto(p.id);
                       setPhotos((xs) => xs.filter((x) => x.id !== p.id));
-                    }, "Gallery")
+                    }, "Gallery", { title: "Photo removed from gallery" })
                   }
                 >
                   <Trash2 className="h-4 w-4 text-destructive" />
@@ -327,7 +329,7 @@ export default function ContentPage() {
                   const created = await createGalleryPhoto({ ...newPhoto, sort_order: photos.length });
                   setPhotos((xs) => [...xs, created]);
                   setNewPhoto(EMPTY_PHOTO);
-                }, "Gallery")
+                }, "Gallery", { title: "Photo added to gallery" })
               }>
               <Plus /> Add photo
             </Button>

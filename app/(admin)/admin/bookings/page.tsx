@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { STATUS_BADGE } from "../status";
+import { useToast } from "@/components/ui/toast";
 
 const FILTERS = ["all", "pending", "confirmed", "cancelled"] as const;
 
@@ -36,6 +37,7 @@ export default function BookingsPage() {
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState(EMPTY_PHONE_BOOKING);
   const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
 
   const load = useCallback(() => {
     listBookings(filter === "all" ? undefined : filter)
@@ -50,9 +52,20 @@ export default function BookingsPage() {
     setBookings((bs) => bs.map((x) => (x.public_id === b.public_id ? { ...x, status } : x)));
     try {
       await updateBooking(b.public_id, { status });
+      toast({
+        variant: "success",
+        title:
+          status === "confirmed"
+            ? `${b.name}'s booking confirmed — email sent`
+            : `${b.name}'s booking cancelled — guest notified`,
+      });
     } catch (e) {
       setBookings(prev);
-      setError(e instanceof Error ? e.message : "Update failed");
+      toast({
+        variant: "error",
+        title: "Update failed",
+        description: e instanceof Error ? e.message : undefined,
+      });
     }
   };
 
@@ -79,8 +92,17 @@ export default function BookingsPage() {
       setAdding(false);
       setForm(EMPTY_PHONE_BOOKING);
       load();
+      toast({
+        variant: "success",
+        title: "Phone booking saved as confirmed",
+        description: form.email ? "Confirmation email sent to the guest" : undefined,
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save booking");
+      toast({
+        variant: "error",
+        title: "Could not save booking",
+        description: err instanceof Error ? err.message : undefined,
+      });
     } finally {
       setSaving(false);
     }
@@ -144,8 +166,8 @@ export default function BookingsPage() {
                 <Input id="pb-notes" value={form.notes} onChange={set("notes")} placeholder="Birthday, window seat…" />
               </div>
               <div className="sm:col-span-2">
-                <Button type="submit" disabled={saving}>
-                  {saving ? "Saving…" : "Save booking (confirmed)"}
+                <Button type="submit" loading={saving}>
+                  Save booking (confirmed)
                 </Button>
               </div>
             </form>
