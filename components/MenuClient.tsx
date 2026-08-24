@@ -107,7 +107,7 @@ export default function MenuClient({
       <main className="container">
         {!live && (
           <p className="ordering-paused" role="status">
-            ⏸️ Online ordering is taking a quick break — please call us on{" "}
+            Online ordering is taking a quick break — please call us on{" "}
             <a href={telHref(restaurantPhone)}>{restaurantPhone}</a> to order. The menu below is still up to date.
           </p>
         )}

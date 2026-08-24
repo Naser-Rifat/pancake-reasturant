@@ -1,28 +1,27 @@
 import Link from "next/link";
 import LogoMark from "@/components/LogoMark";
 import Announce from "@/components/Announce";
+import FeaturedSlider from "@/components/FeaturedSlider";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewsCarousel from "@/components/ReviewsCarousel";
 import {
-  TAG_LABEL,
   formatTime,
   getAnnouncement,
   getCertifications,
-  getFeaturedMenu,
   getGallery,
   getHours,
+  getMenuWithStatus,
   getReviews,
   getSite,
-  heatClass,
   telHref,
 } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [announcement, featured, gallery, reviews, hours, certs, site] = await Promise.all([
+  const [announcement, menu, gallery, reviews, hours, certs, site] = await Promise.all([
     getAnnouncement(),
-    getFeaturedMenu(),
+    getMenuWithStatus(),
     getGallery(),
     getReviews(),
     getHours(),
@@ -60,11 +59,16 @@ export default async function Home() {
               <defs>
                 <path id="badgeCircle" d="M 60,60 m -44,0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0" />
               </defs>
+              <circle
+                cx="60" cy="60" r="33"
+                fill="none" stroke="currentColor" strokeWidth="1.6"
+                strokeDasharray="3.5 6" strokeLinecap="round"
+              />
               <text>
-                <textPath href="#badgeCircle">Book a table • open 7 days •</textPath>
+                <textPath href="#badgeCircle">Book a table • open 7 days • est. 1999 •</textPath>
               </text>
             </svg>
-            <span className="center-ic"><LogoMark size={30} /></span>
+            <span className="center-ic"><LogoMark size={44} /></span>
           </Link>
         </div>
       </section>
@@ -93,28 +97,7 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="featured-grid reveal">
-            {featured.map((f) => (
-              <article className="menu-card" key={f.slug}>
-                <div className="thumb">
-                  <img src={f.image} alt={`${f.name} pancakes`} loading="lazy" />
-                  <span className={`spice-tag ${heatClass(f.heat)}`}>{TAG_LABEL[f.tag]}</span>
-                </div>
-                <div className="body">
-                  <div className="row1">
-                    <h3>{f.name}</h3>
-                    <span className="price">${parseFloat(f.price)}</span>
-                  </div>
-                  <p className="desc">{f.description}</p>
-                  <Link href="/menu" className="btn btn-primary">See on Menu →</Link>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <div className="section-foot reveal">
-            <Link href="/menu" className="btn btn-ghost">View Full Menu</Link>
-          </div>
+          <FeaturedSlider items={menu.items} />
         </div>
       </section>
 

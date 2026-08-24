@@ -14,14 +14,14 @@
 :root {
   --cream: #f8f2e0;
   --cream-card: #fdf9ee;
-  --lavender: #c9b2f0;
+  --lavender: #c7abf3;
   --lav-soft: #ded1f6;
-  --pink: #e8829c;
+  --pink: #f2789c;
   --pink-deep: #d95f80;
   --blush: #f4bcca;
-  --yellow: #e6d63a;
-  --yellow-deep: #c9ba22;
-  --green: #55a054;
+  --yellow: #f2be45;
+  --yellow-deep: #dfa32b;
+  --green: #58ab57;
   --ink: #211a14;
   --muted: #837868;
   --script-pink: #ef9fb4;
@@ -263,6 +263,9 @@ body.has-announce .nav-links { top: calc(var(--nav-h) + 44px - 6px); }
   transform: rotate(-3deg);
   margin-top: 0.35rem;
   letter-spacing: 0;
+  /* Pacifico's descenders overflow the h1's tight 0.92 line box —
+     give the script line its own room so it never overlaps the lead */
+  line-height: 1.25;
 }
 .hero-card-left p.lead {
   color: rgba(255, 255, 255, 0.92);
@@ -393,6 +396,7 @@ h2.title .accent {
   color: var(--script-pink);
   transform: rotate(-2deg);
   margin-top: 0.3rem;
+  line-height: 1.25;
 }
 .section-lead {
   color: var(--muted);
@@ -578,6 +582,7 @@ h2.title .accent {
   color: var(--yellow);
   transform: rotate(-2deg);
   margin-top: 0.4rem;
+  line-height: 1.25;
 }
 .cta p { color: #ffeef3; font-size: 1.1rem; margin: 1.4rem auto 2.2rem; max-width: 34rem; }
 
@@ -653,6 +658,7 @@ footer .logo { color: var(--yellow); }
   color: var(--script-pink);
   transform: rotate(-2deg);
   margin-top: 0.4rem;
+  line-height: 1.25;
 }
 .menu-hero p { color: var(--muted); font-size: 1.1rem; margin-top: 1rem; }
 
@@ -755,6 +761,26 @@ footer .logo { color: var(--yellow); }
   box-shadow: none;
 }
 .menu-card .btn:hover { background: var(--ink); color: var(--cream); }
+
+/* ---------- menu category tabs + card slider ---------- */
+.menu-tabs { margin-top: 0; margin-bottom: 2rem; }
+.menu-slider-wrap { padding-bottom: 4.5rem; }
+.menu-slider {
+  display: flex;
+  gap: 1.8rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  /* generous bottom padding: the scroll container clips overflow, and the
+     cards' soft box-shadows need ~4rem below them or they get cut into a
+     hard-edged band on the background */
+  padding: 0.9rem 0.2rem 4rem;
+  scrollbar-width: none;
+}
+.menu-slider::-webkit-scrollbar { display: none; }
+.menu-slider .menu-card {
+  flex: 0 0 min(340px, 84vw);
+  scroll-snap-align: start;
+}
 
 /* ---------- cart ---------- */
 .cart-fab {
@@ -1171,6 +1197,7 @@ body.has-announce .page-hero { padding-top: calc(var(--nav-h) + 2.5rem + 44px); 
   color: var(--script-pink);
   transform: rotate(-2deg);
   margin-top: 0.4rem;
+  line-height: 1.25;
 }
 .page-hero p { color: var(--muted); font-size: 1.05rem; margin-top: 1rem; }
 
@@ -1398,6 +1425,7 @@ textarea.input { resize: vertical; }
   .announce { font-size: 0.85rem; }
 
   .menu-grid { padding-bottom: 6rem; }
+  .menu-slider-wrap { padding-bottom: 6rem; }
   .booking-grid { padding-bottom: 6rem; }
   .map-card { min-height: 340px; }
   .map-card iframe { min-height: 340px; }
@@ -1437,7 +1465,8 @@ textarea.input { resize: vertical; }
   /* hero: side-by-side cards + spinning badge */
   .hero { padding: calc(var(--nav-h) + 2.5rem) 0 3.5rem; }
   body.has-announce .hero { padding-top: calc(var(--nav-h) + 2.5rem + 44px); }
-  .hero-cards { grid-template-columns: 1fr 1.05fr; }
+  /* 55/45 split — keep .round-badge's left below in sync with the seam */
+  .hero-cards { grid-template-columns: 2.2fr 1.8fr; }
   .hero-card-left {
     align-items: stretch;
     text-align: left;
@@ -1445,7 +1474,7 @@ textarea.input { resize: vertical; }
     height: clamp(380px, calc(100svh - var(--nav-h) - 170px), 560px);
   }
   .hero-card-right { height: clamp(380px, calc(100svh - var(--nav-h) - 170px), 560px); }
-  .round-badge { display: grid; }
+  .round-badge { display: grid; left: 55%; }
 
   section.block { padding: 6rem 0; }
 
@@ -1533,10 +1562,138 @@ textarea.input { resize: vertical; }
 }
 
 /* ============================================
+   CRAFT LAYER — senior-designer polish pass
+   micro-interactions, depth, type & a11y details
+   ============================================ */
+
+/* --- brand-coloured text selection --- */
+::selection { background: var(--pink); color: #fff; }
+
+/* --- visible, on-brand keyboard focus --- */
+:focus-visible {
+  outline: 3px solid var(--pink-deep);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* --- headings never break awkwardly --- */
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+
+/* --- anchor links land clear of the fixed nav --- */
+section[id] { scroll-margin-top: calc(var(--nav-h) + 56px); }
+
+/* --- film-grain texture: gives the pastel flats a tactile, print feel --- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 65;
+  opacity: 0.16;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
+}
+
+/* --- ELEVATION SYSTEM ---------------------------------------------
+   Three deliberate tiers, so a shadow always MEANS something:
+   1. resting  — content sits calmly on the page (subtle or none)
+   2. interactive — light at rest, ELEVATES on hover ("you can touch me")
+   3. floating — fixed/overlay chrome keeps strong shadows (nav, fab,
+      drawer, toast, badge, lightbox — untouched below this block)
+------------------------------------------------------------------- */
+
+/* tier 1: resting content — fully flat, the pastel does the work */
+.stat-card,
+.cert-badge,
+.rev-card,
+.gallery-grid a,
+.about-collage img,
+.hours-card, .widget-card,
+.map-card,
+.fallback-card,
+.ing-card,
+.city-card,
+.experience, .certs { box-shadow: none; }
+
+/* tier 2: interactive — flat at rest, shadow appears ON HOVER only */
+.menu-card { box-shadow: none; }
+.btn-primary { box-shadow: none; }
+.gallery-grid a:hover { box-shadow: 0 10px 24px rgba(33, 26, 20, 0.16); }
+.about-collage img:hover { box-shadow: 0 10px 24px rgba(33, 26, 20, 0.16); }
+/* (menu-card & button hover states keep their original larger shadows) */
+
+/* tier 3: floating chrome — layered contact + ambient */
+.nav-inner { box-shadow: 0 1px 2px rgba(33, 26, 20, 0.1), 0 14px 34px rgba(33, 26, 20, 0.16); }
+
+/* --- springy button physics (transform only — colours stay eased) --- */
+.btn {
+  transition:
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.25s ease, background 0.2s ease, color 0.2s ease;
+}
+
+/* --- dish tilt: cutouts lean into the hover like a picked-up plate --- */
+.menu-card:hover .thumb img { transform: scale(1.06) rotate(-3.5deg); }
+.menu-card .thumb img { transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+/* --- marquee pauses for reading on hover --- */
+.marquee:hover .marquee-track { animation-play-state: paused; }
+
+/* --- logo mark gives a little nod on hover --- */
+.logo svg { transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.logo:hover svg { transform: rotate(-8deg) translateY(-2px); }
+
+/* --- hero entrance choreography: content cascades in on load --- */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes photo-settle {
+  from { transform: scale(1.07); }
+  to { transform: scale(1); }
+}
+.hero-card-left h1 { animation: rise-in 0.7s 0.1s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.hero-card-left p.lead { animation: rise-in 0.7s 0.25s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.hero-card-left > div { animation: rise-in 0.7s 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.hero-card-right img { animation: photo-settle 1.4s cubic-bezier(0.22, 1, 0.36, 1); }
+/* the badge is centred via its own transform, so it needs its own keyframes */
+@keyframes badge-in {
+  from { opacity: 0; transform: translate(-50%, -34%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+.round-badge { animation: badge-in 0.6s 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+
+/* --- slim, on-brand scrollbar (desktop WebKit) --- */
+@media (min-width: 1024px) {
+  ::-webkit-scrollbar { width: 12px; }
+  ::-webkit-scrollbar-track { background: var(--cream); }
+  ::-webkit-scrollbar-thumb {
+    background: var(--lavender);
+    border-radius: 8px;
+    border: 3px solid var(--cream);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--pink); }
+}
+
+/* ============================================
+   GEN Z COLOR TUNE — colourful stays, contrast fixed
+   big headlines stay white (large-text rule passes);
+   small text goes bold ink-on-candy, poster style
+   ============================================ */
+.hero-card-left p.lead { color: rgba(33, 26, 20, 0.82); font-weight: 500; }
+.menu-card .desc { color: rgba(33, 26, 20, 0.78); }
+.chip { background: rgba(253, 249, 238, 0.92); color: var(--ink); }
+.cta p { color: rgba(33, 26, 20, 0.8); font-weight: 500; }
+.city-card p { color: #fff; } /* sits on a dark gradient — keep */
+
+/* ============================================
    Reduced motion
    ============================================ */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .marquee-track, .round-badge svg, .pancake-illust { animation: none; }
   .reveal { opacity: 1; transform: none; transition: none; }
+  .hero-card-left h1, .hero-card-left p.lead, .hero-card-left > div,
+  .hero-card-right img, .round-badge { animation: none; }
+  .menu-card:hover .thumb img { transform: none; }
 }
