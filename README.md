@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Pancake Club 🥞
 
-## Getting Started
+Full-stack website + management system for a pancake restaurant.
 
-First, run the development server:
+| Piece | Stack | Where |
+|---|---|---|
+| Public storefront | Next.js (App Router) + TypeScript, hand-crafted CSS design system | `app/(site)` |
+| Admin panel (`/admin`) | Next.js + Tailwind v4 + shadcn-style components | `app/(admin)` |
+| REST API | Django 5.2 LTS + Django REST Framework | `backend/` |
+
+The storefront and admin live in the **same Next.js app** under two isolated
+root layouts — the admin's Tailwind never touches the storefront's retro CSS.
+
+## Run it (two terminals)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 1 — backend API  (first time: see backend/README.md for setup)
+cd backend
+.venv/bin/python manage.py runserver 8000
+
+# 2 — frontend
+npm install
+npm run dev            # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Storefront: <http://localhost:3000> · Admin panel: <http://localhost:3000/admin>
+- Django admin (backup tooling): <http://localhost:8000/admin/>
+- Copy `.env.example` → `.env.local` for optional config (Cloudinary uploads, site URL).
+- The storefront still renders (with fallback content, ordering paused) if the
+  backend is down.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Tests
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cd backend && .venv/bin/python manage.py test   # API/unit suite
+npm run test:e2e                                # Playwright smoke (needs both servers seeded)
+```
 
-## Learn More
+CI (GitHub Actions) runs backend tests, a production build and the e2e smoke
+suite on every push/PR — see `.github/workflows/ci.yml`.
 
-To learn more about Next.js, take a look at the following resources:
+## Project map
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/(site)/        storefront pages (home, menu, gallery, booking, privacy)
+app/(admin)/admin/ admin panel (dashboard, orders, bookings, menu, reviews,
+                   site content, settings) — token login, staff only
+components/        storefront components · components/ui/ = admin primitives
+lib/api.ts         typed public-API client (server components, with fallbacks)
+lib/admin-api.ts   typed staff-API client (browser, token auth)
+app/globals.css    storefront design system (tokens, elevation, motion)
+backend/           Django project — see backend/README.md for API docs
+e2e/               Playwright smoke suite
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Content & operations
 
-## Deploy on Vercel
+Everything editable lives in the admin panel: menu (CRUD + featured/availability),
+orders (live alerts, status flow, cancel-with-reason), bookings (confirm/decline,
+phone bookings), review moderation, gallery, certifications, announcement bar,
+hero/about copy, contact details, opening hours, timezone. Customer emails
+(order/booking lifecycle) send automatically — console backend in dev, SMTP via
+env in production.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploying
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Frontend → Vercel; backend + Postgres → Railway/Render. Set the env vars listed
+in `backend/README.md` (secret key, hosts, CORS, SMTP) and `NEXT_PUBLIC_API_URL`
+on the frontend. Change the default admin password before launch.

@@ -30,7 +30,9 @@ export default function Nav() {
   return (
     <header className={`nav${scrolled ? " scrolled" : ""}`}>
       <div className="container nav-inner">
-        <Link href="/" className="logo"><LogoMark /> the pancake club</Link>
+        <Link href="/" className="logo" aria-label="The Pancake Club — home">
+          <LogoMark /> <span className="logo-word">the pancake club</span>
+        </Link>
 
         <ul className={`nav-links${open ? " open" : ""}`}>
           {LINKS.map((l) => (
