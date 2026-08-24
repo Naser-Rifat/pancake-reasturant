@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import type { ApiGalleryPhoto } from "@/lib/api";
 
 type Album = ApiGalleryPhoto["album"];
@@ -57,7 +58,7 @@ export default function GalleryClient({ photos }: { photos: ApiGalleryPhoto[] })
               key={p.image}
               onClick={(e) => { e.preventDefault(); show(i); }}
             >
-              <img src={p.image} alt={p.alt} loading="lazy" />
+              <Image src={p.image} alt={p.alt} width={700} height={500} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw" />
             </a>
           ))}
         </div>
@@ -77,7 +78,7 @@ export default function GalleryClient({ photos }: { photos: ApiGalleryPhoto[] })
         >
           <button className="lb-btn lb-close" aria-label="Close" onClick={() => setCurrent(null)}>✕</button>
           <button className="lb-btn lb-prev" aria-label="Previous photo" onClick={() => show(current! - 1)}>←</button>
-          <img src={photo.image.replace("w=700", "w=1400")} alt={photo.alt} />
+          <Image src={photo.image.replace("w=700", "w=1400")} alt={photo.alt} width={1400} height={1050} sizes="92vw" />
           <div className="lb-caption">{photo.caption}</div>
           <button className="lb-btn lb-next" aria-label="Next photo" onClick={() => show(current! + 1)}>→</button>
         </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import LogoMark from "@/components/LogoMark";
 import Announce from "@/components/Announce";
 import FeaturedSlider from "@/components/FeaturedSlider";
@@ -50,7 +51,14 @@ export default async function Home() {
           </div>
 
           <div className="hero-card-right">
-            <img src={site.hero_image} alt="Signature dish at The Pancake Club" />
+            <Image
+              src={site.hero_image}
+              alt="Signature dish at The Pancake Club"
+              width={1200}
+              height={800}
+              priority
+              sizes="(min-width: 1024px) 45vw, 100vw"
+            />
           </div>
 
           <Link href="/booking" className="round-badge" aria-label="Book a table — open 7 days">
@@ -105,9 +113,9 @@ export default async function Home() {
       <section className="block" id="about" style={{ paddingTop: "1rem" }}>
         <div className="container about-grid">
           <div className="about-collage reveal">
-            <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=75" alt="Inside The Pancake Club" />
-            <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=75" alt="Banana pancake stack" />
-            <img src="https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&q=75" alt="Pancakes with honey drizzle" />
+            <Image src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=75" alt="Inside The Pancake Club" width={800} height={600} sizes="(min-width: 1024px) 25vw, 50vw" />
+            <Image src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=75" alt="Banana pancake stack" width={600} height={450} sizes="(min-width: 1024px) 12vw, 25vw" />
+            <Image src="https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&q=75" alt="Pancakes with honey drizzle" width={600} height={450} sizes="(min-width: 1024px) 12vw, 25vw" />
           </div>
           <div className="reveal">
             <p className="kicker">Welcome to the Club</p>
@@ -136,7 +144,7 @@ export default async function Home() {
           <div className="gallery-grid reveal">
             {gallery.slice(0, 8).map((p) => (
               <Link href="/gallery" key={p.image}>
-                <img src={p.image} alt={p.alt} loading="lazy" />
+                <Image src={p.image} alt={p.alt} width={700} height={500} sizes="(min-width: 1024px) 25vw, 50vw" />
               </Link>
             ))}
           </div>

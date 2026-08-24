@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LogoMark from "@/components/LogoMark";
@@ -31,7 +32,8 @@ export default function Nav() {
     <header className={`nav${scrolled ? " scrolled" : ""}`}>
       <div className="container nav-inner">
         <Link href="/" className="logo" aria-label="The Pancake Club — home">
-          <LogoMark /> <span className="logo-word">the pancake club</span>
+          <span className="logo-mark" aria-hidden="true"><LogoMark /></span>
+          <Image src="/logo.png" alt="The Pancake Club" width={529} height={226} priority className="logo-word" />
         </Link>
 
         <ul className={`nav-links${open ? " open" : ""}`}>

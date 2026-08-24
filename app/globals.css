@@ -138,6 +138,9 @@ a { color: inherit; text-decoration: none; }
 }
 /* phones: icon-only brand — the full wordmark doesn't fit beside the CTA */
 .nav .logo-word { display: none; }
+.nav .logo-mark { display: flex; }
+/* the supplied wordmark PNG (public/logo.png) */
+img.logo-word { height: 44px; width: auto; }
 
 .nav-links {
   position: fixed;
@@ -1381,7 +1384,8 @@ textarea.input { resize: vertical; }
    ≥ 640px — large phones / small tablets
    ============================================ */
 @media (min-width: 640px) {
-  .nav .logo-word { display: inline; }
+  .nav .logo-word { display: block; }
+  .nav .logo-mark { display: none; } /* wordmark carries its own icon in the A */
   .hero-card-right { height: 320px; }
 
   .about-collage { grid-template-rows: 160px 160px; }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Plus, Trash2 } from "lucide-react";
 import {
   createAnnouncement,
@@ -286,8 +287,7 @@ export default function ContentPage() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
             {photos.map((p) => (
               <div key={p.id} className="group relative overflow-hidden rounded-md border">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.image} alt={p.alt} className="h-24 w-full object-cover" />
+                <Image src={p.image} alt={p.alt} width={300} height={200} sizes="200px" className="h-24 w-full object-cover" />
                 <Badge variant="secondary" className="absolute left-1 top-1 capitalize">{p.album}</Badge>
                 <button
                   aria-label={`Delete photo: ${p.caption}`}

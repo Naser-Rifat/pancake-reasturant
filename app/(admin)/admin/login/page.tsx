@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import LogoMark from "@/components/LogoMark";
 import { adminLogin } from "@/lib/admin-api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,8 +34,8 @@ export default function AdminLoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="flex justify-center"><LogoMark size={40} /></div>
-          <CardTitle className="text-xl">Pancake Club Admin</CardTitle>
+          <Image src="/logo.png" alt="The Pancake Club" width={529} height={226} className="mx-auto h-16 w-auto" />
+          <CardTitle className="text-xl">Admin</CardTitle>
           <CardDescription>Sign in with your staff account</CardDescription>
         </CardHeader>
         <CardContent>

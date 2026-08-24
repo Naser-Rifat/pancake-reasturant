@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
 import {
   createMenuItem,
@@ -260,7 +261,7 @@ export default function MenuAdminPage() {
                 <TableRow key={item.slug}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <img src={item.image} alt="" className="h-10 w-10 rounded-md object-contain" />
+                      <Image src={item.image} alt="" width={80} height={80} className="h-10 w-10 rounded-md object-contain" />
                       <div>
                         <div className="font-medium">{item.name}</div>
                         <div className="max-w-72 truncate text-xs text-muted-foreground">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { TAG_LABEL, heatClass, type ApiMenuItem } from "@/lib/api";
 
@@ -54,7 +55,7 @@ export default function FeaturedSlider({ items }: { items: ApiMenuItem[] }) {
         {visible.map((f) => (
           <article className="menu-card" key={f.slug}>
             <div className="thumb">
-              <img src={f.image} alt={`${f.name} pancakes`} loading="lazy" />
+              <Image src={f.image} alt={`${f.name} pancakes`} width={600} height={600} sizes="340px" />
               <span className={`spice-tag ${heatClass(f.heat)}`}>{TAG_LABEL[f.tag]}</span>
             </div>
             <div className="body">

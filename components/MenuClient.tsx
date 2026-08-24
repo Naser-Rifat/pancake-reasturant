@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { ShoppingCart } from "lucide-react";
 import {
   TAG_LABEL,
@@ -115,7 +116,7 @@ export default function MenuClient({
           {items.map((b, i) => (
             <article className="menu-card reveal" key={b.slug} style={{ transitionDelay: `${(i % 3) * 0.08}s` }}>
               <div className="thumb">
-                <img src={b.image} alt={`${b.name} pancakes`} loading="lazy" />
+                <Image src={b.image} alt={`${b.name} pancakes`} width={600} height={600} sizes="340px" />
                 <span className={`spice-tag ${heatClass(b.heat)}`}>{TAG_LABEL[b.tag]}</span>
               </div>
               <div className="body">
@@ -162,7 +163,7 @@ export default function MenuClient({
               const b = itemBySlug(slug);
               return (
                 <div className="cart-item" key={slug}>
-                  <img src={b.image} alt={b.name} />
+                  <Image src={b.image} alt={b.name} width={58} height={58} />
                   <div>
                     <div className="n">{b.name}</div>
                     <div className="p">${parseFloat(b.price)} × {qty} = ${(priceOf(slug) * qty).toFixed(2)}</div>
