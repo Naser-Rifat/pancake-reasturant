@@ -45,7 +45,7 @@ export default async function Home() {
             <p className="lead">{site.hero_lead}</p>
             <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
               <Link href="/booking" className="btn btn-primary">Book a Table</Link>
-              <Link href="/menu" className="btn btn-ghost" style={{ borderColor: "#fff", color: "#fff" }}>
+              <Link href="/menu" className="btn btn-ghost">
                 Explore Our Menu
               </Link>
             </div>

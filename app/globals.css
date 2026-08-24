@@ -18,17 +18,20 @@
   --lav-soft: #ded1f6;
   --pink: #f2789c;
   --pink-deep: #d95f80;
+  --berry: #bf2f63;      /* raspberry — the ONE script-accent colour (3.2:1 on gold, 5.5:1 on cream) */
   --blush: #f4bcca;
   --yellow: #f2be45;
   --yellow-deep: #dfa32b;
-  --green: #58ab57;
+  --green: #8fd65a;       /* lime — the gen-z member of the candy set */
+  --green-deep: #3f8f3a;  /* readable green for small text on cream */
   --ink: #211a14;
   --muted: #837868;
-  --script-pink: #ef9fb4;
   --radius: 34px;
   --radius-xl: 36px; /* big section rounding — grows on tablet+ */
   --frame: 8px;      /* lavender page frame — grows on tablet+ */
   --nav-h: 104px;
+  --doodle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='%23fff' fill-opacity='0.15'%3E%3Cg transform='translate(18 16) rotate(-10 8 10)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3Cg transform='translate(92 26)'%3E%3Ccircle cx='9' cy='9' r='9'/%3E%3Ccircle cx='9' cy='9' r='3.2' fill='%23fff' fill-opacity='0.32'/%3E%3C/g%3E%3Cg transform='translate(56 66) rotate(8 6 8)'%3E%3Cpath d='M6 0 C6 0 0 8 0 12 a6 6 0 0 0 12 0 C12 8 6 0 6 0 Z'/%3E%3C/g%3E%3Cg transform='translate(118 88) rotate(15 8 10)'%3E%3Cpath d='M8 5 C12 5 15 9 13.5 14 C12 18 8 21 8 21 C8 21 4 18 2.5 14 C1 9 4 5 8 5 Z'/%3E%3Cpath d='M4 5 L8 0 L12 5 Z'/%3E%3C/g%3E%3Cg transform='translate(28 108) rotate(8 6 6)'%3E%3Crect width='12' height='12' rx='3'/%3E%3C/g%3E%3Cg transform='translate(74 124) rotate(-25 6 12)'%3E%3Crect x='4.5' y='8' width='3' height='16' rx='1.5'/%3E%3Crect x='1' width='2.2' height='9' rx='1'/%3E%3Crect x='4.9' width='2.2' height='9' rx='1'/%3E%3Crect x='8.8' width='2.2' height='9' rx='1'/%3E%3C/g%3E%3Cg transform='translate(138 44)'%3E%3Cpath d='M7 0 L8.5 5.5 L14 7 L8.5 8.5 L7 14 L5.5 8.5 L0 7 L5.5 5.5 Z'/%3E%3C/g%3E%3Cg transform='translate(112 138) rotate(12 6 7) scale(0.75)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  --doodle-strong: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='%23fff' fill-opacity='0.26'%3E%3Cg transform='translate(18 16) rotate(-10 8 10)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3Cg transform='translate(92 26)'%3E%3Ccircle cx='9' cy='9' r='9'/%3E%3Ccircle cx='9' cy='9' r='3.2' fill='%23fff' fill-opacity='0.5'/%3E%3C/g%3E%3Cg transform='translate(56 66) rotate(8 6 8)'%3E%3Cpath d='M6 0 C6 0 0 8 0 12 a6 6 0 0 0 12 0 C12 8 6 0 6 0 Z'/%3E%3C/g%3E%3Cg transform='translate(118 88) rotate(15 8 10)'%3E%3Cpath d='M8 5 C12 5 15 9 13.5 14 C12 18 8 21 8 21 C8 21 4 18 2.5 14 C1 9 4 5 8 5 Z'/%3E%3Cpath d='M4 5 L8 0 L12 5 Z'/%3E%3C/g%3E%3Cg transform='translate(28 108) rotate(8 6 6)'%3E%3Crect width='12' height='12' rx='3'/%3E%3C/g%3E%3Cg transform='translate(74 124) rotate(-25 6 12)'%3E%3Crect x='4.5' y='8' width='3' height='16' rx='1.5'/%3E%3Crect x='1' width='2.2' height='9' rx='1'/%3E%3Crect x='4.9' width='2.2' height='9' rx='1'/%3E%3Crect x='8.8' width='2.2' height='9' rx='1'/%3E%3C/g%3E%3Cg transform='translate(138 44)'%3E%3Cpath d='M7 0 L8.5 5.5 L14 7 L8.5 8.5 L7 14 L5.5 8.5 L0 7 L5.5 5.5 Z'/%3E%3C/g%3E%3Cg transform='translate(112 138) rotate(12 6 7) scale(0.75)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -180,7 +183,7 @@ body.has-announce .nav-links { top: calc(var(--nav-h) + 44px - 6px); }
   transition: background 0.2s, color 0.2s;
 }
 .nav-links a:hover { background: rgba(33, 26, 20, 0.1); }
-.nav-links a.active { background: var(--pink); color: #fff; }
+.nav-links a.active { background: var(--pink); color: var(--ink); }
 /* little drip under the active pill */
 .nav-links a.active::after {
   content: "";
@@ -195,13 +198,13 @@ body.has-announce .nav-links { top: calc(var(--nav-h) + 44px - 6px); }
 
 .nav-cta { display: flex; align-items: center; gap: 0.8rem; }
 .nav-cta .btn {
-  background: var(--yellow);
+  background: var(--pink);
   color: var(--ink);
   box-shadow: none;
   padding: 0.55rem 1.1rem;
   font-size: 0.7rem;
 }
-.nav-cta .btn:hover { background: var(--pink); color: #fff; transform: translateY(-2px); }
+.nav-cta .btn:hover { background: var(--ink); color: var(--cream); transform: translateY(-2px); }
 
 .burger-toggle {
   display: flex;
@@ -236,7 +239,7 @@ body.has-announce .nav-links { top: calc(var(--nav-h) + 44px - 6px); }
   align-items: stretch;
 }
 .hero-card-left {
-  background: var(--pink);
+  background: var(--yellow);
   border-radius: 44px;
   padding: clamp(2.2rem, 5vw, 4rem);
   padding-block: 2.8rem;
@@ -253,7 +256,7 @@ body.has-announce .nav-links { top: calc(var(--nav-h) + 44px - 6px); }
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='%23fff' fill-opacity='0.15'%3E%3Cg transform='translate(18 16) rotate(-10 8 10)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3Cg transform='translate(92 26)'%3E%3Ccircle cx='9' cy='9' r='9'/%3E%3Ccircle cx='9' cy='9' r='3.2' fill='%23f2789c' fill-opacity='0.9'/%3E%3C/g%3E%3Cg transform='translate(56 66) rotate(8 6 8)'%3E%3Cpath d='M6 0 C6 0 0 8 0 12 a6 6 0 0 0 12 0 C12 8 6 0 6 0 Z'/%3E%3C/g%3E%3Cg transform='translate(118 88) rotate(15 8 10)'%3E%3Cpath d='M8 5 C12 5 15 9 13.5 14 C12 18 8 21 8 21 C8 21 4 18 2.5 14 C1 9 4 5 8 5 Z'/%3E%3Cpath d='M4 5 L8 0 L12 5 Z'/%3E%3C/g%3E%3Cg transform='translate(28 108) rotate(8 6 6)'%3E%3Crect width='12' height='12' rx='3'/%3E%3C/g%3E%3Cg transform='translate(74 124) rotate(-25 6 12)'%3E%3Crect x='4.5' y='8' width='3' height='16' rx='1.5'/%3E%3Crect x='1' width='2.2' height='9' rx='1'/%3E%3Crect x='4.9' width='2.2' height='9' rx='1'/%3E%3Crect x='8.8' width='2.2' height='9' rx='1'/%3E%3C/g%3E%3Cg transform='translate(138 44)'%3E%3Cpath d='M7 0 L8.5 5.5 L14 7 L8.5 8.5 L7 14 L5.5 8.5 L0 7 L5.5 5.5 Z'/%3E%3C/g%3E%3Cg transform='translate(112 138) rotate(12 6 7) scale(0.75)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-image: var(--doodle-strong);
   background-size: 160px 160px;
   pointer-events: none;
 }
@@ -263,7 +266,7 @@ body.has-announce .nav-links { top: calc(var(--nav-h) + 44px - 6px); }
   font-weight: 400;
   font-size: clamp(3rem, 6.5vw, 5.4rem);
   line-height: 0.92;
-  color: #fff;
+  color: var(--ink);
   text-transform: uppercase;
   letter-spacing: 0.01em;
 }
@@ -272,7 +275,7 @@ body.has-announce .nav-links { top: calc(var(--nav-h) + 44px - 6px); }
   font-family: var(--font-script);
   text-transform: none;
   font-size: 0.62em;
-  color: var(--yellow);
+  color: var(--berry);
   transform: rotate(-3deg);
   margin-top: 0.35rem;
   letter-spacing: 0;
@@ -406,7 +409,7 @@ h2.title .accent {
   font-family: var(--font-script);
   text-transform: none;
   font-size: 0.78em;
-  color: var(--script-pink);
+  color: var(--berry);
   transform: rotate(-2deg);
   margin-top: 0.3rem;
   line-height: 1.25;
@@ -576,7 +579,7 @@ h2.title .accent {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='%23fff' fill-opacity='0.15'%3E%3Cg transform='translate(18 16) rotate(-10 8 10)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3Cg transform='translate(92 26)'%3E%3Ccircle cx='9' cy='9' r='9'/%3E%3Ccircle cx='9' cy='9' r='3.2' fill='%23f2789c' fill-opacity='0.9'/%3E%3C/g%3E%3Cg transform='translate(56 66) rotate(8 6 8)'%3E%3Cpath d='M6 0 C6 0 0 8 0 12 a6 6 0 0 0 12 0 C12 8 6 0 6 0 Z'/%3E%3C/g%3E%3Cg transform='translate(118 88) rotate(15 8 10)'%3E%3Cpath d='M8 5 C12 5 15 9 13.5 14 C12 18 8 21 8 21 C8 21 4 18 2.5 14 C1 9 4 5 8 5 Z'/%3E%3Cpath d='M4 5 L8 0 L12 5 Z'/%3E%3C/g%3E%3Cg transform='translate(28 108) rotate(8 6 6)'%3E%3Crect width='12' height='12' rx='3'/%3E%3C/g%3E%3Cg transform='translate(74 124) rotate(-25 6 12)'%3E%3Crect x='4.5' y='8' width='3' height='16' rx='1.5'/%3E%3Crect x='1' width='2.2' height='9' rx='1'/%3E%3Crect x='4.9' width='2.2' height='9' rx='1'/%3E%3Crect x='8.8' width='2.2' height='9' rx='1'/%3E%3C/g%3E%3Cg transform='translate(138 44)'%3E%3Cpath d='M7 0 L8.5 5.5 L14 7 L8.5 8.5 L7 14 L5.5 8.5 L0 7 L5.5 5.5 Z'/%3E%3C/g%3E%3Cg transform='translate(112 138) rotate(12 6 7) scale(0.75)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-image: var(--doodle);
   background-size: 160px 160px;
 }
 .cta > .container { position: relative; }
@@ -668,7 +671,7 @@ footer .logo { color: var(--yellow); }
   font-family: var(--font-script);
   text-transform: none;
   font-size: 0.72em;
-  color: var(--script-pink);
+  color: var(--berry);
   transform: rotate(-2deg);
   margin-top: 0.4rem;
   line-height: 1.25;
@@ -725,7 +728,7 @@ footer .logo { color: var(--yellow); }
   letter-spacing: 0.1em;
   text-transform: uppercase;
   background: var(--cream-card);
-  color: var(--green);
+  color: var(--green-deep);
   padding: 0.3rem 0.85rem;
   border-radius: 999px;
   box-shadow: 0 6px 14px rgba(33, 26, 20, 0.2);
@@ -1209,7 +1212,7 @@ body.has-announce .page-hero { padding-top: calc(var(--nav-h) + 2.5rem + 44px); 
   font-family: var(--font-script);
   text-transform: none;
   font-size: 0.72em;
-  color: var(--script-pink);
+  color: var(--berry);
   transform: rotate(-2deg);
   margin-top: 0.4rem;
   line-height: 1.25;
@@ -1276,7 +1279,7 @@ body.has-announce .page-hero { padding-top: calc(var(--nav-h) + 2.5rem + 44px); 
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='%23fff' fill-opacity='0.15'%3E%3Cg transform='translate(18 16) rotate(-10 8 10)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3Cg transform='translate(92 26)'%3E%3Ccircle cx='9' cy='9' r='9'/%3E%3Ccircle cx='9' cy='9' r='3.2' fill='%23f2789c' fill-opacity='0.9'/%3E%3C/g%3E%3Cg transform='translate(56 66) rotate(8 6 8)'%3E%3Cpath d='M6 0 C6 0 0 8 0 12 a6 6 0 0 0 12 0 C12 8 6 0 6 0 Z'/%3E%3C/g%3E%3Cg transform='translate(118 88) rotate(15 8 10)'%3E%3Cpath d='M8 5 C12 5 15 9 13.5 14 C12 18 8 21 8 21 C8 21 4 18 2.5 14 C1 9 4 5 8 5 Z'/%3E%3Cpath d='M4 5 L8 0 L12 5 Z'/%3E%3C/g%3E%3Cg transform='translate(28 108) rotate(8 6 6)'%3E%3Crect width='12' height='12' rx='3'/%3E%3C/g%3E%3Cg transform='translate(74 124) rotate(-25 6 12)'%3E%3Crect x='4.5' y='8' width='3' height='16' rx='1.5'/%3E%3Crect x='1' width='2.2' height='9' rx='1'/%3E%3Crect x='4.9' width='2.2' height='9' rx='1'/%3E%3Crect x='8.8' width='2.2' height='9' rx='1'/%3E%3C/g%3E%3Cg transform='translate(138 44)'%3E%3Cpath d='M7 0 L8.5 5.5 L14 7 L8.5 8.5 L7 14 L5.5 8.5 L0 7 L5.5 5.5 Z'/%3E%3C/g%3E%3Cg transform='translate(112 138) rotate(12 6 7) scale(0.75)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-image: var(--doodle);
   background-size: 160px 160px;
 }
 .fallback-card > * { position: relative; }
@@ -1703,6 +1706,15 @@ body::before {
 .chip { background: rgba(253, 249, 238, 0.92); color: var(--ink); }
 .cta p { color: rgba(33, 26, 20, 0.8); font-weight: 500; }
 .city-card p { color: #fff; } /* sits on a dark gradient — keep */
+
+/* lime cards read best with ink titles (white on lime fails contrast) */
+.menu-card:nth-child(3n+1) h3 { color: var(--ink); text-shadow: none; }
+
+/* hero CTAs on the gold card: white primary (crisp on gold), ink ghost */
+.hero-card-left .btn-primary { background: #fff; color: var(--ink); }
+.hero-card-left .btn-primary:hover { background: var(--cream-card); }
+.hero-card-left .btn-ghost { border-color: var(--ink); color: var(--ink); }
+.hero-card-left .btn-ghost:hover { background: var(--ink); color: var(--cream); }
 
 /* ============================================
    GEN Z LAYER — section colour-blocking + stickers
