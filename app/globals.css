@@ -1285,7 +1285,7 @@ body.has-announce .page-hero { padding-top: calc(var(--nav-h) + 2.5rem + 44px); 
 .fallback-card > * { position: relative; }
 .fallback-card h3 { font-family: var(--font-serif); font-size: 1.55rem; color: #fff; margin-bottom: 0.8rem; }
 .fallback-card h3 .accent { font-family: var(--font-script); color: var(--yellow); }
-.fallback-card p { margin-bottom: 1.2rem; opacity: 0.95; font-size: 0.98rem; }
+.fallback-card p { margin-bottom: 1.2rem; color: var(--ink); opacity: 0.85; font-size: 0.98rem; }
 .fallback-card .phone {
   display: inline-block;
   font-family: var(--font-serif);

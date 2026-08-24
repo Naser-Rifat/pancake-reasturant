@@ -59,7 +59,7 @@ export const FALLBACK_SITE: ApiSiteSettings = {
   hero_script: "Happiness",
   hero_lead:
     "We flip the best homemade pancakes in Sydney — griddled to order, stacked high, drowned in real maple.",
-  hero_image: "https://images.unsplash.com/photo-1554520735-0a6b8b6ce8b7?w=1200&q=80",
+  hero_image: "https://images.unsplash.com/photo-1620991565081-82743a5a499c?w=1200&q=80",
   about_text:
     "G'day! Every pancake at The Pancake Club is ladled to order onto a buttered griddle, flipped at exactly the right bubble, and stacked warm with real maple. No shortcuts, no pre-mix — just food that feels good.",
   address: "123 George Street, Sydney NSW 2000",

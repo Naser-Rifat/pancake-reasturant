@@ -201,7 +201,7 @@ class SiteSettings(models.Model):
     )
     hero_image = models.CharField(
         max_length=300,
-        default="https://images.unsplash.com/photo-1554520735-0a6b8b6ce8b7?w=1200&q=80",
+        default="https://images.unsplash.com/photo-1620991565081-82743a5a499c?w=1200&q=80",
     )
     about_text = models.TextField(
         default="G'day! Every pancake at The Pancake Club is ladled to order onto a buttered "
