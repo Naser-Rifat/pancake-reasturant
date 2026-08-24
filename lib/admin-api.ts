@@ -211,6 +211,8 @@ export interface AdminSiteSettings {
   facebook_url: string;
   timezone: string;
   theme: string;
+  custom_primary: string;
+  custom_accent: string;
 }
 
 export const getSiteSettings = () => adminFetch<AdminSiteSettings>("/site/");

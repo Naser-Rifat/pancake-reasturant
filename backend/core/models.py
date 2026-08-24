@@ -225,8 +225,13 @@ class SiteSettings(models.Model):
         ("berry", "Berry Crush"),
         ("mint", "Minty Fresh"),
         ("choco", "Choc Latte"),
+        ("custom", "Custom"),
     ]
     theme = models.CharField(max_length=20, choices=THEME_CHOICES, default="golden")
+    # client-picked colours, used only when theme == "custom"; the frontend
+    # derives hover/soft/script variants and auto-fixes unreadable contrast
+    custom_primary = models.CharField(max_length=7, default="#f2be45")
+    custom_accent = models.CharField(max_length=7, default="#f2789c")
 
     class Meta:
         verbose_name_plural = "Site settings"

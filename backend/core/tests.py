@@ -404,6 +404,21 @@ class SiteContentApiTests(TestCase):
         res = self.client.patch("/api/admin/site/", {"theme": "neon"}, format="json")
         self.assertEqual(res.status_code, 400)
 
+    def test_custom_theme_colours_validated(self):
+        self.auth()
+        res = self.client.patch(
+            "/api/admin/site/",
+            {"theme": "custom", "custom_primary": "#2a9d8f", "custom_accent": "#e76f51"},
+            format="json",
+        )
+        self.assertEqual(res.status_code, 200)
+        site = self.client.get("/api/site/").json()
+        self.assertEqual(site["theme"], "custom")
+        self.assertEqual(site["custom_primary"], "#2a9d8f")
+        # malformed colours are rejected before they can reach the frontend
+        res = self.client.patch("/api/admin/site/", {"custom_primary": "red"}, format="json")
+        self.assertEqual(res.status_code, 400)
+
     def test_admin_gallery_and_certification_crud(self):
         self.auth()
         photo = self.client.post(

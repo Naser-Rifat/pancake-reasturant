@@ -6,6 +6,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ScrollFx from "@/components/ScrollFx";
 import { getSite } from "@/lib/api";
+import { customThemeStyle } from "@/lib/theme";
 
 const serif = DM_Serif_Display({ weight: "400", subsets: ["latin"], variable: "--font-serif" });
 const script = Pacifico({ weight: "400", subsets: ["latin"], variable: "--font-script" });
@@ -22,6 +23,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const site = await getSite();
+  const themeStyle =
+    site.theme === "custom" ? customThemeStyle(site.custom_primary, site.custom_accent) : null;
   // Restaurant schema markup for Google's local results — kept in sync with
   // the business details staff manage in the admin panel
   const schema = {
@@ -42,6 +45,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html lang="en-AU">
       <body
         data-theme={site.theme}
+        style={themeStyle ?? undefined}
         className={`${serif.variable} ${script.variable} ${body.variable} ${round.variable}`}
       >
         <script

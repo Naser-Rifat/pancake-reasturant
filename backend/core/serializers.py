@@ -154,11 +154,14 @@ class CertificationSerializer(serializers.ModelSerializer):
 
 
 class SiteSettingsSerializer(serializers.ModelSerializer):
+    custom_primary = serializers.RegexField(r"^#[0-9a-fA-F]{6}$", required=False)
+    custom_accent = serializers.RegexField(r"^#[0-9a-fA-F]{6}$", required=False)
+
     class Meta:
         model = SiteSettings
         fields = [
             "hero_heading", "hero_script", "hero_lead", "hero_image",
             "about_text", "address", "phone", "email", "abn",
             "map_embed", "instagram_url", "facebook_url", "timezone",
-            "theme",
+            "theme", "custom_primary", "custom_accent",
         ]

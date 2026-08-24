@@ -71,6 +71,8 @@ export const FALLBACK_SITE: ApiSiteSettings = {
   facebook_url: "",
   timezone: "Australia/Sydney",
   theme: "golden",
+  custom_primary: "#f2be45",
+  custom_accent: "#f2789c",
 };
 
 export const FALLBACK_HOURS: ApiOpeningHours[] = [

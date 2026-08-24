@@ -67,6 +67,8 @@ export interface ApiSiteSettings {
   facebook_url: string;
   timezone: string;
   theme: string;
+  custom_primary: string;
+  custom_accent: string;
 }
 
 export interface ApiOrder {
