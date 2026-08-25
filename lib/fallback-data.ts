@@ -11,7 +11,7 @@ import type {
 // the storefront still renders — keep in sync with `backend seed_demo`.
 
 export const FALLBACK_MENU: ApiMenuItem[] = [
-  { slug: "buttermilk", name: "Classic Buttermilk Stack", description: "Four fluffy buttermilk pancakes with pure maple syrup and whipped butter.", price: "14.00", tag: "sweet", heat: "none", kcal: 680, protein_g: 14, prep_time: "10–12 min", image: "/menu/buttermilk.png", is_featured: true },
+  { slug: "buttermilk", name: "Classic Buttermilk Stack", description: "Four fluffy buttermilk pancakes with pure maple syrup and whipped butter.", price: "14.00", tag: "sweet", heat: "none", kcal: 680, protein_g: 14, prep_time: "10–12 min", image: "/menu/buttermilk-stack.png", is_featured: true },
   { slug: "berry", name: "Berry Bliss", description: "Blueberries and strawberries piled high with berry compote and vanilla cream.", price: "17.00", tag: "sweet", heat: "none", kcal: 720, protein_g: 15, prep_time: "12–14 min", image: "/menu/berry.png", is_featured: true },
   { slug: "choc", name: "Choc Overload", description: "Chocolate pancakes, hazelnut spread, brownie bits and a warm chocolate drizzle.", price: "18.00", tag: "choc", heat: "hot", kcal: 890, protein_g: 16, prep_time: "12–14 min", image: "/menu/choc.png", is_featured: true },
   { slug: "banana", name: "Banana Caramel", description: "Caramelised banana, salted caramel sauce and crushed roasted pecans.", price: "16.00", tag: "sweet", heat: "none", kcal: 780, protein_g: 13, prep_time: "12–14 min", image: "/menu/banana.png", is_featured: false },
@@ -60,10 +60,12 @@ export const FALLBACK_SITE: ApiSiteSettings = {
   hero_lead:
     "We flip the best homemade pancakes in Sydney — griddled to order, stacked high, drowned in real maple.",
   hero_image: "https://images.unsplash.com/photo-1620991565081-82743a5a499c?w=1200&q=80",
+  hero_cutout: "/menu/hero-stack.png",
   about_text:
     "G'day! Every pancake at The Pancake Club is ladled to order onto a buttered griddle, flipped at exactly the right bubble, and stacked warm with real maple. No shortcuts, no pre-mix — just food that feels good.",
   address: "123 George Street, Sydney NSW 2000",
   phone: "(02) 5550 1234",
+  whatsapp: "",
   email: "hello@thepancakeclub.com.au",
   abn: "ABN 00 000 000 000",
   map_embed: "https://www.google.com/maps?q=George%20Street%20Sydney%20NSW&output=embed",

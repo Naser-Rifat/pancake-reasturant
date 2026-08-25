@@ -185,6 +185,7 @@ export interface AdminAnnouncement {
   message: string;
   link_text: string;
   link_url: string;
+  image: string;
   is_active: boolean;
 }
 
@@ -201,9 +202,11 @@ export interface AdminSiteSettings {
   hero_script: string;
   hero_lead: string;
   hero_image: string;
+  hero_cutout: string;
   about_text: string;
   address: string;
   phone: string;
+  whatsapp: string;
   email: string;
   abn: string;
   map_embed: string;
