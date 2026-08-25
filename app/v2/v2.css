@@ -20,6 +20,8 @@
   --v2-lav-soft: #e6dbf9;
   --v2-lime: #8fd65a;
   --v2-lime-soft: #d8f0be;
+  --v2-sky: #cfe4ea;
+  --v2-peach: #f6c39a;
   --v2-berry: #bf2f63;
   --v2-violet: #7c52d9;
   --v2-brown: #33200f;
@@ -97,7 +99,7 @@
   letter-spacing: 0.03em; text-transform: uppercase;
   background: var(--v2-gold);
   color: var(--v2-ink);
-  border: none;
+  border: 1.6px solid var(--v2-ink);
   border-radius: 999px;
   padding: 0.8rem 1.5rem;
   cursor: pointer;
@@ -173,14 +175,19 @@
   border-radius: 40px;
 }
 .v2-blob-doodle { position: absolute; right: 5%; top: 7%; width: 64px; color: rgba(43, 26, 14, 0.72); }
-/* the product cutout stands ON the blob and overflows above it, reference-style */
-.v2-hero-cut {
+/* the product cutout stands ON the blob and overflows above it, reference-style.
+   fill + contain + bottom anchor: any admin-uploaded aspect sits on the blob */
+.v2-hero-cutbox {
   position: absolute;
   bottom: 6%;
   left: 50%;
   transform: translateX(-50%);
   height: 82%;
-  width: auto;
+  width: 86%;
+}
+.v2-hero-cut {
+  object-fit: contain;
+  object-position: bottom center;
   filter: drop-shadow(0 18px 22px rgba(43, 26, 14, 0.28));
 }
 
@@ -189,7 +196,7 @@
 .v2-delight-grid { display: grid; grid-template-columns: 1fr; gap: 2.4rem; align-items: center; }
 .v2-delight-art { position: relative; }
 .v2-delight-blob {
-  background: var(--v2-lav-soft);
+  background: var(--v2-sky);
   border-radius: var(--v2-r);
   height: 300px;
   display: grid; place-items: center;
@@ -247,6 +254,8 @@
 .v2-pill.gold { background: var(--v2-gold-soft); }
 .v2-pill.lime { background: var(--v2-lime-soft); }
 .v2-pill.blush { background: var(--v2-blush); }
+.v2-pill.sky { background: var(--v2-sky); }
+.v2-pill.peach { background: var(--v2-peach); }
 
 /* ---------- carousel ---------- */
 .v2-carousel-sec { padding: 0.6rem 0 2.8rem; }
@@ -268,6 +277,8 @@
 .v2-tile.lav { background: var(--v2-lav-soft); }
 .v2-tile.lime { background: var(--v2-lime-soft); }
 .v2-tile.blush { background: var(--v2-blush); }
+.v2-tile.sky { background: var(--v2-sky); }
+.v2-tile.peach { background: var(--v2-peach); }
 .v2-tile-img { border-radius: 36px; overflow: hidden; height: 220px; }
 .v2-tile-img img { width: 100%; height: 100%; object-fit: cover; }
 .v2-sprinkles { position: absolute; top: 18px; right: 20px; width: 46px; color: rgba(255, 255, 255, 0.9); z-index: 1; }
@@ -379,7 +390,7 @@
 
 /* ---------- rating strip ---------- */
 .v2-rate {
-  background: var(--v2-lav-soft);
+  background: var(--v2-sky);
   border-radius: 44px;
   padding: clamp(1.6rem, 4vw, 2.6rem);
   margin-bottom: 3rem;
@@ -423,13 +434,166 @@
 .v2-hours span { background: #fff; border-radius: 999px; padding: 0.4rem 0.95rem; font-size: 0.72rem; font-weight: 700; }
 .v2-footer small { display: block; text-align: center; color: var(--v2-muted); font-size: 0.78rem; margin-top: 1.4rem; }
 
+/* campaign banner — powered by the Announcement record (image optional) */
+.v2-campaign {
+  background: var(--v2-peach);
+  border-radius: 44px;
+  padding: clamp(1.5rem, 3.5vw, 2.4rem);
+  margin: 0.4rem 0 2.4rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.4rem;
+  align-items: center;
+}
+.v2-campaign h2 { font-size: clamp(1.7rem, 5.4vw, 2.6rem); margin: 0.4rem 0 1.1rem; max-width: 18ch; }
+.v2-campaign-art { border-radius: 30px; overflow: hidden; height: 210px; }
+.v2-campaign-art img { width: 100%; height: 100%; object-fit: cover; }
+
+/* floating WhatsApp button (number set in admin → Settings) */
+.wa-float {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 80;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25d366;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 20px rgba(18, 65, 32, 0.35);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.wa-float:hover { transform: scale(1.08); }
+.wa-float svg { width: 30px; height: 30px; fill: #fff; }
+
+/* ============================================
+   MERGED LAYER — V1's candy DNA inside the Rollin
+   bones: script accents, lavender page frame, marquee,
+   tabbed menu slider, gallery/reviews/hours/CTA bands
+   ============================================ */
+
+/* nav active pill (V1 pink) */
+.v2-nav-links a.active { background: var(--v2-pink); color: var(--v2-ink); }
+.v2-nav-links a.active:hover { background: var(--v2-pink); }
+
+/* marquee strip */
+.v2-marquee {
+  margin: 0.2rem calc(50% - 50vw) 2rem;
+  background: var(--v2-violet);
+  overflow: hidden;
+  padding: 0.72rem 0;
+}
+.v2-marquee-track { display: flex; width: max-content; animation: v2marquee 28s linear infinite; }
+.v2-marquee-track span { display: inline-flex; }
+.v2-marquee-track i {
+  font-style: normal;
+  font-family: var(--font-v2-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.84rem;
+  letter-spacing: 0.14em;
+  color: #fff;
+  padding: 0 1.4rem;
+  white-space: nowrap;
+}
+@keyframes v2marquee { to { transform: translateX(-50%); } }
+
+/* category tabs on the menu slider (V1 home-slider merge) */
+.v2-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.2rem; }
+.v2-tabs button {
+  font-family: var(--font-v2-body);
+  font-weight: 800;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: #fff;
+  color: var(--v2-ink);
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 1.15rem;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s;
+}
+.v2-tabs button:hover { transform: scale(1.05); }
+.v2-tabs button.on { background: var(--v2-pink); }
+
+/* menu tiles inside the carousel — reference style: product breathes in the
+   middle of the pastel tile, price as a white pill, caption sits BELOW */
+.v2-tile.menu { padding: 1.7rem; height: 235px; display: grid; place-items: center; }
+.v2-menu-cut { height: 86%; width: 86%; }
+.v2-menu-cut img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 12px 16px rgba(43, 26, 14, 0.25)); }
+.v2-price-tag {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  z-index: 1;
+  background: #fff;
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  font-family: var(--font-v2-display);
+  font-weight: 800;
+  font-size: 0.88rem;
+}
+
+/* colour bands (V1 rhythm) */
+.v2-band-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.4rem; }
+.v2-band-head h2 { font-size: clamp(1.9rem, 6vw, 2.7rem); }
+.v2-gal-band { margin-bottom: 3rem; }
+.v2-gal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+.v2-gal-grid .ph { border-radius: 24px; overflow: hidden; height: 150px; }
+.v2-gal-grid img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+.v2-gal-grid .ph:hover img { transform: scale(1.05); }
+
+.v2-rev-cards { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr; gap: 0.9rem; margin-top: 0.6rem; }
+.v2-rev-card { background: #fff; border-radius: 26px; padding: 1.2rem 1.15rem; }
+.v2-rev-card .stars { color: var(--v2-berry); letter-spacing: 0.12em; font-size: 0.85rem; }
+.v2-rev-card p { font-weight: 600; font-size: 0.9rem; margin: 0.5rem 0 0.7rem; }
+.v2-rev-card .who { font-weight: 800; font-size: 0.8rem; color: var(--v2-muted); }
+
+.v2-hours-band {
+  background: var(--v2-gold-soft);
+  border-radius: 44px;
+  padding: clamp(1.6rem, 4vw, 2.6rem);
+  margin-bottom: 3rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.6rem;
+}
+.v2-hours-band h2 { font-size: clamp(1.8rem, 5.6vw, 2.5rem); }
+.v2-hours-band .addr { font-weight: 600; color: var(--v2-muted); margin: 0.7rem 0 1.1rem; max-width: 30ch; }
+.v2-hours-rows { display: grid; gap: 0.55rem; align-content: center; }
+.v2-hours-rows .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: #fff;
+  border-radius: 999px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.v2-hours-rows .t { font-weight: 800; }
+
+.v2-cta-band {
+  background: var(--v2-brown);
+  border-radius: 44px;
+  padding: clamp(2.2rem, 6vw, 3.6rem);
+  margin-bottom: 3rem;
+  text-align: center;
+}
+.v2-cta-band h2 { font-size: clamp(2rem, 7vw, 3.2rem); color: #fff; }
+.v2-cta-band p { font-weight: 600; color: rgba(246, 234, 217, 0.78); margin: 0.8rem 0 1.4rem; }
+.v2-cta-band .v2-btn { border-color: transparent; }
+
 /* ============================================
    ≥ 768px
    ============================================ */
 @media (min-width: 768px) {
   .v2-nav-links { display: flex; }
   .v2-hero-art { min-height: 380px; }
-  .v2-hero-cut { height: 88%; }
+  .v2-hero-cutbox { height: 88%; }
   .v2-blob-doodle { width: 88px; }
   .v2-delight-grid { grid-template-columns: 0.95fr 1.05fr; gap: 3rem; }
   .v2-delight-blob { height: 350px; }
@@ -452,6 +616,13 @@
   .v2-quote { grid-area: quote; }
   .v2-rate { grid-template-columns: 1.1fr auto 1fr; gap: 2.2rem; }
   .v2-rate-corner { width: 112px; height: 112px; right: 40px; }
+  .v2-rev-cards { grid-template-columns: repeat(3, 1fr); }
+  .v2-gal-grid { grid-template-columns: repeat(3, 1fr); }
+  .v2-gal-grid .ph { height: 170px; }
+  .v2-hours-band { grid-template-columns: 1fr 1.1fr; gap: 2.4rem; }
+  .v2-campaign { grid-template-columns: 1.05fr 0.95fr; gap: 2.2rem; }
+  .v2-campaign-art { height: 250px; }
+  .wa-float { right: 26px; bottom: 26px; }
 }
 
 /* ============================================
@@ -474,6 +645,8 @@
   .v2-rate-corner { display: block; }
   .v2-car-track { grid-auto-columns: calc((100% - 2rem) / 3); }
   .v2-tile-img { height: 230px; }
+  .v2-gal-grid .ph { height: 190px; }
+  .v2-tile.menu { height: 265px; }
   .v2-footer-top { flex-direction: row; justify-content: space-between; text-align: left; }
   .v2-footer-links { justify-content: flex-end; }
 }
@@ -550,6 +723,7 @@
 /* ---------- reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .v2-spin svg.ring { animation: none; }
+  .v2-marquee-track { animation: none; }
   .v2-btn:hover, .v2-car-btn:hover { transform: none; }
   .v2-h1, .v2-sub, .v2-hero-copy > p, .v2-hero-actions, .v2-hero-art, .v2-hero-img img { animation: none; }
   .v2 .reveal, .v2-collage > * { opacity: 1; transform: none; transition: none; }

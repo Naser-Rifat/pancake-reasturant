@@ -4,6 +4,7 @@ import { DM_Serif_Display, Pacifico, DM_Sans, Baloo_2 } from "next/font/google";
 import "../globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import WhatsAppFloat from "@/components/WhatsAppFloat";
 import ScrollFx from "@/components/ScrollFx";
 import { getSite } from "@/lib/api";
 import { customThemeStyle } from "@/lib/theme";
@@ -55,6 +56,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <Nav />
         {children}
         <Footer />
+        {site.whatsapp &&
+         <WhatsAppFloat phone={site.whatsapp} />
+         }
         <ScrollFx />
       </body>
     </html>

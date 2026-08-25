@@ -36,6 +36,7 @@ const THEMES = [
   { value: "berry", label: "Berry Crush", swatches: ["#f6aec6", "#c7abf3", "#a12857"] },
   { value: "mint", label: "Minty Fresh", swatches: ["#b8e6c4", "#f2be45", "#1f7a52"] },
   { value: "choco", label: "Choc Latte", swatches: ["#e9c99b", "#eda45f", "#7a4520"] },
+  { value: "maple", label: "Maple Gold", swatches: ["#efbf38", "#e08600", "#763a12"] },
 ] as const;
 
 export default function SettingsPage() {
@@ -105,6 +106,10 @@ export default function SettingsPage() {
               <Input id="s-phone" value={site.phone} onChange={setS("phone")} />
             </div>
             <div className="grid gap-1.5">
+              <Label htmlFor="s-wa">WhatsApp number (blank = hide the chat button)</Label>
+              <Input id="s-wa" placeholder="+61 4xx xxx xxx" value={site.whatsapp} onChange={setS("whatsapp")} />
+            </div>
+            <div className="grid gap-1.5">
               <Label htmlFor="s-email">Email</Label>
               <Input id="s-email" type="email" value={site.email} onChange={setS("email")} />
             </div>
@@ -141,6 +146,7 @@ export default function SettingsPage() {
                 await updateSiteSettings({
                   address: site.address,
                   phone: site.phone,
+                  whatsapp: site.whatsapp,
                   email: site.email,
                   abn: site.abn,
                   timezone: site.timezone,

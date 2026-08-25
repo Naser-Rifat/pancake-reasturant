@@ -3,6 +3,8 @@
 import { useRef, useState } from "react";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { API_URL } from "@/lib/api";
+import { getToken } from "@/lib/admin-api";
 
 const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
@@ -10,21 +12,45 @@ const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 /**
  * Uploads an image straight to Cloudinary (unsigned preset, plain REST — no SDK)
  * and hands back the delivery URL with auto format/quality optimisation baked in.
+ * With `cutout`, the photo is first sent through our backend's background
+ * remover, so any picture the client uploads becomes a transparent PNG.
  * Renders nothing when Cloudinary isn't configured, so URL inputs keep working.
  */
-export function UploadButton({ onUploaded }: { onUploaded: (url: string) => void }) {
+export function UploadButton({
+  onUploaded,
+  cutout = false,
+}: {
+  onUploaded: (url: string) => void;
+  cutout?: boolean;
+}) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState(false);
+  const [stage, setStage] = useState<"" | "cutting" | "uploading">("");
   const [error, setError] = useState("");
 
   if (!CLOUD || !PRESET) return null;
 
   const upload = async (file: File) => {
-    setBusy(true);
     setError("");
     try {
+      let payload: File = file;
+      if (cutout) {
+        setStage("cutting");
+        const form = new FormData();
+        form.append("file", file);
+        const res = await fetch(`${API_URL}/admin/remove-bg/`, {
+          method: "POST",
+          headers: { Authorization: `Token ${getToken()}` },
+          body: form,
+        });
+        if (!res.ok) throw new Error("Background removal failed — try a photo on a plain, light background");
+        const blob = await res.blob();
+        payload = new File([blob], file.name.replace(/\.[^.]+$/, "") + "-cutout.png", {
+          type: "image/png",
+        });
+      }
+      setStage("uploading");
       const form = new FormData();
-      form.append("file", file);
+      form.append("file", payload);
       form.append("upload_preset", PRESET);
       const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, {
         method: "POST",
@@ -37,7 +63,7 @@ export function UploadButton({ onUploaded }: { onUploaded: (url: string) => void
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");
     } finally {
-      setBusy(false);
+      setStage("");
       if (fileRef.current) fileRef.current.value = "";
     }
   };
@@ -55,10 +81,11 @@ export function UploadButton({ onUploaded }: { onUploaded: (url: string) => void
         type="button"
         variant="outline"
         size="sm"
-        disabled={busy}
+        loading={stage !== ""}
         onClick={() => fileRef.current?.click()}
       >
-        <Upload /> {busy ? "Uploading…" : "Upload"}
+        <Upload />
+        {stage === "cutting" ? "Removing background…" : stage === "uploading" ? "Uploading…" : "Upload"}
       </Button>
       {error && <span className="text-xs font-medium text-destructive">{error}</span>}
     </span>

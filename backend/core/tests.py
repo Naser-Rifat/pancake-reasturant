@@ -404,6 +404,29 @@ class SiteContentApiTests(TestCase):
         res = self.client.patch("/api/admin/site/", {"theme": "neon"}, format="json")
         self.assertEqual(res.status_code, 400)
 
+    def test_remove_bg_requires_staff_and_returns_png(self):
+        import os
+        from io import BytesIO
+        from unittest import skipUnless  # noqa: F401  (env-gated below)
+
+        # anonymous is rejected outright
+        res = self.client.post("/api/admin/remove-bg/")
+        self.assertEqual(res.status_code, 401)
+
+        if not os.environ.get("RUN_REMBG_TESTS"):
+            return  # inference test is opt-in: the model is a 179 MB download
+
+        from PIL import Image
+
+        buf = BytesIO()
+        Image.new("RGB", (64, 64), (200, 40, 40)).save(buf, format="PNG")
+        buf.seek(0)
+        buf.name = "dish.png"
+        self.auth()
+        res = self.client.post("/api/admin/remove-bg/", {"file": buf}, format="multipart")
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(res.content.startswith(b"\x89PNG"))
+
     def test_custom_theme_colours_validated(self):
         self.auth()
         res = self.client.patch(

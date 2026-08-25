@@ -233,7 +233,7 @@ export default function MenuAdminPage() {
                 <Label htmlFor="mi-image">Image</Label>
                 <div className="flex items-center gap-2">
                   <Input id="mi-image" placeholder="/menu/waffle.png" value={form.image} onChange={set("image")} />
-                  <UploadButton onUploaded={(url) => setForm((f) => ({ ...f, image: url }))} />
+                  <UploadButton cutout onUploaded={(url) => setForm((f) => ({ ...f, image: url }))} />
                 </div>
               </div>
               <div className="flex items-center gap-6 sm:col-span-2">

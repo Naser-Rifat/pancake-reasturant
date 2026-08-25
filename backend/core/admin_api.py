@@ -1,16 +1,29 @@
 """Staff-only API consumed by the custom Next.js admin panel (/admin)."""
+# pyrefly: ignore [missing-import]
 from django.contrib.auth import authenticate
+# pyrefly: ignore [missing-import]
 from django.db.models import F, Sum
+# pyrefly: ignore [missing-import]
 from django.db.models.deletion import ProtectedError
+# pyrefly: ignore [missing-import]
+from django.http import HttpResponse
+# pyrefly: ignore [missing-import]
 from django.utils import timezone
+# pyrefly: ignore [missing-import]
 from rest_framework import mixins, serializers, viewsets
+# pyrefly: ignore [missing-import]
 from rest_framework.authtoken.models import Token
+# pyrefly: ignore [missing-import]
 from rest_framework.permissions import IsAdminUser
+# pyrefly: ignore [missing-import]
 from rest_framework.response import Response
+# pyrefly: ignore [missing-import]
 from rest_framework.throttling import ScopedRateThrottle
+# pyrefly: ignore [missing-import]
 from rest_framework.views import APIView
 
 from . import emails
+# pyrefly: ignore [missing-import]
 from .models import (
     Announcement,
     Booking,
@@ -163,6 +176,51 @@ class AdminMenuItemViewSet(viewsets.ModelViewSet):
             )
 
 
+# ---------- background removal (auto-cutout for uploads) ----------
+
+_REMBG_SESSION = None  # model loads once per process, on first use
+
+
+class AdminRemoveBgView(APIView):
+    """Strip the background from an uploaded dish photo so any picture the
+    client provides becomes a transparent cutout that fits the card design."""
+
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        upload = request.FILES.get("file")
+        if upload is None:
+            return Response({"detail": "Attach an image as 'file'."}, status=400)
+        if upload.size > 12 * 1024 * 1024:
+            return Response({"detail": "Image too large (max 12 MB)."}, status=400)
+
+        from io import BytesIO
+
+        # pyrefly: ignore [missing-import]
+        from PIL import Image
+        # pyrefly: ignore [missing-import]
+        from rembg import new_session, remove
+
+        try:
+            img = Image.open(upload).convert("RGBA")
+        except Exception:
+            return Response({"detail": "That file doesn't look like an image."}, status=400)
+
+        img.thumbnail((1600, 1600))  # cap inference cost; plenty for the cards
+        global _REMBG_SESSION
+        if _REMBG_SESSION is None:
+            _REMBG_SESSION = new_session("isnet-general-use")
+        cut = remove(img, session=_REMBG_SESSION)
+        alpha = cut.split()[3].point(lambda v: 255 if v > 12 else 0)
+        bbox = alpha.getbbox()
+        if bbox:
+            cut = cut.crop(bbox)
+
+        buf = BytesIO()
+        cut.save(buf, format="PNG", optimize=True)
+        return HttpResponse(buf.getvalue(), content_type="image/png")
+
+
 # ---------- site content & settings ----------
 
 class AdminCertificationSerializer(serializers.ModelSerializer):
@@ -180,7 +238,7 @@ class AdminGalleryPhotoSerializer(serializers.ModelSerializer):
 class AdminAnnouncementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Announcement
-        fields = ["id", "message", "link_text", "link_url", "is_active"]
+        fields = ["id", "message", "link_text", "link_url", "image", "is_active"]
 
 
 class AdminOpeningHoursSerializer(serializers.ModelSerializer):

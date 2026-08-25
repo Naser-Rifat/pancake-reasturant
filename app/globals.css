@@ -26,6 +26,9 @@
   --green-deep: #3f8f3a;  /* readable green for small text on cream */
   --ink: #211a14;
   --muted: #837868;
+  --card-a: #f6d77f;   /* menu-card soft surface rotation */
+  --card-b: #f4bcca;
+  --card-c: #ded1f6;
   --radius: 34px;
   --radius-xl: 36px; /* big section rounding — grows on tablet+ */
   --frame: 8px;      /* lavender page frame — grows on tablet+ */
@@ -60,6 +63,23 @@
   --pink-deep: #d98a3f;
   --berry: #7a4520;
   --blush: #f0dcc3;
+}
+/* client's brown & yellow palette — the one preset that also re-tints the
+   frame/marquee (lavender slot) and lime slot so the whole site goes warm */
+[data-theme="maple"] {
+  --yellow: #efbf38;
+  --yellow-deep: #e08600;
+  --pink: #e08600;
+  --pink-deep: #c06e00;
+  --berry: #763a12;
+  --blush: #f5de7a;
+  --lavender: #f5de7a;
+  --lav-soft: #f2eeec;
+  --green: #e08600;
+  --green-deep: #aa4c0a;
+  --card-a: #f5de7a;
+  --card-b: #f2eeec;
+  --card-c: #efbf38;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -717,13 +737,13 @@ footer .logo { color: var(--yellow); }
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 16px 34px rgba(33, 26, 20, 0.14);
+  box-shadow: 0 10px 24px rgba(33, 26, 20, 0.08);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 /* pastel card colours, rotating */
-.menu-card:nth-child(3n+1) { background: var(--green); }
-.menu-card:nth-child(3n+2) { background: var(--pink); }
-.menu-card:nth-child(3n) { background: var(--lavender); }
+.menu-card:nth-child(3n+1) { background: var(--card-a); }
+.menu-card:nth-child(3n+2) { background: var(--card-b); }
+.menu-card:nth-child(3n) { background: var(--card-c); }
 .menu-card:hover {
   /* scale-dominant: edges grow toward the cursor, so hovering near the
      bottom edge can't start a hover-in/hover-out vibration loop */
@@ -774,27 +794,26 @@ footer .logo { color: var(--yellow); }
   font-family: var(--font-round);
   font-weight: 800;
   font-size: 1.45rem;
-  color: #fff;
+  color: var(--ink);
   line-height: 1.15;
-  text-shadow: 0 2px 6px rgba(33, 26, 20, 0.2);
 }
 .menu-card .price {
   font-family: var(--font-round);
   font-weight: 800;
   color: var(--ink);
-  background: var(--yellow);
+  background: #fff;
   font-size: 1.05rem;
   line-height: 1;
   padding: 0.4rem 0.95rem;
   border-radius: 999px;
 }
-.menu-card .desc { color: rgba(255, 255, 255, 0.92); font-size: 0.95rem; margin: 0.7rem 0 1rem; }
+.menu-card .desc { color: rgba(33, 26, 20, 0.72); font-size: 0.95rem; margin: 0.7rem 0 1rem; }
 .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-bottom: 1.2rem; }
 .chip {
   font-weight: 600;
   font-size: 0.75rem;
-  background: rgba(255, 255, 255, 0.25);
-  color: #fff;
+  background: #fff;
+  color: var(--ink);
   border-radius: 999px;
   padding: 0.3rem 0.8rem;
 }
@@ -802,11 +821,11 @@ footer .logo { color: var(--yellow); }
   margin-top: auto;
   justify-content: center;
   width: 100%;
-  background: var(--cream-card);
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--cream);
   box-shadow: none;
 }
-.menu-card .btn:hover { background: var(--ink); color: var(--cream); }
+.menu-card .btn:hover { background: var(--berry); color: #fff; }
 
 /* ---------- menu category tabs + card slider ---------- */
 .menu-tabs { margin-top: 0; margin-bottom: 2rem; }
@@ -1786,4 +1805,26 @@ body::before {
   .hero-card-right img, .round-badge { animation: none; }
   .menu-card:hover .thumb img { transform: none; }
   .stk { animation: none; }
+  .wa-float:hover { transform: none; }
+}
+
+/* floating WhatsApp button (number set in admin → Settings) */
+.wa-float {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 80;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25d366;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 20px rgba(18, 65, 32, 0.35);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.wa-float:hover { transform: scale(1.08); }
+.wa-float svg { width: 30px; height: 30px; fill: #fff; }
+@media (min-width: 768px) {
+  .wa-float { right: 26px; bottom: 26px; }
 }

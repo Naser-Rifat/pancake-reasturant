@@ -123,6 +123,15 @@ export default function ContentPage() {
               </div>
             </div>
             <div className="grid gap-1.5 sm:col-span-2">
+              <Label htmlFor="hero-cutout">
+                Hero cutout (transparent PNG — the dish standing on the gold block)
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input id="hero-cutout" value={site.hero_cutout} onChange={setS("hero_cutout")} />
+                <UploadButton cutout onUploaded={(url) => setSite((s) => (s ? { ...s, hero_cutout: url } : s))} />
+              </div>
+            </div>
+            <div className="grid gap-1.5 sm:col-span-2">
               <Label htmlFor="about-text">About text</Label>
               <Textarea id="about-text" rows={4} value={site.about_text} onChange={setS("about_text")} />
             </div>
@@ -137,6 +146,7 @@ export default function ContentPage() {
                   hero_script: site.hero_script,
                   hero_lead: site.hero_lead,
                   hero_image: site.hero_image,
+                  hero_cutout: site.hero_cutout,
                   about_text: site.about_text,
                 });
               }, "Hero & about")
@@ -161,7 +171,7 @@ export default function ContentPage() {
                 id="ann-message"
                 value={announcement?.message ?? ""}
                 onChange={(e) =>
-                  setAnnouncement((a) => ({ ...(a ?? { id: 0, link_text: "", link_url: "", is_active: true }), message: e.target.value }))
+                  setAnnouncement((a) => ({ ...(a ?? { id: 0, link_text: "", link_url: "", image: "", is_active: true }), message: e.target.value }))
                 }
               />
             </div>
@@ -181,6 +191,18 @@ export default function ContentPage() {
                 value={announcement?.link_url ?? ""}
                 onChange={(e) => setAnnouncement((a) => (a ? { ...a, link_url: e.target.value } : a))}
               />
+            </div>
+            <div className="grid gap-1.5 sm:col-span-2">
+              <Label htmlFor="ann-image">Campaign image (optional — adds the big banner on the home page)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="ann-image"
+                  placeholder="https://…"
+                  value={announcement?.image ?? ""}
+                  onChange={(e) => setAnnouncement((a) => (a ? { ...a, image: e.target.value } : a))}
+                />
+                <UploadButton onUploaded={(url) => setAnnouncement((a) => (a ? { ...a, image: url } : a))} />
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-6">

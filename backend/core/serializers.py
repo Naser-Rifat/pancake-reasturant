@@ -138,7 +138,7 @@ class GalleryPhotoSerializer(serializers.ModelSerializer):
 class AnnouncementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Announcement
-        fields = ["message", "link_text", "link_url"]
+        fields = ["message", "link_text", "link_url", "image"]
 
 
 class OpeningHoursSerializer(serializers.ModelSerializer):
@@ -160,8 +160,8 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteSettings
         fields = [
-            "hero_heading", "hero_script", "hero_lead", "hero_image",
-            "about_text", "address", "phone", "email", "abn",
+            "hero_heading", "hero_script", "hero_lead", "hero_image", "hero_cutout",
+            "about_text", "address", "phone", "whatsapp", "email", "abn",
             "map_embed", "instagram_url", "facebook_url", "timezone",
             "theme", "custom_primary", "custom_accent",
         ]

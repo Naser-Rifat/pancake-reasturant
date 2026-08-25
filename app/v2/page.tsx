@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import LogoMark from "@/components/LogoMark";
-import Carousel from "./Carousel";
+import WhatsAppFloat from "@/components/WhatsAppFloat";
+import TabbedSlider from "./TabbedSlider";
 import {
   TAG_LABEL,
   formatTime,
@@ -19,8 +20,8 @@ import {
 export const dynamic = "force-dynamic";
 
 const TAG_ORDER: ApiMenuItem["tag"][] = ["sweet", "savoury", "choc"];
-const PILL_COLORS = ["lav", "gold", "lime", "blush"];
-const TILE_COLORS = ["gold", "lav", "lime", "blush"];
+const PILL_COLORS = ["gold", "sky", "lav", "peach"];
+const MARQUEE = ["Real Maple", "Est. 1999", "Fresh Berries", "Zero Guilt", "Griddled Daily", "Fluffy Stacks"];
 
 /* ---------- line-art doodles (reference style) ---------- */
 const Steam = ({ className }: { className?: string }) => (
@@ -37,11 +38,6 @@ const CookieDoodle = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 40 34" className={className} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
     <circle cx="16" cy="18" r="11" fill="currentColor" stroke="none" opacity="0.9" />
     <path d="M32 8 L37 3" /><path d="M34 16 L40 14" /><path d="M30 24 L36 27" />
-  </svg>
-);
-const Sprinkles = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 46 30" className={className} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
-    <path d="M6 8 l6 -4" /><path d="M20 24 l6 -4" /><path d="M34 10 l6 -4" /><circle cx="14" cy="18" r="1.6" fill="currentColor" stroke="none" /><circle cx="40" cy="22" r="1.6" fill="currentColor" stroke="none" />
   </svg>
 );
 const Signal = ({ className }: { className?: string }) => (
@@ -135,7 +131,6 @@ export default async function V2Home() {
     ? Math.round((reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) * 10) / 10
     : null;
   const quote = reviews[0];
-  const carouselTiles = gallery.slice(0, 6);
   const interior = gallery.find((g) => g.album === "interior") ?? gallery[0];
   const miniPhoto = gallery.find((g) => g.album === "food") ?? gallery[1];
   const chefPhoto = gallery.find((g) => g.album === "events") ?? gallery[2];
@@ -169,7 +164,7 @@ export default async function V2Home() {
             <Image src="/logo.png" alt="The Pancake Club" width={529} height={226} priority />
           </Link>
           <ul className="v2-nav-links">
-            <li><Link href="/v2">Home</Link></li>
+            <li><Link href="/v2" className="active">Home</Link></li>
             <li><Link href="/menu">Menu</Link></li>
             <li><Link href="/gallery">Gallery</Link></li>
             <li><Link href="/booking">Contact</Link></li>
@@ -204,19 +199,46 @@ export default async function V2Home() {
               </div>
               <div className="v2-hero-art">
                 <div className="v2-hero-blob"><StackLine className="v2-blob-doodle" /></div>
-                <Image
-                  className="v2-hero-cut"
-                  src="/menu/hero-stack.png"
-                  alt="Our signature buttermilk stack with raspberries and maple syrup"
-                  width={880}
-                  height={834}
-                  priority
-                  sizes="(min-width: 1024px) 30vw, (min-width: 768px) 44vw, 74vw"
-                />
+                <div className="v2-hero-cutbox">
+                  <Image
+                    className="v2-hero-cut"
+                    src={site.hero_cutout || "/menu/hero-stack.png"}
+                    alt="Our signature stack, fresh off the griddle"
+                    fill
+                    priority
+                    sizes="(min-width: 1024px) 34vw, (min-width: 768px) 48vw, 80vw"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </section>
+
+        {/* ---------- marquee strip (V1 energy) ---------- */}
+        <div className="v2-marquee" aria-hidden="true">
+          <div className="v2-marquee-track">
+            <span>{MARQUEE.map((m) => <i key={m}>✦ {m}</i>)}</span>
+            <span>{MARQUEE.map((m) => <i key={m}>✦ {m}</i>)}</span>
+          </div>
+        </div>
+
+        {/* ---------- campaign banner (admin: Site content → Announcement) ---------- */}
+        {announcement?.image && (
+          <section className="v2-campaign reveal">
+            <div>
+              <span className="v2-kicker">Right Now At The Club</span>
+              <h2>{announcement.message}</h2>
+              {announcement.link_url && (
+                <Link href={announcement.link_url} className="v2-btn">
+                  {announcement.link_text || "Check It Out"}
+                </Link>
+              )}
+            </div>
+            <div className="v2-campaign-art">
+              <Image src={announcement.image} alt={announcement.message} width={640} height={420} sizes="(min-width: 768px) 44vw, 92vw" />
+            </div>
+          </section>
+        )}
 
         {/* ---------- featured delight ---------- */}
         {featured && (
@@ -258,24 +280,10 @@ export default async function V2Home() {
           </div>
         </section>
 
-        {/* ---------- gallery carousel ---------- */}
-        {carouselTiles.length > 0 && (
-          <section className="v2-carousel-sec reveal">
-            <Carousel>
-              {carouselTiles.map((g, i) => (
-                <div className="v2-car-cell" key={g.image}>
-                  <div className={`v2-tile ${TILE_COLORS[i % TILE_COLORS.length]}`}>
-                    <Sprinkles className="v2-sprinkles" />
-                    <div className="v2-tile-img">
-                      <Image src={g.image} alt={g.alt} width={500} height={380} sizes="(min-width: 1024px) 33vw, 80vw" />
-                    </div>
-                  </div>
-                  <p className="v2-car-cap">{g.caption}</p>
-                </div>
-              ))}
-            </Carousel>
-          </section>
-        )}
+        {/* ---------- menu slider with category tabs (V1 merge) ---------- */}
+        <section className="v2-carousel-sec reveal">
+          <TabbedSlider items={items} />
+        </section>
 
         {/* ---------- dark story panel ---------- */}
         <section className="v2-story reveal">
@@ -344,6 +352,23 @@ export default async function V2Home() {
           )}
         </section>
 
+        {/* ---------- gallery band (V1 lavender) ---------- */}
+        {gallery.length > 0 && (
+          <section className="v2-gal-band reveal">
+            <div className="v2-band-head">
+              <h2>From Our Gallery</h2>
+              <Link href="/gallery" className="v2-btn small">See Full Gallery</Link>
+            </div>
+            <div className="v2-gal-grid">
+              {gallery.slice(0, 6).map((g) => (
+                <div className="ph" key={g.image}>
+                  <Image src={g.image} alt={g.alt} width={420} height={320} sizes="(min-width: 768px) 30vw, 45vw" />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* ---------- rating strip ---------- */}
         <section className="v2-rate reveal">
           {featured && (
@@ -371,6 +396,41 @@ export default async function V2Home() {
           <div className="v2-rate-pills">
             {items.slice(0, 6).map((i) => <span key={i.slug}>{i.name}</span>)}
           </div>
+          {reviews.length > 0 && (
+            <div className="v2-rev-cards">
+              {reviews.slice(0, 3).map((r) => (
+                <div className="v2-rev-card" key={r.name + r.quote.slice(0, 12)}>
+                  <div className="stars">{"★".repeat(r.rating)}</div>
+                  <p>&ldquo;{r.quote}&rdquo;</p>
+                  <div className="who">{r.avatar} {r.name}{r.suburb ? ` · ${r.suburb}` : ""}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* ---------- hours & location (V1 mint band) ---------- */}
+        <section className="v2-hours-band reveal">
+          <div>
+            <h2>Hours &amp; Location</h2>
+            <p className="addr">{site.address}</p>
+            <a href={telHref(site.phone)} className="v2-btn small">Call {site.phone}</a>
+          </div>
+          <div className="v2-hours-rows">
+            {hours.map((h) => (
+              <div className="row" key={h.label}>
+                <span>{h.label}</span>
+                <span className="t">{formatTime(h.opens)} – {formatTime(h.closes)}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ---------- big lavender CTA (V1 band) ---------- */}
+        <section className="v2-cta-band reveal">
+          <h2>Hungry? Book a Table</h2>
+          <p>Reserve online in seconds — free, instant confirmation, open 7 days.</p>
+          <Link href="/booking" className="v2-btn">Book a Table</Link>
         </section>
       </main>
 
@@ -387,14 +447,10 @@ export default async function V2Home() {
               <li><a href={telHref(site.phone)}>{site.phone}</a></li>
             </ul>
           </div>
-          <div className="v2-hours">
-            {hours.map((h) => (
-              <span key={h.label}>{h.label}: {formatTime(h.opens)}–{formatTime(h.closes)}</span>
-            ))}
-          </div>
           <small>Design V2 preview · {site.address} · {site.abn}</small>
         </div>
       </footer>
+      {site.whatsapp && <WhatsAppFloat phone={site.whatsapp} />}
     </>
   );
 }

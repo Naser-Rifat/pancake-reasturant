@@ -29,5 +29,6 @@ urlpatterns = [
     path("admin/login/", admin_api.AdminLoginView.as_view(), name="admin-login"),
     path("admin/stats/", admin_api.AdminStatsView.as_view(), name="admin-stats"),
     path("admin/site/", admin_api.AdminSiteSettingsView.as_view(), name="admin-site"),
+    path("admin/remove-bg/", admin_api.AdminRemoveBgView.as_view(), name="admin-remove-bg"),
     path("admin/", include(admin_router.urls)),
 ]

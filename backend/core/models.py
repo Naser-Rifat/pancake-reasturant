@@ -3,6 +3,7 @@ import uuid
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
+from django.core.cache import cache
 
 
 class TimeStampedModel(models.Model):
@@ -154,6 +155,8 @@ class Announcement(TimeStampedModel):
     message = models.CharField(max_length=200)
     link_text = models.CharField(max_length=60, blank=True)
     link_url = models.CharField(max_length=200, blank=True)
+    # optional campaign image — when set, the home page shows the big banner
+    image = models.CharField(max_length=300, blank=True, default="")
     starts_at = models.DateTimeField(null=True, blank=True)
     ends_at = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
@@ -203,6 +206,8 @@ class SiteSettings(models.Model):
         max_length=300,
         default="https://images.unsplash.com/photo-1620991565081-82743a5a499c?w=1200&q=80",
     )
+    # transparent-PNG product shot standing on the hero blob (V2 design)
+    hero_cutout = models.CharField(max_length=300, default="/menu/hero-stack.png")
     about_text = models.TextField(
         default="G'day! Every pancake at The Pancake Club is ladled to order onto a buttered "
                 "griddle, flipped at exactly the right bubble, and stacked warm with "
@@ -210,6 +215,8 @@ class SiteSettings(models.Model):
     )
     address = models.CharField(max_length=200, default="123 George Street, Sydney NSW 2000")
     phone = models.CharField(max_length=30, default="(02) 5550 1234")
+    # international format; blank hides the floating WhatsApp button
+    whatsapp = models.CharField(max_length=30, blank=True, default="")
     email = models.EmailField(default="hello@thepancakeclub.com.au")
     abn = models.CharField(max_length=40, default="ABN 00 000 000 000")
     map_embed = models.CharField(
@@ -225,6 +232,7 @@ class SiteSettings(models.Model):
         ("berry", "Berry Crush"),
         ("mint", "Minty Fresh"),
         ("choco", "Choc Latte"),
+        ("maple", "Maple Gold"),
         ("custom", "Custom"),
     ]
     theme = models.CharField(max_length=20, choices=THEME_CHOICES, default="golden")
@@ -239,7 +247,6 @@ class SiteSettings(models.Model):
     def save(self, *args, **kwargs):
         self.pk = 1  # enforce the singleton
         super().save(*args, **kwargs)
-        from django.core.cache import cache
 
         cache.delete("site-timezone")  # middleware picks up changes immediately
 
