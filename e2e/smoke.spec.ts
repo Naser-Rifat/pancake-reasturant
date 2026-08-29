@@ -7,18 +7,19 @@ const ADMIN_USER = process.env.E2E_ADMIN_USER ?? "admin";
 const ADMIN_PASS = process.env.E2E_ADMIN_PASS ?? "krush2026";
 
 test("home renders hero, featured slider and reviews from the API", async ({ page }) => {
+  // staff manage the menu, so counts must follow the live API, not a fixture
+  const menu = await (await page.request.get("http://localhost:8000/api/menu/")).json();
   await page.goto("/");
   await expect(page.locator(".hero-card-left h1")).toBeVisible();
-  await expect(page.locator("#featured .menu-card")).toHaveCount(6);
+  // "Our Favourites" rail shows the top picks (up to six)
+  await expect(page.locator("#featured .fav-card")).toHaveCount(Math.min(6, menu.length));
   await expect(page.locator(".rev-card").first()).toBeVisible();
-  // category filter narrows the slider
-  await page.locator("#featured .album-tab", { hasText: "Choc Loaded" }).click();
-  await expect(page.locator("#featured .menu-card")).toHaveCount(1);
 });
 
 test("menu page lists dishes with live ordering", async ({ page }) => {
+  const menu = await (await page.request.get("http://localhost:8000/api/menu/")).json();
   await page.goto("/menu");
-  await expect(page.locator(".menu-grid .menu-card")).toHaveCount(6);
+  await expect(page.locator(".menu-grid .menu-card")).toHaveCount(menu.length);
   // backend is up in this suite, so ordering must not be paused
   await expect(page.locator(".ordering-paused")).toHaveCount(0);
   await expect(page.locator(".menu-card .btn", { hasText: "Add to Order" }).first()).toBeVisible();

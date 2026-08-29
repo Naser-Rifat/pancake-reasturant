@@ -22,9 +22,10 @@
   --v2-lime-soft: #d8f0be;
   --v2-sky: #cfe4ea;
   --v2-peach: #f6c39a;
+  --v2-lime-pop: #cdf065;
   --v2-berry: #bf2f63;
   --v2-violet: #7c52d9;
-  --v2-brown: #33200f;
+  --v2-brown: #451c26; /* deep maroon-chocolate (Doughwey panel tone) */
   --v2-r: 40px;
 }
 
@@ -256,6 +257,10 @@
 .v2-pill.blush { background: var(--v2-blush); }
 .v2-pill.sky { background: var(--v2-sky); }
 .v2-pill.peach { background: var(--v2-peach); }
+/* pills are filter controls in the favourites rail */
+.v2-pill { border: none; cursor: pointer; font-family: var(--font-v2-body); }
+.v2-pill.on { background: var(--v2-ink); color: #fff; }
+.v2-pill.on .n { background: #fff; color: var(--v2-ink); }
 
 /* ---------- carousel ---------- */
 .v2-carousel-sec { padding: 0.6rem 0 2.8rem; }
@@ -324,6 +329,17 @@
 .v2-signal { position: absolute; top: -6px; right: -6px; width: 54px; color: var(--v2-orange); }
 .v2-story h2 { color: #fff; font-size: clamp(1.8rem, 5.6vw, 2.6rem); }
 .v2-story p { color: rgba(246, 234, 217, 0.78); font-size: 0.95rem; font-weight: 500; max-width: 44ch; margin: 0.9rem 0 1.4rem; }
+/* lime promise callout — the Doughwey highlight box */
+.v2-story .v2-promise {
+  background: var(--v2-lime-pop);
+  color: var(--v2-ink);
+  font-weight: 700;
+  font-size: 0.92rem;
+  border-radius: 16px;
+  padding: 0.9rem 1.15rem;
+  max-width: 42ch;
+  margin: 0 0 1.4rem;
+}
 .v2-wheat { position: absolute; right: -14px; bottom: -10px; width: 130px; color: rgba(246, 234, 217, 0.22); pointer-events: none; }
 
 /* ---------- special collage ---------- */
@@ -539,6 +555,141 @@
 /* colour bands (V1 rhythm) */
 .v2-band-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.4rem; }
 .v2-band-head h2 { font-size: clamp(1.9rem, 6vw, 2.7rem); }
+/* our favourites — editorial cards (Option A) */
+.v2-favs { padding: 0.4rem 0 2.6rem; }
+.v2-favs-sub { color: var(--v2-muted); font-weight: 500; margin-top: 0.3rem; }
+.v2-swirl { display: inline-block; width: 0.55em; color: var(--v2-orange); vertical-align: -0.12em; margin-left: 0.18em; }
+.v2-band-head.sub { align-items: flex-end; margin: 2.4rem 0 1.4rem; }
+/* scroll-snap rail — the next card peeks, reference-style */
+.v2-favs-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 78%;
+  gap: 1.3rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-bottom: 0.5rem;
+}
+.v2-favs-grid::-webkit-scrollbar { display: none; }
+.v2-fav { scroll-snap-align: start; }
+.v2-fav .ph {
+  display: block;
+  position: relative;
+  background: #fff;
+  border-radius: 24px;
+  height: 240px;
+  overflow: hidden;
+}
+/* hover flood — the card turns into the dish detail (hover devices only) */
+.v2-fav .hp {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--v2-ink);
+  opacity: 0;
+  pointer-events: none;
+}
+.v2-fav:nth-child(3n + 1) .hp { background: var(--v2-gold-soft); }
+.v2-fav:nth-child(3n + 2) .hp { background: var(--v2-sky); }
+.v2-fav:nth-child(3n) .hp { background: var(--v2-peach); }
+.v2-fav .hp-name { font-family: var(--font-v2-display); font-weight: 800; font-size: 1.2rem; line-height: 1.15; text-transform: uppercase; }
+.v2-fav .hp-price { font-family: var(--font-v2-display); font-weight: 800; background: #fff; border-radius: 999px; padding: 0.28rem 0.9rem; }
+.v2-fav .hp-desc { font-size: 0.88rem; color: rgba(43, 26, 14, 0.75); }
+.v2-fav .hp-cta {
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: #fff;
+  border: 1.6px solid var(--v2-ink);
+  border-radius: 999px;
+  padding: 0.6rem 1.25rem;
+}
+@media (hover: hover) and (pointer: fine) {
+  .v2-fav .hp { transform: scale(1.02); transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+  .v2-fav:hover .hp, .v2-fav:focus-visible .hp { opacity: 1; transform: none; }
+}
+
+/* a real photo fills the frame edge-to-edge; a cutout floats with padding */
+.v2-fav .ph.framed img { object-fit: cover; padding: 0; }
+.v2-fav .ph img {
+  object-fit: contain;
+  padding: 1.6rem;
+  filter: drop-shadow(0 12px 16px rgba(43, 26, 14, 0.22));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.v2-fav:hover .ph img { transform: scale(1.05) rotate(-1.2deg); }
+.v2-fav .nm {
+  display: block;
+  font-family: var(--font-v2-display);
+  font-weight: 800;
+  color: var(--v2-brown);
+  font-size: 1.22rem;
+  margin-top: 0.9rem;
+}
+.v2-fav .pr { display: block; color: var(--v2-muted); font-weight: 600; font-size: 0.9rem; margin-top: 0.1rem; }
+
+/* delight — editorial meta row (Option E flavour) */
+.v2-kicker-scr {
+  font-family: var(--font-v2-display);
+  font-weight: 700;
+  color: var(--v2-orange);
+  font-size: 1.05rem;
+  text-transform: lowercase;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+.v2-delight-meta { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; margin-top: 1.15rem; }
+.v2-mchip { background: #fff; border-radius: 999px; padding: 0.42rem 0.9rem; font-weight: 700; font-size: 0.78rem; }
+
+/* wavy brand strip + characters (Doughwey moves) */
+.v2-wave { position: relative; margin: 0.6rem 0 2.8rem; }
+.v2-wave-svg { width: 100%; height: auto; overflow: visible; display: block; }
+.v2-wave-svg text {
+  font-family: var(--font-v2-display);
+  font-weight: 800;
+  font-size: 64px;
+  letter-spacing: 0.01em;
+  fill: var(--v2-orange);
+}
+.v2-wave-char { position: absolute; left: 1.5%; bottom: -10px; width: clamp(56px, 7vw, 96px); color: var(--v2-brown); }
+.v2-wave-cut {
+  position: absolute;
+  right: 4%;
+  top: -18px;
+  width: clamp(96px, 13vw, 180px);
+  height: auto;
+  filter: drop-shadow(0 10px 14px rgba(43, 26, 14, 0.22));
+  animation: v2bob 5s ease-in-out infinite;
+}
+@keyframes v2bob {
+  0%, 100% { transform: rotate(8deg) translateY(0); }
+  50% { transform: rotate(5deg) translateY(-9px); }
+}
+.v2-peeker { position: absolute; top: -12px; right: 2px; width: clamp(70px, 8vw, 108px); color: var(--v2-brown); }
+
+/* giant footer wordmark */
+.v2-footer-mark {
+  font-family: var(--font-v2-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--v2-orange);
+  font-size: clamp(2rem, 7.4vw, 6.8rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  margin-top: 2.2rem;
+}
+
 .v2-gal-band { margin-bottom: 3rem; }
 .v2-gal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
 .v2-gal-grid .ph { border-radius: 24px; overflow: hidden; height: 150px; }
@@ -617,6 +768,7 @@
   .v2-rate { grid-template-columns: 1.1fr auto 1fr; gap: 2.2rem; }
   .v2-rate-corner { width: 112px; height: 112px; right: 40px; }
   .v2-rev-cards { grid-template-columns: repeat(3, 1fr); }
+  .v2-favs-grid { grid-auto-columns: 42%; gap: 1.7rem; }
   .v2-gal-grid { grid-template-columns: repeat(3, 1fr); }
   .v2-gal-grid .ph { height: 170px; }
   .v2-hours-band { grid-template-columns: 1fr 1.1fr; gap: 2.4rem; }
@@ -647,6 +799,7 @@
   .v2-tile-img { height: 230px; }
   .v2-gal-grid .ph { height: 190px; }
   .v2-tile.menu { height: 265px; }
+  .v2-favs-grid { grid-auto-columns: calc((100% - 3 * 1.7rem) / 3.3); }
   .v2-footer-top { flex-direction: row; justify-content: space-between; text-align: left; }
   .v2-footer-links { justify-content: flex-end; }
 }
@@ -724,6 +877,7 @@
 @media (prefers-reduced-motion: reduce) {
   .v2-spin svg.ring { animation: none; }
   .v2-marquee-track { animation: none; }
+  .v2-wave-cut { animation: none; }
   .v2-btn:hover, .v2-car-btn:hover { transform: none; }
   .v2-h1, .v2-sub, .v2-hero-copy > p, .v2-hero-actions, .v2-hero-art, .v2-hero-img img { animation: none; }
   .v2 .reveal, .v2-collage > * { opacity: 1; transform: none; transition: none; }

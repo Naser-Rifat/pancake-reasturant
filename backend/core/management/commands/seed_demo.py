@@ -49,12 +49,14 @@ GALLERY = [
     ("interior", "Room for the whole crew", "https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=700&q=70", "Long communal tables in the cafe"),
 ]
 
+# Placeholder claims only — the restaurant must confirm or remove each one
+# before launch (accreditation claims are regulated advertising).
 CERTS = [
-    ("🛡️", "Food Safety Certified", "NSW Food Authority"),
-    ("⭐", "5-Star Hygiene Rating", "Local Council Inspection"),
-    ("🏆", "Best Pancakes — Sydney 2025", "Local Eats Awards"),
-    ("✅", "HACCP Compliant", "Certified Kitchen"),
-    ("🌱", "Local Produce Partner", "NSW Farmers' Network"),
+    ("shield", "Food Safety Certified", "NSW Food Authority"),
+    ("star", "5-Star Hygiene Rating", "Local Council Inspection"),
+    ("trophy", "Best Pancakes — Sydney 2025", "Local Eats Awards"),
+    ("check", "HACCP Compliant", "Certified Kitchen"),
+    ("leaf", "Local Produce Partner", "NSW Farmers' Network"),
 ]
 
 HOURS = [

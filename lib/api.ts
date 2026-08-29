@@ -15,7 +15,10 @@ export interface ApiMenuItem {
   kcal: number | null;
   protein_g: number | null;
   prep_time: string;
+  /** transparent cutout — tiles, thumbs, hero blob */
   image: string;
+  /** original photo — framed cards; falls back to `image` when empty */
+  photo: string;
   is_featured: boolean;
 }
 

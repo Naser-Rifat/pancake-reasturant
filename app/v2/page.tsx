@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import LogoMark from "@/components/LogoMark";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
-import TabbedSlider from "./TabbedSlider";
+import FavouritesRail from "@/components/FavouritesRail";
 import {
   TAG_LABEL,
   formatTime,
@@ -75,6 +75,40 @@ const StackLine = ({ className }: { className?: string }) => (
     <path d="M19 17 v13 a26 9 0 0 0 52 0 v-13" />
     <path d="M19 30 v13 a26 9 0 0 0 52 0 v-13" />
     <path d="M33 22 q3 5 0 9" /><path d="M45 25 q3 5 0 9" /><path d="M57 22 q3 5 0 9" />
+  </svg>
+);
+/* hand-drawn characters (Doughwey-style naive line art) */
+const Peeker = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 110 100" className={className} fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="74" cy="26" r="15" />
+    <path d="M62 15 q6 -9 13 -3 q6 -6 11 1 q6 -2 6 6" />
+    <circle cx="69" cy="24" r="1.7" fill="currentColor" stroke="none" />
+    <circle cx="78" cy="24" r="1.7" fill="currentColor" stroke="none" />
+    <path d="M70 32 q4 3.5 9 0" />
+    <path d="M68 41 C56 50 42 56 24 58" />
+    <path d="M74 41 C70 58 68 72 68 86" />
+    <path d="M68 86 l-9 10 M68 86 l8 10" />
+    <path d="M56 48 C46 44 40 38 36 30" />
+  </svg>
+);
+const Carrier = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 96 132" className={className} fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="48" cy="40" r="15" />
+    <path d="M36 29 q6 -9 13 -3 q6 -6 11 1 q5 -2 5 6" />
+    <circle cx="43" cy="38" r="1.7" fill="currentColor" stroke="none" />
+    <circle cx="52" cy="38" r="1.7" fill="currentColor" stroke="none" />
+    <path d="M44 46 q4 3.5 9 0" />
+    <path d="M40 54 C38 74 38 88 42 104" />
+    <path d="M56 54 C58 74 58 88 54 104" />
+    <path d="M42 104 l-10 18 M54 104 l10 18" />
+    <path d="M38 50 C26 42 20 32 22 18" />
+    <path d="M58 50 C70 42 76 32 74 18" />
+  </svg>
+);
+const Swirl = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 54 60" className={className} fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M40 6 c10 4 8 16 -2 17 c-8 1 -12 -8 -5 -12 c10 -5 20 4 17 16 c-3 12 -14 20 -26 22" />
+    <path d="M18 42 l6 7 M24 49 l-9 3" />
   </svg>
 );
 const Ring = ({ className }: { className?: string }) => (
@@ -249,8 +283,10 @@ export default async function V2Home() {
                   <Image src={featured.image} alt={`${featured.name} pancakes`} width={500} height={500} sizes="340px" />
                 </div>
                 <SpinBadge />
+                <Peeker className="v2-peeker" />
               </div>
               <div>
+                <span className="v2-kicker-scr">house favourite —</span>
                 <h2>Your Only <CookieDoodle className="v2-inline-doodle" /><br />Dose of Delight</h2>
                 <p className="v2-featured-label">Featured Item -</p>
                 <div className="v2-item-row">
@@ -262,27 +298,32 @@ export default async function V2Home() {
                   <div className="v2-item-price">${parseFloat(featured.price)}</div>
                 </div>
                 <p className="desc">{featured.description}</p>
+                <div className="v2-delight-meta">
+                  <Link href="/menu" className="v2-btn">Add To Order</Link>
+                  {featured.kcal != null && <span className="v2-mchip">🔥 {featured.kcal} kcal</span>}
+                  {featured.prep_time && <span className="v2-mchip">⏱ {featured.prep_time}</span>}
+                </div>
               </div>
             </div>
           </section>
         )}
 
-        {/* ---------- category pills ---------- */}
-        <section className="v2-cats reveal">
-          <h2>What We Stack Here Daily-</h2>
-          <div className="v2-pill-rows">
-            {counts.map((c, i) => (
-              <span className={`v2-pill ${PILL_COLORS[i % PILL_COLORS.length]}`} key={c.tag}>
-                {c.label} <span className="n">{c.count}</span>
-              </span>
-            ))}
-            <span className="v2-pill">All Stacks <span className="n">{items.length}</span></span>
-          </div>
-        </section>
-
-        {/* ---------- menu slider with category tabs (V1 merge) ---------- */}
-        <section className="v2-carousel-sec reveal">
-          <TabbedSlider items={items} />
+        {/* ---------- our favourites: category pills + editorial rail ---------- */}
+        <section className="v2-favs reveal">
+          <FavouritesRail
+            items={items}
+            variant="v2"
+            title={<h2>What We Stack Here Daily<Swirl className="v2-swirl" /></h2>}
+            middle={
+              <div className="v2-band-head sub">
+                <div>
+                  <h2>Our Favourites</h2>
+                  <p className="v2-favs-sub">Top picks that&apos;ll make you smile</p>
+                </div>
+                <Link href="/menu" className="v2-btn small">View Full Menu</Link>
+              </div>
+            }
+          />
         </section>
 
         {/* ---------- dark story panel ---------- */}
@@ -295,6 +336,10 @@ export default async function V2Home() {
           <div>
             <h2>Why Is Pancaking Considered An Art Form?</h2>
             <p>{site.about_text}</p>
+            <p className="v2-promise">
+              From the first ladle to the last drizzle — every stack is hand-flipped,
+              hand-stacked, and heart-approved.
+            </p>
             <Link href="/menu" className="v2-btn on-dark">See The Menu</Link>
           </div>
           <Wheat className="v2-wheat" />
@@ -351,6 +396,18 @@ export default async function V2Home() {
             </div>
           )}
         </section>
+
+        {/* ---------- wavy brand strip (Doughwey move) ---------- */}
+        <div className="v2-wave reveal" aria-hidden="true">
+          <Carrier className="v2-wave-char" />
+          <svg viewBox="0 0 1200 190" className="v2-wave-svg">
+            <defs>
+              <path id="v2wavepath" d="M20,130 C280,40 560,175 860,80 C1010,32 1130,66 1185,50" fill="none" />
+            </defs>
+            <text><textPath href="#v2wavepath" startOffset="8%">Fluffy. Golden. Always Stacked.</textPath></text>
+          </svg>
+          <Image className="v2-wave-cut" src="/menu/hero-stack.png" alt="" width={220} height={205} />
+        </div>
 
         {/* ---------- gallery band (V1 lavender) ---------- */}
         {gallery.length > 0 && (
@@ -447,6 +504,7 @@ export default async function V2Home() {
               <li><a href={telHref(site.phone)}>{site.phone}</a></li>
             </ul>
           </div>
+          <div className="v2-footer-mark" aria-hidden="true">The Pancake Club</div>
           <small>Design V2 preview · {site.address} · {site.abn}</small>
         </div>
       </footer>

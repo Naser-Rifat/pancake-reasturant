@@ -11,12 +11,12 @@ import type {
 // the storefront still renders — keep in sync with `backend seed_demo`.
 
 export const FALLBACK_MENU: ApiMenuItem[] = [
-  { slug: "buttermilk", name: "Classic Buttermilk Stack", description: "Four fluffy buttermilk pancakes with pure maple syrup and whipped butter.", price: "14.00", tag: "sweet", heat: "none", kcal: 680, protein_g: 14, prep_time: "10–12 min", image: "/menu/buttermilk-stack.png", is_featured: true },
-  { slug: "berry", name: "Berry Bliss", description: "Blueberries and strawberries piled high with berry compote and vanilla cream.", price: "17.00", tag: "sweet", heat: "none", kcal: 720, protein_g: 15, prep_time: "12–14 min", image: "/menu/berry.png", is_featured: true },
-  { slug: "choc", name: "Choc Overload", description: "Chocolate pancakes, hazelnut spread, brownie bits and a warm chocolate drizzle.", price: "18.00", tag: "choc", heat: "hot", kcal: 890, protein_g: 16, prep_time: "12–14 min", image: "/menu/choc.png", is_featured: true },
-  { slug: "banana", name: "Banana Caramel", description: "Caramelised banana, salted caramel sauce and crushed roasted pecans.", price: "16.00", tag: "sweet", heat: "none", kcal: 780, protein_g: 13, prep_time: "12–14 min", image: "/menu/banana.png", is_featured: false },
-  { slug: "lemon", name: "Lemon Ricotta", description: "Cloud-light ricotta pancakes with lemon curd and a snowfall of icing sugar.", price: "16.00", tag: "sweet", heat: "none", kcal: 640, protein_g: 18, prep_time: "12–15 min", image: "/menu/lemon.png", is_featured: false },
-  { slug: "brekkie", name: "Big Brekkie Stack", description: "Savoury stack with crispy bacon, fried eggs and maple butter. Sweet meets salty.", price: "19.00", tag: "savoury", heat: "medium", kcal: 840, protein_g: 32, prep_time: "14–16 min", image: "/menu/brekkie.png", is_featured: false },
+  { slug: "buttermilk", name: "Classic Buttermilk Stack", description: "Four fluffy buttermilk pancakes with pure maple syrup and whipped butter.", price: "14.00", tag: "sweet", heat: "none", kcal: 680, protein_g: 14, prep_time: "10–12 min", image: "/menu/buttermilk-stack.png", photo: "", is_featured: true },
+  { slug: "berry", name: "Berry Bliss", description: "Blueberries and strawberries piled high with berry compote and vanilla cream.", price: "17.00", tag: "sweet", heat: "none", kcal: 720, protein_g: 15, prep_time: "12–14 min", image: "/menu/berry.png", photo: "", is_featured: true },
+  { slug: "choc", name: "Choc Overload", description: "Chocolate pancakes, hazelnut spread, brownie bits and a warm chocolate drizzle.", price: "18.00", tag: "choc", heat: "hot", kcal: 890, protein_g: 16, prep_time: "12–14 min", image: "/menu/choc.png", photo: "", is_featured: true },
+  { slug: "banana", name: "Banana Caramel", description: "Caramelised banana, salted caramel sauce and crushed roasted pecans.", price: "16.00", tag: "sweet", heat: "none", kcal: 780, protein_g: 13, prep_time: "12–14 min", image: "/menu/banana.png", photo: "", is_featured: false },
+  { slug: "lemon", name: "Lemon Ricotta", description: "Cloud-light ricotta pancakes with lemon curd and a snowfall of icing sugar.", price: "16.00", tag: "sweet", heat: "none", kcal: 640, protein_g: 18, prep_time: "12–15 min", image: "/menu/lemon.png", photo: "", is_featured: false },
+  { slug: "brekkie", name: "Big Brekkie Stack", description: "Savoury stack with crispy bacon, fried eggs and maple butter. Sweet meets salty.", price: "19.00", tag: "savoury", heat: "medium", kcal: 840, protein_g: 32, prep_time: "14–16 min", image: "/menu/brekkie.png", photo: "", is_featured: false },
 ];
 
 export const FALLBACK_REVIEWS: ApiReview[] = [
@@ -47,11 +47,11 @@ export const FALLBACK_GALLERY: ApiGalleryPhoto[] = [
 ];
 
 export const FALLBACK_CERTS: ApiCertification[] = [
-  { icon: "🛡️", title: "Food Safety Certified", subtitle: "NSW Food Authority" },
-  { icon: "⭐", title: "5-Star Hygiene Rating", subtitle: "Local Council Inspection" },
-  { icon: "🏆", title: "Best Pancakes — Sydney 2025", subtitle: "Local Eats Awards" },
-  { icon: "✅", title: "HACCP Compliant", subtitle: "Certified Kitchen" },
-  { icon: "🌱", title: "Local Produce Partner", subtitle: "NSW Farmers' Network" },
+  { icon: "shield", title: "Food Safety Certified", subtitle: "NSW Food Authority" },
+  { icon: "star", title: "5-Star Hygiene Rating", subtitle: "Local Council Inspection" },
+  { icon: "trophy", title: "Best Pancakes — Sydney 2025", subtitle: "Local Eats Awards" },
+  { icon: "check", title: "HACCP Compliant", subtitle: "Certified Kitchen" },
+  { icon: "leaf", title: "Local Produce Partner", subtitle: "NSW Farmers' Network" },
 ];
 
 export const FALLBACK_SITE: ApiSiteSettings = {
@@ -72,9 +72,9 @@ export const FALLBACK_SITE: ApiSiteSettings = {
   instagram_url: "",
   facebook_url: "",
   timezone: "Australia/Sydney",
-  theme: "golden",
-  custom_primary: "#f2be45",
-  custom_accent: "#f2789c",
+  theme: "maple",
+  custom_primary: "#efbf38",
+  custom_accent: "#e08600",
 };
 
 export const FALLBACK_HOURS: ApiOpeningHours[] = [

@@ -2,7 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import LogoMark from "@/components/LogoMark";
 import Announce from "@/components/Announce";
-import FeaturedSlider from "@/components/FeaturedSlider";
+import CertIcon from "@/components/CertIcon";
+import FavouritesRail from "@/components/FavouritesRail";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewsCarousel from "@/components/ReviewsCarousel";
 import Sticker from "@/components/Sticker";
@@ -100,15 +101,24 @@ export default async function Home() {
         <Sticker kind="sparkle" color="var(--pink)" size={56} style={{ top: "4rem", left: "3%", transform: "rotate(12deg)" }} />
         <Sticker kind="squiggle" color="var(--yellow)" size={84} style={{ top: "6rem", right: "4%", transform: "rotate(-8deg)" }} />
         <div className="container">
-          <div className="reveal" style={{ textAlign: "center" }}>
-            <p className="kicker">Crowd Favourites</p>
-            <h2 className="title">Featured <span className="accent">Stacks</span></h2>
-            <p className="section-lead" style={{ marginInline: "auto" }}>
-              Hand-picked by the chef. Griddled to order, gone in minutes.
-            </p>
+          <div className="reveal">
+            <FavouritesRail
+              items={menu.items}
+              variant="v1"
+              title={
+                <>
+                  <p className="kicker">Crowd Favourites</p>
+                  <h2 className="title">Our <span className="accent">Favourites</span></h2>
+                  <p className="fav-sub">Top picks straight off our menu.</p>
+                </>
+              }
+              footer={
+                <div className="fav-foot">
+                  <Link href="/menu" className="btn btn-primary">View Full Menu</Link>
+                </div>
+              }
+            />
           </div>
-
-          <FeaturedSlider items={menu.items} />
         </div>
       </section>
 
@@ -122,7 +132,6 @@ export default async function Home() {
             <Image src="https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&q=75" alt="Pancakes with honey drizzle" width={600} height={450} sizes="(min-width: 1024px) 12vw, 25vw" />
           </div>
           <div className="reveal">
-            <p className="kicker">Welcome to the Club</p>
             <h2 className="title">
               Fluffy. Golden.<br /><span className="accent">Fully Stacked.</span>
             </h2>
@@ -167,30 +176,11 @@ export default async function Home() {
         <Sticker kind="sparkle" color="var(--green)" size={40} style={{ bottom: "6rem", right: "5%" }} />
         <div className="container">
           <div className="reveal" style={{ textAlign: "center" }}>
-            <p className="kicker">★ 4.8 Average Rating</p>
+            <p className="stat-chip"><span className="star">★</span> 4.8 average from happy guests</p>
             <h2 className="title">What Our <span className="accent">Guests Say</span></h2>
           </div>
           <ReviewsCarousel reviews={reviews} />
           <ReviewForm />
-        </div>
-      </section>
-
-      {/* ================= CERTIFICATIONS STRIP (FR-06) ================= */}
-      <section className="block certs" id="certifications">
-        <div className="container">
-          <div className="reveal" style={{ textAlign: "center" }}>
-            <p className="kicker">Dine With Confidence</p>
-            <h2 className="title">Certified &amp; <span className="accent">Award-Winning</span></h2>
-          </div>
-
-          <div className="cert-strip reveal">
-            {certs.map((c) => (
-              <div className="cert-badge" key={c.title}>
-                <span className="ic">{c.icon}</span>
-                <span><b>{c.title}</b><small>{c.subtitle}</small></span>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -200,7 +190,6 @@ export default async function Home() {
         <Sticker kind="ring" color="var(--lavender)" size={52} style={{ bottom: "4rem", right: "4%" }} />
         <div className="container">
           <div className="reveal" style={{ textAlign: "center" }}>
-            <p className="kicker">Come Say Hi</p>
             <h2 className="title">Hours &amp; <span className="accent">Location</span></h2>
           </div>
 
@@ -233,6 +222,25 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* ========== CERTIFICATIONS (FR-06) — quiet trust strip before the CTA ========== */}
+      {certs.length > 0 && (
+        <section className="certs-strip-sec" id="certifications">
+          <div className="container">
+            <div style={{ textAlign: "center" }}>
+              <p className="kicker">Certified &amp; Award-Winning</p>
+            </div>
+            <div className="cert-strip reveal">
+              {certs.map((c) => (
+                <div className="cert-badge" key={c.title}>
+                  <span className="ic"><CertIcon name={c.icon} /></span>
+                  <span><b>{c.title}</b><small>{c.subtitle}</small></span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ================= BOOKING CTA (FR-25) ================= */}
       <section className="cta">

@@ -10,7 +10,6 @@ export default function PrivacyPage() {
     <>
       <section className="page-hero">
         <div className="container">
-          <p className="kicker">The Fine Print</p>
           <h1>Privacy <span className="accent">Policy.</span></h1>
           <p>Last updated: August 2026</p>
         </div>

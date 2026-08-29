@@ -64,13 +64,14 @@
   --berry: #7a4520;
   --blush: #f0dcc3;
 }
-/* client's brown & yellow palette — the one preset that also re-tints the
-   frame/marquee (lavender slot) and lime slot so the whole site goes warm */
+/* THE DEFAULT PALETTE — the client's brown & yellow set, every value taken
+   straight from their swatch sheet. Also re-tints the frame/marquee (lavender
+   slot) and the lime slot so the whole site reads warm. */
 [data-theme="maple"] {
   --yellow: #efbf38;
   --yellow-deep: #e08600;
   --pink: #e08600;
-  --pink-deep: #c06e00;
+  --pink-deep: #aa4c0a;
   --berry: #763a12;
   --blush: #f5de7a;
   --lavender: #f5de7a;
@@ -430,19 +431,54 @@ body.has-announce .nav-links { top: calc(var(--nav-h) + 44px - 6px); }
 
 /* ---------- generic section ---------- */
 section.block { padding: 3.5rem 0; position: relative; }
+/* Editorial eyebrow — deliberately NOT a filled pill: a gold pill reads as a
+   button, and a label you can't click that looks like the primary CTA is a trap. */
 .kicker {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
   font-family: var(--font-body);
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--ink);
-  background: var(--yellow);
-  border-radius: 999px;
-  padding: 0.4rem 1.3rem;
+  color: var(--pink-deep);
   font-size: 0.72rem;
-  margin-bottom: 1.3rem;
+  margin-bottom: 1rem;
 }
+.kicker::before {
+  content: "";
+  width: 26px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  flex-shrink: 0;
+}
+/* centred sections get the rule on both sides so it stays symmetrical */
+[style*="center"] .kicker::after,
+.section-head-center .kicker::after {
+  content: "";
+  width: 26px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* the one eyebrow carrying real data stays loud — a stat, not a label */
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--cream-card);
+  border-radius: 999px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: var(--ink);
+  margin-bottom: 1rem;
+  box-shadow: 0 6px 16px rgba(33, 26, 20, 0.08);
+}
+.stat-chip .star { color: var(--yellow-deep); font-size: 1rem; line-height: 1; }
 h2.title {
   font-family: var(--font-serif);
   font-weight: 400;
@@ -1184,25 +1220,37 @@ body.has-announce .page-hero { padding-top: calc(var(--nav-h) + 2.5rem + 44px); 
   margin: 0 auto;
   box-shadow: 0 24px 54px rgba(33, 26, 20, 0.1);
 }
+/* quiet trust strip: auto-fit means the last row always fills — no orphan card */
+.certs-strip-sec { padding: 1.6rem 0 3rem; }
 .cert-strip {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1.2rem;
-  margin-top: 2.6rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 0.9rem;
+  margin-top: 1.1rem;
 }
 .cert-badge {
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  background: #fff;
-  border-radius: 999px;
-  padding: 0.8rem 1.6rem;
-  box-shadow: 0 10px 22px rgba(33, 26, 20, 0.1);
-  transition: transform 0.25s ease;
+  background: var(--cream-card);
+  border-radius: 18px;
+  padding: 0.85rem 1.05rem;
+  box-shadow: 0 4px 14px rgba(33, 26, 20, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-.cert-badge:hover { transform: scale(1.05); }
-.cert-badge .ic { font-size: 1.8rem; }
+.cert-badge:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 10px 20px rgba(33, 26, 20, 0.09); }
+.cert-badge .ic {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--blush);
+  color: var(--berry);
+  flex-shrink: 0;
+}
+.cert-badge .ic svg { width: 21px; height: 21px; }
+.cert-badge .ic .emoji { font-size: 1.25rem; }
 .cert-badge b { font-family: var(--font-round); font-weight: 800; color: var(--ink); display: block; line-height: 1.15; font-size: 0.95rem; }
 .cert-badge small { color: var(--muted); font-size: 0.78rem; }
 
@@ -1635,7 +1683,9 @@ textarea.input { resize: vertical; }
    ============================================ */
 
 /* --- brand-coloured text selection --- */
-::selection { background: var(--pink); color: #fff; }
+/* ink on the accent, not white: white fails contrast on the lighter
+   accents (gold/pink) that several themes use */
+::selection { background: var(--pink); color: var(--ink); }
 
 /* --- visible, on-brand keyboard focus --- */
 :focus-visible {
@@ -1827,4 +1877,219 @@ body::before {
 .wa-float svg { width: 30px; height: 30px; fill: #fff; }
 @media (min-width: 768px) {
   .wa-float { right: 26px; bottom: 26px; }
+}
+
+/* ============================================
+   HOME — "Our Favourites" editorial cards (Option A)
+   ============================================ */
+/* headline left, category pills right — reference composition */
+.fav-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.1rem 1.6rem;
+}
+.fav-head { align-items: flex-end; }
+.fav-h .title { margin-bottom: 0.4rem; }
+.fav-sub { color: var(--muted); font-weight: 500; }
+.fav-foot { display: flex; justify-content: flex-end; margin-top: 1.6rem; }
+
+/* category count pills — click to filter the rail */
+.fav-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.fav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--cream-card);
+  border: none;
+  border-radius: 999px;
+  padding: 0.5rem 0.55rem 0.5rem 1.1rem;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s ease;
+}
+.fav-pill:hover { transform: scale(1.05); }
+.fav-pill .n {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 999px;
+  font-size: 0.72rem;
+}
+.fav-pill.a { background: var(--card-a); }
+.fav-pill.b { background: var(--card-b); }
+.fav-pill.c { background: var(--card-c); }
+.fav-pill.on { background: var(--pink); }
+
+/* scroll-snap rail: the next card always peeks, so there's a visible
+   "there's more" cue instead of hidden arrows */
+.fav-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 78%;
+  gap: 1.4rem;
+  margin-top: 1.8rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-bottom: 0.5rem;
+}
+.fav-grid::-webkit-scrollbar { display: none; }
+.fav-card { scroll-snap-align: start; }
+.fav-card .ph {
+  display: block;
+  position: relative;
+  background: #fff;
+  border-radius: 26px;
+  height: 250px;
+  overflow: hidden;
+}
+/* hover flood — the card turns into the dish detail (hover devices only) */
+.hp {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 1.6rem;
+  text-align: center;
+  color: var(--ink);
+  opacity: 0;
+  pointer-events: none;
+}
+.fav-card:nth-child(3n + 1) .hp { background: var(--card-a); }
+.fav-card:nth-child(3n + 2) .hp { background: var(--card-b); }
+.fav-card:nth-child(3n) .hp { background: var(--card-c); }
+.hp-name { font-family: var(--font-round); font-weight: 800; font-size: 1.25rem; line-height: 1.15; }
+.hp-price {
+  font-family: var(--font-round);
+  font-weight: 800;
+  background: var(--yellow);
+  border-radius: 999px;
+  padding: 0.3rem 0.95rem;
+}
+.hp-desc { font-size: 0.9rem; color: rgba(33, 26, 20, 0.78); }
+.hp-cta {
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--cream-card);
+  border-radius: 999px;
+  padding: 0.7rem 1.4rem;
+  margin-top: 0.2rem;
+}
+@media (hover: hover) and (pointer: fine) {
+  .hp {
+    transform: scale(1.02);
+    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fav-card:hover .hp,
+  .fav-card:focus-visible .hp { opacity: 1; transform: none; }
+}
+
+/* a real photo fills the frame edge-to-edge; a cutout floats with padding */
+.fav-card .ph.framed img { object-fit: cover; padding: 0; }
+.fav-card .ph img {
+  object-fit: contain;
+  padding: 1.6rem;
+  filter: drop-shadow(0 14px 18px rgba(33, 26, 20, 0.2));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.fav-card:hover .ph img { transform: scale(1.05) rotate(-1.2deg); }
+.fav-card .nm {
+  display: block;
+  font-family: var(--font-round);
+  font-weight: 800;
+  color: var(--ink);
+  font-size: 1.25rem;
+  margin-top: 0.9rem;
+}
+.fav-card .pr { display: block; color: var(--muted); font-weight: 600; font-size: 0.92rem; margin-top: 0.1rem; }
+@media (min-width: 768px) {
+  .fav-grid { grid-auto-columns: 42%; gap: 1.8rem; }
+}
+@media (min-width: 1024px) {
+  /* three full cards + a slice of the fourth */
+  .fav-grid { grid-auto-columns: calc((100% - 3 * 1.8rem) / 3.3); }
+}
+
+/* ============================================
+   MENU PAGE — bistro list (Option C)
+   Scoped to .menu-grid so the home slider keeps its tile cards.
+   ============================================ */
+.menu-grid {
+  grid-template-columns: 1fr;
+  background: var(--cream-card);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.4rem 1.6rem;
+  gap: 0;
+}
+.menu-cat-block { padding-top: 1.4rem; }
+.menu-cat-block:first-child { padding-top: 0.4rem; }
+.menu-cat {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pink-deep);
+  border-bottom: 2px solid rgba(33, 26, 20, 0.1);
+  padding-bottom: 0.6rem;
+}
+.menu-grid .menu-card {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 0.4rem 1.1rem;
+  align-items: center;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
+  border-bottom: 1.5px dashed rgba(33, 26, 20, 0.15);
+  padding: 1.05rem 0;
+}
+.menu-cat-block .menu-card:last-child { border-bottom: none; }
+.menu-grid .menu-card:hover { transform: none; box-shadow: none; }
+.menu-grid .menu-card .thumb { position: static; height: 64px; width: 64px; padding: 0; }
+.menu-grid .menu-card .thumb img { filter: drop-shadow(0 6px 8px rgba(33, 26, 20, 0.2)); }
+.menu-grid .menu-card:hover .thumb img { transform: scale(1.08) rotate(-3deg); }
+.menu-grid .menu-card .body { position: static; padding: 0; text-align: left; display: block; min-width: 0; }
+.menu-grid .menu-card .row1 { flex-direction: row; align-items: baseline; gap: 0.8rem; }
+.menu-grid .menu-card h3 { font-size: 1.18rem; color: var(--ink); }
+.menu-grid .menu-card .lead { flex: 1; border-bottom: 2.5px dotted rgba(33, 26, 20, 0.3); transform: translateY(-4px); }
+.menu-grid .menu-card .price { background: transparent; padding: 0; font-size: 1.12rem; max-height: none; opacity: 1; }
+.menu-grid .menu-card .desc { color: var(--muted); font-size: 0.88rem; margin: 0.15rem 0 0; max-height: none; opacity: 1; }
+.menu-grid .menu-card .chips { justify-content: flex-start; margin: 0.45rem 0 0; max-height: none; opacity: 1; }
+.menu-grid .menu-card .chip { background: #fff; color: var(--ink); }
+.menu-grid .menu-card .btn {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: 0.3rem;
+  white-space: nowrap;
+}
+@media (min-width: 768px) {
+  .menu-grid { padding: 1.6rem 2.2rem 2rem; }
+  .menu-grid .menu-card { grid-template-columns: 68px 1fr 185px; height: auto; }
+  .menu-grid .menu-card .thumb { grid-column: 1; grid-row: 1; }
+  .menu-grid .menu-card .body { grid-column: 2; grid-row: 1; padding-right: 1.6rem; }
+  .menu-grid .menu-card .btn { padding: 0.75rem 1.3rem; font-size: 0.8rem; }
+  .menu-grid .menu-card .btn { grid-column: 3; grid-row: 1; align-self: center; justify-self: end; width: auto; margin-top: 0; }
 }

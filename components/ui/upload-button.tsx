@@ -18,10 +18,15 @@ const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
  */
 export function UploadButton({
   onUploaded,
+  onPair,
   cutout = false,
+  label = "Upload",
 }: {
-  onUploaded: (url: string) => void;
+  onUploaded?: (url: string) => void;
+  /** dual mode: one pick returns BOTH the original photo and its cutout */
+  onPair?: (urls: { photo: string; cutout: string }) => void;
   cutout?: boolean;
+  label?: string;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [stage, setStage] = useState<"" | "cutting" | "uploading">("");
@@ -29,37 +34,52 @@ export function UploadButton({
 
   if (!CLOUD || !PRESET) return null;
 
+  const toCloudinary = async (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("upload_preset", PRESET);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, {
+      method: "POST",
+      body: form,
+    });
+    const body = await res.json();
+    if (!res.ok) throw new Error(body?.error?.message ?? "Upload failed");
+    // serve every upload optimised (WebP/AVIF + right quality) forever
+    return (body.secure_url as string).replace("/upload/", "/upload/f_auto,q_auto/");
+  };
+
+  const removeBg = async (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch(`${API_URL}/admin/remove-bg/`, {
+      method: "POST",
+      headers: { Authorization: `Token ${getToken()}` },
+      body: form,
+    });
+    if (!res.ok) throw new Error("Background removal failed — try a photo on a plain, light background");
+    const blob = await res.blob();
+    return new File([blob], file.name.replace(/\.[^.]+$/, "") + "-cutout.png", { type: "image/png" });
+  };
+
   const upload = async (file: File) => {
     setError("");
     try {
+      if (onPair) {
+        setStage("uploading");
+        const photo = await toCloudinary(file);
+        setStage("cutting");
+        const cut = await removeBg(file);
+        setStage("uploading");
+        onPair({ photo, cutout: await toCloudinary(cut) });
+        return;
+      }
       let payload: File = file;
       if (cutout) {
         setStage("cutting");
-        const form = new FormData();
-        form.append("file", file);
-        const res = await fetch(`${API_URL}/admin/remove-bg/`, {
-          method: "POST",
-          headers: { Authorization: `Token ${getToken()}` },
-          body: form,
-        });
-        if (!res.ok) throw new Error("Background removal failed — try a photo on a plain, light background");
-        const blob = await res.blob();
-        payload = new File([blob], file.name.replace(/\.[^.]+$/, "") + "-cutout.png", {
-          type: "image/png",
-        });
+        payload = await removeBg(file);
       }
       setStage("uploading");
-      const form = new FormData();
-      form.append("file", payload);
-      form.append("upload_preset", PRESET);
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, {
-        method: "POST",
-        body: form,
-      });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body?.error?.message ?? "Upload failed");
-      // serve every upload optimised (WebP/AVIF + right quality) forever
-      onUploaded((body.secure_url as string).replace("/upload/", "/upload/f_auto,q_auto/"));
+      onUploaded?.(await toCloudinary(payload));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");
     } finally {
@@ -85,7 +105,7 @@ export function UploadButton({
         onClick={() => fileRef.current?.click()}
       >
         <Upload />
-        {stage === "cutting" ? "Removing background…" : stage === "uploading" ? "Uploading…" : "Upload"}
+        {stage === "cutting" ? "Removing background…" : stage === "uploading" ? "Uploading…" : label}
       </Button>
       {error && <span className="text-xs font-medium text-destructive">{error}</span>}
     </span>

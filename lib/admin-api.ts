@@ -58,6 +58,7 @@ export interface AdminMenuItem {
   protein_g: number | null;
   prep_time: string;
   image: string;
+  photo: string;
   is_featured: boolean;
   is_available: boolean;
   sort_order: number;

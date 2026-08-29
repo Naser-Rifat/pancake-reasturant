@@ -31,6 +31,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadButton } from "@/components/ui/upload-button";
 import { useToast, type ToastInput } from "@/components/ui/toast";
+import { CERT_ICONS } from "@/components/CertIcon";
 
 const EMPTY_PHOTO: Pick<AdminGalleryPhoto, "album" | "caption" | "image" | "alt"> = {
   album: "food",
@@ -38,7 +39,7 @@ const EMPTY_PHOTO: Pick<AdminGalleryPhoto, "album" | "caption" | "image" | "alt"
   image: "",
   alt: "",
 };
-const EMPTY_CERT = { icon: "🏅", title: "", subtitle: "" };
+const EMPTY_CERT = { icon: "medal", title: "", subtitle: "" };
 
 export default function ContentPage() {
   const [site, setSite] = useState<AdminSiteSettings | null>(null);
@@ -233,16 +234,24 @@ export default function ContentPage() {
       <Card>
         <CardHeader>
           <CardTitle>Certifications &amp; awards</CardTitle>
-          <CardDescription>The badges in the &ldquo;Certified &amp; Award-Winning&rdquo; strip</CardDescription>
+          <CardDescription>
+            The trust strip above the booking CTA — only list accreditations the
+            restaurant actually holds
+          </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3">
           {certs.map((c) => (
             <div key={c.id} className="flex flex-wrap items-center gap-2 rounded-md border p-2">
-              <Input
-                className="w-14 text-center"
+              <Select
+                className="h-9 w-32"
                 value={c.icon}
                 onChange={(e) => setCerts((xs) => xs.map((x) => (x.id === c.id ? { ...x, icon: e.target.value } : x)))}
-              />
+              >
+                {!CERT_ICONS.includes(c.icon) && <option value={c.icon}>Custom: {c.icon}</option>}
+                {CERT_ICONS.map((ic) => (
+                  <option key={ic} value={ic} className="capitalize">{ic}</option>
+                ))}
+              </Select>
               <Input
                 className="min-w-40 flex-1"
                 value={c.title}
@@ -282,8 +291,12 @@ export default function ContentPage() {
             </div>
           ))}
           <div className="flex flex-wrap items-center gap-2 rounded-md border border-dashed p-2">
-            <Input className="w-14 text-center" value={newCert.icon}
-              onChange={(e) => setNewCert((n) => ({ ...n, icon: e.target.value }))} />
+            <Select className="h-9 w-32" value={newCert.icon}
+              onChange={(e) => setNewCert((n) => ({ ...n, icon: e.target.value }))}>
+              {CERT_ICONS.map((ic) => (
+                <option key={ic} value={ic} className="capitalize">{ic}</option>
+              ))}
+            </Select>
             <Input className="min-w-40 flex-1" placeholder="New award title"
               value={newCert.title} onChange={(e) => setNewCert((n) => ({ ...n, title: e.target.value }))} />
             <Input className="min-w-40 flex-1" placeholder="Subtitle"

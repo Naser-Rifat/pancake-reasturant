@@ -2,8 +2,8 @@ import uuid
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.utils import timezone
-from django.core.cache import cache
+from django.utils import timezone 
+from django.core.cache import cache 
 
 
 class TimeStampedModel(models.Model):
@@ -37,7 +37,13 @@ class MenuItem(TimeStampedModel):
     image = models.CharField(
         max_length=300,
         blank=True,
-        help_text="Path or URL the storefront can render, e.g. /menu/berry.png",
+        help_text="Transparent cutout used on tiles and thumbs, e.g. /menu/berry.png",
+    )
+    photo = models.CharField(
+        max_length=300,
+        blank=True,
+        default="",
+        help_text="Original photo for framed cards; falls back to the cutout when blank",
     )
     is_featured = models.BooleanField(default=False)
     is_available = models.BooleanField(default=True)
@@ -235,11 +241,11 @@ class SiteSettings(models.Model):
         ("maple", "Maple Gold"),
         ("custom", "Custom"),
     ]
-    theme = models.CharField(max_length=20, choices=THEME_CHOICES, default="golden")
+    theme = models.CharField(max_length=20, choices=THEME_CHOICES, default="maple")
     # client-picked colours, used only when theme == "custom"; the frontend
     # derives hover/soft/script variants and auto-fixes unreadable contrast
-    custom_primary = models.CharField(max_length=7, default="#f2be45")
-    custom_accent = models.CharField(max_length=7, default="#f2789c")
+    custom_primary = models.CharField(max_length=7, default="#efbf38")
+    custom_accent = models.CharField(max_length=7, default="#e08600")
 
     class Meta:
         verbose_name_plural = "Site settings"

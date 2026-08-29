@@ -39,6 +39,7 @@ const EMPTY_FORM = {
   protein_g: "",
   prep_time: "",
   image: "",
+  photo: "",
   is_available: true,
   is_featured: false,
 };
@@ -83,6 +84,7 @@ export default function MenuAdminPage() {
       protein_g: item.protein_g?.toString() ?? "",
       prep_time: item.prep_time,
       image: item.image,
+      photo: item.photo ?? "",
       is_available: item.is_available,
       is_featured: item.is_featured,
     });
@@ -109,6 +111,7 @@ export default function MenuAdminPage() {
       protein_g: form.protein_g ? Number(form.protein_g) : null,
       prep_time: form.prep_time,
       image: form.image,
+      photo: form.photo,
       is_available: form.is_available,
       is_featured: form.is_featured,
     };
@@ -229,11 +232,24 @@ export default function MenuAdminPage() {
                 <Label htmlFor="mi-prep">Prep time</Label>
                 <Input id="mi-prep" placeholder="12–14 min" value={form.prep_time} onChange={set("prep_time")} />
               </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="mi-image">Image</Label>
+              <div className="grid gap-1.5 sm:col-span-2">
+                <Label htmlFor="mi-image">
+                  Dish photo — one upload fills both fields (photo for cards, cutout for tiles)
+                </Label>
                 <div className="flex items-center gap-2">
-                  <Input id="mi-image" placeholder="/menu/waffle.png" value={form.image} onChange={set("image")} />
-                  <UploadButton cutout onUploaded={(url) => setForm((f) => ({ ...f, image: url }))} />
+                  <UploadButton
+                    label="Upload dish photo"
+                    onPair={({ photo, cutout }) =>
+                      setForm((f) => ({ ...f, photo, image: cutout }))
+                    }
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    Plain, well-lit background gives the cleanest cutout
+                  </span>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <Input id="mi-image" placeholder="Cutout URL (/menu/waffle.png)" value={form.image} onChange={set("image")} />
+                  <Input id="mi-photo" placeholder="Photo URL (optional)" value={form.photo} onChange={set("photo")} />
                 </div>
               </div>
               <div className="flex items-center gap-6 sm:col-span-2">

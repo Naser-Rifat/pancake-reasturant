@@ -394,8 +394,8 @@ class SiteContentApiTests(TestCase):
         self.assertIn("(02) 9999 8888", mail.outbox[-1].body)
 
     def test_theme_roundtrip_and_validation(self):
-        # default ships as golden and is public
-        self.assertEqual(self.client.get("/api/site/").json()["theme"], "golden")
+        # the client's brown & yellow palette ships as the default
+        self.assertEqual(self.client.get("/api/site/").json()["theme"], "maple")
         self.auth()
         res = self.client.patch("/api/admin/site/", {"theme": "berry"}, format="json")
         self.assertEqual(res.status_code, 200)

@@ -5,13 +5,13 @@ import Image from "next/image";
 import { ShoppingCart } from "lucide-react";
 import {
   TAG_LABEL,
-  heatClass,
   placeOrder,
   telHref,
   type ApiMenuItem,
 } from "@/lib/api";
 
 const CART_KEY = "krush-cart-v2";
+const TAG_ORDER = ["sweet", "savoury", "choc"] as const;
 
 type Cart = Record<string, number>;
 
@@ -113,31 +113,40 @@ export default function MenuClient({
           </p>
         )}
         <div className="menu-grid">
-          {items.map((b, i) => (
-            <article className="menu-card reveal" key={b.slug} style={{ transitionDelay: `${(i % 3) * 0.08}s` }}>
-              <div className="thumb">
-                <Image src={b.image} alt={`${b.name} pancakes`} width={600} height={600} sizes="340px" />
-                <span className={`spice-tag ${heatClass(b.heat)}`}>{TAG_LABEL[b.tag]}</span>
-              </div>
-              <div className="body">
-                <div className="row1">
-                  <h3>{b.name}</h3>
-                  <span className="price">${parseFloat(b.price)}</span>
-                </div>
-                <p className="desc">{b.description}</p>
-                <div className="chips">
-                  {b.kcal != null && <span className="chip">🔥 {b.kcal} kcal</span>}
-                  {b.protein_g != null && <span className="chip">💪 {b.protein_g}g protein</span>}
-                  {b.prep_time && <span className="chip">⏱ {b.prep_time}</span>}
-                </div>
-                {live && (
-                  <button className="btn btn-primary" onClick={() => add(b.slug)}>
-                    Add to Order +
-                  </button>
-                )}
-              </div>
-            </article>
-          ))}
+          {TAG_ORDER.map((tag) => {
+            const group = items.filter((b) => b.tag === tag);
+            if (group.length === 0) return null;
+            return (
+              <section className="menu-cat-block" key={tag}>
+                <h2 className="menu-cat">{TAG_LABEL[tag]}</h2>
+                {group.map((b) => (
+                  <article className="menu-card reveal" key={b.slug}>
+                    <div className="thumb">
+                      <Image src={b.image} alt={`${b.name} pancakes`} width={200} height={200} sizes="80px" />
+                    </div>
+                    <div className="body">
+                      <div className="row1">
+                        <h3>{b.name}</h3>
+                        <span className="lead" aria-hidden="true" />
+                        <span className="price">${parseFloat(b.price)}</span>
+                      </div>
+                      <p className="desc">{b.description}</p>
+                      <div className="chips">
+                        {b.kcal != null && <span className="chip">🔥 {b.kcal} kcal</span>}
+                        {b.protein_g != null && <span className="chip">💪 {b.protein_g}g protein</span>}
+                        {b.prep_time && <span className="chip">⏱ {b.prep_time}</span>}
+                      </div>
+                    </div>
+                    {live && (
+                      <button className="btn btn-primary" onClick={() => add(b.slug)}>
+                        Add to Order +
+                      </button>
+                    )}
+                  </article>
+                ))}
+              </section>
+            );
+          })}
         </div>
       </main>
 

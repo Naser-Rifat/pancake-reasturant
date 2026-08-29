@@ -90,8 +90,8 @@ class AdminMenuItemSerializer(serializers.ModelSerializer):
         model = MenuItem
         fields = [
             "slug", "name", "description", "price", "tag", "heat", "kcal",
-            "protein_g", "prep_time", "image", "is_featured", "is_available",
-            "sort_order",
+            "protein_g", "prep_time", "image", "photo", "is_featured",
+            "is_available", "sort_order",
         ]
 
 
