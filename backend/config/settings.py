@@ -6,6 +6,7 @@ the defaults below are development-only.
 """
 import os
 from pathlib import Path
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,7 +22,10 @@ def _env_list(name, default):
     return [v.strip() for v in os.environ.get(name, default).split(",") if v.strip()]
 
 
-ALLOWED_HOSTS = _env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS = _env_list(
+    "DJANGO_ALLOWED_HOSTS",
+    "localhost,127.0.0.1,.railway.app,.up.railway.app,*"
+)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -29,6 +33,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     # third-party
     "rest_framework",
@@ -40,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -71,10 +77,10 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -91,6 +97,10 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# Trust Railway's reverse proxy for HTTPS
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -117,9 +127,6 @@ REST_FRAMEWORK = {
 }
 
 # ---------- email ----------
-# Development default prints emails to the runserver console. For production,
-# set DJANGO_EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend and the
-# SMTP vars below (works with Gmail app passwords, Resend, Brevo, etc.).
 EMAIL_BACKEND = os.environ.get(
     "DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
 )
@@ -132,8 +139,16 @@ DEFAULT_FROM_EMAIL = os.environ.get(
     "DJANGO_FROM_EMAIL", "The Pancake Club <hello@thepancakeclub.com.au>"
 )
 
-# ---------- CORS (Next.js dev server) ----------
+# ---------- CORS ----------
+CORS_ALLOW_ALL_ORIGINS = os.environ.get("DJANGO_CORS_ALLOW_ALL", "1") == "1"
 CORS_ALLOWED_ORIGINS = _env_list(
     "DJANGO_CORS_ORIGINS",
     "http://localhost:3000,http://127.0.0.1:3000",
 )
+
+# ---------- CSRF Trusted Origins ----------
+CSRF_TRUSTED_ORIGINS = _env_list(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000,https://*.railway.app,https://*.up.railway.app",
+)
+
