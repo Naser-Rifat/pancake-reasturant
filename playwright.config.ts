@@ -11,7 +11,7 @@ export default defineConfig({
   // html report is what the CI failure-artifact step uploads
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
     channel: isCI ? undefined : "chrome",
     viewport: { width: 1280, height: 900 },
   },
