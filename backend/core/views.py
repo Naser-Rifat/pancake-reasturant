@@ -7,6 +7,7 @@ from .models import (
     Announcement,
     Booking,
     Certification,
+    HomeStep,
     GalleryPhoto,
     MenuItem,
     OpeningHours,
@@ -18,6 +19,7 @@ from .serializers import (
     AnnouncementSerializer,
     BookingSerializer,
     CertificationSerializer,
+    HomeStepSerializer,
     GalleryPhotoSerializer,
     MenuItemSerializer,
     OpeningHoursSerializer,
@@ -128,6 +130,22 @@ class AnnouncementView(APIView):
 class OpeningHoursListView(ListAPIView):
     serializer_class = OpeningHoursSerializer
     queryset = OpeningHours.objects.all()
+    pagination_class = None
+
+
+class CampaignListView(ListAPIView):
+    """All live campaigns — the home page runs them as a slider."""
+
+    serializer_class = AnnouncementSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        return Announcement.live()
+
+
+class HomeStepListView(ListAPIView):
+    serializer_class = HomeStepSerializer
+    queryset = HomeStep.objects.all()
     pagination_class = None
 
 

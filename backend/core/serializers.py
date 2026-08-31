@@ -7,7 +7,9 @@ from .models import (
     Booking,
     Certification,
     GalleryPhoto,
+    HomeStep,
     MenuItem,
+    MenuItemPhoto,
     OpeningHours,
     Order,
     OrderItem,
@@ -16,12 +18,21 @@ from .models import (
 )
 
 
+class MenuItemPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MenuItemPhoto
+        fields = ["id", "image", "alt", "sort_order"]
+
+
 class MenuItemSerializer(serializers.ModelSerializer):
+    photos = MenuItemPhotoSerializer(many=True, read_only=True)
+
     class Meta:
         model = MenuItem
         fields = [
             "slug", "name", "description", "price", "tag", "heat",
-            "kcal", "protein_g", "prep_time", "image", "photo", "is_featured",
+            "kcal", "protein_g", "prep_time", "image", "photo", "photos",
+            "is_featured",
         ]
 
 
@@ -132,13 +143,13 @@ class ReviewSerializer(serializers.ModelSerializer):
 class GalleryPhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = GalleryPhoto
-        fields = ["id", "album", "caption", "image", "alt"]
+        fields = ["id", "album", "caption", "image", "alt", "focus"]
 
 
 class AnnouncementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Announcement
-        fields = ["message", "link_text", "link_url", "image"]
+        fields = ["message", "details", "link_text", "link_url", "image", "ends_at"]
 
 
 class OpeningHoursSerializer(serializers.ModelSerializer):
@@ -153,6 +164,12 @@ class CertificationSerializer(serializers.ModelSerializer):
         fields = ["icon", "title", "subtitle"]
 
 
+class HomeStepSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HomeStep
+        fields = ["id", "label", "title", "text", "image", "sort_order"]
+
+
 class SiteSettingsSerializer(serializers.ModelSerializer):
     custom_primary = serializers.RegexField(r"^#[0-9a-fA-F]{6}$", required=False)
     custom_accent = serializers.RegexField(r"^#[0-9a-fA-F]{6}$", required=False)
@@ -161,7 +178,11 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
         model = SiteSettings
         fields = [
             "hero_heading", "hero_script", "hero_lead", "hero_image", "hero_cutout",
-            "about_text", "address", "phone", "whatsapp", "email", "abn",
+            "about_text", "about_heading", "about_script",
+            "about_image_1", "about_image_2", "about_image_3", "about_points",
+            "cta_heading", "cta_script", "cta_lead", "cta_button_label", "cta_button_url",
+            "marquee_words", "footer_tagline",
+            "address", "phone", "whatsapp", "email", "abn",
             "map_embed", "instagram_url", "facebook_url", "timezone",
             "theme", "custom_primary", "custom_accent",
         ]

@@ -56,6 +56,21 @@ class MenuItem(TimeStampedModel):
         return self.name
 
 
+class MenuItemPhoto(TimeStampedModel):
+    """Extra real-life shots of a dish, shown in the gallery rail on its page."""
+
+    menu_item = models.ForeignKey(MenuItem, related_name="photos", on_delete=models.CASCADE)
+    image = models.CharField(max_length=300)
+    alt = models.CharField(max_length=200, blank=True)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["sort_order", "id"]
+
+    def __str__(self):
+        return f"{self.menu_item.name} photo #{self.pk}"
+
+
 class Booking(TimeStampedModel):
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
@@ -144,7 +159,14 @@ class GalleryPhoto(TimeStampedModel):
         INTERIOR = "interior", "Interior"
         EVENTS = "events", "Events"
 
+    class Focus(models.TextChoices):
+        TOP = "top", "Keep the top"
+        CENTER = "center", "Keep the middle"
+        BOTTOM = "bottom", "Keep the bottom"
+
     album = models.CharField(max_length=12, choices=Album.choices)
+    # grid cells crop to a fixed shape; this says which part survives the crop
+    focus = models.CharField(max_length=8, choices=Focus.choices, default=Focus.CENTER)
     caption = models.CharField(max_length=200)
     image = models.CharField(max_length=300)
     alt = models.CharField(max_length=200)
@@ -159,6 +181,13 @@ class GalleryPhoto(TimeStampedModel):
 
 class Announcement(TimeStampedModel):
     message = models.CharField(max_length=200)
+    # the offer panel had room for terms but nothing to put in it
+    details = models.CharField(
+        max_length=220,
+        blank=True,
+        default="",
+        help_text="The conditions in one or two lines — days, dine-in or takeaway, which dishes.",
+    )
     link_text = models.CharField(max_length=60, blank=True)
     link_url = models.CharField(max_length=200, blank=True)
     # optional campaign image — when set, the home page shows the big banner
@@ -174,14 +203,35 @@ class Announcement(TimeStampedModel):
         return self.message
 
     @classmethod
-    def current(cls):
+    def live(cls):
+        """Every campaign that is on right now, in display order."""
         now = timezone.now()
         return (
             cls.objects.filter(is_active=True)
             .exclude(starts_at__gt=now)
             .exclude(ends_at__lt=now)
-            .first()
+            .order_by("-created_at")
         )
+
+    @classmethod
+    def current(cls):
+        return cls.live().first()
+
+
+class HomeStep(TimeStampedModel):
+    """One card in the "How Pickup Works" row — was three hard-coded blocks."""
+
+    label = models.CharField(max_length=20, help_text='e.g. "Step 1"')
+    title = models.CharField(max_length=80)
+    text = models.CharField(max_length=200)
+    image = models.CharField(max_length=300, blank=True)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["sort_order", "id"]
+
+    def __str__(self):
+        return f"{self.label} — {self.title}"
 
 
 class Certification(TimeStampedModel):
@@ -214,6 +264,41 @@ class SiteSettings(models.Model):
     )
     # transparent-PNG product shot standing on the hero blob (V2 design)
     hero_cutout = models.CharField(max_length=300, default="/menu/hero-stack.png")
+    # editable copy for the About block; the heading was hard-coded in the page
+    about_heading = models.CharField(max_length=60, default="Fluffy. Golden.")
+    about_script = models.CharField(max_length=60, default="Fully Stacked.")
+    about_image_1 = models.CharField(max_length=300, blank=True, default="")
+    about_image_2 = models.CharField(max_length=300, blank=True, default="")
+    about_image_3 = models.CharField(max_length=300, blank=True, default="")
+    about_points = models.TextField(
+        blank=True,
+        default="Batter whisked fresh every morning\n"
+                "100% pure Canadian maple — never syrup-flavoured\n"
+                "Berries & fruit from local NSW growers\n"
+                "Cloud-light ricotta & buttermilk stacks",
+        help_text="One tick per line. These are public claims — keep them true.",
+    )
+    # footer strapline, next to the copyright line
+    footer_tagline = models.CharField(
+        max_length=120,
+        default="Fluffy stacks · real maple · est. 1999",
+        help_text="Shown in the footer. Contains a founding-year claim — confirm it.",
+    )
+    # closing call to action
+    cta_heading = models.CharField(max_length=60, default="Hungry?")
+    cta_script = models.CharField(max_length=60, default="Book a Table.")
+    cta_lead = models.CharField(
+        max_length=200,
+        default="Reserve online in seconds — free, instant confirmation, open 7 days.",
+    )
+    cta_button_label = models.CharField(max_length=40, default="Book a Table")
+    cta_button_url = models.CharField(max_length=200, default="/booking")
+    # ticker strip; one phrase per line, separated by ✦ on the site
+    marquee_words = models.TextField(
+        blank=True,
+        default="Fluffy Stacks\nReal Maple\nEst. 1999\nFresh Berries\nZero Guilt\nGriddled Daily",
+        help_text="One phrase per line. \"Est. 1999\" is a factual claim — confirm it.",
+    )
     about_text = models.TextField(
         default="G'day! Every pancake at The Pancake Club is ladled to order onto a buttered "
                 "griddle, flipped at exactly the right bubble, and stacked warm with "

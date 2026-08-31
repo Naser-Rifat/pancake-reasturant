@@ -28,8 +28,10 @@ from .models import (
     Announcement,
     Booking,
     Certification,
+    HomeStep,
     GalleryPhoto,
     MenuItem,
+    MenuItemPhoto,
     OpeningHours,
     Order,
     OrderItem,
@@ -158,6 +160,30 @@ class AdminReviewViewSet(
     pagination_class = None
 
 
+class AdminMenuItemPhotoSerializer(serializers.ModelSerializer):
+    # the admin panel speaks in slugs, not database ids
+    menu_item = serializers.SlugRelatedField(slug_field="slug", queryset=MenuItem.objects.all())
+
+    class Meta:
+        model = MenuItemPhoto
+        fields = ["id", "menu_item", "image", "alt", "sort_order"]
+
+
+class AdminMenuItemPhotoViewSet(
+    mixins.CreateModelMixin, mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet
+):
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminMenuItemPhotoSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        qs = MenuItemPhoto.objects.all()
+        slug = self.request.query_params.get("menu_item")
+        if slug:
+            qs = qs.filter(menu_item__slug=slug)
+        return qs
+
+
 class AdminMenuItemViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
     serializer_class = AdminMenuItemSerializer
@@ -232,19 +258,35 @@ class AdminCertificationSerializer(serializers.ModelSerializer):
 class AdminGalleryPhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = GalleryPhoto
-        fields = ["id", "album", "caption", "image", "alt", "sort_order"]
+        fields = ["id", "album", "caption", "image", "alt", "sort_order", "focus"]
 
 
 class AdminAnnouncementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Announcement
-        fields = ["id", "message", "link_text", "link_url", "image", "is_active"]
+        fields = [
+            "id", "message", "details", "link_text", "link_url", "image",
+            "starts_at", "ends_at", "is_active",
+        ]
 
 
 class AdminOpeningHoursSerializer(serializers.ModelSerializer):
     class Meta:
         model = OpeningHours
         fields = ["id", "label", "opens", "closes", "sort_order"]
+
+
+class AdminHomeStepSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HomeStep
+        fields = ["id", "label", "title", "text", "image", "sort_order"]
+
+
+class AdminHomeStepViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminHomeStepSerializer
+    queryset = HomeStep.objects.all()
+    pagination_class = None
 
 
 class AdminCertificationViewSet(viewsets.ModelViewSet):
