@@ -2,8 +2,8 @@
 // Server components use the read helpers (with graceful fallbacks so the
 // storefront renders even when the API is down); client components use the
 // POST helpers, which surface backend validation errors.
-
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+const rawApiUrl = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api").replace(/\/+$/, "");
+export const API_URL = rawApiUrl.endsWith("/api") ? rawApiUrl : `${rawApiUrl}/api`;
 
 export interface ApiMenuItem {
   slug: string;
