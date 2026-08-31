@@ -14,7 +14,7 @@
 /coverage
 /docs
 .claude
-/backend
+.backend
 
 # next.js
 /.next/
