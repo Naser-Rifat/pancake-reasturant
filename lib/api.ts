@@ -227,7 +227,9 @@ export interface ApiHomeStep {
 }
 
 export async function getCampaigns(): Promise<ApiAnnouncement[]> {
-  return get("/campaigns/", [] as ApiAnnouncement[]);
+  const { FALLBACK_CAMPAIGNS } = await import("./fallback-data");
+  const data = await get<ApiAnnouncement[]>("/campaigns/", FALLBACK_CAMPAIGNS);
+  return data && data.length > 0 ? data : FALLBACK_CAMPAIGNS;
 }
 
 export async function getHomeSteps(): Promise<ApiHomeStep[]> {

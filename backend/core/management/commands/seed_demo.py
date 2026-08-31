@@ -105,9 +105,40 @@ class Command(BaseCommand):
 
         SiteSettings.load()  # create the singleton with its defaults
 
-        Announcement.objects.update_or_create(
-            message="🎉 Tuesday Special — 2-for-1 Classic Buttermilk Stack all day!",
-            defaults=dict(link_text="Book your table", link_url="/booking", is_active=True),
-        )
+        CAMPAIGNS = [
+            (
+                "KIDS EAT FREE EVERY SUNDAY WITH A FULL-PRICE STACK",
+                "Sundays · one kids stack per full-price stack · under 12s",
+                "BOOK A TABLE",
+                "/booking",
+                "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&q=80",
+            ),
+            (
+                "🎉 Tuesday Special — 2-for-1 Classic Buttermilk Stack all day!",
+                "Dine-in only · every Tuesday · all day long",
+                "BOOK A TABLE",
+                "/booking",
+                "https://images.unsplash.com/photo-1575853121743-60c24f0a7502?w=800&q=80",
+            ),
+            (
+                "🥞 Weekend Brunch Pass — 20% Off All Stacks Before 11am!",
+                "Saturday & Sunday · early birds enjoy 20% discount",
+                "EXPLORE MENU",
+                "/menu",
+                "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&q=80",
+            ),
+        ]
+
+        for msg, details, link_text, link_url, img in CAMPAIGNS:
+            Announcement.objects.update_or_create(
+                message=msg,
+                defaults=dict(
+                    details=details,
+                    link_text=link_text,
+                    link_url=link_url,
+                    image=img,
+                    is_active=True,
+                ),
+            )
 
         self.stdout.write(self.style.SUCCESS("Demo content seeded."))

@@ -1,4 +1,5 @@
 import type {
+  ApiAnnouncement,
   ApiHomeStep,
   ApiCertification,
   ApiGalleryPhoto,
@@ -10,6 +11,33 @@ import type {
 
 // Snapshot of the seeded backend content. Used when the API is unreachable so
 // the storefront still renders — keep in sync with `backend seed_demo`.
+
+export const FALLBACK_CAMPAIGNS: ApiAnnouncement[] = [
+  {
+    message: "KIDS EAT FREE EVERY SUNDAY WITH A FULL-PRICE STACK",
+    details: "Sundays · one kids stack per full-price stack · under 12s",
+    image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&q=80",
+    link_text: "BOOK A TABLE",
+    link_url: "/booking",
+    ends_at: new Date(Date.now() + 6 * 86400000).toISOString(),
+  },
+  {
+    message: "🎉 Tuesday Special — 2-for-1 Classic Buttermilk Stack all day!",
+    details: "Dine-in only · every Tuesday · all day long",
+    image: "https://images.unsplash.com/photo-1575853121743-60c24f0a7502?w=800&q=80",
+    link_text: "BOOK A TABLE",
+    link_url: "/booking",
+    ends_at: new Date(Date.now() + 2 * 86400000).toISOString(),
+  },
+  {
+    message: "🥞 Weekend Brunch Pass — 20% Off All Stacks Before 11am!",
+    details: "Saturday & Sunday · early birds enjoy 20% discount",
+    image: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&q=80",
+    link_text: "EXPLORE MENU",
+    link_url: "/menu",
+    ends_at: new Date(Date.now() + 5 * 86400000).toISOString(),
+  },
+];
 
 export const FALLBACK_MENU: ApiMenuItem[] = [
   { slug: "buttermilk", name: "Classic Buttermilk Stack", description: "Four fluffy buttermilk pancakes with pure maple syrup and whipped butter.", price: "14.00", tag: "sweet", heat: "none", kcal: 680, protein_g: 14, prep_time: "10–12 min", image: "/menu/buttermilk-stack.png", photo: "", photos: [], is_featured: true },
