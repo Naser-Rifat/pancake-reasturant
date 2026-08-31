@@ -176,8 +176,9 @@ export default async function V2Home() {
 
   return (
     <>
-      {/* ---------- violet announcement bar ---------- */}
-      {announcement && (
+      {/* ---------- violet announcement bar (hidden once the campaign has an
+           image — then it shows as the banner below instead) ---------- */}
+      {announcement && !announcement.image && (
         <div className="v2-annc">
           <div className="v2-wrap v2-annc-row">
             <span className="seg">✦ {announcement.message}</span>
@@ -314,15 +315,8 @@ export default async function V2Home() {
             items={items}
             variant="v2"
             title={<h2>What We Stack Here Daily<Swirl className="v2-swirl" /></h2>}
-            middle={
-              <div className="v2-band-head sub">
-                <div>
-                  <h2>Our Favourites</h2>
-                  <p className="v2-favs-sub">Top picks that&apos;ll make you smile</p>
-                </div>
-                <Link href="/menu" className="v2-btn small">View Full Menu</Link>
-              </div>
-            }
+            subhead={{ title: "Our Favourites", text: "Top picks that'll make you smile" }}
+            cta={{ href: "/menu", label: "View Full Menu" }}
           />
         </section>
 

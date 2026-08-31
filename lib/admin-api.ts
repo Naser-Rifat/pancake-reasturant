@@ -179,14 +179,19 @@ export interface AdminGalleryPhoto {
   image: string;
   alt: string;
   sort_order: number;
+  focus: "top" | "center" | "bottom";
 }
 
 export interface AdminAnnouncement {
   id: number;
   message: string;
+  details: string;
   link_text: string;
   link_url: string;
   image: string;
+  /** ISO datetimes; null = no limit on that end */
+  starts_at: string | null;
+  ends_at: string | null;
   is_active: boolean;
 }
 
@@ -205,6 +210,19 @@ export interface AdminSiteSettings {
   hero_image: string;
   hero_cutout: string;
   about_text: string;
+  about_heading: string;
+  about_script: string;
+  about_image_1: string;
+  about_image_2: string;
+  about_image_3: string;
+  about_points: string;
+  cta_heading: string;
+  cta_script: string;
+  cta_lead: string;
+  cta_button_label: string;
+  cta_button_url: string;
+  marquee_words: string;
+  footer_tagline: string;
   address: string;
   phone: string;
   whatsapp: string;
@@ -219,6 +237,21 @@ export interface AdminSiteSettings {
   custom_accent: string;
 }
 
+export interface AdminMenuItemPhoto {
+  id: number;
+  menu_item: string; // slug
+  image: string;
+  alt: string;
+  sort_order: number;
+}
+
+export const listMenuItemPhotos = (slug: string) =>
+  adminFetch<AdminMenuItemPhoto[]>(`/menu-photos/?menu_item=${encodeURIComponent(slug)}`);
+export const createMenuItemPhoto = (d: Omit<AdminMenuItemPhoto, "id">) =>
+  adminFetch<AdminMenuItemPhoto>("/menu-photos/", { method: "POST", body: JSON.stringify(d) });
+export const deleteMenuItemPhoto = (id: number) =>
+  adminFetch<void>(`/menu-photos/${id}/`, { method: "DELETE" });
+
 export const getSiteSettings = () => adminFetch<AdminSiteSettings>("/site/");
 export const updateSiteSettings = (patch: Partial<AdminSiteSettings>) =>
   adminFetch<AdminSiteSettings>("/site/", { method: "PATCH", body: JSON.stringify(patch) });
@@ -231,13 +264,34 @@ export const updateCertification = (id: number, d: Partial<AdminCertification>) 
 export const deleteCertification = (id: number) =>
   adminFetch<void>(`/certifications/${id}/`, { method: "DELETE" });
 
+export interface AdminHomeStep {
+  id: number;
+  label: string;
+  title: string;
+  text: string;
+  image: string;
+  sort_order: number;
+}
+
+export const listHomeSteps = () => adminFetch<AdminHomeStep[]>("/home-steps/");
+export const createHomeStep = (d: Partial<AdminHomeStep>) =>
+  adminFetch<AdminHomeStep>("/home-steps/", { method: "POST", body: JSON.stringify(d) });
+export const updateHomeStep = (id: number, d: Partial<AdminHomeStep>) =>
+  adminFetch<AdminHomeStep>(`/home-steps/${id}/`, { method: "PATCH", body: JSON.stringify(d) });
+export const deleteHomeStep = (id: number) =>
+  adminFetch<void>(`/home-steps/${id}/`, { method: "DELETE" });
+
 export const listGalleryAdmin = () => adminFetch<AdminGalleryPhoto[]>("/gallery/");
 export const createGalleryPhoto = (d: Partial<AdminGalleryPhoto>) =>
   adminFetch<AdminGalleryPhoto>("/gallery/", { method: "POST", body: JSON.stringify(d) });
+export const updateGalleryPhoto = (id: number, d: Partial<AdminGalleryPhoto>) =>
+  adminFetch<AdminGalleryPhoto>(`/gallery/${id}/`, { method: "PATCH", body: JSON.stringify(d) });
 export const deleteGalleryPhoto = (id: number) =>
   adminFetch<void>(`/gallery/${id}/`, { method: "DELETE" });
 
 export const listAnnouncements = () => adminFetch<AdminAnnouncement[]>("/announcements/");
+export const deleteAnnouncement = (id: number) =>
+  adminFetch<void>(`/announcements/${id}/`, { method: "DELETE" });
 export const createAnnouncement = (d: Partial<AdminAnnouncement>) =>
   adminFetch<AdminAnnouncement>("/announcements/", { method: "POST", body: JSON.stringify(d) });
 export const updateAnnouncement = (id: number, d: Partial<AdminAnnouncement>) =>

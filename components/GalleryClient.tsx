@@ -58,7 +58,15 @@ export default function GalleryClient({ photos }: { photos: ApiGalleryPhoto[] })
               key={p.image}
               onClick={(e) => { e.preventDefault(); show(i); }}
             >
-              <Image src={p.image} alt={p.alt} width={700} height={500} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw" />
+              <Image
+                src={p.image}
+                alt={p.alt || p.caption}
+                width={700}
+                height={500}
+                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+                priority={i < 4}
+                style={{ objectPosition: `50% ${p.focus === "top" ? "18%" : p.focus === "bottom" ? "82%" : "50%"}` }}
+              />
             </a>
           ))}
         </div>
@@ -78,7 +86,11 @@ export default function GalleryClient({ photos }: { photos: ApiGalleryPhoto[] })
         >
           <button className="lb-btn lb-close" aria-label="Close" onClick={() => setCurrent(null)}>✕</button>
           <button className="lb-btn lb-prev" aria-label="Previous photo" onClick={() => show(current! - 1)}>←</button>
-          <Image src={photo.image.replace("w=700", "w=1400")} alt={photo.alt} width={1400} height={1050} sizes="92vw" />
+          {/* a fixed 1400x1050 forced every photo into 4:3 — portrait shots came
+              out stretched. A stage plus object-fit letterboxes them instead. */}
+          <div className="lb-stage">
+            <Image src={photo.image.replace("w=700", "w=1400")} alt={photo.alt || photo.caption} fill sizes="92vw" />
+          </div>
           <div className="lb-caption">{photo.caption}</div>
           <button className="lb-btn lb-next" aria-label="Next photo" onClick={() => show(current! + 1)}>→</button>
         </div>

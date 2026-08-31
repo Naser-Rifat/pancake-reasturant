@@ -19,6 +19,8 @@ export interface ApiMenuItem {
   image: string;
   /** original photo — framed cards; falls back to `image` when empty */
   photo: string;
+  /** extra real-life shots — the polaroid fan on the dish page */
+  photos: { id: number; image: string; alt: string; sort_order: number }[];
   is_featured: boolean;
 }
 
@@ -35,13 +37,42 @@ export interface ApiGalleryPhoto {
   caption: string;
   image: string;
   alt: string;
+  /** which part of the photo survives the grid's crop */
+  focus: "top" | "center" | "bottom";
 }
 
 export interface ApiAnnouncement {
   message: string;
+  /** the offer's conditions, one or two lines */
+  details: string;
   link_text: string;
   link_url: string;
   image: string;
+  /** ISO datetime; null = runs until switched off */
+  ends_at: string | null;
+}
+
+/** "Ends today!" / "Ends tomorrow" / "Ends Sunday" — urgency copy for a promo. */
+export function endsLabel(endsAt: string | null): string | null {
+  if (!endsAt) return null;
+  const end = new Date(endsAt);
+  const days = Math.floor((end.getTime() - Date.now()) / 86_400_000);
+  if (days < 0) return null;
+  if (days === 0) return "Ends today!";
+  if (days === 1) return "Ends tomorrow";
+  if (days < 7) return `Ends ${end.toLocaleDateString("en-AU", { weekday: "long" })}`;
+  return `Until ${end.toLocaleDateString("en-AU", { day: "numeric", month: "short" })}`;
+}
+
+/** Splits a campaign's end date into the two lines the circular badge shows.
+ *  Falls back to "ON / now" so an open-ended campaign still fills the badge. */
+export function countdownBadge(endsAt: string | null): { big: string; small: string } {
+  if (!endsAt) return { big: "ON", small: "now" };
+  const days = Math.floor((new Date(endsAt).getTime() - Date.now()) / 86_400_000);
+  if (days < 0) return { big: "ON", small: "now" };
+  if (days === 0) return { big: "TODAY", small: "last chance" };
+  if (days === 1) return { big: "1 DAY", small: "left to claim" };
+  return { big: `${days} DAYS`, small: "left to claim" };
 }
 
 export interface ApiOpeningHours {
@@ -63,6 +94,21 @@ export interface ApiSiteSettings {
   hero_image: string;
   hero_cutout: string;
   about_text: string;
+  about_heading: string;
+  about_script: string;
+  about_image_1: string;
+  about_image_2: string;
+  about_image_3: string;
+  /** one tick per line */
+  about_points: string;
+  cta_heading: string;
+  cta_script: string;
+  cta_lead: string;
+  cta_button_label: string;
+  cta_button_url: string;
+  /** one phrase per line */
+  marquee_words: string;
+  footer_tagline: string;
   address: string;
   phone: string;
   whatsapp: string;
@@ -108,6 +154,12 @@ export const stars = (rating: number) => "★".repeat(rating) + "☆".repeat(5 -
 export const telHref = (phone: string) => `tel:${phone.replace(/[^+\d]/g, "")}`;
 
 /** "21:30:00" -> "9:30pm" */
+/** One price format for the whole site. Whole dollars stay whole. */
+export function money(price: string | number) {
+  const v = typeof price === "number" ? price : parseFloat(price);
+  return `$${Number.isInteger(v) ? v : v.toFixed(2)}`;
+}
+
 export function formatTime(t: string) {
   const [h, m] = t.split(":").map(Number);
   const ampm = h >= 12 ? "pm" : "am";
@@ -163,6 +215,29 @@ export async function getHours(): Promise<ApiOpeningHours[]> {
 export async function getCertifications(): Promise<ApiCertification[]> {
   const { FALLBACK_CERTS } = await import("./fallback-data");
   return get("/certifications/", FALLBACK_CERTS);
+}
+
+export interface ApiHomeStep {
+  id: number;
+  label: string;
+  title: string;
+  text: string;
+  image: string;
+  sort_order: number;
+}
+
+export async function getCampaigns(): Promise<ApiAnnouncement[]> {
+  return get("/campaigns/", [] as ApiAnnouncement[]);
+}
+
+export async function getHomeSteps(): Promise<ApiHomeStep[]> {
+  const { FALLBACK_HOME_STEPS } = await import("./fallback-data");
+  return get("/home-steps/", FALLBACK_HOME_STEPS);
+}
+
+/** Splits a one-per-line settings field, dropping blank lines. */
+export function lines(value: string): string[] {
+  return (value || "").split("\n").map((l) => l.trim()).filter(Boolean);
 }
 
 export async function getSite(): Promise<ApiSiteSettings> {

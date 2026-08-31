@@ -12,23 +12,32 @@
    ============================================ */
 
 :root {
+  /* The client's brown-and-yellow palette IS the baseline, not an override.
+     These used to hold the original pink/lavender/lime set, which only worked
+     because [data-theme="maple"] on <body> covered them — anything outside body,
+     or any future rule on <html>, would silently have gone candy-coloured.
+     The three neutrals below are not in the client's six: their palette has no
+     text colour and one light neutral, so cream/card/ink stay as the base. */
   --cream: #f8f2e0;
   --cream-card: #fdf9ee;
-  --lavender: #c7abf3;
-  --lav-soft: #ded1f6;
-  --pink: #f2789c;
-  --pink-deep: #d95f80;
-  --berry: #bf2f63;      /* raspberry — the ONE script-accent colour (3.2:1 on gold, 5.5:1 on cream) */
-  --blush: #f4bcca;
-  --yellow: #f2be45;
-  --yellow-deep: #dfa32b;
-  --green: #8fd65a;       /* lime — the gen-z member of the candy set */
-  --green-deep: #3f8f3a;  /* readable green for small text on cream */
+  --lavender: #f5de7a;
+  --lav-soft: #f2eeec;
+  --pink: #e08600;
+  --pink-deep: #aa4c0a;
+  --berry: #763a12;      /* the ONE script-accent colour */
+  --blush: #f5de7a;
+  --yellow: #efbf38;
+  --yellow-deep: #e08600;
+  --green: #e08600;
+  --green-deep: #aa4c0a;
   --ink: #211a14;
-  --muted: #837868;
-  --card-a: #f6d77f;   /* menu-card soft surface rotation */
-  --card-b: #f4bcca;
-  --card-c: #ded1f6;
+  --deep: #763a12;      /* large dark surfaces: photo frame, statement band */
+  /* #837868 measured 3.93:1 on cream and 3.49:1 on the butter band — under
+     the 4.5:1 body-text minimum. This is the same warm grey, two steps down. */
+  --muted: #6f6455;
+  --card-a: #f5de7a;   /* menu-card soft surface rotation */
+  --card-b: #f2eeec;
+  --card-c: #efbf38;
   --radius: 34px;
   --radius-xl: 36px; /* big section rounding — grows on tablet+ */
   --frame: 8px;      /* lavender page frame — grows on tablet+ */
@@ -41,6 +50,7 @@
    Same-lightness hue swaps only, so every existing ink-on-surface pairing keeps
    its contrast. --lavender page frame + --ink stay brand-fixed across themes. */
 [data-theme="berry"] {
+  --deep: #4a2033;
   --yellow: #f6aec6;
   --yellow-deep: #e88bab;
   --pink: #c7abf3;
@@ -49,6 +59,7 @@
   --blush: #f8cdd9;
 }
 [data-theme="mint"] {
+  --deep: #16412f;
   --yellow: #b8e6c4;
   --yellow-deep: #93d6a8;
   --pink: #f2be45;
@@ -57,6 +68,7 @@
   --blush: #dff0d0;
 }
 [data-theme="choco"] {
+  --deep: #4a2c17;
   --yellow: #e9c99b;
   --yellow-deep: #d9ad72;
   --pink: #eda45f;
@@ -68,6 +80,7 @@
    straight from their swatch sheet. Also re-tints the frame/marquee (lavender
    slot) and the lime slot so the whole site reads warm. */
 [data-theme="maple"] {
+  --deep: #763a12;
   --yellow: #efbf38;
   --yellow-deep: #e08600;
   --pink: #e08600;
@@ -339,9 +352,70 @@ body.has-announce .nav-links { top: calc(var(--nav-h) + 44px - 6px); }
   margin: 1.4rem 0 2rem;
 }
 .hero-card-right {
+  position: relative;
   border-radius: 44px;
   overflow: hidden;
   height: 280px;
+}
+/* price chip sits on the photo — the hero states the offer, not just the mood */
+.hero-price {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 1rem;
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+}
+/* actions row: CTAs and the dish switcher share one line, reference-style */
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+.hero-thumbs {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+/* round dish chip sitting inside the headline */
+.head-chip {
+  display: inline-grid;
+  place-items: center;
+  /* measured, not guessed: DM Serif's caps are 0.694em, and the disc was set to
+     0.82em — 18% taller than the letters, which is what read as oversized.
+     0.72em puts it a hair over cap height; the -0.03em drop lands its centre on
+     the cap centre (offset measured at 0.1px). */
+  width: 0.72em;
+  height: 0.72em;
+  border-radius: 50%;
+  background: var(--pink);
+  vertical-align: -0.03em;
+  overflow: hidden;
+  margin: 0 0.06em;
+}
+.head-chip img { width: 88%; height: 88%; object-fit: contain; }
+.hero-thumbs button {
+  width: 48px;
+  height: 48px;
+  padding: 3px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: rgba(253, 249, 238, 0.85);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease;
+}
+.hero-thumbs button:hover { transform: translateY(-2px); }
+.hero-thumbs button.on { border-color: var(--ink); }
+.hero-thumbs img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+@media (min-width: 768px) {
+  .hero-thumbs button { width: 56px; height: 56px; }
 }
 .hero-card-right img {
   width: 100%; height: 100%;
@@ -1077,11 +1151,428 @@ body.has-announce .page-hero { padding-top: calc(var(--nav-h) + 2.5rem + 44px); 
 .section-foot { text-align: center; margin-top: 2.6rem; }
 
 /* ---------- gallery preview + gallery page ---------- */
+/* ---------- deep photo frame (dish page hero) ---------- */
+.hf {
+  background: var(--deep);
+  border-radius: var(--radius-xl);
+  padding: 14px;
+  overflow: hidden;
+}
+.hf-photo {
+  position: relative;
+  height: 40vh;
+  min-height: 260px;
+  border-radius: calc(var(--radius-xl) - 10px);
+  overflow: hidden;
+}
+.hf-photo img { object-fit: cover; }
+.hf-photo.dish { background: var(--cream-card); }
+.hf-photo .as-cutout { object-fit: contain; padding: 2rem; }
+.hf-photo .price-spin { right: 20px; bottom: 20px; }
+@media (min-width: 1024px) {
+  .hf-photo { height: 48vh; min-height: 360px; }
+}
+
+/* product block — copy left, cutout + polaroids right */
+.dprod {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: center;
+  padding: 2.4rem 0 3rem;
+}
+.dprod-copy h1 {
+  font-family: var(--font-serif);
+  text-transform: uppercase;
+  font-size: clamp(2.1rem, 4.6vw, 3.4rem);
+  line-height: 1.0;
+  color: var(--ink);
+  margin: 0.2rem 0 0.8rem;
+}
+.dprod-copy .chips { justify-content: flex-start; margin-bottom: 1.5rem; }
+.dprod-art { position: relative; }
+/* panel rail: the last panel is sliced by the section edge, so "more views"
+   is shown rather than announced */
+.drail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 78%;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  margin-right: calc(50% - 50vw);
+  padding-right: 22%;
+}
+.drail::-webkit-scrollbar { display: none; }
+.dpanel {
+  scroll-snap-align: start;
+  position: relative;
+  border: none;
+  padding: 1.4rem;
+  cursor: pointer;
+  background: var(--cream-card);
+  border-radius: var(--radius);
+  height: 300px;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.dpanel:hover { transform: scale(1.01); }
+.dpanel:focus-visible { outline: 3px solid var(--pink-deep); outline-offset: 3px; }
+.dpanel-img { position: absolute; inset: 1.4rem; border-radius: calc(var(--radius) - 16px); overflow: hidden; }
+.dpanel-img img { object-fit: cover; }
+.dpanel-img.cut img { object-fit: contain; filter: drop-shadow(0 16px 20px rgba(33, 26, 20, 0.24)); }
+.drail-hint { color: var(--muted); font-size: 0.82rem; font-weight: 600; margin-top: 0.7rem; }
+
+@media (min-width: 1024px) {
+  .dprod { grid-template-columns: 1fr 1.15fr; gap: 3rem; }
+  .drail { grid-auto-columns: 72%; gap: 16px; padding-right: 30%; }
+  .dpanel { height: 400px; }
+}
+
+/* ---------- statement band: brand voice with scattered pills ---------- */
+.statement {
+  background: var(--deep);
+  padding: clamp(3rem, 7vw, 5.5rem) 0;
+  overflow: hidden;
+}
+.statement-in { position: relative; text-align: center; }
+.st-text {
+  font-family: var(--font-round);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: clamp(1.5rem, 3.8vw, 2.9rem);
+  line-height: 1.18;
+  color: var(--cream);
+  max-width: 24ch;
+  margin-inline: auto;
+}
+.st-pill {
+  display: none;
+  position: absolute;
+  z-index: 1;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--cream-card);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.45rem 1.1rem;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+}
+@media (min-width: 768px) {
+  .st-pill { display: inline-block; }
+}
+
+/* ---------- how pickup works: three-step cards ---------- */
+.steps-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.6rem;
+  margin-top: 2.2rem;
+}
+.step-card .ph {
+  position: relative;
+  height: 210px;
+  border-radius: 24px;
+  overflow: hidden;
+}
+.step-card .ph img { object-fit: cover; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+.step-card:hover .ph img { transform: scale(1.05); }
+.step-row { display: flex; align-items: center; gap: 0.7rem; margin: 1rem 0 0.35rem; }
+.step-pill {
+  font-weight: 800;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--yellow);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  transform: rotate(-3deg);
+  flex-shrink: 0;
+}
+.step-card:nth-child(2) .step-pill { transform: rotate(2.5deg); }
+.step-row b { font-family: var(--font-round); font-weight: 800; font-size: 1.15rem; color: var(--ink); }
+.step-card p { color: var(--muted); font-size: 0.95rem; max-width: 34ch; }
+@media (min-width: 768px) {
+  .steps-grid { grid-template-columns: repeat(3, 1fr); gap: 1.8rem; }
+}
+
+/* giant footer wordmark — the brand sign-off (V2's move, shared) */
+.footer-mark {
+  font-family: var(--font-serif);
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--yellow);
+  font-size: clamp(2rem, 7.4vw, 6.8rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  margin: 2.2rem 0 1.4rem;
+  opacity: 0.92;
+}
+
+/* ---------- dish detail: product stage ---------- */
+.dish-page {
+  padding: calc(var(--nav-h) + 2rem) 0 4rem;
+  /* the panel rail bleeds past the right edge on purpose; clip (not hidden)
+     so it never becomes a page-level horizontal scrollbar */
+  overflow-x: clip;
+}
+body.has-announce .dish-page { padding-top: calc(var(--nav-h) + 2rem + 44px); }
+.dish-crumb { margin-bottom: 1.2rem; }
+.dish-crumb a { font-weight: 700; color: var(--pink-deep); }
+.dish-crumb a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.dish-stage {
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  padding: clamp(1.8rem, 4vw, 3.2rem);
+}
+.dish-stage.tint-a { background: var(--card-a); }
+.dish-stage.tint-b { background: var(--card-b); }
+.dish-stage.tint-c { background: var(--card-c); }
+
+/* giant category word ghosting behind the product */
+.dish-bigword {
+  position: absolute;
+  top: -0.12em;
+  left: -0.04em;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(6rem, 21vw, 17rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(33, 26, 20, 0.14);
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.dish-stage-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.6rem;
+  align-items: center;
+}
+.dish-art { position: relative; height: 300px; }
+.dish-art img { object-fit: contain; filter: drop-shadow(0 22px 26px rgba(33, 26, 20, 0.28)); }
+
+/* spinning price badge — tap target that adds to the order */
+.price-spin {
+  position: absolute;
+  right: 2%;
+  bottom: 4%;
+  width: 108px;
+  height: 108px;
+  display: block;
+}
+.price-spin svg { position: absolute; inset: 0; animation: spin-slow 16s linear infinite; }
+.price-spin svg text {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 11.5px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  fill: var(--ink);
+}
+.price-spin .num {
+  position: absolute;
+  inset: 26px;
+  background: var(--cream-card);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--ink);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+
+.dish-copy h1 {
+  font-family: var(--font-serif);
+  text-transform: uppercase;
+  font-size: clamp(2.1rem, 4.6vw, 3.6rem);
+  line-height: 1.0;
+  color: var(--ink);
+  margin: 0.2rem 0 0.8rem;
+}
+.dish-desc { color: rgba(33, 26, 20, 0.75); font-weight: 500; font-size: 1.02rem; max-width: 44ch; margin-bottom: 1.1rem; }
+.dish-copy .chips { justify-content: flex-start; margin-bottom: 1.5rem; }
+.dish-copy .chip { background: #fff; }
+.dish-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; }
+.dish-note { color: rgba(33, 26, 20, 0.6); font-size: 0.85rem; margin-top: 1.1rem; }
+/* lightbox */
+.plbx {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(33, 26, 20, 0.88);
+  display: grid;
+  align-items: center;
+}
+.plbx-close {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.plbx-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 88%;
+  gap: 1.2rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 2rem 6%;
+  scrollbar-width: none;
+}
+.plbx-track::-webkit-scrollbar { display: none; }
+.plbx-track figure { scroll-snap-align: center; }
+.plbx-track img { width: 100%; height: auto; max-height: 78vh; object-fit: contain; border-radius: 18px; }
+.plbx-track figcaption { color: var(--cream); text-align: center; font-size: 0.85rem; margin-top: 0.6rem; }
+@media (min-width: 768px) {
+  .plbx-track { grid-auto-columns: 72%; }
+}
+@media (min-width: 768px) {
+  .pfan { --pol-step-x: 46px; --pol-step-y: 8px; }
+}
+
+.dish-related { margin-top: 3.5rem; }
+.dish-related .title { margin-bottom: 0.4rem; }
+@media (min-width: 1024px) {
+  .dish-stage-grid { grid-template-columns: 1.05fr 1fr; gap: 3rem; }
+  .dish-art { height: 430px; }
+  .price-spin { width: 128px; height: 128px; }
+  .price-spin .num { inset: 31px; font-size: 1.45rem; }
+}
+
+/* campaign strip — deliberately NOT a section: a short, wide notice with a
+   round photo chip, so it can never be mistaken for the hero or a content band */
+.promo { padding: 2rem 0 0; }
+.promo-strip {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.9rem 1.2rem;
+  /* deep brand tone: on cream the neutral surface measured 1.03:1 — no visible
+     edge at all. This reads as a notice the moment it enters view. */
+  background: var(--berry);
+  /* container radius, not a pill: full rounding on a block this size reads
+     as a giant button, and fights the circular photo chip inside it */
+  border-radius: 24px;
+  padding: 0.85rem 1.1rem;
+}
+.promo-thumb {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.promo-thumb img { object-fit: cover; }
+.promo-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 800;
+  font-size: 0.66rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--yellow);
+  animation: live-pulse 1.8s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes live-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 191, 56, 0.55); }
+  55% { box-shadow: 0 0 0 6px rgba(239, 191, 56, 0); }
+}
+.promo-ends {
+  background: var(--yellow);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.22rem 0.7rem;
+  letter-spacing: 0.08em;
+}
+.promo-msg {
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
+  line-height: 1.2;
+  color: var(--cream);
+  margin-top: 0.15rem;
+}
+.promo-strip .btn { grid-column: 1 / -1; justify-content: center; }
+@media (min-width: 768px) {
+  .promo-strip { grid-template-columns: auto 1fr auto; padding: 0.9rem 1.1rem 0.9rem 0.9rem; }
+  .promo-strip .btn { grid-column: auto; }
+  .promo-thumb { width: 88px; height: 88px; }
+}
+
+/* gallery: head row inside the container, photo wall breaking out of it */
+.gal-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.1rem 1.6rem;
+}
+.gal-head .title { margin-bottom: 0; }
+/* one line, script inline — a different silhouette from the stacked
+   eyebrow + two-line title the other sections use */
+h2.title.inline .accent {
+  display: inline;
+  font-size: 0.86em;
+  vertical-align: baseline;
+}
+
+.gallery-mosaic {
+  margin-top: 1.8rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 150px;
+  gap: 10px;
+}
+/* the first photo leads: full width on phones, a 2×2 block from tablet up.
+   the last one widens too, so the wall never ends on a lonely half-row */
+.gallery-mosaic > a:first-child,
+.gallery-mosaic > a:last-child { grid-column: span 2; }
+.gallery-mosaic a {
+  display: block;
+  border-radius: 22px;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.gallery-mosaic a:hover { transform: scale(1.02); z-index: 2; position: relative; }
+.gallery-mosaic img { width: 100%; height: 100%; object-fit: cover; }
+
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.1rem;
-  margin-top: 3rem;
+  margin-top: 1.8rem;
 }
 .gallery-grid a {
   display: block;
@@ -1378,8 +1869,10 @@ body.has-announce .page-hero { padding-top: calc(var(--nav-h) + 2.5rem + 44px); 
   background-size: 160px 160px;
 }
 .fallback-card > * { position: relative; }
-.fallback-card h3 { font-family: var(--font-serif); font-size: 1.55rem; color: #fff; margin-bottom: 0.8rem; }
-.fallback-card h3 .accent { font-family: var(--font-script); color: var(--yellow); }
+/* ink + berry, not white + yellow: on the accent-coloured card those
+   measured 2.77:1 and 1.61:1 — unreadable in every theme */
+.fallback-card h3 { font-family: var(--font-serif); font-size: 1.55rem; color: var(--ink); margin-bottom: 0.8rem; }
+.fallback-card h3 .accent { font-family: var(--font-script); color: var(--berry); }
 .fallback-card p { margin-bottom: 1.2rem; color: var(--ink); opacity: 0.85; font-size: 0.98rem; }
 .fallback-card .phone {
   display: inline-block;
@@ -1390,7 +1883,12 @@ body.has-announce .page-hero { padding-top: calc(var(--nav-h) + 2.5rem + 44px); 
   padding: 0.5rem 1.5rem;
   border-radius: 999px;
 }
-.fallback-card a:not(.phone) { color: var(--yellow); font-weight: 700; }
+.fallback-card a:not(.phone) {
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 
 /* ---------- forms (booking + cart checkout) ---------- */
 .input {
@@ -1497,7 +1995,11 @@ textarea.input { resize: vertical; }
 
   .cities { grid-template-columns: repeat(2, 1fr); }
   .menu-grid { grid-template-columns: repeat(2, 1fr); }
-  .gallery-grid a { height: 170px; }
+  .gallery-grid a { height: 200px; }
+  .gallery-mosaic { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 175px; gap: 12px; }
+  .gallery-mosaic > a:first-child { grid-column: span 2; grid-row: span 2; }
+  /* three columns already close flush — no widened last tile here */
+  .gallery-mosaic > a:last-child { grid-column: auto; }
 
   .cart-fab { right: 1.8rem; bottom: 1.8rem; width: 64px; height: 64px; }
   .cart-drawer { border-radius: 34px 0 0 34px; }
@@ -1526,7 +2028,7 @@ textarea.input { resize: vertical; }
 
   .featured-grid { grid-template-columns: repeat(2, 1fr); }
   .gallery-grid { grid-template-columns: repeat(3, 1fr); }
-  .gallery-grid a { height: 190px; }
+  .gallery-grid a { height: 215px; }
 
   .stats-row { grid-template-columns: repeat(3, 1fr); }
   .ingredients-row { gap: 1.4rem; }
@@ -1597,8 +2099,10 @@ textarea.input { resize: vertical; }
   .about-grid { grid-template-columns: 1fr 1fr; gap: 3.5rem; }
   .featured-grid, .menu-grid, .cities { grid-template-columns: repeat(3, 1fr); }
   .ingredients-row { grid-template-columns: repeat(4, 1fr); }
-  .gallery-grid { grid-template-columns: repeat(4, 1fr); }
-  .gallery-grid a { height: 200px; }
+  .gallery-grid a { height: 240px; }
+  .gallery-mosaic { grid-template-columns: repeat(5, 1fr); grid-auto-rows: 215px; gap: 14px; }
+  .gallery-mosaic > a:first-child { grid-column: span 2; grid-row: span 2; }
+  .gallery-mosaic > a:last-child { grid-column: span 2; }
   .city-card { height: 300px; }
 
   .hours-grid { grid-template-columns: 0.9fr 1.1fr; gap: 2.5rem; }
@@ -1620,7 +2124,7 @@ textarea.input { resize: vertical; }
   .hero-card-right { height: clamp(420px, calc(100svh - var(--nav-h) - 170px), 640px); }
 
   .featured-grid, .menu-grid { gap: 2.2rem; }
-  .gallery-grid a { height: 230px; }
+  .gallery-grid a { height: 265px; }
   .menu-card .thumb { height: 240px; }
   .city-card { height: 340px; }
   .about-collage { grid-template-rows: 230px 230px; }
@@ -1818,10 +2322,14 @@ body::before {
    the cream stays the "paper"; sections wear light
    pastel bands so the page reads as a colourful zine
    ============================================ */
-.band-butter { background: #fbf0cf; }
-.band-lavender { background: #efe9fb; }
-.band-blush { background: #fbe8ee; }
-.band-mint { background: #e9f3e6; }
+/* These were fixed hex from the original playful palette — lilac, pink and
+   mint — so they survived the switch to the client's warm brand and left three
+   off-palette bands mid-page. Deriving them from theme tokens keeps the whole
+   page inside whichever palette is active. Plain hex first as a fallback. */
+.band-butter { background: #f6e6b8; background: color-mix(in srgb, var(--yellow) 24%, var(--cream)); }
+.band-lavender { background: #f2eeec; background: var(--lav-soft); }
+.band-blush { background: #eee3d0; background: color-mix(in srgb, var(--deep) 8%, var(--cream)); }
+.band-mint { background: #f6e6b8; background: color-mix(in srgb, var(--yellow) 24%, var(--cream)); }
 
 /* sections keep their content above the decorative stickers */
 .block > .container { position: relative; z-index: 1; }
@@ -1856,6 +2364,8 @@ body::before {
   .menu-card:hover .thumb img { transform: none; }
   .stk { animation: none; }
   .wa-float:hover { transform: none; }
+  .live-dot { animation: none; }
+  .price-spin svg { animation: none; }
 }
 
 /* floating WhatsApp button (number set in admin → Settings) */
@@ -2093,3 +2603,1335 @@ body::before {
   .menu-grid .menu-card .btn { padding: 0.75rem 1.3rem; font-size: 0.8rem; }
   .menu-grid .menu-card .btn { grid-column: 3; grid-row: 1; align-self: center; justify-self: end; width: auto; margin-top: 0; }
 }
+
+/* ---------- hero-embedded nav (reference layout) ---------- */
+.hero-nav { display: none; }
+.hero-topbar { display: none; }
+@media (min-width: 1024px) {
+  /* the fixed nav steps aside on the home page only */
+  /* the panel nav owns the fold; this header takes over below it */
+  body:has(.hero-nav) .nav:not(.past-hero) { display: none; }
+  body:has(.hero-nav) .nav.past-hero { animation: nav-drop 0.28s ease both; }
+  body:has(.hero-nav) .hero { padding-top: 1.6rem; }
+  body:has(.hero-nav).has-announce .hero { padding-top: calc(1.6rem + 44px); }
+
+  .hero-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2.6rem;
+  }
+  .hero-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--font-round);
+    font-weight: 800;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .hero-nav ul {
+    display: flex;
+    gap: 1.6rem;
+    list-style: none;
+    font-weight: 800;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .hero-nav a:hover { text-decoration: underline; text-underline-offset: 5px; }
+
+  .hero-topbar {
+    position: absolute;
+    inset: 18px 18px auto 18px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .hero-find {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(253, 249, 238, 0.9);
+    border-radius: 999px;
+    padding: 0.55rem 1.1rem;
+    font-weight: 800;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .hero-order {
+    background: var(--cream-card);
+    border-radius: 999px;
+    padding: 0.6rem 1.3rem;
+    font-weight: 800;
+    font-size: 0.76rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
+    box-shadow: 0 6px 16px rgba(33, 26, 20, 0.18);
+    transition: transform 0.2s ease;
+  }
+  .hero-order:hover { transform: translateY(-2px); }
+}
+
+
+/* ============================================
+   HERO — reference alignment pass
+   full-bleed panels, dominant headline, dark CTA
+   ============================================ */
+@media (min-width: 1024px) {
+  /* panels run to the page edges, only a hairline of cream showing */
+  body:has(.hero-nav) .hero { padding: 12px 0 0; }
+  body:has(.hero-nav).has-announce .hero { padding-top: calc(12px + 44px); }
+  body:has(.hero-nav) .hero .container.hero-cards {
+    width: auto;
+    max-width: none;
+    margin-inline: 12px;
+    gap: 14px;
+    grid-template-columns: 1.08fr 0.92fr;
+    min-height: calc(100vh - 24px);
+  }
+  body:has(.hero-nav) .hero-card-left,
+  body:has(.hero-nav) .hero-card-right { border-radius: 34px; }
+  body:has(.hero-nav) .hero-card-right { height: auto; }
+
+  /* the headline owns the panel, like the reference's three-line block */
+  body:has(.hero-nav) .hero-card-left h1 {
+    font-size: clamp(3.4rem, 6.4vw, 6rem);
+    line-height: 0.92;
+    letter-spacing: -0.015em;
+  }
+  body:has(.hero-nav) .hero-card-left h1 .script { font-size: 0.66em; margin-top: 0.1em; }
+  body:has(.hero-nav) .hero-card-left p.lead { font-size: 1.06rem; max-width: 34ch; margin-top: 1.4rem; }
+  body:has(.hero-nav) .hero-actions { margin-top: auto; padding-top: 2rem; }
+
+  /* primary CTA is the dark pill from the reference */
+  body:has(.hero-nav) .hero-actions .btn-primary {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 1rem 2.1rem;
+  }
+  body:has(.hero-nav) .hero-actions .btn-primary:hover { background: var(--berry); color: #fff; }
+
+  /* the spinning badge moves off the seam into the photo corner */
+  body:has(.hero-nav) .round-badge {
+    top: auto;
+    bottom: 26px;
+    left: auto;
+    right: 26px;
+    transform: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* the desktop rule pins the panel to a clamp height; in the reference layout
+     both panels simply share the row */
+  body:has(.hero-nav) .hero-card-left { height: auto; }
+}
+
+@media (min-width: 1024px) {
+  /* the hero must end at the fold — thumbs were landing just below it */
+  body:has(.hero-nav) .hero .container.hero-cards { min-height: calc(100svh - 24px); }
+  body:has(.hero-nav).has-announce .hero .container.hero-cards {
+    min-height: calc(100svh - 24px - 44px);
+  }
+  /* keep CTAs and the dish switcher on one line, like the reference */
+  body:has(.hero-nav) .hero-actions { flex-wrap: nowrap; gap: 0.9rem; }
+  body:has(.hero-nav) .hero-thumbs button { width: 46px; height: 46px; }
+  body:has(.hero-nav) .hero-actions .btn { white-space: nowrap; }
+}
+
+@media (min-width: 1024px) {
+  /* min-height let tall content push past the fold; pin the row instead */
+  body:has(.hero-nav) .hero .container.hero-cards { height: calc(100svh - 24px); min-height: 0; }
+  body:has(.hero-nav).has-announce .hero .container.hero-cards { height: calc(100svh - 68px); }
+  body:has(.hero-nav) .hero-card-left { overflow: hidden; }
+}
+
+@media (min-width: 1024px) {
+  /* ---- reference proportions: outer inset, radius, headline mass ---- */
+  body:has(.hero-nav) .hero { padding: 16px 0 0; }
+  body:has(.hero-nav).has-announce .hero { padding-top: calc(16px + 44px); }
+  body:has(.hero-nav) .hero .container.hero-cards {
+    margin-inline: 16px;
+    gap: 16px;
+    height: calc(100svh - 32px);
+  }
+  body:has(.hero-nav).has-announce .hero .container.hero-cards { height: calc(100svh - 76px); }
+  body:has(.hero-nav) .hero-card-left,
+  body:has(.hero-nav) .hero-card-right { border-radius: 40px; }
+  body:has(.hero-nav) .hero-card-left { padding: 3.4rem 4rem; }
+
+  /* the headline carries the panel — a 322px void sat here before */
+  body:has(.hero-nav) .hero-card-left h1 { font-size: clamp(4rem, 7.2vw, 7rem); line-height: 0.9; }
+  body:has(.hero-nav) .hero-card-left h1 .script { font-size: 0.74em; }
+  body:has(.hero-nav) .hero-card-left p.lead {
+    font-size: 1.12rem;
+    line-height: 1.55;
+    max-width: 32ch;
+    margin-top: 1.8rem;
+  }
+  body:has(.hero-nav) .hero-nav { margin-bottom: 3.2rem; }
+
+  /* the badge shared a corner with the floating WhatsApp button */
+  body:has(.hero-nav) .round-badge { right: auto; left: 26px; bottom: 26px; }
+}
+
+@media (min-width: 1024px) {
+  /* the top bar owns the photo's top edge, so the price moves down-left */
+  body:has(.hero-nav) .hero-price { top: auto; right: auto; left: 22px; bottom: 22px; font-size: 1.05rem; padding: 0.5rem 1.15rem; }
+  /* the spinning badge duplicated the Book a Table CTA and collided with it —
+     this layout states the offer with the buttons instead */
+  body:has(.hero-nav) .round-badge { display: none; }
+}
+
+@media (min-width: 1024px) {
+  /* the page frame is 14px; a 16px inset left a 2px sliver, so the hero looked
+     glued to it. 28px gives frame + a real breathing gap on every side. */
+  body:has(.hero-nav) .hero { padding: 28px 0 0; }
+  body:has(.hero-nav).has-announce .hero { padding-top: calc(28px + 44px); }
+  body:has(.hero-nav) .hero .container.hero-cards {
+    margin-inline: 28px;
+    height: calc(100svh - 56px);
+  }
+  body:has(.hero-nav).has-announce .hero .container.hero-cards { height: calc(100svh - 100px); }
+}
+
+@media (min-width: 1024px) {
+  /* nowrap forced the CTA + switcher row 23px past the padding box, and the
+     panel's overflow:hidden clipped the last thumb. Let it wrap: wide screens
+     still get the reference one-liner, 1440 drops the switcher to its own row. */
+  body:has(.hero-nav) .hero-actions {
+    flex-wrap: wrap;
+    row-gap: 1.1rem;
+    align-items: center;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* the hero brand is the supplied wordmark, not the SVG mark — size it so its
+     optical centre lands on the same line as the nav links */
+  /* it's a stacked lockup (THE / PANCAKE / CLUB), so it needs more height
+     than a single-line wordmark before the small lines become legible */
+  .hero-logo-word { height: 56px; width: auto; display: block; }
+  body:has(.hero-nav) .hero-nav { align-items: center; min-height: 56px; }
+  body:has(.hero-nav) .hero-nav ul { align-items: center; margin: 0; padding: 0; }
+}
+
+@media (min-width: 1024px) {
+  /* the wordmark's thin THE/CLUB lines are tan — 1.01:1 on the gold panel, i.e.
+     invisible. A cream chip (same pill language as FIND A STACK opposite it)
+     gives the whole lockup a light ground to sit on. */
+  body:has(.hero-nav) .hero-logo {
+    background: rgba(253, 249, 238, 0.92);
+    border-radius: 999px;
+    padding: 0.5rem 1.15rem;
+    box-shadow: 0 2px 10px rgba(33, 26, 20, 0.06);
+    transition: background 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  body:has(.hero-nav) .hero-logo:hover { background: #fdf9ee; transform: translateY(-1px); }
+  .hero-logo-word { height: 46px; }
+  body:has(.hero-nav) .hero-nav { min-height: 46px; }
+}
+
+@media (min-width: 1024px) {
+  /* ---- closing the gap with the reference layout ----
+     it splits 57/43, carries ONE call to action, and puts three large product
+     thumbs on that same line. Two CTAs is what pushed our switcher to its own
+     row, so the button goes first and the thumbs come back up beside it. */
+  body:has(.hero-nav) .hero .container.hero-cards { grid-template-columns: 1.33fr 1fr; }
+
+  /* the menu already sits in the panel nav — a second hero button only
+     competed with Book a Table and ate the switcher's room */
+  body:has(.hero-nav) .hero-actions .btn-ghost { display: none; }
+
+  body:has(.hero-nav) .hero-actions { flex-wrap: nowrap; justify-content: space-between; }
+  body:has(.hero-nav) .hero-thumbs { gap: 0.65rem; }
+  body:has(.hero-nav) .hero-thumbs button { width: 64px; height: 64px; border-radius: 18px; }
+  body:has(.hero-nav) .hero-thumbs img { border-radius: 14px; }
+
+  /* a wider panel can carry more headline, which is what fills the void:
+     the reference gives its headline ~45% of the panel height */
+  body:has(.hero-nav) .hero-card-left h1 { font-size: clamp(4.6rem, 9vw, 8.6rem); }
+}
+
+@media (min-width: 1024px) {
+  /* the chip's own padding pushed the artwork to 82px while the headline, lead
+     and CTA all start at 64px. Optical alignment wins: pull the chip out by its
+     padding so the wordmark itself sits on the column's rail. */
+  body:has(.hero-nav) .hero-logo { margin-left: -1.15rem; }
+}
+
+@media (min-width: 1024px) {
+  /* ---- nav rhythm, measured against the reference ----
+     its brand is a one-line lockup ~26px tall, so the links get to spread over
+     ~61% of the panel. Ours is a stacked 3-line lockup, so it has to come down
+     in size before the links stop bunching into the right third. */
+  .hero-logo-word { height: 34px; }
+  body:has(.hero-nav) .hero-logo { padding: 0.4rem 0.85rem; margin-left: -0.85rem; }
+  body:has(.hero-nav) .hero-nav { min-height: 46px; }
+
+  /* 26px between links read as one clustered block; the reference sits at ~46 */
+  body:has(.hero-nav) .hero-nav ul { gap: 2.75rem; font-size: 0.875rem; letter-spacing: 0.08em; }
+}
+
+@media (min-width: 1024px) {
+  /* ---- left panel, measured against the reference ---- */
+
+  /* its CTA takes ~38% of the panel and reads as a statement; ours was a
+     general-purpose 13px button lost in a 781px panel */
+  body:has(.hero-nav) .hero-actions .btn-primary {
+    font-size: 1.15rem;
+    padding: 1.3rem 3.2rem;
+    letter-spacing: 0.06em;
+  }
+
+  /* the reference panel is quiet — soft rays only. Our doodle tile was at full
+     strength and competed with the headline for the same attention. */
+  body:has(.hero-nav) .hero-card-left::before { opacity: 0.42; }
+
+  /* the lead sat tight under the headline while the space piled up below it */
+  body:has(.hero-nav) .hero-card-left p.lead { margin-top: 2.9rem; }
+}
+
+@media (min-width: 1024px) {
+  /* ---- brand lockup: mark in a white disc + wordmark, as in the reference ----
+     replaces the cream chip; the disc gives the mark its own light ground so
+     nothing has to sit on the gold at low contrast. */
+  body:has(.hero-nav) .hero-logo {
+    background: none;
+    box-shadow: none;
+    padding: 0;
+    margin-left: 0;
+    gap: 0.7rem;
+  }
+  body:has(.hero-nav) .hero-logo:hover { background: none; }
+  .hero-logo-disc {
+    width: 46px;
+    height: 46px;
+    flex: none;
+    border-radius: 50%;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 2px 10px rgba(33, 26, 20, 0.08);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  body:has(.hero-nav) .hero-logo:hover .hero-logo-disc { transform: rotate(-8deg) translateY(-2px); }
+  .hero-logo-name {
+    font-family: var(--font-round);
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    /* the reference sets this in white; on our gold that is ~1.9:1, so the
+       wordmark keeps the ink colour instead */
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  body:has(.hero-nav) .hero-nav { min-height: 46px; }
+}
+
+@media (min-width: 1024px) {
+  /* these three were hand-tuned (800 weight, 0.06–0.08em tracking) and sat just
+     off the site's own button scale — same family, subtly different rhythm,
+     which is exactly what reads as "not ours". Snap them to .btn's typography. */
+  body:has(.hero-nav) .hero-find,
+  body:has(.hero-nav) .hero-order {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+  }
+  body:has(.hero-nav) .hero-actions .btn-primary { letter-spacing: 0.12em; }
+}
+
+@media (min-width: 1024px) {
+  /* the reference nav is set in its chunky display face, not its body text
+     font. Ours is Baloo 2 — already the brand voice (logo, dish names) — so the
+     hero panel's nav and pills speak it too instead of body-font DM Sans. */
+  body:has(.hero-nav) .hero-nav ul,
+  body:has(.hero-nav) .hero-find,
+  body:has(.hero-nav) .hero-order,
+  body:has(.hero-nav) .hero-actions .btn-primary,
+  body:has(.hero-nav) .hero-price {
+    font-family: var(--font-round);
+    font-weight: 800;
+  }
+  /* Baloo runs wider and taller than DM Sans, so it needs less tracking */
+  body:has(.hero-nav) .hero-nav ul { letter-spacing: 0.05em; }
+  body:has(.hero-nav) .hero-find,
+  body:has(.hero-nav) .hero-order { letter-spacing: 0.06em; }
+  body:has(.hero-nav) .hero-actions .btn-primary { letter-spacing: 0.07em; }
+}
+
+@media (min-width: 1024px) {
+  /* the pill carried Tailwind's `flex items-center gap-2`, but the public site
+     never loads Tailwind — so it stayed display:block and the chevron sat on
+     the text baseline, 6.5px above the centre. Do the layout in real CSS. */
+  body:has(.hero-nav) .hero-find,
+  body:has(.hero-nav) .hero-order {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  body:has(.hero-nav) .hero-order .arrow-icon { flex: none; }
+}
+
+@media (min-width: 1024px) {
+  /* the reference sets FIND FLAVORS as plain text on the photo, no pill. Plain
+     text is only safe if the photo behind it is guaranteed dark — and clients
+     upload their own — so a soft top scrim gives the text its own ground while
+     leaving the dish itself untouched. */
+  body:has(.hero-nav) .hero-card-right::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 170px;
+    background: linear-gradient(180deg, rgba(18, 12, 6, 0.5), rgba(18, 12, 6, 0));
+    border-radius: 40px 40px 0 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+  body:has(.hero-nav) .hero-find {
+    background: none;
+    box-shadow: none;
+    padding: 0;
+    color: #fff;
+  }
+  body:has(.hero-nav) .hero-find:hover { text-decoration: underline; text-underline-offset: 5px; }
+}
+
+@media (min-width: 1024px) {
+  /* the reference CTA carries a chevron; .btn already lays its children out
+     in a row, the icon just needs to stop shrinking */
+  body:has(.hero-nav) .hero-actions .btn-primary .arrow-icon { flex: none; }
+  /* the reference gives the pill wider flanks and keeps the chevron closer to
+     the label; ours sat at 19% padding / 4.2% gap against their 25% / 2.3% */
+  body:has(.hero-nav) .hero-actions .btn-primary { padding-inline: 3.6rem; }
+}
+
+@media (min-width: 1024px) {
+  /* 40px read heavier than the reference's ~30px; the scrim has to follow the
+     panel's corner or it shows a square edge over the photo */
+  body:has(.hero-nav) .hero-card-left,
+  body:has(.hero-nav) .hero-card-right { border-radius: 32px; }
+  body:has(.hero-nav) .hero-card-right::before { border-radius: 32px 32px 0 0; }
+}
+
+/* The CTA is the one section whose card ran wider than the page column (43px
+   inset against everything else's 72px). Its content is centred, so the rail
+   inside it is invisible — the card's own edge is what has to line up. Give it
+   the container's width formula at both breakpoints. */
+.cta { width: min(1180px, 92%); }
+.cta > .container { width: 100%; padding-inline: 5%; }
+@media (min-width: 1440px) { .cta { width: min(1320px, 90%); } }
+
+/* ============================================
+   CAMPAIGN BAND — badge · statement · product cards
+   deep brand ground so it never reads as one more cream section
+   ============================================ */
+.promo-band {
+  background: var(--deep);
+  border-radius: var(--radius-xl);
+  padding: 2.2rem;
+  display: grid;
+  gap: 1.6rem;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.promo-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--doodle);
+  background-size: 170px 170px;
+  opacity: 0.16;
+  pointer-events: none;
+}
+.promo-band > * { position: relative; z-index: 1; }
+
+.promo-badge {
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  /* --accent is not a theme token here; --yellow-deep is each theme's orange */
+  background: var(--yellow-deep);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+  /* ink, not cream: cream on this orange measures 2.75:1 */
+  color: var(--ink);
+  justify-self: start;
+}
+.promo-badge b {
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.promo-badge span { font-size: 0.78rem; line-height: 1.25; max-width: 8ch; margin-top: 0.3rem; }
+
+.promo-head {
+  font-family: var(--font-round);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+  color: var(--cream);
+  margin: 0;
+  /* 26ch stopped the text 101px short of its column, leaving a tail of empty
+     brown before the cards — the column itself was correctly aligned */
+  max-width: none;
+  /* the copy carries hyphens ("2-for-1") and the browser breaks after them,
+     stranding "1 CLASSIC" on its own line */
+  text-wrap: balance;
+}
+.promo-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.3rem;
+  padding: 0.85rem 1.7rem;
+  border-radius: 999px;
+  border: 2px solid var(--cream);
+  color: var(--cream);
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.promo-cta:hover { background: var(--cream); color: var(--deep); }
+
+.promo-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.promo-card {
+  background: var(--cream-card);
+  border: 2px solid var(--ink);
+  border-radius: 20px;
+  padding: 0.85rem;
+  display: grid;
+  gap: 0.7rem;
+  color: var(--ink);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.promo-card:hover { transform: translateY(-4px); }
+/* a one-line label ("The offer") and a two-line one ("Classic Buttermilk Stack")
+   started their photos at different heights — reserve both lines */
+.pc-top {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 2.5em;
+}
+.pc-top b {
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+}
+.pc-ph { position: relative; display: block; aspect-ratio: 4 / 5; border-radius: 14px; overflow: hidden; }
+.pc-ph img { object-fit: cover; }
+
+@media (min-width: 900px) {
+  .promo-band {
+    grid-template-columns: auto 1fr auto;
+    gap: 2.4rem;
+    padding: 2.6rem 2.8rem;
+  }
+  .promo-cards { grid-template-columns: repeat(2, 200px); }
+}
+
+/* The filter pills cycle through three decorative tints and the selected one
+   turned orange — four different hues, so "which is on?" was a guess. State
+   now reads as state: the active pill is the only dark one. */
+.fav-pill.on { background: var(--ink); color: var(--cream); }
+.fav-pill.on .n { background: var(--cream); color: var(--ink); }
+
+/* On the orange CTA band the heading was cream (2.77:1) and its accent word
+   yellow (1.61:1) — the page's final call to action was the least readable
+   thing on it. Ink + deep brown give the same two-tone heading, legibly. */
+.cta h2 { color: var(--ink); }
+.cta h2 .accent { color: var(--deep); }
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* At 1024 the gold panel's content box is only ~415px but the nav needs 563
+     and the action row 504 — both were being silently clipped by the panel's
+     overflow:hidden. Tighten the panel and let the disc carry the brand on its
+     own (the link keeps its aria-label), which is what actually fits. */
+  body:has(.hero-nav) .hero-card-left { padding: 2.6rem 2.4rem; }
+  body:has(.hero-nav) .hero-logo-name { display: none; }
+  body:has(.hero-nav) .hero-nav ul { gap: 1.4rem; font-size: 0.8rem; }
+  body:has(.hero-nav) .hero-nav { margin-bottom: 2rem; }
+  body:has(.hero-nav) .hero-actions { flex-wrap: wrap; row-gap: 1rem; }
+  body:has(.hero-nav) .hero-actions .btn-primary { padding-inline: 2rem; font-size: 1rem; }
+  body:has(.hero-nav) .hero-thumbs button { width: 54px; height: 54px; }
+}
+
+/* footer contact column — the address used to live only in the Hours section */
+.footer-find { text-align: center; }
+.footer-find h2 {
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin-bottom: 0.7rem;
+}
+.footer-find address {
+  font-style: normal;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #d9d0c0;
+}
+.footer-find a { color: #d9d0c0; transition: color 0.2s ease; }
+.footer-find a:hover { color: var(--yellow); }
+@media (min-width: 768px) {
+  .footer-find { text-align: left; }
+}
+
+/* The WhatsApp float is fixed bottom-right and was sitting on the last 10px of
+   the footer strapline. Reserve its lane so nothing lands underneath it. */
+body:has(.wa-float) .footer-bottom { padding-right: 84px; }
+@media (max-width: 767px) {
+  body:has(.wa-float) .footer-bottom { padding-right: 0; padding-bottom: 76px; }
+}
+
+@media (min-width: 1024px) {
+  /* The photo panel's bar was pinned 18px from the top while the gold panel's
+     nav starts at the panel padding — so the two sat 39px apart and the whole
+     header line looked crooked. Drop the bar onto the same rail. */
+  body:has(.hero-nav) .hero-topbar { top: 2.6rem; min-height: 46px; }
+  body:has(.hero-nav) .hero-order { padding: 0.8rem 1.5rem; }
+  body:has(.hero-nav) .hero-find { min-height: 46px; }
+}
+@media (min-width: 1280px) {
+  body:has(.hero-nav) .hero-topbar { top: 3.4rem; }
+}
+
+@media (min-width: 1024px) {
+  /* The panel centres its column, so the nav's y drifted with the content
+     height (5.9px outside the padding box at 1600) while the photo panel's bar
+     is pinned to a fixed top — the two could only line up by luck. Anchor the
+     column to the top; .hero-actions already has margin-top:auto, so the CTA
+     still sits on the bottom padding. */
+  body:has(.hero-nav) .hero-card-left { justify-content: flex-start; }
+}
+
+/* ---- short desktop windows ----
+   The panel is pinned to the fold, so on a laptop-height window (~814px) the
+   column ran 29px past the bottom padding — and overflow:hidden was quietly
+   clipping the CTA and the switcher. Scale the vertical rhythm with the
+   viewport height; the headline is capped by height as well as width. */
+@media (min-width: 1024px) and (max-height: 899px) {
+  body:has(.hero-nav) .hero-card-left { padding-block: 2.4rem; }
+  body:has(.hero-nav) .hero-topbar { top: 2.4rem; }
+  body:has(.hero-nav) .hero-nav { margin-bottom: 2rem; }
+  body:has(.hero-nav) .hero-card-left h1 { font-size: min(9vw, 15vh); }
+  body:has(.hero-nav) .hero-card-left p.lead { margin-top: 1.6rem; }
+}
+@media (min-width: 1024px) and (max-height: 779px) {
+  body:has(.hero-nav) .hero-card-left { padding-block: 1.9rem; }
+  body:has(.hero-nav) .hero-topbar { top: 1.9rem; }
+  body:has(.hero-nav) .hero-nav { margin-bottom: 1.4rem; }
+  body:has(.hero-nav) .hero-card-left h1 { font-size: min(9vw, 13.2vh); }
+  body:has(.hero-nav) .hero-card-left p.lead { margin-top: 1.2rem; font-size: 1.02rem; }
+  body:has(.hero-nav) .hero-thumbs button { width: 54px; height: 54px; }
+}
+
+@media (min-width: 1024px) {
+  /* the disc ran 3.9x the wordmark's cap height and swallowed the name beside
+     it; the nav row keeps its 46px min-height so the header rail doesn't move */
+  .hero-logo-disc { width: 34px; height: 34px; }
+}
+
+@keyframes nav-drop {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@media (max-width: 767px) {
+  /* the switcher sat in the bottom-right corner, where the WhatsApp float
+     covered the last thumbnail — an unreachable control, not just a visual clash */
+  .hero-actions { justify-content: flex-start; }
+  .hero-thumbs { margin-right: 72px; }
+}
+
+/* ---- footer: three labelled columns ----
+   Two items in a space-between row left a 571px void and none of what people
+   actually come to a restaurant footer for. */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.4rem;
+  text-align: left;
+  align-items: start;
+}
+.f-col h2 {
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin-bottom: 0.9rem;
+}
+.f-col address { font-style: normal; display: grid; gap: 0.4rem; }
+.f-col address,
+.f-hours,
+.f-links { font-size: 0.92rem; line-height: 1.5; color: #d9d0c0; list-style: none; }
+/* :not(.btn) — this rule was repainting the Book a Table label light grey on
+   its gold background, 1.13:1 */
+.f-col a:not(.btn) { color: #d9d0c0; transition: color 0.2s ease; }
+.f-col a:not(.btn):hover { color: var(--yellow); }
+.f-directions { font-weight: 700; color: var(--yellow) !important; }
+.f-directions::after { content: " →"; }
+.f-hours { display: grid; gap: 0.4rem; }
+.f-hours li { display: flex; justify-content: space-between; gap: 1.2rem; max-width: 22rem; }
+.f-links { display: grid; gap: 0.45rem; }
+.f-cta { margin-top: 1.3rem; }
+
+/* the wordmark is a good closing device, but it was eating a quarter of the
+   footer's height while the useful content sat in thin strips */
+.footer-mark { font-size: clamp(2rem, 7vw, 4.4rem); margin-top: 2.4rem; }
+
+@media (min-width: 768px) {
+  .footer-grid { grid-template-columns: 1.2fr 1fr 0.9fr; gap: 3rem; }
+}
+
+/* ---- footer grid discipline ----
+   Columns were 474/395/355 wide, the hours rows had a 91px hole between label
+   and time, and the wordmark was centred while everything else was left-aligned. */
+@media (min-width: 768px) {
+  .footer-grid { grid-template-columns: repeat(3, 1fr); }
+}
+/* one grid for the whole list so every row's times line up, with a real gap
+   instead of space-between pushing them apart */
+.f-hours {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  column-gap: 1.6rem;
+  row-gap: 0.4rem;
+  max-width: none;
+}
+.f-hours li { display: contents; }
+.f-hours li > span:last-child { color: #cfc5b3; }
+
+/* the wordmark shares the columns' rail — one axis, not two */
+.footer-mark { text-align: left; }
+
+/* the price lived only as a badge on the photo, well above the add control */
+.dish-price {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--ink);
+  margin: 1.6rem 0 0.9rem;
+}
+.dish-price span {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-left: 0.5rem;
+}
+.dish-stars a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.dish-stars a:hover { color: var(--berry); }
+
+/* .qty-add had no rule at all, so the stepper and the button stacked instead of
+   sitting on one line the way the component intends. */
+.qty-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.4rem;
+}
+.qty {
+  background: var(--cream-card);
+  border: 1.5px solid rgba(33, 26, 20, 0.12);
+  border-radius: 999px;
+  padding: 0.25rem;
+  gap: 0.25rem;
+}
+/* 28px missed the 44px minimum target — hard to hit on a phone */
+.qty button { width: 44px; height: 44px; font-size: 1.15rem; background: transparent; }
+.qty > span { min-width: 1.6rem; text-align: center; }
+/* white on this orange measured 1.76:1 */
+.qty button:hover:not(:disabled) { background: var(--yellow); color: var(--ink); }
+.qty button:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* Measured, then removed: a shared warm grade narrowed the hue spread (39 → 17)
+   but widened the brightness spread (81 → 88) on these three shots, because the
+   exposure difference is in the photographs, not the colour. Three photos from
+   one shoot is the fix; the fields are editable in Content → Home page blocks. */
+
+/* 151px sat empty under the checklist while the section offered no next step */
+.about-cta { margin-top: 2rem; }
+
+/* lightbox stage: the photo keeps its own shape instead of being squashed */
+.lb-stage {
+  position: relative;
+  width: min(920px, 92vw);
+  height: 70vh;
+}
+.lb-stage img { object-fit: contain; border-radius: 20px; box-shadow: none; }
+@media (min-width: 768px) { .lb-stage { height: 76vh; } }
+
+/* ---- pickup steps ----
+   A numbered disc on the same line as its title, description underneath, and a
+   dashed rule joining the discs. Tried a shared three-row grid first so every
+   line matched across columns; display:contents fought grid-auto-flow and put
+   the items in the wrong cells. The disc always occupies its row's first cell,
+   so this version stays aligned without that trick. No card behind it — that
+   competed with the menu card directly below, same tone and radius. */
+.pickup-steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 1.8rem 0 2.4rem;
+  padding: 0;
+}
+.pickup-steps li {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  column-gap: 0.95rem;
+  row-gap: 0.4rem;
+  align-items: center;
+}
+.ps-num {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  line-height: 1;
+}
+.pickup-steps b {
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 1.06rem;
+  color: var(--ink);
+}
+.ps-text {
+  grid-column: 2;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+@media (min-width: 768px) {
+  .pickup-steps { grid-template-columns: repeat(3, 1fr); gap: 2.4rem; }
+  /* the dashed rule is what makes three columns read as one sequence. It lives
+     in the column gap — anchored to the disc it ran straight through the title */
+  .pickup-steps li { position: relative; }
+  .pickup-steps li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 22px;
+    right: -2.4rem;
+    width: 2.4rem;
+    height: 1.5px;
+    background: repeating-linear-gradient(
+      to right,
+      rgba(33, 26, 20, 0.2) 0 6px,
+      transparent 6px 12px
+    );
+  }
+}
+
+/* the photo-first dish-card grid was tried here and reverted — the list
+   layout reads better for this menu */
+
+
+/* ---- full-photo hero ----
+   One image behind the whole hero at every width. The panel loses its gold
+   ground, so the copy needs its own: a left-weighted scrim keeps the text
+   legible on any photo the client uploads while the food stays clear.
+   These sit outside the media query on purpose — scoped to ≥1024 the mobile
+   .hero-bg stayed position:static with height 0 and the fill image escaped. */
+body:has(.hero-nav) .hero .container.hero-cards {
+  position: relative;
+  overflow: hidden;
+  border-radius: 32px;
+}
+body:has(.hero-nav) .hero-bg { position: absolute; inset: 0; z-index: 0; }
+body:has(.hero-nav) .hero-bg img { object-fit: cover; }
+body:has(.hero-nav) .hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(26, 17, 9, 0.86) 0%,
+    rgba(26, 17, 9, 0.7) 55%,
+    rgba(26, 17, 9, 0.8) 100%
+  );
+}
+body:has(.hero-nav) .hero-card-left {
+  position: relative;
+  z-index: 1;
+  background: none;
+  border-radius: 0;
+}
+body:has(.hero-nav) .hero-card-left::before { display: none; }
+body:has(.hero-nav) .hero-card-left h1,
+body:has(.hero-nav) .hero-logo-name,
+body:has(.hero-nav) .hero-nav ul a { color: var(--cream); }
+body:has(.hero-nav) .hero-card-left h1 .script { color: var(--yellow); }
+body:has(.hero-nav) .hero-card-left p.lead { color: rgba(248, 242, 224, 0.86); }
+body:has(.hero-nav) .hero-actions .btn-primary { background: var(--yellow); color: var(--ink); }
+body:has(.hero-nav) .hero-actions .btn-primary:hover { background: var(--cream); }
+body:has(.hero-nav) .hero-card-right {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: none;
+  border-radius: 0;
+  pointer-events: none;
+}
+body:has(.hero-nav) .hero-card-right::before { display: none; }
+body:has(.hero-nav) .hero-topbar,
+body:has(.hero-nav) .hero-price { pointer-events: auto; }
+body:has(.hero-nav) .hero-find { display: none; }
+
+@media (min-width: 1024px) {
+  body:has(.hero-nav) .hero .container.hero-cards { display: block; }
+  /* on desktop the copy holds the left half and the scrim leans that way, so
+     the food stays clear on the right */
+  body:has(.hero-nav) .hero-scrim {
+    background: linear-gradient(
+      100deg,
+      rgba(26, 17, 9, 0.9) 0%,
+      rgba(26, 17, 9, 0.82) 34%,
+      rgba(26, 17, 9, 0.45) 58%,
+      rgba(26, 17, 9, 0.18) 100%
+    );
+  }
+  body:has(.hero-nav) .hero-card-left { width: 56%; height: 100%; }
+  body:has(.hero-nav) .hero-topbar { left: auto; right: 3.4rem; width: auto; }
+  body:has(.hero-nav) .hero-price { left: auto; right: 3.4rem; bottom: 3.4rem; }
+}
+
+/* the ghost CTA kept its ink outline, which on the dark scrim was barely there */
+body:has(.hero-nav) .hero-actions .btn-ghost {
+  border-color: rgba(248, 242, 224, 0.55);
+  color: var(--cream);
+}
+body:has(.hero-nav) .hero-actions .btn-ghost:hover { background: var(--cream); color: var(--ink); border-color: var(--cream); }
+
+@media (min-width: 1024px) {
+  /* the hero headline takes the reference's chunky hand-cut caps; the script
+     word stays Pacifico so the handmade signature isn't lost to one heavy block */
+  body:has(.hero-nav) .hero-card-left h1 {
+    font-family: var(--font-display), var(--font-serif), serif;
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: 0.005em;
+  }
+  body:has(.hero-nav) .hero-card-left h1 .script {
+    font-family: var(--font-script), cursive;
+    font-size: 0.82em;
+  }
+}
+
+/* ---- display headings site-wide ----
+   The hero headline moved to the chunky display face; these are the same kind
+   of statement heading, so they follow. Prices, card h3s and the footer wordmark
+   stay in the serif — different job, and numerals read better there. */
+h2.title,
+.cta h2,
+.menu-hero h1,
+.page-hero h1,
+.dprod-copy h1,
+.dish-copy h1 {
+  font-family: var(--font-display), var(--font-serif), serif;
+  font-weight: 400;
+  letter-spacing: 0.005em;
+}
+/* the script accent keeps its own voice — that contrast is the point */
+h2.title .accent,
+.cta h2 .accent { font-family: var(--font-script), cursive; }
+
+/* ---- nav + buttons speak the label voice ----
+   The panel nav moved to Baloo 2 but the sticky header stayed DM Sans in
+   sentence case, so scrolling past the hero swapped both the font and the
+   capitalisation. Same role, same voice. */
+.nav .nav-links a {
+  font-family: var(--font-round), sans-serif;
+  font-weight: 800;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.btn {
+  font-family: var(--font-round), sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+}
+
+/* ============================================
+   CAMPAIGN SLIDER — Reference-matched redesign
+   Dark rounded card, inset rounded image with vertical dots,
+   botanical wheat line art, decorative signal icon, yellow pill CTA
+   ============================================ */
+
+/* -- keyframes -- */
+@keyframes camp-live-ping {
+  0% { transform: scale(1); opacity: 0.75; }
+  75%, 100% { transform: scale(2.2); opacity: 0; }
+}
+@keyframes camp-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes camp-vdot-pop {
+  0% { transform: scale(0.7); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.camp { position: relative; width: 100%; }
+
+.camp-viewport {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(33, 26, 20, 0.22), 0 2px 10px rgba(33, 26, 20, 0.08);
+}
+
+.camp-track-vertical {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+/* ---------- Floating vertical dots on left edge ---------- */
+.camp-vdots-wrap {
+  position: absolute;
+  left: 1.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.camp-vdots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  align-items: center;
+}
+.camp-vdots button {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(248, 242, 224, 0.35);
+  cursor: pointer;
+  padding: 0;
+  transition: height 0.35s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+.camp-vdots button.on {
+  height: 28px;
+  border-radius: 999px;
+  background: var(--yellow-deep);
+  animation: camp-vdot-pop 0.35s ease-out;
+}
+.camp-vdots button:hover:not(.on) {
+  background: rgba(248, 242, 224, 0.65);
+  transform: scale(1.2);
+}
+
+/* ---------- each slide: the dark rounded card ---------- */
+.camp-slide {
+  width: 100%;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  background: var(--deep);
+  position: relative;
+  padding: 1.4rem 1.4rem 1.4rem 3.4rem;
+  gap: 1.4rem;
+  box-sizing: border-box;
+}
+
+/* ---------- left column: inset image ---------- */
+.camp-left {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+/* inset image with rounded corners */
+.camp-shot {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: calc(var(--radius-xl) - 6px);
+  overflow: hidden;
+  background: var(--lav-soft);
+  width: 100%;
+}
+.camp-shot img {
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.camp-slide:hover .camp-shot img { transform: scale(1.04); }
+
+/* ---------- decorative signal icon ---------- */
+.camp-deco-icon {
+  position: absolute;
+  top: 1rem;
+  /* center between image and copy on mobile */
+  right: 1.6rem;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- right: copy panel ---------- */
+.camp-copy {
+  display: grid;
+  align-content: center;
+  gap: 1rem;
+  padding: 0.5rem 0.6rem 0.6rem;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* headline — bold chunky display font */
+.camp-copy h3 {
+  font-family: var(--font-display), var(--font-serif), serif;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  line-height: 1.1;
+  color: var(--cream);
+  text-wrap: balance;
+  position: relative;
+  z-index: 1;
+}
+
+/* details / subtitle text */
+.camp-details {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(248, 242, 224, 0.78);
+  max-width: 38ch;
+  position: relative;
+  z-index: 1;
+}
+
+/* urgency label */
+.camp-urgency {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fb923c;
+  padding: 0.25rem 0.7rem;
+  background: rgba(251, 146, 60, 0.12);
+  border: 1px solid rgba(251, 146, 60, 0.2);
+  border-radius: 999px;
+  width: fit-content;
+  position: relative;
+  z-index: 1;
+}
+.camp-urgency::before {
+  content: "⏰";
+  font-size: 0.75rem;
+}
+
+/* ---------- CTA: yellow pill with dot ---------- */
+.camp-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1.6rem 0.7rem 1.2rem;
+  background: var(--yellow);
+  color: var(--ink);
+  font-family: var(--font-display), var(--font-serif), serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 999px;
+  width: fit-content;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+.camp-cta:hover {
+  background: var(--yellow-deep);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 191, 56, 0.35);
+}
+/* green dot inside CTA */
+.camp-cta-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+  position: relative;
+}
+.camp-cta-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: camp-live-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* ---------- botanical wheat line art (CSS-drawn) ---------- */
+.camp-botanical {
+  position: absolute;
+  right: -1rem;
+  bottom: -2rem;
+  top: -2rem;
+  width: 40%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 500' fill='none' stroke='%23f8f2e0' stroke-width='1.2' stroke-linecap='round'%3E%3C!-- main stem --%3E%3Cpath d='M100 480 C100 400 100 300 100 100'/%3E%3C!-- left leaves --%3E%3Cpath d='M100 420 C80 400 50 410 40 430 C50 420 80 420 100 420'/%3E%3Cpath d='M100 380 C75 355 40 360 28 385 C42 370 75 370 100 380'/%3E%3Cpath d='M100 340 C70 310 35 315 22 340 C38 322 72 325 100 340'/%3E%3Cpath d='M100 300 C68 268 30 272 18 298 C35 278 70 282 100 300'/%3E%3Cpath d='M100 260 C70 232 38 236 25 258 C38 240 72 244 100 260'/%3E%3C!-- right leaves --%3E%3Cpath d='M100 400 C120 378 150 385 162 408 C148 392 120 395 100 400'/%3E%3Cpath d='M100 360 C125 335 158 340 170 362 C155 345 125 348 100 360'/%3E%3Cpath d='M100 320 C128 292 162 296 175 320 C160 302 128 305 100 320'/%3E%3Cpath d='M100 280 C130 252 165 256 178 280 C162 262 130 265 100 280'/%3E%3Cpath d='M100 240 C128 215 160 218 172 240 C158 224 128 227 100 240'/%3E%3C!-- top grain head --%3E%3Cpath d='M100 100 C100 80 92 55 88 40'/%3E%3Cpath d='M100 100 C100 78 108 55 112 40'/%3E%3Cpath d='M100 100 C96 75 82 52 78 35'/%3E%3Cpath d='M100 100 C104 75 118 52 122 35'/%3E%3Cellipse cx='88' cy='38' rx='5' ry='12'/%3E%3Cellipse cx='112' cy='38' rx='5' ry='12'/%3E%3Cellipse cx='78' cy='33' rx='5' ry='11'/%3E%3Cellipse cx='122' cy='33' rx='5' ry='11'/%3E%3Cellipse cx='100' cy='30' rx='4' ry='10'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: contain;
+}
+
+/* ---------- responsive: desktop layout ---------- */
+@media (min-width: 900px) {
+  .camp-slide {
+    grid-template-columns: 48% 1fr;
+    grid-template-rows: 1fr;
+    padding: 1.8rem 1.8rem 1.8rem 4rem;
+    gap: 0;
+    min-height: 420px;
+  }
+  .camp-left {
+    grid-row: 1;
+    grid-column: 1;
+  }
+  .camp-shot {
+    aspect-ratio: auto;
+    min-height: 380px;
+  }
+  .camp-copy {
+    grid-row: 1;
+    grid-column: 2;
+    padding: 2rem 2.4rem 2rem 2.8rem;
+    gap: 1.2rem;
+  }
+  .camp-copy h3 {
+    font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+  }
+  .camp-details { font-size: 1rem; }
+  .camp-deco-icon {
+    top: 1.2rem;
+    /* position between columns */
+    left: calc(48% - 18px);
+    right: auto;
+  }
+  .camp-botanical {
+    right: -0.5rem;
+    width: 35%;
+    opacity: 0.08;
+  }
+}
+
+/* large screens — more breathing room */
+@media (min-width: 1200px) {
+  .camp-slide { padding: 2.2rem; }
+  .camp-copy { padding: 2.5rem 3rem 2.5rem 3.2rem; }
+  .camp-copy h3 { font-size: clamp(2rem, 3.6vw, 3rem); }
+}
+
+/* ============================================
+   ABOUT SLIDER — one photo at a time on the left
+   replaces the three-photo collage; scroll-snap so a swipe or a wheel flick
+   moves exactly one frame and the page keeps its own scrolling
+   ============================================ */
+.ab-slider { position: relative; }
+.ab-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  border-radius: var(--radius);
+}
+.ab-track::-webkit-scrollbar { display: none; }
+.ab-frame {
+  position: relative;
+  display: block;
+  scroll-snap-align: start;
+  aspect-ratio: 4 / 3;
+  background: var(--lav-soft);
+  overflow: hidden;
+}
+.ab-frame img { object-fit: cover; }
+
+.ab-nav { display: flex; align-items: center; justify-content: flex-start; gap: 0.9rem; margin-top: 1rem; }
+.ab-nav > button {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(33, 26, 20, 0.16);
+  background: var(--cream-card);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.ab-nav > button:hover:not(:disabled) { background: var(--yellow); transform: translateY(-2px); }
+.ab-nav > button:disabled { opacity: 0.35; cursor: not-allowed; }
+.ab-dots { display: inline-flex; gap: 0.45rem; }
+.ab-dots button {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(33, 26, 20, 0.24);
+  cursor: pointer;
+  transition: width 0.25s ease, background 0.25s ease;
+}
+.ab-dots button.on { width: 26px; border-radius: 999px; background: var(--pink-deep); }
+
+@media (min-width: 1024px) {
+  .ab-frame { aspect-ratio: 5 / 6; }
+}
+
+/* the slider now lives inside a tinted section */
+#offers .camp { margin-top: 2rem; }

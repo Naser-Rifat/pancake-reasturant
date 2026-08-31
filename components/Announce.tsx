@@ -2,21 +2,27 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { ApiAnnouncement } from "@/lib/api";
 
 export default function Announce({ data }: { data: ApiAnnouncement | null }) {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(Boolean(data));
 
   useEffect(() => {
     if (sessionStorage.getItem("krush-announce-closed")) setVisible(false);
   }, []);
 
-  useEffect(() => {
-    document.body.classList.toggle("has-announce", visible);
-    return () => document.body.classList.remove("has-announce");
-  }, [visible]);
+  // the home page shows the campaign strip instead — never both on one page
+  const shown = Boolean(data) && visible && !(data?.image && pathname === "/");
 
-  if (!data || !visible) return null;
+  useEffect(() => {
+    // the class reserves layout space, so it must follow what actually renders
+    document.body.classList.toggle("has-announce", shown);
+    return () => document.body.classList.remove("has-announce");
+  }, [shown]);
+
+  if (!shown || !data) return null;
 
   return (
     <div className="announce">

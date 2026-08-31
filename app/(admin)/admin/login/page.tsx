@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <Image src="/logo.png" alt="The Pancake Club" width={529} height={226} className="mx-auto h-16 w-auto" />
+          <Image src="/logo.png" alt="The Pancake Club" width={529} height={226} priority className="mx-auto h-16 w-auto" />
           <CardTitle className="text-xl">Admin</CardTitle>
           <CardDescription>Sign in with your staff account</CardDescription>
         </CardHeader>

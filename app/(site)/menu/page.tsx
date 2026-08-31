@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import MenuClient from "@/components/MenuClient";
-import { getMenuWithStatus, getSite } from "@/lib/api";
+import { getHomeSteps, getMenuWithStatus, getSite } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +11,11 @@ export const metadata: Metadata = {
 };
 
 export default async function MenuPage() {
-  const [{ items, live }, site] = await Promise.all([getMenuWithStatus(), getSite()]);
+  const [{ items, live }, site, steps] = await Promise.all([
+    getMenuWithStatus(),
+    getSite(),
+    getHomeSteps(),
+  ]);
 
   return (
     <>
@@ -22,6 +26,25 @@ export default async function MenuPage() {
           <p>Signature pancake stacks. Griddled to order. Zero regrets.</p>
         </div>
       </section>
+      {/* Moved off the home page: these three answers matter at the moment
+          someone is actually choosing a stack, not before they've picked one. */}
+      {steps.length > 0 && (
+        <div className="container">
+          <ol className="pickup-steps">
+            {steps.map((st, i) => (
+              <li key={st.id}>
+                {/* the number carries the "step" meaning, so the old STEP 1
+                    caption above the title was saying it twice */}
+                <span className="ps-num" aria-hidden="true">
+                  {st.label.match(/\d+/)?.[0] ?? i + 1}
+                </span>
+                <b>{st.title}</b>
+                <span className="ps-text">{st.text}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
       <MenuClient items={items} live={live} phone={site.phone} />
     </>
   );

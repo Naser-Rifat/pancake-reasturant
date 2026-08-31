@@ -21,12 +21,15 @@ export function UploadButton({
   onPair,
   cutout = false,
   label = "Upload",
+  multiple = false,
 }: {
   onUploaded?: (url: string) => void;
   /** dual mode: one pick returns BOTH the original photo and its cutout */
   onPair?: (urls: { photo: string; cutout: string }) => void;
   cutout?: boolean;
   label?: string;
+  /** let staff pick several files in one go — onUploaded fires per file */
+  multiple?: boolean;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [stage, setStage] = useState<"" | "cutting" | "uploading">("");
@@ -95,7 +98,11 @@ export function UploadButton({
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])}
+        multiple={multiple}
+        onChange={async (e) => {
+          const files = [...(e.target.files ?? [])];
+          for (const f of files) await upload(f);
+        }}
       />
       <Button
         type="button"

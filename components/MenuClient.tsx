@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import {
   TAG_LABEL,
+  money,
   placeOrder,
   telHref,
   type ApiMenuItem,
@@ -41,9 +43,22 @@ export default function MenuClient({
       Object.keys(saved).forEach((slug) => {
         if (!items.some((b) => b.slug === slug)) delete saved[slug];
       });
+      // deep link from a dish page: /menu?add=slug drops it straight in the
+      // cart. Merged into `saved` and persisted BEFORE setCart so dev-mode
+      // double-invocation (which re-reads storage) can't wipe it.
+      const params = new URLSearchParams(window.location.search);
+      const wanted = params.get("add");
+      const qty = Math.min(9, Math.max(1, parseInt(params.get("qty") || "1", 10) || 1));
+      if (wanted && items.some((b) => b.slug === wanted)) {
+        saved[wanted] = (saved[wanted] || 0) + qty;
+        localStorage.setItem(CART_KEY, JSON.stringify(saved));
+        window.history.replaceState(null, "", "/menu");
+        showToast(`${items.find((b) => b.slug === wanted)!.name} added to your order 🥞`);
+      }
       setCart(saved);
     } catch { /* corrupted storage — start fresh */ }
     setLoaded(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
   useEffect(() => {
@@ -122,13 +137,16 @@ export default function MenuClient({
                 {group.map((b) => (
                   <article className="menu-card reveal" key={b.slug}>
                     <div className="thumb">
-                      <Image src={b.image} alt={`${b.name} pancakes`} width={200} height={200} sizes="80px" />
+                      {/* fall back to the photo; src="" makes the browser refetch the page */}
+                      {(b.image || b.photo) && (
+                        <Image src={b.image || b.photo} alt={`${b.name} pancakes`} width={200} height={200} sizes="80px" />
+                      )}
                     </div>
                     <div className="body">
                       <div className="row1">
-                        <h3>{b.name}</h3>
+                        <h3><Link href={`/menu/${b.slug}`}>{b.name}</Link></h3>
                         <span className="lead" aria-hidden="true" />
-                        <span className="price">${parseFloat(b.price)}</span>
+                        <span className="price">{money(b.price)}</span>
                       </div>
                       <p className="desc">{b.description}</p>
                       <div className="chips">
@@ -139,7 +157,7 @@ export default function MenuClient({
                     </div>
                     {live && (
                       <button className="btn btn-primary" onClick={() => add(b.slug)}>
-                        Add to Order +
+                        Add to Order
                       </button>
                     )}
                   </article>

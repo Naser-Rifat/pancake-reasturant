@@ -6,31 +6,41 @@
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { TAG_LABEL, type ApiMenuItem } from "@/lib/api";
+import { TAG_LABEL, money, type ApiMenuItem } from "@/lib/api";
 
 const TAGS: ApiMenuItem["tag"][] = ["sweet", "savoury", "choc"];
 const MAX = 6;
 
 const SKIN = {
-  v1: { head: "fav-head", h: "fav-h", tabs: "fav-tabs", pill: "fav-pill", tints: ["a", "b", "c"], rail: "fav-grid", card: "fav-card" },
-  v2: { head: "v2-band-head", h: "", tabs: "v2-pill-rows", pill: "v2-pill", tints: ["gold", "sky", "lav"], rail: "v2-favs-grid", card: "v2-fav" },
+  v1: {
+    head: "fav-head", h: "fav-h", tabs: "fav-tabs", pill: "fav-pill", tints: ["a", "b", "c"],
+    rail: "fav-grid", card: "fav-card", sub: "fav-head sub", subText: "fav-sub",
+    foot: "fav-foot", cta: "btn btn-primary",
+  },
+  v2: {
+    head: "v2-band-head", h: "", tabs: "v2-pill-rows", pill: "v2-pill", tints: ["gold", "sky", "lav"],
+    rail: "v2-favs-grid", card: "v2-fav", sub: "v2-band-head sub", subText: "v2-favs-sub",
+    foot: "", cta: "v2-btn small",
+  },
 } as const;
 
 export default function FavouritesRail({
   items,
   variant = "v1",
   title,
-  middle,
-  footer,
+  subhead,
+  cta,
 }: {
   items: ApiMenuItem[];
   variant?: keyof typeof SKIN;
-  /** headline block sitting opposite the category pills */
+  /** headline block sitting opposite the category pills — host elements only:
+   *  passing components (e.g. <Link>) across the server→client boundary trips
+   *  React's key validation */
   title: ReactNode;
-  /** block rendered between the pills row and the rail */
-  middle?: ReactNode;
-  /** block rendered under the rail (e.g. the "view full menu" CTA) */
-  footer?: ReactNode;
+  /** optional second heading between the pills and the rail */
+  subhead?: { title: string; text: string };
+  /** "view full menu" link — inside the subhead when there is one, else under the rail */
+  cta?: { href: string; label: string };
 }) {
   const [tab, setTab] = useState<"all" | ApiMenuItem["tag"]>("all");
   const s = SKIN[variant];
@@ -67,11 +77,19 @@ export default function FavouritesRail({
         </div>
       </div>
 
-      {middle}
+      {subhead && (
+        <div className={s.sub}>
+          <div>
+            <h2>{subhead.title}</h2>
+            <p className={s.subText}>{subhead.text}</p>
+          </div>
+          {cta && <Link href={cta.href} className={s.cta}>{cta.label}</Link>}
+        </div>
+      )}
 
       <div className={s.rail}>
         {shown.map((m) => (
-          <Link href="/menu" className={s.card} key={m.slug}>
+          <Link href={`/menu/${m.slug}`} className={s.card} key={m.slug}>
             <span className={`ph${m.photo ? " framed" : ""}`}>
               <Image
                 src={m.photo || m.image}
@@ -80,20 +98,27 @@ export default function FavouritesRail({
                 sizes="(min-width: 1024px) 30vw, 88vw"
               />
               {/* hover flood: the full card turns into the dish detail */}
+              {/* the panel adds what the card doesn't already show — the name and
+                  price sit right below it, so repeating them on hover just put
+                  the same two lines on screen twice */}
               <span className="hp" aria-hidden="true">
-                <b className="hp-name">{m.name}</b>
-                <span className="hp-price">${parseFloat(m.price)}</span>
                 <span className="hp-desc">{m.description}</span>
-                <span className="hp-cta">See on Menu →</span>
+                {/* the card links to the dish's own page, not the menu list —
+                    the old label promised the wrong destination */}
+                <span className="hp-cta">View dish →</span>
               </span>
             </span>
             <span className="nm">{m.name}</span>
-            <span className="pr">$ {parseFloat(m.price).toFixed(2)} AUD</span>
+            <span className="pr">{money(m.price)}</span>
           </Link>
         ))}
       </div>
 
-      {footer}
+      {cta && !subhead && (
+        <div className={s.foot}>
+          <Link href={cta.href} className={s.cta}>{cta.label}</Link>
+        </div>
+      )}
     </>
   );
 }

@@ -18,6 +18,7 @@ export default function Nav() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -26,10 +27,27 @@ export default function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // On the home page the hero carries its own nav inside the gold panel, so this
+  // header stays out of the way — but it has to take over once the hero scrolls
+  // away, or the rest of the page has no navigation at all.
+  useEffect(() => {
+    // Watch the panel's own nav, not the whole hero: this header should take
+    // over the moment that one scrolls out of sight, so the brand is never off
+    // screen and the two navs are never on screen together.
+    const panelNav = document.querySelector(".hero-nav");
+    if (!panelNav) { setPastHero(true); return; }
+    const io = new IntersectionObserver(
+      ([entry]) => setPastHero(!entry.isIntersecting),
+      { threshold: 0 },
+    );
+    io.observe(panelNav);
+    return () => io.disconnect();
+  }, [pathname]);
+
   useEffect(() => setOpen(false), [pathname]);
 
   return (
-    <header className={`nav${scrolled ? " scrolled" : ""}`}>
+    <header className={`nav${scrolled ? " scrolled" : ""}${pastHero ? " past-hero" : ""}`}>
       <div className="container nav-inner">
         <Link href="/" className="logo" aria-label="The Pancake Club — home">
           <span className="logo-mark" aria-hidden="true"><LogoMark /></span>

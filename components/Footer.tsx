@@ -1,44 +1,71 @@
 import Link from "next/link";
-import LogoMark from "@/components/LogoMark";
-import { getSite } from "@/lib/api";
+import { formatTime, getHours, getSite, telHref } from "@/lib/api";
+
+const LINKS = [
+  ["Menu", "/menu"],
+  ["About Us", "/#about"],
+  ["Gallery", "/gallery"],
+  ["Reviews", "/#reviews"],
+  ["Find Us", "/#contact"],
+];
 
 export default async function Footer() {
-  const site = await getSite();
+  const [site, hours] = await Promise.all([getSite(), getHours()]);
   const socials = [
     ["Instagram", site.instagram_url],
     ["Facebook", site.facebook_url],
   ].filter(([, url]) => url);
+  const directions = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address)}`;
 
   return (
     <footer>
       <div className="container">
         <div className="footer-grid">
-          <Link href="/" className="logo"><LogoMark /> the pancake club</Link>
-          <ul className="footer-links">
-            <li><Link href="/">Home</Link></li>
-            <li><Link href="/menu">Menu</Link></li>
-            <li><Link href="/booking">Book a Table</Link></li>
-            <li><Link href="/gallery">Gallery</Link></li>
-            <li><Link href="/#reviews">Reviews</Link></li>
-            <li><Link href="/privacy">Privacy</Link></li>
-          </ul>
-          {socials.length > 0 ? (
-            <ul className="footer-links">
+          <div className="f-col">
+            <h2>Visit</h2>
+            <address>
+              <span>{site.address}</span>
+              <a href={directions} target="_blank" rel="noopener noreferrer" className="f-directions">
+                Get directions
+              </a>
+              <a href={telHref(site.phone)}>{site.phone}</a>
+              <a href={`mailto:${site.email}`}>{site.email}</a>
+            </address>
+          </div>
+
+          <div className="f-col">
+            <h2>Opening hours</h2>
+            <ul className="f-hours">
+              {hours.map((h) => (
+                <li key={h.label}>
+                  <span>{h.label}</span>
+                  <span>{formatTime(h.opens)} – {formatTime(h.closes)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="f-col">
+            <h2>Explore</h2>
+            <ul className="f-links">
+              {LINKS.map(([label, href]) => (
+                <li key={href}><Link href={href}>{label}</Link></li>
+              ))}
               {socials.map(([label, url]) => (
                 <li key={label}>
                   <a href={url} target="_blank" rel="noopener noreferrer">{label}</a>
                 </li>
               ))}
             </ul>
-          ) : (
-            <div className="footer-icons" aria-hidden="true">
-              <LogoMark size={34} />
-            </div>
-          )}
+            <Link href="/booking" className="btn btn-primary f-cta">Book a Table</Link>
+          </div>
         </div>
+
+        <div className="footer-mark" aria-hidden="true">The Pancake Club</div>
+
         <div className="footer-bottom">
-          <span>© 2026 The Pancake Club — All rights reserved. {site.abn}</span>
-          <span>Fluffy stacks · real maple · est. 1999</span>
+          <span>© {new Date().getFullYear()} The Pancake Club — All rights reserved. {site.abn}</span>
+          <span>{site.footer_tagline}</span>
         </div>
       </div>
     </footer>

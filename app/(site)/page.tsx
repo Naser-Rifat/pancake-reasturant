@@ -1,15 +1,20 @@
 import Link from "next/link";
 import Image from "next/image";
 import LogoMark from "@/components/LogoMark";
-import Announce from "@/components/Announce";
 import CertIcon from "@/components/CertIcon";
+import HeroShowcase from "@/components/HeroShowcase";
+import Marquee from "@/components/Marquee";
+import CampaignSlider from "@/components/CampaignSlider";
 import FavouritesRail from "@/components/FavouritesRail";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewsCarousel from "@/components/ReviewsCarousel";
 import Sticker from "@/components/Sticker";
 import {
-  formatTime,
+  countdownBadge,
   getAnnouncement,
+  getCampaigns,
+  lines,
+  formatTime,
   getCertifications,
   getGallery,
   getHours,
@@ -22,8 +27,9 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [announcement, menu, gallery, reviews, hours, certs, site] = await Promise.all([
+  const [announcement, campaigns, menu, gallery, reviews, hours, certs, site] = await Promise.all([
     getAnnouncement(),
+    getCampaigns(),
     getMenuWithStatus(),
     getGallery(),
     getReviews(),
@@ -34,34 +40,22 @@ export default async function Home() {
 
   return (
     <main>
-      <Announce data={announcement} />
 
       {/* ================= HERO (FR-01) ================= */}
       <section className="hero">
         <div className="container hero-cards">
-          <div className="hero-card-left">
-            <h1>
-              {site.hero_heading} <span className="script">{site.hero_script}</span>
-            </h1>
-            <p className="lead">{site.hero_lead}</p>
-            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-              <Link href="/booking" className="btn btn-primary">Book a Table</Link>
-              <Link href="/menu" className="btn btn-ghost">
-                Explore Our Menu
-              </Link>
-            </div>
-          </div>
-
-          <div className="hero-card-right">
-            <Image
-              src={site.hero_image}
-              alt="Signature dish at The Pancake Club"
-              width={1200}
-              height={800}
-              priority
-              sizes="(min-width: 1024px) 45vw, 100vw"
-            />
-          </div>
+          <HeroShowcase
+            heading={site.hero_heading}
+            script={site.hero_script}
+            lead={site.hero_lead}
+            ctas={[
+              { href: "/booking", label: "Book a Table", variant: "primary" },
+              { href: "/menu", label: "Explore Our Menu", variant: "ghost" },
+            ]}
+            heroImage={site.hero_image}
+            heroCutout={site.hero_cutout}
+            dishes={menu.items.filter((m) => m.is_featured)}
+          />
 
           <Link href="/booking" className="round-badge" aria-label="Book a table — open 7 days">
             <span className="disc"></span>
@@ -84,17 +78,59 @@ export default async function Home() {
       </section>
 
       {/* ================= MARQUEE ================= */}
-      <div className="marquee" aria-hidden="true">
-        <div className="marquee-track">
-          {[0, 1].map((i) => (
-            <span key={i} style={{ display: "contents" }}>
-              <span>Fluffy Stacks</span><span>✦</span><span>Real Maple</span><span>✦</span>
-              <span>Est. 1999</span><span>✦</span><span>Fresh Berries</span><span>✦</span>
-              <span>Zero Guilt</span><span>✦</span><span>Griddled Daily</span><span>✦</span>
-            </span>
-          ))}
-        </div>
-      </div>
+      {/* <Marquee /> */}
+
+      {/* ================= CAMPAIGN BAND ================= */}
+      {announcement?.image && (() => {
+        const badge = countdownBadge(announcement.ends_at);
+        const cards = [
+          { href: announcement.link_url || "/menu", label: "The offer", img: announcement.image },
+          ...menu.items
+            .filter((m) => m.is_featured && (m.photo || m.image))
+            .map((d) => ({ href: `/menu/${d.slug}`, label: d.name, img: d.photo || d.image })),
+        ].slice(0, 2);
+
+        return (
+          <section className="promo">
+            <div className="container">
+              <div className="promo-band reveal">
+                <div className="promo-badge">
+                  <b>{badge.big}</b>
+                  <span>{badge.small}</span>
+                </div>
+
+                <div className="promo-main">
+                  <h2 className="promo-head">{announcement.message}</h2>
+                  {announcement.link_url && (
+                    <Link href={announcement.link_url} className="promo-cta">
+                      {announcement.link_text || "Find out more"}
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M9 6l6 6-6 6" />
+                      </svg>
+                    </Link>
+                  )}
+                </div>
+
+                <div className="promo-cards">
+                  {cards.map((c) => (
+                    <Link key={c.href} href={c.href} className="promo-card">
+                      <span className="pc-top">
+                        <b>{c.label}</b>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M7 17L17 7M9 7h8v8" />
+                        </svg>
+                      </span>
+                      <span className="pc-ph">
+                        <Image src={c.img} alt="" fill sizes="(min-width: 1024px) 220px, 45vw" />
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* ================= FEATURED DISHES (FR-02) ================= */}
       <section className="block" id="featured">
@@ -105,67 +141,62 @@ export default async function Home() {
             <FavouritesRail
               items={menu.items}
               variant="v1"
+              /* a single element, not a fragment: RSC serialises multi-child
+                 fragments into an unkeyed array when crossing to a client component */
               title={
-                <>
+                <div>
                   <p className="kicker">Crowd Favourites</p>
                   <h2 className="title">Our <span className="accent">Favourites</span></h2>
                   <p className="fav-sub">Top picks straight off our menu.</p>
-                </>
-              }
-              footer={
-                <div className="fav-foot">
-                  <Link href="/menu" className="btn btn-primary">View Full Menu</Link>
                 </div>
               }
+              cta={{ href: "/menu", label: "View Full Menu" }}
             />
           </div>
         </div>
       </section>
 
-      {/* ================= ABOUT / WELCOME (FR-03) ================= */}
-      <section className="block band-butter" id="about">
-        <Sticker kind="arc" color="var(--pink)" size={90} style={{ bottom: "3rem", right: "5%", transform: "rotate(180deg)" }} />
-        <div className="container about-grid">
-          <div className="about-collage reveal">
-            <Image src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=75" alt="Inside The Pancake Club" width={800} height={600} sizes="(min-width: 1024px) 25vw, 50vw" />
-            <Image src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=75" alt="Banana pancake stack" width={600} height={450} sizes="(min-width: 1024px) 12vw, 25vw" />
-            <Image src="https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&q=75" alt="Pancakes with honey drizzle" width={600} height={450} sizes="(min-width: 1024px) 12vw, 25vw" />
+      {/* ================= CAMPAIGNS ================= */}
+      {campaigns.length > 0 && (
+        <section className="block band-butter" id="offers">
+          <Sticker kind="arc" color="var(--pink)" size={90} style={{ bottom: "3rem", right: "5%", transform: "rotate(180deg)" }} />
+          <div className="container">
+            <div className="reveal" style={{ textAlign: "center" }}>
+              <p className="kicker">On Right Now</p>
+              <h2 className="title">This Week&apos;s <span className="accent">Offers</span></h2>
+            </div>
+            {/* photo left, the offer right — one at a time */}
+            <CampaignSlider items={campaigns} />
           </div>
-          <div className="reveal">
-            <h2 className="title">
-              Fluffy. Golden.<br /><span className="accent">Fully Stacked.</span>
-            </h2>
-            <p className="section-lead">{site.about_text}</p>
-            <ul className="checklist">
-              <li>Batter whisked fresh every morning</li>
-              <li>100% pure Canadian maple — never syrup-flavoured</li>
-              <li>Berries &amp; fruit from local NSW growers</li>
-              <li>Cloud-light ricotta &amp; buttermilk stacks</li>
-            </ul>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ================= GALLERY PREVIEW (FR-04) ================= */}
       <section className="block band-lavender" id="gallery">
         <Sticker kind="sparkle" color="var(--yellow)" size={44} style={{ top: "5rem", right: "6%", transform: "rotate(-15deg)" }} />
         <Sticker kind="ring" color="var(--pink)" size={60} style={{ bottom: "5rem", left: "4%" }} />
         <div className="container">
-          <div className="reveal" style={{ textAlign: "center" }}>
-            <p className="kicker">Feast Your Eyes</p>
-            <h2 className="title">From Our <span className="accent">Gallery</span></h2>
+          <div className="gal-head reveal">
+            <h2 className="title inline">From Our <span className="accent">Gallery</span></h2>
+            <Link href="/gallery" className="btn btn-primary">See Full Gallery</Link>
           </div>
 
-          <div className="gallery-grid reveal">
-            {gallery.slice(0, 8).map((p) => (
+          {/* asymmetric mosaic — a photo wall, not another uniform card row */}
+          <div className="gallery-mosaic reveal">
+            {gallery.slice(0, 6).map((p) => (
               <Link href="/gallery" key={p.image}>
-                <Image src={p.image} alt={p.alt} width={700} height={500} sizes="(min-width: 1024px) 25vw, 50vw" />
+                {/* cells crop to a fixed shape; the photo's own focus decides
+                    which part survives instead of always taking the middle */}
+                <Image
+                  src={p.image}
+                  alt={p.alt || p.caption}
+                  width={900}
+                  height={700}
+                  sizes="(min-width: 1024px) 40vw, 100vw"
+                  style={{ objectPosition: `50% ${p.focus === "top" ? "18%" : p.focus === "bottom" ? "82%" : "50%"}` }}
+                />
               </Link>
             ))}
-          </div>
-
-          <div className="section-foot reveal">
-            <Link href="/gallery" className="btn btn-ghost">See Full Gallery</Link>
           </div>
         </div>
       </section>
@@ -245,9 +276,11 @@ export default async function Home() {
       {/* ================= BOOKING CTA (FR-25) ================= */}
       <section className="cta">
         <div className="container reveal">
-          <h2>Hungry? <span className="accent">Book a Table.</span></h2>
-          <p>Reserve online in seconds — free, instant confirmation, open 7 days.</p>
-          <Link href="/booking" className="btn btn-primary">Book a Table</Link>
+          <h2>{site.cta_heading} <span className="accent">{site.cta_script}</span></h2>
+          <p>{site.cta_lead}</p>
+          <Link href={site.cta_button_url || "/booking"} className="btn btn-primary">
+            {site.cta_button_label}
+          </Link>
         </div>
       </section>
     </main>
