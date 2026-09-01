@@ -172,55 +172,41 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle>Kitchen &amp; Takeaway Online Ordering</CardTitle>
           <CardDescription>
-            Control whether customers can place online takeaway orders from the website
+            Instantly enable or pause online takeaway orders when the kitchen is busy
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
-            <div>
-              <div className="font-semibold text-sm">Online Takeaway Ordering</div>
-              <p className="text-xs text-muted-foreground mt-0.5">
+        <CardContent>
+          <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/40">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className={`inline-block h-2.5 w-2.5 rounded-full ${site.online_ordering_enabled ? "bg-emerald-500 animate-pulse" : "bg-rose-500"}`} />
+                <span className="font-semibold text-sm">
+                  {site.online_ordering_enabled ? "Currently Active — Taking Orders" : "Currently Paused — Orders Disabled"}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground">
                 {site.online_ordering_enabled
-                  ? "🟢 Taking orders — checkout is active on the menu page"
-                  : "🔴 Paused — customers will see a message and phone/Uber Eats alternatives"}
+                  ? "Checkout is live on the menu page. Click switch to pause when the kitchen is busy."
+                  : "Checkout is paused. Customers will be directed to call the restaurant or use Uber Eats."}
               </p>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
+            <label className="relative inline-flex items-center cursor-pointer ml-4">
               <input
                 type="checkbox"
                 className="sr-only peer"
                 checked={site.online_ordering_enabled}
-                onChange={(e) =>
-                  setSite((s) => (s ? { ...s, online_ordering_enabled: e.target.checked } : s))
-                }
+                disabled={busy === "OrderingToggle"}
+                onChange={(e) => {
+                  const nextVal = e.target.checked;
+                  setSite((s) => (s ? { ...s, online_ordering_enabled: nextVal } : s));
+                  run(async () => {
+                    await updateSiteSettings({ online_ordering_enabled: nextVal });
+                  }, "OrderingToggle");
+                }}
               />
-              <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              <div className="w-12 h-6 bg-muted-foreground/30 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
             </label>
           </div>
-
-          <div className="grid gap-1.5">
-            <Label htmlFor="s-pause-msg">Pause message shown to customers</Label>
-            <Input
-              id="s-pause-msg"
-              placeholder="Online ordering is temporarily paused. Please visit us or call to place an order."
-              value={site.online_ordering_disabled_message}
-              onChange={setS("online_ordering_disabled_message")}
-            />
-          </div>
-
-          <Button
-            loading={busy === "OrderingControl"}
-            onClick={() =>
-              run(async () => {
-                await updateSiteSettings({
-                  online_ordering_enabled: site.online_ordering_enabled,
-                  online_ordering_disabled_message: site.online_ordering_disabled_message,
-                });
-              }, "OrderingControl")
-            }
-          >
-            Save ordering status
-          </Button>
         </CardContent>
       </Card>
 
