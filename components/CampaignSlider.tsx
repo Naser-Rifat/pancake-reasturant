@@ -137,24 +137,20 @@ export default function CampaignSlider({
                       </div>
                     </div>
 
-                    {/* Decorative signal icon top-center between image and copy */}
+                    {/* Decorative signal wave icon top-center between image and copy matching reference */}
                     <span className="camp-deco-icon" aria-hidden="true">
                       <svg
-                        viewBox="0 0 32 32"
-                        width="36"
-                        height="36"
+                        viewBox="0 0 40 40"
+                        width="40"
+                        height="40"
                         fill="none"
                         stroke="var(--yellow-deep)"
-                        strokeWidth="2.5"
+                        strokeWidth="3.4"
                         strokeLinecap="round"
                       >
-                        <path
-                          d="M16 24a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"
-                          fill="var(--yellow-deep)"
-                          stroke="none"
-                        />
-                        <path d="M10 20a8.5 8.5 0 0 1 12 0" />
-                        <path d="M6 16a14 14 0 0 1 20 0" />
+                        <path d="M14 28 C16 22 22 16 28 14" />
+                        <path d="M10 32 C14 20 20 14 32 10" />
+                        <path d="M6 36 C12 16 16 12 36 6" />
                       </svg>
                     </span>
 
