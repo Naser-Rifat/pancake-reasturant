@@ -18,29 +18,20 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [pastHero, setPastHero] = useState(false);
-
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 30);
+      const hero = document.querySelector(".hero");
+      if (hero) {
+        setPastHero(y > 220);
+      } else {
+        setPastHero(true);
+      }
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // On the home page the hero carries its own nav inside the gold panel, so this
-  // header stays out of the way — but it has to take over once the hero scrolls
-  // away, or the rest of the page has no navigation at all.
-  useEffect(() => {
-    // Watch the panel's own nav, not the whole hero: this header should take
-    // over the moment that one scrolls out of sight, so the brand is never off
-    // screen and the two navs are never on screen together.
-    const panelNav = document.querySelector(".hero-nav");
-    if (!panelNav) { setPastHero(true); return; }
-    const io = new IntersectionObserver(
-      ([entry]) => setPastHero(!entry.isIntersecting),
-      { threshold: 0 },
-    );
-    io.observe(panelNav);
-    return () => io.disconnect();
   }, [pathname]);
 
   useEffect(() => setOpen(false), [pathname]);
