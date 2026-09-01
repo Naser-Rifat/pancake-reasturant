@@ -12,11 +12,10 @@ import type { ApiMenuItem } from "@/lib/api";
 import { ChevronRight } from "lucide-react";
 
 const NAV = [
-  { href: "/", label: "Home" },
   { href: "/menu", label: "Menu" },
+  { href: "/#about", label: "About Us" },
   { href: "/gallery", label: "Gallery" },
-  { href: "/#reviews", label: "Reviews" },
-  { href: "/#contact", label: "Contact" },
+  { href: "/#contact", label: "Find Us" },
 ];
 
 type Cta = { href: string; label: string; variant: "primary" | "ghost" };
@@ -143,7 +142,7 @@ export default function HeroShowcase({
             </svg>
             Find a stack
           </Link>
-          <Link href="/booking" className="hero-order">Book a Table<ChevronRight className="arrow-icon" size={14} strokeWidth={2.75} /></Link>
+          <Link href="/menu" className="hero-order">Order Now<ChevronRight className="arrow-icon" size={14} strokeWidth={2.75} /></Link>
         </div>
 
         {current?.price && <span className="hero-price">{current.price}</span>}
