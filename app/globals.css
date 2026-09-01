@@ -5258,7 +5258,7 @@ h2.title .accent,
 }
 .camp-sticky-box {
   position: sticky;
-  top: max(80px, calc(50svh - 350px));
+  top: max(96px, calc(50svh - 275px));
   width: 100%;
   z-index: 5;
   display: flex;
@@ -5267,7 +5267,7 @@ h2.title .accent,
 }
 .camp-header-box {
   width: 100%;
-  margin-bottom: 1.6rem;
+  margin-bottom: 1.1rem;
 }
 .camp {
   position: relative;
