@@ -7,11 +7,10 @@ import { usePathname } from "next/navigation";
 import LogoMark from "@/components/LogoMark";
 
 const LINKS = [
-  { href: "/", label: "Home" },
   { href: "/menu", label: "Menu" },
+  { href: "/#about", label: "About Us" },
   { href: "/gallery", label: "Gallery" },
-  { href: "/#reviews", label: "Reviews" },
-  { href: "/#contact", label: "Contact" },
+  { href: "/#contact", label: "Find Us" },
 ];
 
 export default function Nav() {
