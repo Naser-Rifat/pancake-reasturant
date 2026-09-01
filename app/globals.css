@@ -5703,3 +5703,15 @@ h2.title .accent,
     padding-top: clamp(7.5rem, 13.5vh, 9rem) !important;
   }
 }
+
+/* ---------- Ultra-Wide & Large Desktop Optimization (≥ 1600px / 4K) ---------- */
+@media (min-width: 1600px) {
+  body:has(.hero-nav) .hero .container.hero-cards {
+    max-width: 1760px;
+    margin-inline: auto;
+    max-height: 980px;
+  }
+  body:has(.hero-nav) .hero-card-left h1 {
+    font-size: clamp(4.5rem, 5.2vw, 6.2rem);
+  }
+}
