@@ -5115,10 +5115,15 @@ body:has(.hero-nav) .hero-card-left p.lead {
 }
 body:has(.hero-nav) .hero-actions .btn-primary {
   background: var(--yellow);
-  color: var(--ink);
+  color: var(--ink) !important;
+  font-weight: 800;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 body:has(.hero-nav) .hero-actions .btn-primary:hover {
-  background: var(--cream);
+  background: var(--yellow-deep) !important;
+  color: var(--ink) !important;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.45);
 }
 body:has(.hero-nav) .hero-card-right {
   position: absolute;
