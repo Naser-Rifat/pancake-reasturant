@@ -5251,65 +5251,44 @@ h2.title .accent,
     opacity: 0;
   }
 }
-@keyframes camp-shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-@keyframes camp-vdot-pop {
-  0% {
-    transform: scale(0.7);
-  }
-  60% {
-    transform: scale(1.15);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
 
 .camp {
   position: relative;
   width: 100%;
 }
 
-.camp-viewport {
+.camp-swiper {
   position: relative;
   width: 100%;
+  height: 580px;
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow:
-    0 12px 40px rgba(33, 26, 20, 0.22),
+    0 16px 48px rgba(33, 26, 20, 0.22),
     0 2px 10px rgba(33, 26, 20, 0.08);
 }
 
-.camp-track-vertical {
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
+.camp-swiper-slide {
+  height: 100% !important;
+  width: 100%;
+  display: block;
 }
 
-/* ---------- Floating vertical dots on left edge ---------- */
-.camp-vdots-wrap {
+/* ---------- Floating vertical pagination dots on left edge ---------- */
+.camp-swiper-pagination {
   position: absolute;
-  left: 1.4rem;
+  left: 1.2rem;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 10;
-  pointer-events: auto;
-}
-
-.camp-vdots {
+  z-index: 20;
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
   align-items: center;
+  pointer-events: auto;
 }
-.camp-vdots button {
+
+.camp-vbullet {
   width: 9px;
   height: 9px;
   border-radius: 50%;
@@ -5317,56 +5296,67 @@ h2.title .accent,
   background: rgba(248, 242, 224, 0.35);
   cursor: pointer;
   padding: 0;
+  margin: 0 !important;
   transition:
     height 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     background 0.3s ease,
     transform 0.2s ease;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  display: block;
+  outline: none;
 }
-.camp-vdots button.on {
-  height: 28px;
+
+.camp-vbullet.camp-vbullet-active {
+  height: 28px !important;
   border-radius: 999px;
-  background: var(--yellow-deep);
+  background: var(--yellow-deep) !important;
   animation: camp-vdot-pop 0.35s ease-out;
 }
-.camp-vdots button:hover:not(.on) {
-  background: rgba(248, 242, 224, 0.65);
-  transform: scale(1.2);
+
+.camp-vbullet:hover:not(.camp-vbullet-active) {
+  background: rgba(248, 242, 224, 0.75);
+  transform: scale(1.25);
 }
 
 /* ---------- each slide: the dark rounded card ---------- */
 .camp-slide {
   width: 100%;
-  flex-shrink: 0;
+  height: 100%;
   display: grid;
   grid-template-columns: 1fr;
+  grid-template-rows: 240px 1fr;
   background: var(--deep);
   position: relative;
-  padding: 1.4rem 1.4rem 1.4rem 3.4rem;
-  gap: 1.4rem;
+  padding: 1.2rem 1.2rem 1.4rem 3.2rem;
+  gap: 1.2rem;
   box-sizing: border-box;
 }
 
 /* ---------- left column: inset image ---------- */
 .camp-left {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   position: relative;
+  height: 100%;
+  width: 100%;
+  min-height: 0;
 }
 
 /* inset image with rounded corners */
 .camp-shot {
   position: relative;
-  aspect-ratio: 4 / 3;
-  border-radius: calc(var(--radius-xl) - 6px);
+  height: 100%;
+  width: 100%;
+  border-radius: calc(var(--radius-xl) - 8px);
   overflow: hidden;
   background: var(--lav-soft);
-  width: 100%;
 }
+
 .camp-shot img {
   object-fit: cover;
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 .camp-slide:hover .camp-shot img {
   transform: scale(1.04);
 }
@@ -5375,8 +5365,7 @@ h2.title .accent,
 .camp-deco-icon {
   position: absolute;
   top: 1rem;
-  /* center between image and copy on mobile */
-  right: 1.6rem;
+  right: 1.4rem;
   z-index: 3;
   display: flex;
   align-items: center;
@@ -5385,10 +5374,11 @@ h2.title .accent,
 
 /* ---------- right: copy panel ---------- */
 .camp-copy {
-  display: grid;
-  align-content: center;
-  gap: 1rem;
-  padding: 0.5rem 0.6rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.85rem;
+  padding: 0.4rem 0.6rem 0.6rem;
   position: relative;
   overflow: hidden;
   z-index: 1;
@@ -5398,22 +5388,24 @@ h2.title .accent,
 .camp-copy h3 {
   font-family: var(--font-display), var(--font-serif), serif;
   font-weight: 400;
-  font-size: clamp(1.5rem, 3vw, 2.4rem);
-  line-height: 1.1;
+  font-size: clamp(1.4rem, 2.8vw, 2.3rem);
+  line-height: 1.12;
   color: var(--cream);
   text-wrap: balance;
   position: relative;
   z-index: 1;
+  margin: 0;
 }
 
 /* details / subtitle text */
 .camp-details {
-  font-size: 0.92rem;
-  line-height: 1.55;
+  font-size: 0.9rem;
+  line-height: 1.5;
   color: rgba(248, 242, 224, 0.78);
-  max-width: 38ch;
+  max-width: 42ch;
   position: relative;
   z-index: 1;
+  margin: 0;
 }
 
 /* urgency label */
@@ -5468,6 +5460,7 @@ h2.title .accent,
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(239, 191, 56, 0.35);
 }
+
 /* green dot inside CTA */
 .camp-cta-dot {
   width: 9px;
@@ -5504,25 +5497,27 @@ h2.title .accent,
 
 /* ---------- responsive: desktop layout ---------- */
 @media (min-width: 900px) {
+  .camp-swiper {
+    height: 450px;
+  }
   .camp-slide {
     grid-template-columns: 48% 1fr;
     grid-template-rows: 1fr;
-    padding: 1.8rem 1.8rem 1.8rem 4rem;
+    padding: 1.8rem 1.8rem 1.8rem 4.2rem;
     gap: 0;
-    min-height: 420px;
   }
   .camp-left {
     grid-row: 1;
     grid-column: 1;
   }
   .camp-shot {
-    aspect-ratio: auto;
-    min-height: 380px;
+    height: 100%;
+    min-height: 0;
   }
   .camp-copy {
     grid-row: 1;
     grid-column: 2;
-    padding: 2rem 2.4rem 2rem 2.8rem;
+    padding: 2rem 2.4rem 2rem 3rem;
     gap: 1.2rem;
   }
   .camp-copy h3 {
@@ -5533,7 +5528,6 @@ h2.title .accent,
   }
   .camp-deco-icon {
     top: 1.2rem;
-    /* position between columns */
     left: calc(48% - 18px);
     right: auto;
   }
@@ -5546,11 +5540,14 @@ h2.title .accent,
 
 /* large screens — more breathing room */
 @media (min-width: 1200px) {
+  .camp-swiper {
+    height: 480px;
+  }
   .camp-slide {
-    padding: 2.2rem;
+    padding: 2.2rem 2.2rem 2.2rem 4.6rem;
   }
   .camp-copy {
-    padding: 2.5rem 3rem 2.5rem 3.2rem;
+    padding: 2.5rem 3.2rem 2.5rem 3.6rem;
   }
   .camp-copy h3 {
     font-size: clamp(2rem, 3.6vw, 3rem);

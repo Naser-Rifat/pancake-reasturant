@@ -1,172 +1,83 @@
 "use client";
 
-// Campaign slider — vertical top-to-bottom one-by-one scroll:
-// Slides are arranged vertically and transition with translateY(top-to-bottom).
-// Intercepts vertical wheel and touch swipes when in view, transitions one slide
-// at a time, and releases page scroll at start/end boundaries.
+// Campaign slider — vertical top-to-bottom one-by-one Swiper slider:
+// Slides transition smoothly vertically with Swiper.
+// Supports vertical touch gestures, vertical mousewheel (releases page scroll at boundaries),
+// autoplay with pause-on-hover, and custom vertical floating pagination pills.
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { countdownBadge, endsLabel, type ApiAnnouncement } from "@/lib/api";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Mousewheel, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
 
-const COOLDOWN_MS = 650;
-const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1575853121743-60c24f0a7502?w=800&q=80";
+import { endsLabel, type ApiAnnouncement } from "@/lib/api";
+
+const DEFAULT_IMAGE =
+  "https://images.unsplash.com/photo-1575853121743-60c24f0a7502?w=800&q=80";
 
 export default function CampaignSlider({ items }: { items: ApiAnnouncement[] }) {
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const [index, setIndex] = useState(0);
-  const [dotKey, setDotKey] = useState(0);
-
-  const cooldownRef = useRef(false);
-  const releasedRef = useRef<"up" | "down" | null>(null);
-  const touchStartY = useRef<number | null>(null);
-
-  const setSlide = useCallback(
-    (newIndex: number) => {
-      const next = Math.max(0, Math.min(items.length - 1, newIndex));
-      setIndex(next);
-      setDotKey((k) => k + 1);
-    },
-    [items.length],
-  );
-
-  // Wheel interception for vertical one-by-one scrolling
-  useEffect(() => {
-    if (items.length <= 1) return;
-    const wrap = wrapRef.current;
-    if (!wrap) return;
-
-    const onWheel = (e: WheelEvent) => {
-      const rect = wrap.getBoundingClientRect();
-      const inView =
-        rect.top < window.innerHeight * 0.7 && rect.bottom > window.innerHeight * 0.3;
-
-      if (!inView) {
-        releasedRef.current = null;
-        return;
-      }
-
-      // Need enough delta to trigger
-      if (Math.abs(e.deltaY) < 12) return;
-
-      const direction = e.deltaY > 0 ? "down" : "up";
-
-      if (releasedRef.current === direction) return;
-      if (releasedRef.current && releasedRef.current !== direction) {
-        releasedRef.current = null;
-      }
-
-      const atStart = index === 0 && direction === "up";
-      const atEnd = index === items.length - 1 && direction === "down";
-
-      if (atStart || atEnd) {
-        releasedRef.current = direction;
-        return;
-      }
-
-      e.preventDefault();
-
-      if (cooldownRef.current) return;
-      cooldownRef.current = true;
-
-      const next = direction === "down" ? index + 1 : index - 1;
-      setSlide(next);
-
-      setTimeout(() => {
-        cooldownRef.current = false;
-      }, COOLDOWN_MS);
-    };
-
-    window.addEventListener("wheel", onWheel, { passive: false });
-    return () => window.removeEventListener("wheel", onWheel);
-  }, [items.length, index, setSlide]);
-
-  // Touch gesture support (swipe up / swipe down)
-  useEffect(() => {
-    if (items.length <= 1) return;
-    const wrap = wrapRef.current;
-    if (!wrap) return;
-
-    const onTouchStart = (e: TouchEvent) => {
-      touchStartY.current = e.touches[0].clientY;
-    };
-
-    const onTouchEnd = (e: TouchEvent) => {
-      if (touchStartY.current === null) return;
-      const touchEndY = e.changedTouches[0].clientY;
-      const diff = touchStartY.current - touchEndY;
-      touchStartY.current = null;
-
-      if (Math.abs(diff) < 40) return; // small gesture ignore
-
-      if (diff > 0 && index < items.length - 1) {
-        // swipe up -> next slide
-        setSlide(index + 1);
-      } else if (diff < 0 && index > 0) {
-        // swipe down -> prev slide
-        setSlide(index - 1);
-      }
-    };
-
-    wrap.addEventListener("touchstart", onTouchStart, { passive: true });
-    wrap.addEventListener("touchend", onTouchEnd, { passive: true });
-
-    return () => {
-      wrap.removeEventListener("touchstart", onTouchStart);
-      wrap.removeEventListener("touchend", onTouchEnd);
-    };
-  }, [items.length, index, setSlide]);
-
-  if (items.length === 0) return null;
+  if (!items || items.length === 0) return null;
 
   return (
-    <div className="camp" ref={wrapRef}>
-      {/* Permanent floating vertical navigation dots on left */}
+    <div className="camp">
+      {/* Floating Vertical Pagination Container on the left */}
       {items.length > 1 && (
-        <div className="camp-vdots-wrap">
-          <span className="camp-vdots" role="tablist" aria-label="Offers">
-            {items.map((item, j) => (
-              <button
-                key={`${item.message}-${dotKey}`}
-                type="button"
-                role="tab"
-                aria-selected={j === index}
-                aria-label={`Offer ${j + 1} of ${items.length}`}
-                className={j === index ? "on" : ""}
-                onClick={() => setSlide(j)}
-              />
-            ))}
-          </span>
-        </div>
+        <div className="camp-swiper-pagination" aria-label="Campaign slides" />
       )}
 
-      <div className="camp-viewport">
-        <div
-          className="camp-track-vertical"
-          style={{ transform: `translateY(-${index * 100}%)` }}
-        >
-          {items.map((c, i) => {
-            const urgency = endsLabel(c.ends_at);
-            const imgSrc = c.image || DEFAULT_IMAGE;
-            return (
-              <article
-                className={`camp-slide ${i === index ? "active" : ""}`}
-                key={c.message}
-              >
-                {/* left: inset rounded image */}
+      <Swiper
+        direction="vertical"
+        slidesPerView={1}
+        spaceBetween={0}
+        speed={650}
+        loop={items.length > 1}
+        mousewheel={{
+          releaseOnEdges: true,
+          forceToAxis: true,
+        }}
+        autoplay={{
+          delay: 6000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true,
+        }}
+        pagination={
+          items.length > 1
+            ? {
+                el: ".camp-swiper-pagination",
+                clickable: true,
+                bulletClass: "camp-vbullet",
+                bulletActiveClass: "camp-vbullet-active",
+                renderBullet: (_index, className) =>
+                  `<button type="button" class="${className}" aria-label="Slide ${_index + 1}"></button>`,
+              }
+            : false
+        }
+        modules={[Autoplay, Mousewheel, Pagination]}
+        className="camp-swiper"
+      >
+        {items.map((c) => {
+          const urgency = endsLabel(c.ends_at);
+          const imgSrc = c.image || DEFAULT_IMAGE;
+
+          return (
+            <SwiperSlide key={c.message} className="camp-swiper-slide">
+              <article className="camp-slide">
+                {/* Left: Inset rounded image */}
                 <div className="camp-left">
                   <div className="camp-shot">
                     <Image
                       src={imgSrc}
                       alt={c.message}
                       fill
-                      sizes="(min-width: 900px) 40vw, 88vw"
+                      sizes="(min-width: 900px) 45vw, 90vw"
+                      priority
                     />
                   </div>
                 </div>
 
-                {/* decorative signal icon top-center between image and copy */}
+                {/* Decorative signal icon top-center between image and copy */}
                 <span className="camp-deco-icon" aria-hidden="true">
                   <svg
                     viewBox="0 0 32 32"
@@ -187,7 +98,7 @@ export default function CampaignSlider({ items }: { items: ApiAnnouncement[] }) 
                   </svg>
                 </span>
 
-                {/* right: copy + botanical art */}
+                {/* Right: Copy + botanical art */}
                 <div className="camp-copy">
                   <h3>{c.message}</h3>
                   {c.details && <p className="camp-details">{c.details}</p>}
@@ -198,16 +109,14 @@ export default function CampaignSlider({ items }: { items: ApiAnnouncement[] }) 
                       {c.link_text || "Book a Table"}
                     </Link>
                   )}
-                  {/* botanical wheat illustration */}
+                  {/* Botanical wheat line art */}
                   <span className="camp-botanical" aria-hidden="true" />
                 </div>
               </article>
-            );
-          })}
-        </div>
-      </div>
+            </SwiperSlide>
+          );
+        })}
+      </Swiper>
     </div>
   );
 }
-
-
