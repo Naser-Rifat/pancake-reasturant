@@ -5258,9 +5258,16 @@ h2.title .accent,
 }
 .camp-sticky-box {
   position: sticky;
-  top: clamp(3rem, 10vh, 6rem);
+  top: max(80px, calc(50svh - 350px));
   width: 100%;
   z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.camp-header-box {
+  width: 100%;
+  margin-bottom: 1.6rem;
 }
 .camp {
   position: relative;

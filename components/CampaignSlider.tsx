@@ -14,7 +14,13 @@ import { endsLabel, type ApiAnnouncement } from "@/lib/api";
 const DEFAULT_IMAGE =
   "https://images.unsplash.com/photo-1575853121743-60c24f0a7502?w=800&q=80";
 
-export default function CampaignSlider({ items }: { items: ApiAnnouncement[] }) {
+export default function CampaignSlider({
+  items,
+  title,
+}: {
+  items: ApiAnnouncement[];
+  title?: React.ReactNode;
+}) {
   const swiperRef = useRef<SwiperType | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -76,6 +82,7 @@ export default function CampaignSlider({ items }: { items: ApiAnnouncement[] }) 
       style={{ height: trackHeight }}
     >
       <div className="camp-sticky-box">
+        {title && <div className="camp-header-box">{title}</div>}
         <div className="camp">
           {/* Floating vertical pagination dots on left edge */}
           {numItems > 1 && (

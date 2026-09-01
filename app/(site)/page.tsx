@@ -228,14 +228,17 @@ export default async function Home() {
             style={{ bottom: "3rem", right: "5%", transform: "rotate(180deg)" }}
           />
           <div className="container">
-            <div className="reveal" style={{ textAlign: "center" }}>
-              <p className="kicker">On Right Now</p>
-              <h2 className="title">
-                This Week&apos;s <span className="accent">Offers</span>
-              </h2>
-            </div>
-            {/* photo left, the offer right — one at a time */}
-            <CampaignSlider items={campaigns} />
+            <CampaignSlider
+              items={campaigns}
+              title={
+                <div className="reveal" style={{ textAlign: "center" }}>
+                  <p className="kicker">On Right Now</p>
+                  <h2 className="title">
+                    This Week&apos;s <span className="accent">Offers</span>
+                  </h2>
+                </div>
+              }
+            />
           </div>
         </section>
       )}
