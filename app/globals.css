@@ -5645,9 +5645,55 @@ h2.title .accent,
   margin-top: 2rem;
 }
 
-/* ---------- Hero Nav & Headline Gap ---------- */
+/* ---------- Centered Navigation Links ---------- */
 @media (min-width: 1024px) {
   body:has(.hero-nav) .hero-nav {
-    margin-bottom: 2.4rem !important;
+    position: absolute;
+    top: 2.4rem;
+    left: 3.4rem;
+    right: 3.4rem;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: none;
+    margin-bottom: 0 !important;
+  }
+  body:has(.hero-nav) .hero-nav > * {
+    pointer-events: auto;
+  }
+  body:has(.hero-nav) .hero-nav ul {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 2.2rem;
+    margin: 0;
+    padding: 0;
+  }
+  body:has(.hero-nav) .hero-card-left {
+    padding-top: clamp(6.2rem, 11vh, 8rem) !important;
+  }
+  .nav-inner {
+    position: relative;
+  }
+  .nav-inner .nav-links {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 1.8rem;
+  }
+}
+@media (min-width: 1024px) and (max-height: 899px) {
+  body:has(.hero-nav) .hero-nav {
+    top: 2rem;
+    left: 2.8rem;
+    right: 2.8rem;
+  }
+  body:has(.hero-nav) .hero-card-left {
+    padding-top: clamp(5.4rem, 9.5vh, 6.8rem) !important;
   }
 }
