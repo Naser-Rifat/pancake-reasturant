@@ -115,7 +115,26 @@ export default async function DishPage({ params }: Props) {
             <p className="dish-price">
               {money(item.price)} <span>per stack</span>
             </p>
-            <QtyAdd slug={item.slug} />
+            {site.online_ordering_enabled ? (
+              <QtyAdd slug={item.slug} />
+            ) : (
+              <div className="dish-paused-cta" style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap", margin: "1rem 0" }}>
+                <Link href="/booking" className="btn btn-primary">
+                  Book a Table 🥞
+                </Link>
+                {site.uber_eats_url && (
+                  <a
+                    href={site.uber_eats_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-secondary"
+                    style={{ background: "#06C167", color: "#fff", borderColor: "#06C167" }}
+                  >
+                    Order on Uber Eats 🛵
+                  </a>
+                )}
+              </div>
+            )}
             <p className="dish-note">
               Pickup from {site.address.split(",")[0]} — griddled when you order, never before.{" "}
               <Link href="/booking">Or book a table →</Link>
