@@ -8,9 +8,9 @@ import LogoMark from "@/components/LogoMark";
 
 const LINKS = [
   { href: "/menu", label: "Menu" },
-  { href: "/#about", label: "About Us" },
   { href: "/gallery", label: "Gallery" },
-  { href: "/#contact", label: "Find Us" },
+  { href: "/#reviews", label: "Reviews" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 export default function Nav() {

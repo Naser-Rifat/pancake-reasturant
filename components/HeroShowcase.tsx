@@ -13,9 +13,9 @@ import { ChevronRight } from "lucide-react";
 
 const NAV = [
   { href: "/menu", label: "Menu" },
-  { href: "/#about", label: "About Us" },
   { href: "/gallery", label: "Gallery" },
-  { href: "/#contact", label: "Find Us" },
+  { href: "/#reviews", label: "Reviews" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 type Cta = { href: string; label: string; variant: "primary" | "ghost" };
