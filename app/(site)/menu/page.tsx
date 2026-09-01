@@ -45,7 +45,13 @@ export default async function MenuPage() {
           </ol>
         </div>
       )}
-      <MenuClient items={items} live={live} phone={site.phone} />
+      <MenuClient
+        items={items}
+        live={live && site.online_ordering_enabled}
+        phone={site.phone}
+        pauseMessage={site.online_ordering_disabled_message}
+        uberEatsUrl={site.uber_eats_url}
+      />
     </>
   );
 }

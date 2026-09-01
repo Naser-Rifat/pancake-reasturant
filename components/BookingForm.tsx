@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { createBooking, type ApiBooking } from "@/lib/api";
 
-export default function BookingForm() {
+interface BookingFormProps {
+  menuItems?: { slug: string; name: string; price: string }[];
+}
+
+export default function BookingForm({ menuItems = [] }: BookingFormProps) {
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -11,6 +15,7 @@ export default function BookingForm() {
     date: "",
     time: "",
     party_size: 2,
+    preselected_dish: "",
     notes: "",
   });
   const [submitting, setSubmitting] = useState(false);
@@ -42,7 +47,8 @@ export default function BookingForm() {
         <span className="big">✅</span>
         <b>Request received, {form.name.split(" ")[0]}!</b>
         <span>
-          {booking.date} at {booking.time.slice(0, 5)} for {booking.party_size} — we&apos;ll
+          {booking.date} at {booking.time.slice(0, 5)} for {booking.party_size}
+          {form.preselected_dish ? ` (${form.preselected_dish})` : ""} — we&apos;ll
           email {form.email} as soon as it&apos;s confirmed.
         </span>
       </div>
@@ -63,7 +69,22 @@ export default function BookingForm() {
           <option key={n} value={n}>{n} {n === 1 ? "guest" : "guests"}</option>
         ))}
       </select>
-      <textarea className="input" rows={2} placeholder="Anything we should know? (optional)" value={form.notes} onChange={set("notes")} />
+      {menuItems.length > 0 && (
+        <select
+          className="input"
+          value={form.preselected_dish}
+          onChange={set("preselected_dish")}
+          aria-label="Pre-select dish or favourite stack"
+        >
+          <option value="">🥞 Pre-select favourite pancake / dish (optional)</option>
+          {menuItems.map((item) => (
+            <option key={item.slug} value={`${item.name} ($${item.price})`}>
+              {item.name} — ${item.price}
+            </option>
+          ))}
+        </select>
+      )}
+      <textarea className="input" rows={2} placeholder="Anything we should know? Special requests or dietary needs (optional)" value={form.notes} onChange={set("notes")} />
       {error && <p className="form-error" role="alert">{error}</p>}
       <button className="btn btn-primary" type="submit" disabled={submitting}>
         {submitting ? "Sending…" : "Request a Table"}

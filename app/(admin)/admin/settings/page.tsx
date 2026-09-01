@@ -137,6 +137,10 @@ export default function SettingsPage() {
               <Label htmlFor="s-fb">Facebook URL</Label>
               <Input id="s-fb" placeholder="https://facebook.com/…" value={site.facebook_url} onChange={setS("facebook_url")} />
             </div>
+            <div className="grid gap-1.5 sm:col-span-2">
+              <Label htmlFor="s-uber">Uber Eats Store Link</Label>
+              <Input id="s-uber" placeholder="https://www.ubereats.com/..." value={site.uber_eats_url} onChange={setS("uber_eats_url")} />
+            </div>
           </div>
           <Button
             className="mt-4"
@@ -153,11 +157,69 @@ export default function SettingsPage() {
                   map_embed: site.map_embed,
                   instagram_url: site.instagram_url,
                   facebook_url: site.facebook_url,
+                  uber_eats_url: site.uber_eats_url,
                 });
               }, "Settings")
             }
           >
-            Save settings
+            Save contact details
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* ---------- online ordering & kitchen control ---------- */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Kitchen &amp; Takeaway Online Ordering</CardTitle>
+          <CardDescription>
+            Control whether customers can place online takeaway orders from the website
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
+            <div>
+              <div className="font-semibold text-sm">Online Takeaway Ordering</div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {site.online_ordering_enabled
+                  ? "🟢 Taking orders — checkout is active on the menu page"
+                  : "🔴 Paused — customers will see a message and phone/Uber Eats alternatives"}
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={site.online_ordering_enabled}
+                onChange={(e) =>
+                  setSite((s) => (s ? { ...s, online_ordering_enabled: e.target.checked } : s))
+                }
+              />
+              <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+
+          <div className="grid gap-1.5">
+            <Label htmlFor="s-pause-msg">Pause message shown to customers</Label>
+            <Input
+              id="s-pause-msg"
+              placeholder="Online ordering is temporarily paused. Please visit us or call to place an order."
+              value={site.online_ordering_disabled_message}
+              onChange={setS("online_ordering_disabled_message")}
+            />
+          </div>
+
+          <Button
+            loading={busy === "OrderingControl"}
+            onClick={() =>
+              run(async () => {
+                await updateSiteSettings({
+                  online_ordering_enabled: site.online_ordering_enabled,
+                  online_ordering_disabled_message: site.online_ordering_disabled_message,
+                });
+              }, "OrderingControl")
+            }
+          >
+            Save ordering status
           </Button>
         </CardContent>
       </Card>

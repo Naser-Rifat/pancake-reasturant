@@ -31,6 +31,7 @@ export interface AdminBooking {
   date: string;
   time: string;
   party_size: number;
+  preselected_dish?: string;
   notes: string;
   status: "pending" | "confirmed" | "cancelled";
   created_at: string;
@@ -231,6 +232,9 @@ export interface AdminSiteSettings {
   map_embed: string;
   instagram_url: string;
   facebook_url: string;
+  uber_eats_url: string;
+  online_ordering_enabled: boolean;
+  online_ordering_disabled_message: string;
   timezone: string;
   theme: string;
   custom_primary: string;

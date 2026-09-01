@@ -217,7 +217,14 @@ export default function BookingsPage() {
                   <TableCell>{b.date}</TableCell>
                   <TableCell>{b.time.slice(0, 5)}</TableCell>
                   <TableCell>{b.party_size}</TableCell>
-                  <TableCell className="max-w-48 text-muted-foreground">{b.notes || "—"}</TableCell>
+                  <TableCell className="max-w-48 text-muted-foreground">
+                    {b.preselected_dish && (
+                      <div className="font-semibold text-primary text-xs mb-0.5">
+                        🥞 {b.preselected_dish}
+                      </div>
+                    )}
+                    <div className="text-xs">{b.notes || (!b.preselected_dish ? "—" : "")}</div>
+                  </TableCell>
                   <TableCell>
                     <Badge variant={STATUS_BADGE[b.status]}>{b.status}</Badge>
                   </TableCell>

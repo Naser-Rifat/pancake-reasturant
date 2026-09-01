@@ -117,6 +117,9 @@ export interface ApiSiteSettings {
   map_embed: string;
   instagram_url: string;
   facebook_url: string;
+  uber_eats_url: string;
+  online_ordering_enabled: boolean;
+  online_ordering_disabled_message: string;
   timezone: string;
   theme: string;
   custom_primary: string;
@@ -136,6 +139,7 @@ export interface ApiBooking {
   date: string;
   time: string;
   party_size: number;
+  preselected_dish?: string;
 }
 
 // ---------- display helpers ----------
@@ -189,6 +193,11 @@ export async function getMenuWithStatus(): Promise<{ items: ApiMenuItem[]; live:
   } catch {
     return { items: FALLBACK_MENU, live: false };
   }
+}
+
+export async function getMenu(): Promise<ApiMenuItem[]> {
+  const { items } = await getMenuWithStatus();
+  return items;
 }
 
 export async function getFeaturedMenu(): Promise<ApiMenuItem[]> {
@@ -321,6 +330,7 @@ export function createBooking(payload: {
   date: string;
   time: string;
   party_size: number;
+  preselected_dish?: string;
   notes?: string;
 }): Promise<ApiBooking> {
   return post("/bookings/", payload);

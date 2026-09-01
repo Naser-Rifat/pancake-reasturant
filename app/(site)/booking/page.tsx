@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import BookingForm from "@/components/BookingForm";
-import { getSite, telHref } from "@/lib/api";
+import { getMenu, getSite, telHref } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BookingPage() {
-  const site = await getSite();
+  const [site, menu] = await Promise.all([getSite(), getMenu()]);
   return (
     <>
       <section className="page-hero">
@@ -26,7 +26,7 @@ export default async function BookingPage() {
         <div className="widget-card reveal">
           <h3>Online Reservation</h3>
           <p>Tell us when — we&apos;ll confirm by email. No fees, ever.</p>
-          <BookingForm />
+          <BookingForm menuItems={menu} />
         </div>
 
         <aside className="fallback-card reveal">

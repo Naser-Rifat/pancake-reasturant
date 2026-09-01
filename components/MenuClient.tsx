@@ -21,10 +21,14 @@ export default function MenuClient({
   items,
   live = true,
   phone: restaurantPhone = "(02) 5550 1234",
+  pauseMessage = "",
+  uberEatsUrl = "",
 }: {
   items: ApiMenuItem[];
   live?: boolean;
   phone?: string;
+  pauseMessage?: string;
+  uberEatsUrl?: string;
 }) {
   const [cart, setCart] = useState<Cart>({});
   const [loaded, setLoaded] = useState(false);
@@ -122,10 +126,20 @@ export default function MenuClient({
     <>
       <main className="container">
         {!live && (
-          <p className="ordering-paused" role="status">
-            Online ordering is taking a quick break — please call us on{" "}
-            <a href={telHref(restaurantPhone)}>{restaurantPhone}</a> to order. The menu below is still up to date.
-          </p>
+          <div className="ordering-paused" role="status" style={{ padding: "1.2rem", borderRadius: "12px", background: "rgba(224, 134, 0, 0.12)", border: "1px solid rgba(224, 134, 0, 0.3)", marginBottom: "2rem" }}>
+            <p style={{ margin: 0, fontWeight: 500 }}>
+              {pauseMessage || "Online ordering is temporarily paused."} Call us on{" "}
+              <a href={telHref(restaurantPhone)} style={{ textDecoration: "underline", fontWeight: 700 }}>{restaurantPhone}</a> to place an order.
+            </p>
+            {uberEatsUrl && (
+              <p style={{ margin: "0.5rem 0 0 0", fontSize: "0.95rem" }}>
+                Delivery is also available on{" "}
+                <a href={uberEatsUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#06C167", fontWeight: 700, textDecoration: "underline" }}>
+                  Uber Eats 🛵
+                </a>
+              </p>
+            )}
+          </div>
         )}
         <div className="menu-grid">
           {TAG_ORDER.map((tag) => {

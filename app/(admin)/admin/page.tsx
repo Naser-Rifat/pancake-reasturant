@@ -2,8 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CalendarCheck, DollarSign, ShoppingBag, Star } from "lucide-react";
-import { getStats, listOrders, type AdminOrder, type AdminStats } from "@/lib/admin-api";
+import { CalendarCheck, DollarSign, ShoppingBag, Star, Users } from "lucide-react";
+import {
+  getStats,
+  listBookings,
+  listOrders,
+  type AdminBooking,
+  type AdminOrder,
+  type AdminStats,
+} from "@/lib/admin-api";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -11,14 +18,16 @@ import { STATUS_BADGE } from "./status";
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
-  const [recent, setRecent] = useState<AdminOrder[]>([]);
+  const [recentOrders, setRecentOrders] = useState<AdminOrder[]>([]);
+  const [recentBookings, setRecentBookings] = useState<AdminBooking[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    Promise.all([getStats(), listOrders()])
-      .then(([s, o]) => {
+    Promise.all([getStats(), listOrders(), listBookings()])
+      .then(([s, o, b]) => {
         setStats(s);
-        setRecent(o.slice(0, 6));
+        setRecentOrders(o.slice(0, 6));
+        setRecentBookings(b.slice(0, 6));
       })
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"));
   }, []);
@@ -55,51 +64,108 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Recent orders</CardTitle>
-          <Link href="/admin/orders" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-            View all →
-          </Link>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Items</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Placed</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recent.map((o) => (
-                <TableRow key={o.public_id}>
-                  <TableCell className="font-medium">{o.customer_name}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {o.items.map((i) => `${i.quantity}× ${i.name}`).join(", ")}
-                  </TableCell>
-                  <TableCell>${o.total}</TableCell>
-                  <TableCell>
-                    <Badge variant={STATUS_BADGE[o.status]}>{o.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {new Date(o.created_at).toLocaleString("en-AU", { dateStyle: "short", timeStyle: "short" })}
-                  </TableCell>
-                </TableRow>
-              ))}
-              {recent.length === 0 && (
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Recent Orders</CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">Latest takeaway requests</p>
+            </div>
+            <Link href="/admin/orders" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              View all →
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
-                    No orders yet
-                  </TableCell>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Items</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Placed</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {recentOrders.map((o) => (
+                  <TableRow key={o.public_id}>
+                    <TableCell className="font-medium">{o.customer_name}</TableCell>
+                    <TableCell className="text-muted-foreground text-xs">
+                      {o.items.map((i) => `${i.quantity}× ${i.name}`).join(", ")}
+                    </TableCell>
+                    <TableCell className="font-medium">${o.total}</TableCell>
+                    <TableCell>
+                      <Badge variant={STATUS_BADGE[o.status]}>{o.status}</Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-xs">
+                      {new Date(o.created_at).toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" })}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {recentOrders.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground py-6">
+                      No orders yet
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Recent Reservations</CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">Upcoming table bookings</p>
+            </div>
+            <Link href="/admin/bookings" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              View all →
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Guest</TableHead>
+                  <TableHead>When</TableHead>
+                  <TableHead>Guests</TableHead>
+                  <TableHead>Pre-order / Notes</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {recentBookings.map((b) => (
+                  <TableRow key={b.public_id}>
+                    <TableCell className="font-medium">
+                      <div>{b.name}</div>
+                      {b.phone && <div className="text-xs text-muted-foreground">{b.phone}</div>}
+                    </TableCell>
+                    <TableCell className="text-xs">
+                      {b.date} at {b.time.slice(0, 5)}
+                    </TableCell>
+                    <TableCell className="text-sm font-medium">{b.party_size}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground max-w-[140px] truncate">
+                      {b.preselected_dish || b.notes || "—"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={STATUS_BADGE[b.status]}>{b.status}</Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {recentBookings.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground py-6">
+                      No bookings yet
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
