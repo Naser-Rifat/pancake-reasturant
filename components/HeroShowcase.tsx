@@ -61,11 +61,10 @@ export default function HeroShowcase({
   // the headline is never left with a gap
   const chip = heroCutout || dishes.find((d) => d.image)?.image;
 
+  const headingWords = heading ? heading.trim().split(/\s+/) : ["Stack", "Into"];
+
   return (
     <>
-      {/* the client wants the whole hero to be the photograph, with the same
-          content over it — so the image is one full-bleed layer behind both
-          columns instead of filling only the right-hand panel */}
       {current && (
         <div className="hero-bg">
           <Image
@@ -104,12 +103,28 @@ export default function HeroShowcase({
 
       <div className="hero-card-left">
         <h1>
-          {heading}
-          {chip && (
-            <span className="head-chip" aria-hidden="true">
-              <Image src={chip} alt="" width={120} height={120} sizes="64px" />
-            </span>
-          )}{" "}
+          {headingWords.length >= 2 ? (
+            <>
+              <span className="head-line">{headingWords[0]}</span>
+              <span className="head-line">
+                {headingWords.slice(1).join(" ")}
+                {chip && (
+                  <span className="head-chip" aria-hidden="true">
+                    <Image src={chip} alt="" width={120} height={120} sizes="64px" />
+                  </span>
+                )}
+              </span>
+            </>
+          ) : (
+            <>
+              {heading}
+              {chip && (
+                <span className="head-chip" aria-hidden="true">
+                  <Image src={chip} alt="" width={120} height={120} sizes="64px" />
+                </span>
+              )}
+            </>
+          )}
           <span className="script">{script}</span>
         </h1>
         <p className="lead">{lead}</p>

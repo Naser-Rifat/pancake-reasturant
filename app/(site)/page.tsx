@@ -302,9 +302,7 @@ export default async function Home() {
         />
         <div className="container">
           <div className="reveal" style={{ textAlign: "center" }}>
-            <p className="stat-chip">
-              <span className="star">★</span> 4.8 average from happy guests
-            </p>
+            
             <h2 className="title">
               What Our <span className="accent">Guests Say</span>
             </h2>

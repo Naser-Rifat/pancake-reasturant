@@ -5715,3 +5715,11 @@ h2.title .accent,
     font-size: clamp(4.5rem, 5.2vw, 6.2rem);
   }
 }
+
+.head-line {
+  display: block;
+}
+body:has(.hero-nav) .hero-card-left h1 .script {
+  display: block;
+  margin-top: 0.12em;
+}
