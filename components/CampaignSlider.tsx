@@ -8,7 +8,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Mousewheel, Pagination } from "swiper/modules";
+import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 
@@ -22,7 +22,7 @@ export default function CampaignSlider({ items }: { items: ApiAnnouncement[] }) 
 
   return (
     <div className="camp">
-      {/* Floating Vertical Pagination Container on the left */}
+      {/* Floating Vertical Pagination Container */}
       {items.length > 1 && (
         <div className="camp-swiper-pagination" aria-label="Campaign slides" />
       )}
@@ -31,14 +31,10 @@ export default function CampaignSlider({ items }: { items: ApiAnnouncement[] }) 
         direction="vertical"
         slidesPerView={1}
         spaceBetween={0}
-        speed={650}
+        speed={700}
         loop={items.length > 1}
-        mousewheel={{
-          releaseOnEdges: true,
-          forceToAxis: true,
-        }}
         autoplay={{
-          delay: 6000,
+          delay: 4500,
           disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
@@ -54,7 +50,7 @@ export default function CampaignSlider({ items }: { items: ApiAnnouncement[] }) 
               }
             : false
         }
-        modules={[Autoplay, Mousewheel, Pagination]}
+        modules={[Autoplay, Pagination]}
         className="camp-swiper"
       >
         {items.map((c) => {
