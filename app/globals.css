@@ -5645,42 +5645,9 @@ h2.title .accent,
   margin-top: 2rem;
 }
 
-/* ---------- Hero Nav & Headline Spacing ---------- */
+/* ---------- Hero Nav & Headline Gap ---------- */
 @media (min-width: 1024px) {
-  body:has(.hero-nav) .hero-card-left {
-    padding-top: clamp(2.2rem, 3.6vh, 3.2rem);
-    padding-bottom: clamp(2.2rem, 3.6vh, 3.2rem);
-    display: flex;
-    flex-direction: column;
-  }
   body:has(.hero-nav) .hero-nav {
-    margin-bottom: clamp(1.8rem, 3.2vh, 2.6rem) !important;
-  }
-  body:has(.hero-nav) .hero-topbar {
-    top: clamp(2.2rem, 3.6vh, 3.2rem);
-  }
-  body:has(.hero-nav) .hero-card-left h1 {
-    margin-top: 0;
-    line-height: 0.94;
-    letter-spacing: -0.01em;
-  }
-}
-@media (min-width: 1024px) and (max-height: 899px) {
-  body:has(.hero-nav) .hero-card-left {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-  }
-  body:has(.hero-nav) .hero-nav {
-    margin-bottom: 1.8rem !important;
-  }
-  body:has(.hero-nav) .hero-topbar {
-    top: 2rem;
-  }
-  body:has(.hero-nav) .hero-card-left h1 {
-    font-size: clamp(3.4rem, 6.2vw, 5.8rem);
-    line-height: 0.94;
-  }
-  body:has(.hero-nav) .hero-card-left p.lead {
-    margin-top: 1.2rem;
+    margin-bottom: 2.4rem !important;
   }
 }
