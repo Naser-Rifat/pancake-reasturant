@@ -5509,19 +5509,19 @@ h2.title .accent,
   animation: camp-live-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
-/* ---------- botanical wheat line art (CSS-drawn) matching reference ---------- */
+/* ---------- botanical corn & wheat vintage engraving line art matching reference ---------- */
 .camp-botanical {
   position: absolute;
-  right: -1rem;
-  bottom: -2rem;
-  top: -2rem;
-  width: 44%;
+  right: 0;
+  bottom: -0.5rem;
+  top: -0.5rem;
+  width: 48%;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.14;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 500' fill='none' stroke='%23f8f2e0' stroke-width='1.2' stroke-linecap='round'%3E%3C!-- main stem --%3E%3Cpath d='M100 480 C100 400 100 300 100 100'/%3E%3C!-- left leaves --%3E%3Cpath d='M100 420 C80 400 50 410 40 430 C50 420 80 420 100 420'/%3E%3Cpath d='M100 380 C75 355 40 360 28 385 C42 370 75 370 100 380'/%3E%3Cpath d='M100 340 C70 310 35 315 22 340 C38 322 72 325 100 340'/%3E%3Cpath d='M100 300 C68 268 30 272 18 298 C35 278 70 282 100 300'/%3E%3Cpath d='M100 260 C70 232 38 236 25 258 C38 240 72 244 100 260'/%3E%3C!-- right leaves --%3E%3Cpath d='M100 400 C120 378 150 385 162 408 C148 392 120 395 100 400'/%3E%3Cpath d='M100 360 C125 335 158 340 170 362 C155 345 125 348 100 360'/%3E%3Cpath d='M100 320 C128 292 162 296 175 320 C160 302 128 305 100 320'/%3E%3Cpath d='M100 280 C130 252 165 256 178 280 C162 262 130 265 100 280'/%3E%3Cpath d='M100 240 C128 215 160 218 172 240 C158 224 128 227 100 240'/%3E%3C!-- top grain head --%3E%3Cpath d='M100 100 C100 80 92 55 88 40'/%3E%3Cpath d='M100 100 C100 78 108 55 112 40'/%3E%3Cpath d='M100 100 C96 75 82 52 78 35'/%3E%3Cpath d='M100 100 C104 75 118 52 122 35'/%3E%3Cellipse cx='88' cy='38' rx='5' ry='12'/%3E%3Cellipse cx='112' cy='38' rx='5' ry='12'/%3E%3Cellipse cx='78' cy='33' rx='5' ry='11'/%3E%3Cellipse cx='122' cy='33' rx='5' ry='11'/%3E%3Cellipse cx='100' cy='30' rx='4' ry='10'/%3E%3C/svg%3E");
+  opacity: 0.36;
+  background-image: url("/botanical-corn-wheat.svg");
   background-repeat: no-repeat;
-  background-position: right center;
+  background-position: right bottom;
   background-size: contain;
 }
 
