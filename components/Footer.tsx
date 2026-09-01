@@ -93,7 +93,7 @@ export default async function Footer() {
           </div>
         </div>
 
-        <div className="footer-mark" aria-hidden="true">The Pancake Club</div>
+        {/* <div className="footer-mark" aria-hidden="true">The Pancake Club</div> */}
 
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} The Pancake Club — All rights reserved. {site.abn}</span>
