@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import MenuClient from "@/components/MenuClient";
 import { getHomeSteps, getMenuWithStatus, getSite } from "@/lib/api";
+import {
+  OrderOnlineSticker,
+  GriddleFreshSticker,
+  PickUpHotSticker,
+} from "@/components/icons/StepStickers";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +14,8 @@ export const metadata: Metadata = {
   description:
     "Six signature pancake stacks — fluffy, fresh, and griddled to order. See the menu and book a table.",
 };
+
+const STICKERS = [OrderOnlineSticker, GriddleFreshSticker, PickUpHotSticker];
 
 export default async function MenuPage() {
   const [{ items, live }, site, steps] = await Promise.all([
@@ -26,24 +33,34 @@ export default async function MenuPage() {
           <p>Signature pancake stacks. Griddled to order. Zero regrets.</p>
         </div>
       </section>
-      {/* Moved off the home page: these three answers matter at the moment
-          someone is actually choosing a stack, not before they've picked one. */}
+
+      {/* 3 Step Visual Process Sticker Cards (Option 2) */}
       {steps.length > 0 && (
-        <div className="container">
-          <ol className="pickup-steps">
-            {steps.map((st, i) => (
-              <li key={st.id}>
-                {/* the number carries the "step" meaning, so the old STEP 1
-                    caption above the title was saying it twice */}
-                <span className="ps-num" aria-hidden="true">
-                  {st.label.match(/\d+/)?.[0] ?? i + 1}
-                </span>
-                <b>{st.title}</b>
-                <span className="ps-text">{st.text}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
+        <section className="pickup-steps-section">
+          <div className="container">
+            <div className="pickup-steps-grid">
+              {steps.map((st, i) => {
+                const stepNum = `0${i + 1}`;
+                const StickerComp = STICKERS[i % STICKERS.length];
+
+                return (
+                  <article className="pickup-step-card" key={st.id}>
+                    <div className="ps-icon-badge-wrap">
+                      <div className="ps-sticker-bubble">
+                        <StickerComp />
+                      </div>
+                      <span className="ps-step-pill">STEP {stepNum}</span>
+                    </div>
+                    <div className="ps-content">
+                      <h3 className="ps-title">{st.title}</h3>
+                      <p className="ps-desc">{st.text}</p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
       )}
       <MenuClient
         items={items}

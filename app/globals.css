@@ -4992,73 +4992,104 @@ body:has(.wa-float) .footer-bottom {
    A numbered disc on the same line as its title, description underneath, and a
    dashed rule joining the discs. Tried a shared three-row grid first so every
    line matched across columns; display:contents fought grid-auto-flow and put
-   the items in the wrong cells. The disc always occupies its row's first cell,
-   so this version stays aligned without that trick. No card behind it — that
-   competed with the menu card directly below, same tone and radius. */
-.pickup-steps {
+/* ============================================
+   PICKUP STEPS (Option 2: Retro Food Stickers)
+   ============================================ */
+.pickup-steps-section {
+  padding: 1.2rem 0 3.2rem;
+}
+.pickup-steps-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
-  list-style: none;
-  margin: 1.8rem 0 2.4rem;
+  gap: 1.6rem;
+  margin: 0;
   padding: 0;
+  list-style: none;
 }
-.pickup-steps li {
-  display: grid;
-  grid-template-columns: 44px 1fr;
-  column-gap: 0.95rem;
-  row-gap: 0.4rem;
+@media (min-width: 768px) {
+  .pickup-steps-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+.pickup-step-card {
+  background: var(--surface, #ffffff);
+  border-radius: 30px;
+  padding: 2rem 1.6rem 1.8rem;
+  border: 2px solid rgba(33, 26, 20, 0.08);
+  box-shadow:
+    0 12px 32px rgba(33, 26, 20, 0.05),
+    0 2px 6px rgba(33, 26, 20, 0.03);
+  display: flex;
+  flex-direction: column;
   align-items: center;
-}
-.ps-num {
+  text-align: center;
   position: relative;
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
+}
+.pickup-step-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(245, 158, 11, 0.55);
+  box-shadow:
+    0 20px 42px rgba(245, 158, 11, 0.18),
+    0 4px 10px rgba(33, 26, 20, 0.06);
+}
+.ps-icon-badge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+.ps-sticker-bubble {
+  width: 90px;
+  height: 90px;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.pickup-step-card:hover .ps-sticker-bubble {
+  transform: scale(1.14) rotate(5deg);
+}
+.step-svg-art {
+  width: 84px;
+  height: 84px;
+  filter: drop-shadow(0 6px 14px rgba(33, 26, 20, 0.12));
+}
+.ps-step-pill {
   background: var(--yellow);
   color: var(--ink);
-  font-family: var(--font-serif);
-  font-size: 1.3rem;
-  line-height: 1;
-}
-.pickup-steps b {
-  font-family: var(--font-round);
+  font-family: var(--font-display), var(--font-serif), serif;
+  font-size: 0.78rem;
   font-weight: 800;
-  font-size: 1.06rem;
-  color: var(--ink);
+  letter-spacing: 0.08em;
+  padding: 0.32rem 0.9rem;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
 }
-.ps-text {
-  grid-column: 2;
+.ps-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.ps-title {
+  font-family: var(--font-display), var(--font-serif), serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.2;
+}
+.ps-desc {
   font-size: 0.94rem;
   line-height: 1.55;
   color: var(--muted);
-}
-
-@media (min-width: 768px) {
-  .pickup-steps {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2.4rem;
-  }
-  /* the dashed rule is what makes three columns read as one sequence. It lives
-     in the column gap — anchored to the disc it ran straight through the title */
-  .pickup-steps li {
-    position: relative;
-  }
-  .pickup-steps li:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    top: 22px;
-    right: -2.4rem;
-    width: 2.4rem;
-    height: 1.5px;
-    background: repeating-linear-gradient(
-      to right,
-      rgba(33, 26, 20, 0.2) 0 6px,
-      transparent 6px 12px
-    );
-  }
+  margin: 0;
 }
 
 /* the photo-first dish-card grid was tried here and reverted — the list
