@@ -80,22 +80,29 @@ export default function HeroShowcase({
         </div>
       )}
 
-      <div className="hero-card-left">
-        {/* the reference puts the nav inside the panel; the global fixed nav
-            takes over below 1024px so phones keep a sticky Book a Table */}
-        <nav className="hero-nav" aria-label="Main">
-          <Link href="/" className="hero-logo" aria-label="The Pancake Club — home">
-            {/* mark-in-a-disc + wordmark, the lockup the reference nav uses */}
-            <span className="hero-logo-disc" aria-hidden="true"><LogoMark size={19} /></span>
-            <span className="hero-logo-name">The Pancake Club</span>
+      {/* Full-width hero top navigation bar spanning the hero container */}
+      <nav className="hero-nav" aria-label="Main">
+        <Link href="/" className="hero-logo" aria-label="The Pancake Club — home">
+          <span className="hero-logo-disc" aria-hidden="true"><LogoMark size={19} /></span>
+          <span className="hero-logo-name">The Pancake Club</span>
+        </Link>
+        <ul className="hero-nav-links">
+          {NAV.map((l) => (
+            <li key={l.href}><Link href={l.href}>{l.label}</Link></li>
+          ))}
+        </ul>
+        <div className="hero-topbar">
+          <Link href="/menu" className="hero-find">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" strokeLinecap="round" />
+            </svg>
+            Find a stack
           </Link>
-          <ul>
-            {NAV.map((l) => (
-              <li key={l.href}><Link href={l.href}>{l.label}</Link></li>
-            ))}
-          </ul>
-        </nav>
+          <Link href="/menu" className="hero-order">Order Now<ChevronRight className="arrow-icon" size={14} strokeWidth={2.75} /></Link>
+        </div>
+      </nav>
 
+      <div className="hero-card-left">
         <h1>
           {heading}
           {chip && (
@@ -135,16 +142,6 @@ export default function HeroShowcase({
       </div>
 
       <div className="hero-card-right">
-        <div className="hero-topbar">
-          <Link href="/menu" className="hero-find">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
-              <circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" strokeLinecap="round" />
-            </svg>
-            Find a stack
-          </Link>
-          <Link href="/menu" className="hero-order">Order Now<ChevronRight className="arrow-icon" size={14} strokeWidth={2.75} /></Link>
-        </div>
-
         {current?.price && <span className="hero-price">{current.price}</span>}
       </div>
     </>

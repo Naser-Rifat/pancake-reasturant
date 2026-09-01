@@ -5645,21 +5645,58 @@ h2.title .accent,
   margin-top: 2rem;
 }
 
-/* ---------- Hero Nav Spacing ---------- */
+/* ---------- Full-Width Hero Header Bar with Centered Links ---------- */
 @media (min-width: 1024px) {
   body:has(.hero-nav) .hero-nav {
+    position: absolute;
+    top: 2.2rem;
+    left: 3rem;
+    right: 3rem;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2rem;
-    margin-bottom: 2.4rem !important;
+    pointer-events: auto;
+    margin-bottom: 0 !important;
   }
-  body:has(.hero-nav) .hero-nav ul {
+  body:has(.hero-nav) .hero-nav-links {
     display: flex;
     align-items: center;
-    gap: 1.6rem;
-    margin: 0;
+    gap: 2.2rem;
+    margin: 0 auto;
     padding: 0;
     list-style: none;
+    font-weight: 800;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  body:has(.hero-nav) .hero-nav-links a {
+    color: var(--cream);
+    transition: opacity 0.2s ease;
+  }
+  body:has(.hero-nav) .hero-nav-links a:hover {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+  body:has(.hero-nav) .hero-topbar {
+    position: static !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    inset: auto !important;
+  }
+  body:has(.hero-nav) .hero-card-left {
+    padding-top: clamp(6.2rem, 11vh, 7.8rem) !important;
+  }
+}
+@media (min-width: 1024px) and (max-height: 899px) {
+  body:has(.hero-nav) .hero-nav {
+    top: 1.8rem;
+    left: 2.4rem;
+    right: 2.4rem;
+  }
+  body:has(.hero-nav) .hero-card-left {
+    padding-top: clamp(5.4rem, 9.5vh, 6.8rem) !important;
   }
 }
