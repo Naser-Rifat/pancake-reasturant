@@ -15,9 +15,15 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
     date: "",
     time: "",
     party_size: 2,
-    preselected_dish: "",
     notes: "",
   });
+  // several favourites, not one — joined into the booking's text field on submit
+  const [dishes, setDishes] = useState<string[]>([]);
+  // past this many dishes the chip wall would push the form apart — collapse the tail
+  const CHIP_LIMIT = 8;
+  const [showAllDishes, setShowAllDishes] = useState(false);
+  const toggleDish = (label: string) =>
+    setDishes((d) => (d.includes(label) ? d.filter((x) => x !== label) : [...d, label]));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [booking, setBooking] = useState<ApiBooking | null>(null);
@@ -32,7 +38,11 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
     setSubmitting(true);
     try {
       setBooking(
-        await createBooking({ ...form, party_size: Number(form.party_size) })
+        await createBooking({
+          ...form,
+          party_size: Number(form.party_size),
+          preselected_dish: dishes.join(", "),
+        })
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong — please try again.");
@@ -48,7 +58,7 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
         <b>Request received, {form.name.split(" ")[0]}!</b>
         <span>
           {booking.date} at {booking.time.slice(0, 5)} for {booking.party_size}
-          {form.preselected_dish ? ` (${form.preselected_dish})` : ""} — we&apos;ll
+          {dishes.length > 0 ? ` (${dishes.join(", ")})` : ""} — we&apos;ll
           email {form.email} as soon as it&apos;s confirmed.
         </span>
       </div>
@@ -70,19 +80,38 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
         ))}
       </select>
       {menuItems.length > 0 && (
-        <select
-          className="input"
-          value={form.preselected_dish}
-          onChange={set("preselected_dish")}
-          aria-label="Pre-select dish or favourite stack"
-        >
-          <option value="">🥞 Pre-select favourite pancake / dish (optional)</option>
-          {menuItems.map((item) => (
-            <option key={item.slug} value={`${item.name} ($${item.price})`}>
-              {item.name} — ${item.price}
-            </option>
-          ))}
-        </select>
+        <fieldset className="bk-dishes">
+          {/* toggle chips, not a multiple <select>: several favourites should be
+              one tap each, and native multi-selects need ctrl-click */}
+          <legend>🥞 Pre-select favourites (optional{dishes.length > 0 ? ` · ${dishes.length} picked` : ""})</legend>
+          <div className="bk-dish-chips">
+            {(showAllDishes ? menuItems : menuItems.slice(0, CHIP_LIMIT)).map((item) => {
+              const label = `${item.name} ($${item.price})`;
+              const on = dishes.includes(label);
+              return (
+                <button
+                  type="button"
+                  key={item.slug}
+                  className={`bk-dish-chip${on ? " on" : ""}`}
+                  aria-pressed={on}
+                  onClick={() => toggleDish(label)}
+                >
+                  {on ? "✓ " : ""}{item.name} — ${item.price}
+                </button>
+              );
+            })}
+            {menuItems.length > CHIP_LIMIT && (
+              <button
+                type="button"
+                className="bk-dish-chip bk-dish-more"
+                aria-expanded={showAllDishes}
+                onClick={() => setShowAllDishes((v) => !v)}
+              >
+                {showAllDishes ? "Show less" : `+ Show all (${menuItems.length})`}
+              </button>
+            )}
+          </div>
+        </fieldset>
       )}
       <textarea className="input" rows={2} placeholder="Anything we should know? Special requests or dietary needs (optional)" value={form.notes} onChange={set("notes")} />
       {error && <p className="form-error" role="alert">{error}</p>}

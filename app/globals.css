@@ -892,7 +892,9 @@ h2.title .accent {
 .cta {
   background: var(--pink);
   text-align: center;
-  padding: 4.5rem 0;
+  /* asymmetric on purpose: the display face carries ~76px of head bearing, so
+     equal paddings measured 148px above the heading and 76px below the button */
+  padding: 2.2rem 0 6.6rem;
   border-radius: var(--radius-xl);
   width: min(1400px, 96%);
   margin: 0 auto 4rem;
@@ -931,6 +933,7 @@ h2.title .accent {
   font-size: 1.1rem;
   margin: 1.4rem auto 2.2rem;
   max-width: 34rem;
+  text-wrap: balance;
 }
 
 /* ---------- footer ---------- */
@@ -2201,7 +2204,29 @@ h2.title.inline .accent {
   scroll-snap-type: x mandatory;
   padding: 0.5rem 0.2rem 1.4rem;
   scrollbar-width: none;
+  /* 3.64 cards fit the rail, so one card is always cut mid-sentence; a soft
+     fade at the edges reads as "more this way" instead of a broken clip. The
+     component sets data-at-start/data-at-end so a fade never dims a resting
+     edge with nothing behind it. */
+  --fade-l: 56px;
+  --fade-r: 64px;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--fade-l),
+    #000 calc(100% - var(--fade-r)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--fade-l),
+    #000 calc(100% - var(--fade-r)),
+    transparent 100%
+  );
 }
+.rev-track[data-at-start="true"] { --fade-l: 0px; }
+.rev-track[data-at-end="true"] { --fade-r: 0px; }
 .rev-track::-webkit-scrollbar {
   display: none;
 }
@@ -2284,11 +2309,13 @@ h2.title.inline .accent {
 }
 .cert-badge {
   display: flex;
-  align-items: center;
+  /* top-aligned, not centred: a two-line title used to lift its whole text
+     block 9px above the neighbours' shared line */
+  align-items: flex-start;
   gap: 0.8rem;
   background: var(--cream-card);
   border-radius: 18px;
-  padding: 0.85rem 1.05rem;
+  padding: 0.95rem 1.05rem;
   box-shadow: 0 4px 14px rgba(33, 26, 20, 0.05);
   transition:
     transform 0.25s ease,
@@ -2388,6 +2415,17 @@ h2.title.inline .accent {
   border: 0;
   min-height: 280px;
   flex: 1;
+  /* Google's stock blues and greens were the one cold thing on a warm page;
+     a light sepia pull tucks the map into the palette without hurting labels */
+  filter: sepia(0.3) saturate(0.75) contrast(1.02);
+}
+.map-card:hover iframe {
+  /* full colour when you're actually using it */
+  filter: none;
+  transition: filter 0.3s ease;
+}
+.map-card iframe {
+  transition: filter 0.3s ease;
 }
 
 /* ---------- generic inner-page hero ---------- */
@@ -2769,7 +2807,10 @@ textarea.input {
    ============================================ */
 @media (min-width: 768px) {
   :root {
-    --radius-xl: 60px;
+    /* was 60px: the bands, ticket and footer rounded at 13-16% of their height
+       while the hero row sits hand-tuned at 32px — same page, two families.
+       40 keeps the soft retro feel and stays in step with the hero. */
+    --radius-xl: 40px;
     --frame: 14px;
   }
 
@@ -4486,8 +4527,10 @@ body::before {
 }
 
 .promo-head {
-  font-family: var(--font-round);
-  font-weight: 800;
+  /* every other statement heading moved to the display face; this band's
+     Baloo heading got left behind */
+  font-family: var(--font-display), var(--font-serif), serif;
+  font-weight: 400;
   text-transform: uppercase;
   font-size: clamp(1.4rem, 2.4vw, 2rem);
   line-height: 1.12;
@@ -4508,8 +4551,11 @@ body::before {
   margin-top: 1.3rem;
   padding: 0.85rem 1.7rem;
   border-radius: 999px;
-  border: 2px solid var(--cream);
-  color: var(--cream);
+  /* was a cream outline ghost — the only CTA on the page that wasn't the
+     brand's gold pill */
+  border: none;
+  background: var(--yellow);
+  color: var(--ink);
   font-family: var(--font-round);
   font-weight: 800;
   font-size: 0.85rem;
@@ -4521,7 +4567,7 @@ body::before {
 }
 .promo-cta:hover {
   background: var(--cream);
-  color: var(--deep);
+  color: var(--ink);
 }
 
 .promo-cards {
@@ -4565,6 +4611,9 @@ body::before {
   aspect-ratio: 4 / 5;
   border-radius: 14px;
   overflow: hidden;
+  /* a hairline so a white-background photo doesn't melt into the cream card */
+  border: 1.5px solid rgba(33, 26, 20, 0.1);
+  background: var(--lav-soft);
 }
 .pc-ph img {
   object-fit: cover;
@@ -5336,7 +5385,10 @@ h2.title .accent,
 /* ---------- Floating vertical pagination dots on left edge ---------- */
 .camp-swiper-pagination {
   position: absolute;
-  left: 1.2rem;
+  /* !important: Swiper's own vertical-bullets rule sets `right` and was dragging
+     the dots to the card's right edge, half-buried in the border */
+  left: 1.2rem !important;
+  right: auto !important;
   top: 50%;
   transform: translateY(-50%);
   z-index: 20;
@@ -5384,13 +5436,25 @@ h2.title .accent,
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 240px 1fr;
-  background: var(--deep);
+  /* coupon, not another brown band — the promo band above already owns that
+     ground, and the two blocks were reading as the same module twice */
+  background: var(--cream-card);
   position: relative;
   padding: 1.4rem 1.4rem 1.6rem 3.6rem;
   gap: 1.2rem;
   box-sizing: border-box;
   border-radius: 40px;
 }
+/* the ticket's perforated inner rule */
+.camp-slide::after {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border: 2px dashed rgba(118, 58, 18, 0.4);
+  border-radius: 30px;
+  pointer-events: none;
+}
+.camp-left { z-index: 1; }
 
 /* ---------- left column: inset image ---------- */
 .camp-left {
@@ -5425,13 +5489,11 @@ h2.title .accent,
 /* ---------- decorative signal wave icon matching reference ---------- */
 .camp-deco-icon {
   position: absolute;
-  top: 1.1rem;
-  right: 1.4rem;
   z-index: 3;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.35));
+  color: var(--pink-deep);
 }
 
 /* ---------- right: copy panel ---------- */
@@ -5453,19 +5515,19 @@ h2.title .accent,
   font-size: clamp(1.6rem, 3.2vw, 2.7rem);
   line-height: 1.06;
   letter-spacing: 0.02em;
-  color: #ffffff;
   text-transform: uppercase;
   text-wrap: balance;
   position: relative;
   z-index: 1;
   margin: 0;
+  color: var(--ink);
 }
 
 /* details / subtitle text */
 .camp-details {
   font-size: 0.98rem;
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--muted);
   max-width: 40ch;
   position: relative;
   z-index: 1;
@@ -5482,14 +5544,15 @@ h2.title .accent,
   font-size: 0.7rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #fb923c;
-  padding: 0.25rem 0.7rem;
-  background: rgba(251, 146, 60, 0.12);
-  border: 1px solid rgba(251, 146, 60, 0.2);
-  border-radius: 999px;
+  color: var(--pink-deep);
+  padding: 0.3rem 0.75rem;
+  background: rgba(170, 76, 10, 0.07);
+  border: 1.5px dashed rgba(170, 76, 10, 0.55);
+  border-radius: 8px;
   width: fit-content;
   position: relative;
   z-index: 1;
+  transform: rotate(-2.5deg);
 }
 .camp-urgency::before {
   content: "⏰";
@@ -5531,17 +5594,16 @@ h2.title .accent,
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--deep);
   flex-shrink: 0;
   position: relative;
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
 }
 .camp-cta-dot::after {
   content: "";
   position: absolute;
   inset: -3px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(118, 58, 18, 0.35);
   animation: camp-live-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
@@ -5554,12 +5616,22 @@ h2.title .accent,
   width: 48%;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.36;
-  background-image: url("/botanical-corn-wheat.svg");
-  background-repeat: no-repeat;
-  background-position: right bottom;
-  background-size: contain;
+  opacity: 0.3;
+  background-color: rgba(118, 58, 18, 0.85);
+  -webkit-mask-image: url("/botanical-corn-wheat.svg");
+  mask-image: url("/botanical-corn-wheat.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: right bottom;
+  mask-position: right bottom;
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
+/* the wave seal sits on cream now, not on brown */
+.camp-deco-icon svg { stroke: var(--pink-deep); }
+.camp-deco-icon { filter: none; }
+/* the photo's heavy dark-card shadow, lightened for the ticket */
+.camp-shot { box-shadow: 0 6px 18px rgba(33, 26, 20, 0.16); }
 
 /* ---------- responsive: desktop layout ---------- */
 @media (min-width: 900px) {
@@ -5575,6 +5647,8 @@ h2.title .accent,
   .camp-left {
     grid-row: 1;
     grid-column: 1;
+    /* the photo sat flush on the tear line and buried it */
+    padding-right: 1.5rem;
   }
   .camp-shot {
     height: 100%;
@@ -5585,6 +5659,8 @@ h2.title .accent,
     grid-column: 2;
     padding: 1.5rem 2rem 1.5rem 2.6rem;
     gap: 1rem;
+    /* the tear line between the stub (photo) and the offer */
+    border-left: 2px dashed rgba(33, 26, 20, 0.16);
   }
   .camp-copy h3 {
     font-size: clamp(1.6rem, 2.8vw, 2.4rem);
@@ -5593,8 +5669,12 @@ h2.title .accent,
     font-size: 0.95rem;
   }
   .camp-deco-icon {
-    top: 1rem;
-    left: calc(48% - 18px);
+    display: flex;
+    top: 1.5rem;
+    /* on the tear line itself, blades pointing down the perforation. The line
+       sits at padding-left + 48% of the content box, not at 48% of the card. */
+    left: calc(4rem + (100% - 4rem - 1.6rem) * 0.48);
+    transform: translateX(-50%) rotate(90deg);
     right: auto;
   }
   .camp-botanical {
@@ -5614,6 +5694,9 @@ h2.title .accent,
   }
   .camp-copy {
     padding: 1.8rem 2.6rem 1.8rem 3.2rem;
+  }
+  .camp-deco-icon {
+    left: calc(4.4rem + (100% - 4.4rem - 1.8rem) * 0.48);
   }
   .camp-copy h3 {
     font-size: clamp(2rem, 3.6vw, 3rem);
@@ -5788,4 +5871,130 @@ h2.title .accent,
 body:has(.hero-nav) .hero-card-left h1 .script {
   display: block;
   margin-top: 0.12em;
+}
+
+/* The gold pill sat on the orange band at 1.61:1 — the page's closing CTA was
+   camouflaged in its own section. Ink is the established alternative (menu
+   cards) wherever the ground itself is warm. */
+.cta .btn-primary {
+  background: var(--ink);
+  color: var(--cream);
+}
+.cta .btn-primary:hover {
+  background: var(--deep);
+  color: var(--cream);
+}
+
+/* .btn-secondary had no rule at all — its look lived in an inline Uber-green
+   that measured 2.38:1 under white text. On the dark footer the secondary
+   action is a cream ghost beside the gold primary. */
+footer .btn-secondary {
+  background: transparent;
+  border: 2px solid rgba(248, 242, 224, 0.7);
+  color: var(--cream);
+}
+footer .btn-secondary:hover {
+  background: var(--cream);
+  border-color: var(--cream);
+  color: var(--ink);
+}
+
+/* ---- footer: editorial split ----
+   brand block left, directory right; replaces the flat grid whose Visit column
+   ended half-way up, leaving a dead zone with the buttons stranded far right */
+.footer-split { display: grid; gap: 2.6rem; }
+.f-brand-logo {
+  display: block;
+  width: 220px;
+  aspect-ratio: 529 / 226;
+  background: var(--cream);
+  -webkit-mask: url("/logo.png") no-repeat center / contain;
+  mask: url("/logo.png") no-repeat center / contain;
+  margin-bottom: 1rem;
+}
+.f-brand-tag { color: #cfc5b3; font-size: 0.95rem; line-height: 1.5; max-width: 26ch; }
+.f-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.5rem; }
+
+@media (min-width: 900px) {
+  .footer-split { grid-template-columns: 1.05fr 2fr; gap: 4rem; align-items: start; }
+}
+
+.f-brand-mark { display: block; margin-bottom: 0.9rem; line-height: 0; }
+
+/* ---- booking: favourite-dish toggle chips ----
+   replaces the single <select>; each tap adds or removes one favourite */
+.bk-dishes { border: none; padding: 0; margin: 0; }
+.bk-dishes legend {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+.bk-dish-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.bk-dish-chip {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--cream-card);
+  border: 1.5px solid rgba(33, 26, 20, 0.18);
+  border-radius: 999px;
+  padding: 0.5rem 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+.bk-dish-chip:hover { border-color: var(--ink); transform: translateY(-1px); }
+.bk-dish-chip.on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--cream);
+}
+
+.bk-dish-more { border-style: dashed; color: var(--muted); background: transparent; }
+.bk-dish-more:hover { color: var(--ink); }
+
+/* ---- sticker character animations ----
+   every shape floats; each kind adds its own slow gesture. Amplitudes stay
+   small and cycles long so they read as alive, not busy. The reduced-motion
+   block's `.stk { animation: none }` already covers all of these. */
+.stk-sparkle {
+  animation:
+    stk-float 7s ease-in-out infinite,
+    stk-twinkle 3.8s ease-in-out infinite;
+}
+@keyframes stk-twinkle {
+  0%, 100% { scale: 1; opacity: 0.9; }
+  50% { scale: 0.8; opacity: 0.55; }
+}
+.stk-ring {
+  animation:
+    stk-float 8s ease-in-out infinite,
+    stk-breathe 5.2s ease-in-out infinite;
+}
+@keyframes stk-breathe {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.14; }
+}
+.stk-squiggle {
+  animation:
+    stk-float 9s ease-in-out infinite,
+    stk-sway 6.4s ease-in-out infinite;
+}
+@keyframes stk-sway {
+  0%, 100% { rotate: -4deg; }
+  50% { rotate: 4deg; }
+}
+/* the certifications strip never had a positioned ground for stickers */
+.certs-strip-sec { position: relative; overflow: hidden; }
+
+/* the per-kind sticker animations above are declared after the main
+   reduced-motion block, so they need their own kill switch */
+@media (prefers-reduced-motion: reduce) {
+  .stk,
+  .stk-sparkle,
+  .stk-ring,
+  .stk-squiggle,
+  .stk-arc {
+    animation: none;
+  }
 }

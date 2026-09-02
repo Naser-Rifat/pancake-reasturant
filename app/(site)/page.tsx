@@ -221,6 +221,7 @@ export default async function Home() {
       {/* ================= CAMPAIGNS ================= */}
       {campaigns.length > 0 && (
         <section className="block band-butter" id="offers">
+          <Sticker kind="sparkle" color="var(--yellow-deep)" size={44} style={{ top: "5rem", left: "4%", transform: "rotate(-10deg)" }} />
           <Sticker
             kind="arc"
             color="var(--pink)"
@@ -375,6 +376,7 @@ export default async function Home() {
       {/* ========== CERTIFICATIONS (FR-06) — quiet trust strip before the CTA ========== */}
       {certs.length > 0 && (
         <section className="certs-strip-sec" id="certifications">
+          <Sticker kind="ring" color="var(--yellow)" size={40} style={{ top: "1.5rem", right: "6%" }} />
           <div className="container">
             <div style={{ textAlign: "center" }}>
               <p className="kicker">Certified &amp; Award-Winning</p>

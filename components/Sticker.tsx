@@ -46,7 +46,7 @@ export default function Sticker({
       viewBox={viewBox}
       width={size}
       height={size * (parseInt(viewBox.split(" ")[3]) / parseInt(viewBox.split(" ")[2]))}
-      className={`stk ${className}`}
+      className={`stk stk-${kind} ${className}`}
       style={{ color, ...style }}
       fill="currentColor"
       aria-hidden="true"

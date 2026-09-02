@@ -219,8 +219,13 @@ export default function BookingsPage() {
                   <TableCell>{b.party_size}</TableCell>
                   <TableCell className="max-w-48 text-muted-foreground">
                     {b.preselected_dish && (
-                      <div className="font-semibold text-primary text-xs mb-0.5">
-                        🥞 {b.preselected_dish}
+                      <div className="mb-1 flex flex-wrap gap-1">
+                        {/* the field holds several comma-separated favourites now */}
+                        {b.preselected_dish.split(", ").map((d) => (
+                          <span key={d} className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium">
+                            🥞 {d}
+                          </span>
+                        ))}
                       </div>
                     )}
                     <div className="text-xs">{b.notes || (!b.preselected_dish ? "—" : "")}</div>

@@ -15,6 +15,29 @@ export default function ReviewsCarousel({ reviews }: { reviews: ApiReview[] }) {
   const scroll = (dir: number) =>
     trackRef.current?.scrollBy({ left: dir * step(), behavior: "smooth" });
 
+  // the edge fades should only show where there IS more to scroll — a fade over
+  // the first card at rest just looks like a rendering bug
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const update = () => {
+      track.dataset.atStart = String(track.scrollLeft < 10);
+      // scroll-snap parks on the last card's START, short of scrollWidth — so
+      // "the last card is fully in view" is the real end condition
+      const last = track.lastElementChild;
+      track.dataset.atEnd = String(
+        !!last && last.getBoundingClientRect().right <= track.getBoundingClientRect().right + 10,
+      );
+    };
+    update();
+    track.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      track.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
   useEffect(() => {
     const id = setInterval(() => {
       const track = trackRef.current;

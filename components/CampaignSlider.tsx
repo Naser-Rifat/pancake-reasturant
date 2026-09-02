@@ -137,20 +137,24 @@ export default function CampaignSlider({
                       </div>
                     </div>
 
-                    {/* Decorative signal wave icon top-center between image and copy matching reference */}
+                    {/* scissors on the tear line — the coupon's own language; the old
+                        signal-wave was drawn for the dark card and read as a stray mark */}
                     <span className="camp-deco-icon" aria-hidden="true">
                       <svg
-                        viewBox="0 0 40 40"
-                        width="40"
-                        height="40"
+                        viewBox="0 0 24 24"
+                        width="26"
+                        height="26"
                         fill="none"
-                        stroke="var(--yellow-deep)"
-                        strokeWidth="3.4"
+                        stroke="currentColor"
+                        strokeWidth="2"
                         strokeLinecap="round"
+                        strokeLinejoin="round"
                       >
-                        <path d="M14 28 C16 22 22 16 28 14" />
-                        <path d="M10 32 C14 20 20 14 32 10" />
-                        <path d="M6 36 C12 16 16 12 36 6" />
+                        <circle cx="6" cy="6" r="3" />
+                        <circle cx="6" cy="18" r="3" />
+                        <path d="M20 4 8.5 15.5" />
+                        <path d="M14.5 9.5 20 20" />
+                        <path d="M8.5 8.5 12 12" />
                       </svg>
                     </span>
 
