@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TableSkeleton } from "@/components/ui/skeleton";
+import { AdminError } from "@/components/ui/admin-error";
 import { ORDER_STATUSES, STATUS_BADGE } from "../status";
 import { useToast } from "@/components/ui/toast";
 
@@ -36,11 +38,13 @@ function newOrderChime() {
 export default function OrdersPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const knownIds = useRef<Set<string> | null>(null);
   const { toast } = useToast();
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (isInitial = false) => {
+    if (isInitial) setLoading(true);
     try {
       // always fetch ALL orders so new ones are detected regardless of filter
       const all = await listOrders();
@@ -59,13 +63,15 @@ export default function OrdersPage() {
       setOrders(all);
       setError("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load");
+      setError(e instanceof Error ? e.message : "Failed to load orders");
+    } finally {
+      setLoading(false);
     }
   }, [toast]);
 
   useEffect(() => {
-    load();
-    const id = setInterval(load, POLL_MS);
+    load(true);
+    const id = setInterval(() => load(false), POLL_MS);
     return () => clearInterval(id);
   }, [load]);
 
@@ -115,7 +121,9 @@ export default function OrdersPage() {
             New orders appear automatically with a chime — checked every 15 seconds
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={load}>Refresh now</Button>
+        <Button variant="outline" size="sm" onClick={() => load(true)}>
+          Refresh now
+        </Button>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -132,61 +140,65 @@ export default function OrdersPage() {
         ))}
       </div>
 
-      {error && <p className="text-sm font-medium text-destructive">{error}</p>}
+      {error && <AdminError message={error} onRetry={() => load(true)} />}
 
       <Card>
         <CardContent className="pt-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Items</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Placed</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Set status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {visible.map((o) => (
-                <TableRow key={o.public_id}>
-                  <TableCell className="font-medium">{o.customer_name}</TableCell>
-                  <TableCell className="text-muted-foreground">{o.phone || o.email || "—"}</TableCell>
-                  <TableCell className="max-w-64 text-muted-foreground">
-                    {o.items.map((i) => `${i.quantity}× ${i.name}`).join(", ")}
-                    {o.status === "cancelled" && o.cancel_reason && (
-                      <div className="text-xs text-destructive">Reason: {o.cancel_reason}</div>
-                    )}
-                  </TableCell>
-                  <TableCell className="font-medium">${o.total}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {new Date(o.created_at).toLocaleString("en-AU", { dateStyle: "short", timeStyle: "short" })}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={STATUS_BADGE[o.status]}>{o.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Select
-                      value={o.status}
-                      onChange={(e) => setStatus(o, e.target.value as AdminOrder["status"])}
-                    >
-                      {ORDER_STATUSES.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </Select>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {visible.length === 0 && (
+          {loading ? (
+            <TableSkeleton rows={6} cols={7} />
+          ) : (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">
-                    No orders{filter !== "all" ? ` with status “${filter}”` : " yet"}
-                  </TableCell>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Items</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead>Placed</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Set status</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {visible.map((o) => (
+                  <TableRow key={o.public_id}>
+                    <TableCell className="font-medium">{o.customer_name}</TableCell>
+                    <TableCell className="text-muted-foreground">{o.phone || o.email || "—"}</TableCell>
+                    <TableCell className="max-w-64 text-muted-foreground">
+                      {o.items.map((i) => `${i.quantity}× ${i.name}`).join(", ")}
+                      {o.status === "cancelled" && o.cancel_reason && (
+                        <div className="text-xs text-destructive">Reason: {o.cancel_reason}</div>
+                      )}
+                    </TableCell>
+                    <TableCell className="font-medium">${o.total}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(o.created_at).toLocaleString("en-AU", { dateStyle: "short", timeStyle: "short" })}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={STATUS_BADGE[o.status]}>{o.status}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Select
+                        value={o.status}
+                        onChange={(e) => setStatus(o, e.target.value as AdminOrder["status"])}
+                      >
+                        {ORDER_STATUSES.map((s) => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </Select>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {visible.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                      No orders{filter !== "all" ? ` with status “${filter}”` : " yet"}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

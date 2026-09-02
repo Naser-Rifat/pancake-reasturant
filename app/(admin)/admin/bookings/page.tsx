@@ -15,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TableSkeleton } from "@/components/ui/skeleton";
+import { AdminError } from "@/components/ui/admin-error";
 import { STATUS_BADGE } from "../status";
 import { useToast } from "@/components/ui/toast";
 
@@ -33,6 +35,7 @@ const EMPTY_PHONE_BOOKING = {
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<AdminBooking[]>([]);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState(EMPTY_PHONE_BOOKING);
@@ -40,9 +43,15 @@ export default function BookingsPage() {
   const { toast } = useToast();
 
   const load = useCallback(() => {
+    setLoading(true);
+    setError("");
     listBookings(filter === "all" ? undefined : filter)
-      .then(setBookings)
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"));
+      .then((res) => {
+        setBookings(res);
+        setError("");
+      })
+      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load bookings"))
+      .finally(() => setLoading(false));
   }, [filter]);
 
   useEffect(load, [load]);
@@ -118,7 +127,7 @@ export default function BookingsPage() {
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={load}>Refresh</Button>
           <Button size="sm" onClick={() => { setAdding(true); setError(""); }}>
-            <Phone /> Add phone booking
+            <Phone className="mr-1 h-4 w-4" /> Add phone booking
           </Button>
         </div>
       </div>
@@ -126,37 +135,41 @@ export default function BookingsPage() {
       {adding && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Phone booking</CardTitle>
-            <Button variant="ghost" size="icon" onClick={() => setAdding(false)} aria-label="Close form">
-              <X />
-            </Button>
+            <CardTitle>New Phone Booking</CardTitle>
+            <button
+              onClick={() => setAdding(false)}
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="Close form"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </CardHeader>
           <CardContent>
             <form onSubmit={submitPhoneBooking} className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-1.5">
                 <Label htmlFor="pb-name">Guest name *</Label>
-                <Input id="pb-name" required value={form.name} onChange={set("name")} />
+                <Input id="pb-name" required value={form.name} onChange={set("name")} placeholder="Jane Doe" />
               </div>
               <div className="grid gap-1.5">
-                <Label htmlFor="pb-phone">Phone *</Label>
-                <Input id="pb-phone" required inputMode="tel" value={form.phone} onChange={set("phone")} />
+                <Label htmlFor="pb-phone">Phone number *</Label>
+                <Input id="pb-phone" required type="tel" value={form.phone} onChange={set("phone")} placeholder="0412 345 678" />
               </div>
-              <div className="grid gap-1.5 sm:col-span-2">
-                <Label htmlFor="pb-email">Email (optional — gets the confirmation email)</Label>
-                <Input id="pb-email" type="email" value={form.email} onChange={set("email")} />
+              <div className="grid gap-1.5">
+                <Label htmlFor="pb-email">Email (optional, sends confirmation)</Label>
+                <Input id="pb-email" type="email" value={form.email} onChange={set("email")} placeholder="jane@example.com" />
               </div>
               <div className="grid gap-1.5">
                 <Label htmlFor="pb-date">Date *</Label>
-                <Input id="pb-date" type="date" required value={form.date} onChange={set("date")} />
+                <Input id="pb-date" required type="date" value={form.date} onChange={set("date")} />
               </div>
               <div className="grid gap-1.5">
                 <Label htmlFor="pb-time">Time *</Label>
-                <Input id="pb-time" type="time" required value={form.time} onChange={set("time")} />
+                <Input id="pb-time" required type="time" value={form.time} onChange={set("time")} />
               </div>
               <div className="grid gap-1.5">
-                <Label htmlFor="pb-party">Party size</Label>
-                <Select id="pb-party" className="h-9" value={form.party_size} onChange={set("party_size")}>
-                  {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
+                <Label htmlFor="pb-party">Party size *</Label>
+                <Select id="pb-party" value={form.party_size} onChange={set("party_size")}>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20].map((n) => (
                     <option key={n} value={n}>{n}</option>
                   ))}
                 </Select>
@@ -189,73 +202,77 @@ export default function BookingsPage() {
         ))}
       </div>
 
-      {error && <p className="text-sm font-medium text-destructive">{error}</p>}
+      {error && <AdminError message={error} onRetry={load} />}
 
       <Card>
         <CardContent className="pt-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Guest</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Time</TableHead>
-                <TableHead>Party</TableHead>
-                <TableHead>Notes</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {bookings.map((b) => (
-                <TableRow key={b.public_id}>
-                  <TableCell className="font-medium">{b.name}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    <div>{b.email}</div>
-                    {b.phone && <div>{b.phone}</div>}
-                  </TableCell>
-                  <TableCell>{b.date}</TableCell>
-                  <TableCell>{b.time.slice(0, 5)}</TableCell>
-                  <TableCell>{b.party_size}</TableCell>
-                  <TableCell className="max-w-48 text-muted-foreground">
-                    {b.preselected_dish && (
-                      <div className="mb-1 flex flex-wrap gap-1">
-                        {/* the field holds several comma-separated favourites now */}
-                        {b.preselected_dish.split(", ").map((d) => (
-                          <span key={d} className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium">
-                            🥞 {d}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <div className="text-xs">{b.notes || (!b.preselected_dish ? "—" : "")}</div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={STATUS_BADGE[b.status]}>{b.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      {b.status !== "confirmed" && (
-                        <Button size="sm" onClick={() => setStatus(b, "confirmed")}>Confirm</Button>
-                      )}
-                      {b.status !== "cancelled" && (
-                        <Button size="sm" variant="destructive" onClick={() => setStatus(b, "cancelled")}>
-                          Cancel
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {bookings.length === 0 && (
+          {loading ? (
+            <TableSkeleton rows={6} cols={8} />
+          ) : (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center text-muted-foreground">
-                    No bookings{filter !== "all" ? ` with status “${filter}”` : " yet"}
-                  </TableCell>
+                  <TableHead>Guest</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Time</TableHead>
+                  <TableHead>Party</TableHead>
+                  <TableHead>Notes</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {bookings.map((b) => (
+                  <TableRow key={b.public_id}>
+                    <TableCell className="font-medium">{b.name}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      <div>{b.email}</div>
+                      {b.phone && <div>{b.phone}</div>}
+                    </TableCell>
+                    <TableCell>{b.date}</TableCell>
+                    <TableCell>{b.time.slice(0, 5)}</TableCell>
+                    <TableCell>{b.party_size}</TableCell>
+                    <TableCell className="max-w-48 text-muted-foreground">
+                      {b.preselected_dish && (
+                        <div className="mb-1 flex flex-wrap gap-1">
+                          {/* the field holds several comma-separated favourites now */}
+                          {b.preselected_dish.split(", ").map((d) => (
+                            <span key={d} className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium">
+                              🥞 {d}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <div className="text-xs">{b.notes || (!b.preselected_dish ? "—" : "")}</div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={STATUS_BADGE[b.status]}>{b.status}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        {b.status !== "confirmed" && (
+                          <Button size="sm" onClick={() => setStatus(b, "confirmed")}>Confirm</Button>
+                        )}
+                        {b.status !== "cancelled" && (
+                          <Button size="sm" variant="destructive" onClick={() => setStatus(b, "cancelled")}>
+                            Cancel
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {bookings.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                      No bookings{filter !== "all" ? ` with status “${filter}”` : " yet"}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Plus, Trash2 } from "lucide-react";
 import {
@@ -35,6 +35,8 @@ import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadButton } from "@/components/ui/upload-button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AdminError } from "@/components/ui/admin-error";
 import { useToast, type ToastInput } from "@/components/ui/toast";
 import { CERT_ICONS } from "@/components/CertIcon";
 import { ImageField } from "@/components/ui/image-field";
@@ -58,8 +60,6 @@ const fromLocalInput = (value: string) => (value ? new Date(value).toISOString()
 
 export default function ContentPage() {
   const [site, setSite] = useState<AdminSiteSettings | null>(null);
-  // the home page runs campaigns as a slider, so this is a list now; the form
-  // below still edits one at a time through the shim under it
   const [announcements, setAnnouncements] = useState<AdminAnnouncement[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [certs, setCerts] = useState<AdminCertification[]>([]);
@@ -67,11 +67,14 @@ export default function ContentPage() {
   const [newPhoto, setNewPhoto] = useState(EMPTY_PHOTO);
   const [newCert, setNewCert] = useState(EMPTY_CERT);
   const [steps, setSteps] = useState<AdminHomeStep[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
   const { toast } = useToast();
 
-  useEffect(() => {
+  const load = useCallback(() => {
+    setLoading(true);
+    setError("");
     Promise.all([getSiteSettings(), listAnnouncements(), listCertifications(), listGalleryAdmin(), listHomeSteps()])
       .then(([s, anns, cs, ps, st]) => {
         setSite(s);
@@ -80,9 +83,15 @@ export default function ContentPage() {
         setCerts(cs);
         setPhotos(ps);
         setSteps(st);
+        setError("");
       })
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"));
+      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load content settings"))
+      .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const announcement =
     announcements.find((a) => a.id === selectedId) ?? announcements[0] ?? null;
@@ -113,7 +122,48 @@ export default function ContentPage() {
     }
   };
 
-  if (!site) return error ? <p className="text-sm font-medium text-destructive">{error}</p> : null;
+  if (loading) {
+    return (
+      <div className="grid gap-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Site content</h1>
+          <p className="text-sm text-muted-foreground">
+            Everything shown on the public website — changes go live immediately
+          </p>
+        </div>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-4 w-72" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-24 w-full sm:col-span-2" />
+              <Skeleton className="h-48 w-full sm:col-span-2" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error && !site) {
+    return (
+      <div className="grid gap-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Site content</h1>
+          <p className="text-sm text-muted-foreground">
+            Everything shown on the public website — changes go live immediately
+          </p>
+        </div>
+        <AdminError message={error} onRetry={load} />
+      </div>
+    );
+  }
+
+  if (!site) return null;
 
   const setS = (key: keyof AdminSiteSettings) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>

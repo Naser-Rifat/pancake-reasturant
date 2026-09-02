@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import {
   createHours,
@@ -17,6 +17,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AdminError } from "@/components/ui/admin-error";
 import { useToast, type ToastInput } from "@/components/ui/toast";
 
 const AU_TIMEZONES = [
@@ -43,18 +45,27 @@ export default function SettingsPage() {
   const [site, setSite] = useState<AdminSiteSettings | null>(null);
   const [hours, setHours] = useState<AdminHours[]>([]);
   const [newRow, setNewRow] = useState(EMPTY_ROW);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
   const { toast } = useToast();
 
-  useEffect(() => {
+  const load = useCallback(() => {
+    setLoading(true);
+    setError("");
     Promise.all([getSiteSettings(), listHoursAdmin()])
       .then(([s, h]) => {
         setSite(s);
         setHours(h);
+        setError("");
       })
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"));
+      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load settings"))
+      .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const run = async (fn: () => Promise<void>, what: string, success?: ToastInput) => {
     setBusy(what);
@@ -72,7 +83,49 @@ export default function SettingsPage() {
     }
   };
 
-  if (!site) return error ? <p className="text-sm font-medium text-destructive">{error}</p> : null;
+  if (loading) {
+    return (
+      <div className="grid gap-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+          <p className="text-sm text-muted-foreground">
+            Business details shown on the website and in customer emails
+          </p>
+        </div>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-4 w-72" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Skeleton className="h-10 w-full sm:col-span-2" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error && !site) {
+    return (
+      <div className="grid gap-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+          <p className="text-sm text-muted-foreground">
+            Business details shown on the website and in customer emails
+          </p>
+        </div>
+        <AdminError message={error} onRetry={load} />
+      </div>
+    );
+  }
+
+  if (!site) return null;
 
   const setS = (key: keyof AdminSiteSettings) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>

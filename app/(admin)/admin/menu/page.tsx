@@ -22,6 +22,8 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast";
+import { TableSkeleton } from "@/components/ui/skeleton";
+import { AdminError } from "@/components/ui/admin-error";
 import PhotoBoard from "@/components/admin/PhotoBoard";
 
 const TAG_LABEL: Record<AdminMenuItem["tag"], string> = {
@@ -53,6 +55,7 @@ const slugify = (s: string) =>
 
 export default function MenuAdminPage() {
   const [items, setItems] = useState<AdminMenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   // null = form closed, "" = adding new, slug = editing that item
   const [editing, setEditing] = useState<string | null>(null);
@@ -86,6 +89,8 @@ export default function MenuAdminPage() {
   };
 
   const load = useCallback(() => {
+    setLoading(true);
+    setError("");
     listMenu()
       .then(async (list) => {
         setItems(list);
@@ -94,7 +99,8 @@ export default function MenuAdminPage() {
         );
         setPhotoCounts(Object.fromEntries(counts));
       })
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"));
+      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load menu items"))
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(load, [load]);
@@ -254,7 +260,7 @@ export default function MenuAdminPage() {
         </Button>
       </div>
 
-      {error && <p className="text-sm font-medium text-destructive">{error}</p>}
+      {error && <AdminError message={error} onRetry={load} />}
 
       {editing !== null && (
         <Card ref={formRef} className="scroll-mt-6">
@@ -409,106 +415,117 @@ export default function MenuAdminPage() {
 
       <Card>
         <CardContent className="pt-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Item</TableHead>
-                <TableHead>Tag</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Photos</TableHead>
-                <TableHead>Available</TableHead>
-                <TableHead>Featured</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {items.map((item) => (
-                <TableRow key={item.slug}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => openEdit(item, true)}
-                        aria-label={`Photos for ${item.name}`}
-                        className="rounded-md transition-transform hover:scale-105"
-                      >
-                        {/* a dish may legitimately have no image yet — never
-                            hand next/image an empty src */}
-                        {item.photo || item.image ? (
-                          <Image
-                            src={item.photo || item.image}
-                            alt=""
-                            width={80}
-                            height={80}
-                            className="h-10 w-10 rounded-md object-cover"
-                          />
-                        ) : (
-                          <span className="grid h-10 w-10 place-items-center rounded-md border border-dashed text-[10px] text-muted-foreground">
-                            add
-                          </span>
-                        )}
-                      </button>
-                      <div>
-                        <div className="font-medium">{item.name}</div>
-                        <div className="max-w-72 truncate text-xs text-muted-foreground">
-                          {item.description}
+          {loading ? (
+            <TableSkeleton rows={6} cols={7} />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Item</TableHead>
+                  <TableHead>Tag</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>Photos</TableHead>
+                  <TableHead>Available</TableHead>
+                  <TableHead>Featured</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {items.map((item) => (
+                  <TableRow key={item.slug}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => openEdit(item, true)}
+                          aria-label={`Photos for ${item.name}`}
+                          className="rounded-md transition-transform hover:scale-105"
+                        >
+                          {/* a dish may legitimately have no image yet — never
+                              hand next/image an empty src */}
+                          {item.photo || item.image ? (
+                            <Image
+                              src={item.photo || item.image}
+                              alt=""
+                              width={80}
+                              height={80}
+                              className="h-10 w-10 rounded-md object-cover"
+                            />
+                          ) : (
+                            <span className="grid h-10 w-10 place-items-center rounded-md border border-dashed text-[10px] text-muted-foreground">
+                              add
+                            </span>
+                          )}
+                        </button>
+                        <div>
+                          <div className="font-medium">{item.name}</div>
+                          <div className="max-w-72 truncate text-xs text-muted-foreground">
+                            {item.description}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{TAG_LABEL[item.tag]}</Badge>
-                  </TableCell>
-                  <TableCell className="font-medium">${item.price}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openEdit(item, true)}
-                      aria-label={`Manage photos for ${item.name}`}
-                    >
-                      <ImageIcon />
-                      {photoCounts[item.slug] ? `${photoCounts[item.slug]} photos` : "Add"}
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <Switch
-                      checked={item.is_available}
-                      onCheckedChange={(v) =>
-                        toggle(
-                          item,
-                          { is_available: v },
-                          v ? `${item.name} is available again` : `${item.name} hidden from the menu`
-                        )
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Switch
-                      checked={item.is_featured}
-                      onCheckedChange={(v) =>
-                        toggle(
-                          item,
-                          { is_featured: v },
-                          v ? `${item.name} featured on the home page` : `${item.name} unfeatured`
-                        )
-                      }
-                    />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button variant="outline" size="sm" onClick={() => openEdit(item)} aria-label={`Edit ${item.name}`}>
-                        <Pencil /> Edit
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">{TAG_LABEL[item.tag]}</Badge>
+                    </TableCell>
+                    <TableCell className="font-medium">${item.price}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openEdit(item, true)}
+                        aria-label={`Manage photos for ${item.name}`}
+                      >
+                        <ImageIcon />
+                        {photoCounts[item.slug] ? `${photoCounts[item.slug]} photos` : "Add"}
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => remove(item)} aria-label={`Delete ${item.name}`}>
-                        <Trash2 className="text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    </TableCell>
+                    <TableCell>
+                      <Switch
+                        checked={item.is_available}
+                        onCheckedChange={(v) =>
+                          toggle(
+                            item,
+                            { is_available: v },
+                            v ? `${item.name} is available again` : `${item.name} hidden from the menu`
+                          )
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Switch
+                        checked={item.is_featured}
+                        onCheckedChange={(v) =>
+                          toggle(
+                            item,
+                            { is_featured: v },
+                            v ? `${item.name} featured on the home page` : `${item.name} unfeatured`
+                          )
+                        }
+                      />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button variant="outline" size="sm" onClick={() => openEdit(item)} aria-label={`Edit ${item.name}`}>
+                          <Pencil /> Edit
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => remove(item)} aria-label={`Delete ${item.name}`}>
+                          <Trash2 className="text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {items.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                      No menu items yet. Click &ldquo;Add item&rdquo; to create one.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
