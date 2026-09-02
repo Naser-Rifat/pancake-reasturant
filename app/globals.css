@@ -5998,3 +5998,74 @@ footer .btn-secondary:hover {
     animation: none;
   }
 }
+
+/* ============================================
+   MOTION PASS — all compositor-only (transform/opacity), so the frame
+   budget is untouched: no layout, no paint, no scroll listeners.
+   Two wrapper shapes exist: gallery/certs carry .reveal on the grid itself,
+   reviews/favourites carry it on a parent — every rule lists both.
+   ============================================ */
+.reveal .rev-card,
+.reveal .fav-card,
+.gallery-mosaic.reveal > a,
+.cert-strip.reveal > .cert-badge {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.55s ease,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.visible .rev-card,
+.reveal.visible .fav-card,
+.gallery-mosaic.reveal.visible > a,
+.cert-strip.reveal.visible > .cert-badge {
+  opacity: 1;
+  transform: none;
+}
+.reveal.visible .rev-card:nth-child(2),
+.reveal.visible .fav-card:nth-child(2),
+.gallery-mosaic.reveal.visible > a:nth-child(2),
+.cert-strip.reveal.visible > .cert-badge:nth-child(2) { transition-delay: 0.07s; }
+.reveal.visible .rev-card:nth-child(3),
+.reveal.visible .fav-card:nth-child(3),
+.gallery-mosaic.reveal.visible > a:nth-child(3),
+.cert-strip.reveal.visible > .cert-badge:nth-child(3) { transition-delay: 0.14s; }
+.reveal.visible .rev-card:nth-child(4),
+.reveal.visible .fav-card:nth-child(4),
+.gallery-mosaic.reveal.visible > a:nth-child(4),
+.cert-strip.reveal.visible > .cert-badge:nth-child(4) { transition-delay: 0.21s; }
+.reveal.visible .rev-card:nth-child(5),
+.reveal.visible .fav-card:nth-child(5),
+.gallery-mosaic.reveal.visible > a:nth-child(5),
+.cert-strip.reveal.visible > .cert-badge:nth-child(5) { transition-delay: 0.28s; }
+.reveal.visible .rev-card:nth-child(n + 6),
+.reveal.visible .fav-card:nth-child(n + 6),
+.gallery-mosaic.reveal.visible > a:nth-child(n + 6),
+.cert-strip.reveal.visible > .cert-badge:nth-child(n + 6) { transition-delay: 0.35s; }
+
+/* the hero photo settles in — a slow one-shot, not an endless zoom */
+@keyframes hero-drift {
+  from { scale: 1.06; }
+  to { scale: 1; }
+}
+body:has(.hero-nav) .hero-bg img { animation: hero-drift 14s ease-out both; }
+
+/* buttons acknowledge the press */
+.btn:active { transform: translateY(1px) scale(0.98); }
+
+/* (the sticky nav already speaks with its pill + drip indicator — a slide-in
+   underline on top of that read as two languages at once, so it was removed) */
+
+/* motion added after the main reduced-motion block needs its own kill switch */
+@media (prefers-reduced-motion: reduce) {
+  .reveal .rev-card,
+  .reveal .fav-card,
+  .gallery-mosaic.reveal > a,
+  .cert-strip.reveal > .cert-badge {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  body:has(.hero-nav) .hero-bg img { animation: none; }
+  .btn:active { transform: none; }
+}

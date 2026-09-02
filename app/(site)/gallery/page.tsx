@@ -5,8 +5,9 @@ import { getGallery } from "@/lib/api";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Gallery | The Pancake Club",
+  title: "Gallery",
   description: "Photos from The Pancake Club — our food, our space, and the good times in between.",
+  alternates: { canonical: "/gallery" },
 };
 
 export default async function GalleryPage() {

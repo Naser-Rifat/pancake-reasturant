@@ -5,9 +5,10 @@ import { getMenu, getSite, telHref } from "@/lib/api";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Book a Table | The Pancake Club",
+  title: "Book a Table",
   description:
     "Book a table at The Pancake Club online — free, instant confirmation, open 7 days. Large groups welcome by phone.",
+  alternates: { canonical: "/booking" },
 };
 
 export default async function BookingPage() {

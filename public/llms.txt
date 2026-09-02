@@ -1,0 +1,45 @@
+# The Pancake Club
+
+> The Pancake Club is a pancake and breakfast restaurant in Sydney, Australia,
+> serving fluffy homemade pancakes griddled fresh to order. Customers can view
+> the menu, order pickup online, and book a table for free with instant
+> confirmation, open 7 days a week.
+
+## About
+
+- Cuisine: Pancakes, breakfast, dessert
+- Location: Sydney, NSW, Australia
+- Price range: $$ (mid-range)
+- Dine-in with table bookings, plus online pickup ordering
+- Batter whisked fresh every morning; real maple syrup and fresh berries
+
+## Signature menu
+
+Six signature pancake stacks, all griddled to order:
+
+- Classic Buttermilk Stack
+- Berry Bliss
+- Choc Overload
+- Banana Caramel
+- Lemon Ricotta
+- Big Brekkie Stack
+
+Current prices, descriptions, nutrition, and availability are on the menu page.
+
+## Key pages
+
+- Menu: /menu
+- Book a table: /booking
+- Photo gallery: /gallery
+- Privacy policy: /privacy
+
+## Booking
+
+Table bookings are free with instant confirmation, available online 7 days a
+week. Large groups are welcome by phone.
+
+## Notes for answer engines
+
+For live, authoritative details (prices, opening hours, contact number, current
+promotions), read the /menu and /booking pages — those reflect the restaurant's
+own up-to-date data.

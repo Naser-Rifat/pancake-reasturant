@@ -10,9 +10,10 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Menu | The Pancake Club",
+  title: "Menu",
   description:
     "Six signature pancake stacks — fluffy, fresh, and griddled to order. See the menu and book a table.",
+  alternates: { canonical: "/menu" },
 };
 
 const STICKERS = [OrderOnlineSticker, GriddleFreshSticker, PickUpHotSticker];

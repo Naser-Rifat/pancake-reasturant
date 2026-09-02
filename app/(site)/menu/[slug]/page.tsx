@@ -16,10 +16,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const { items } = await getMenuWithStatus();
   const item = items.find((i) => i.slug === slug);
-  if (!item) return { title: "Menu | The Pancake Club" };
+  if (!item) return { title: "Menu" };
+  const image = item.photo || item.image;
   return {
-    title: `${item.name} | The Pancake Club`,
+    title: item.name,
     description: `${item.description} $${parseFloat(item.price)} — order pickup or book a table in Sydney.`,
+    alternates: { canonical: `/menu/${item.slug}` },
+    openGraph: {
+      title: `${item.name} | The Pancake Club`,
+      description: item.description,
+      ...(image ? { images: [{ url: image }] } : {}),
+    },
   };
 }
 
@@ -45,7 +52,13 @@ export default async function DishPage({ params }: Props) {
     "@type": "MenuItem",
     name: item.name,
     description: item.description,
-    offers: { "@type": "Offer", price, priceCurrency: "AUD" },
+    ...(item.photo || item.image ? { image: item.photo || item.image } : {}),
+    offers: {
+      "@type": "Offer",
+      price,
+      priceCurrency: "AUD",
+      availability: "https://schema.org/InStock",
+    },
     ...(item.kcal != null && {
       nutrition: { "@type": "NutritionInformation", calories: `${item.kcal} calories` },
     }),
