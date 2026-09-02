@@ -41,6 +41,17 @@ export default function FavouritesRail({
       <div className="fav-head">
         <div className="fav-h">{title}</div>
         <div className="fav-tabs" role="tablist" aria-label="Menu categories">
+          <button
+            role="tab"
+            type="button"
+            aria-selected={tab === "all"}
+            className={`fav-pill all${tab === "all" ? " on" : ""}`}
+            onClick={() => setTab("all")}
+          >
+            <span className="pill-icon">✨</span>
+            <span className="pill-label">All Stacks</span>
+            <span className="n">{items.length}</span>
+          </button>
           {counts.map((c) => (
             <button
               key={c.tag}
@@ -55,17 +66,6 @@ export default function FavouritesRail({
               <span className="n">{c.count}</span>
             </button>
           ))}
-          <button
-            role="tab"
-            type="button"
-            aria-selected={tab === "all"}
-            className={`fav-pill all${tab === "all" ? " on" : ""}`}
-            onClick={() => setTab("all")}
-          >
-            <span className="pill-icon">✨</span>
-            <span className="pill-label">All Stacks</span>
-            <span className="n">{items.length}</span>
-          </button>
         </div>
       </div>
 
@@ -147,8 +147,9 @@ export default function FavouritesRail({
 
       {cta && !subhead && (
         <div className="fav-foot">
-          <Link href={cta.href} className="btn btn-primary">
-            {cta.label}
+          <Link href={cta.href} className="btn btn-primary fav-cta-btn">
+            <span>{cta.label}</span>
+            <ArrowRight size={16} className="fav-foot-arrow" />
           </Link>
         </div>
       )}

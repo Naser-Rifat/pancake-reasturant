@@ -187,62 +187,63 @@ a {
 }
 
 /* ---------- navbar : floating yellow pill ---------- */
+/* ---------- navbar : floating frosted glass pill ---------- */
 /* mobile base: logo + CTA + burger; links live in a dropdown pill */
 .nav {
   position: fixed;
-  inset: 22px 0 auto 0;
+  inset: 16px 0 auto 0;
   z-index: 100;
   display: flex;
   align-items: center;
-  transition: top 0.3s ease;
+  transition: all 0.3s ease;
 }
 .nav-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  background: var(--cream-card);
-  border: 1.5px solid rgba(33, 26, 20, 0.08);
-  border-radius: 26px;
-  padding: 0.8rem 1.6rem;
-  box-shadow: 0 14px 34px rgba(33, 26, 20, 0.16);
+  gap: 0.8rem;
+  background: rgba(254, 250, 240, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(118, 58, 18, 0.12);
+  border-radius: 999px;
+  padding: 0.55rem 1.1rem;
+  box-shadow:
+    0 10px 30px rgba(33, 26, 20, 0.12),
+    0 2px 8px rgba(33, 26, 20, 0.04);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .nav.scrolled .nav-inner {
-  box-shadow: 0 18px 44px rgba(33, 26, 20, 0.28);
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(118, 58, 18, 0.18);
+  box-shadow: 0 14px 40px rgba(33, 26, 20, 0.2);
 }
 .logo {
   font-family: var(--font-round);
   font-weight: 800;
-  font-size: 1.15rem;
-  letter-spacing: 0.01em;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
   color: var(--ink);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   line-height: 1;
+  text-decoration: none;
   white-space: nowrap;
 }
-/* brand chip: the logo shares the nav's gold hue, so it sits on a cream
-   pill (mirroring the CTA button) to keep its own gold icon + orange caps visible */
 .nav .logo {
   padding: 0.2rem 0;
 }
-.nav .logo-word {
-  height: 40px;
-  width: auto;
-}
-
-/* phones: icon-only brand — the full wordmark doesn't fit beside the CTA */
-.nav .logo-word {
-  display: none;
+.logo-brand-text {
+  font-family: var(--font-round), sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.02rem, 3.2vw, 1.15rem);
+  color: var(--ink);
+  letter-spacing: -0.02em;
 }
 .nav .logo-mark {
   display: flex;
-}
-/* the supplied wordmark PNG (public/logo.png) */
-img.logo-word {
-  height: 44px;
-  width: auto;
+  align-items: center;
 }
 
 .nav-links {
@@ -306,47 +307,71 @@ body.has-announce .nav-links {
 .nav-cta {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.6rem;
 }
-.nav-cta .btn {
-  background: var(--pink);
-  color: var(--ink);
-  box-shadow: none;
-  padding: 0.55rem 1.1rem;
-  font-size: 0.7rem;
+
+/* Compact Luxury Nav Book Button */
+.nav-book-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--yellow-deep) !important;
+  color: var(--ink) !important;
+  font-family: var(--font-round), sans-serif;
+  font-weight: 800 !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.03em;
+  padding: 0.45rem 0.95rem !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--ink) !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25) !important;
+  text-decoration: none;
+  transition: all 0.2s ease !important;
 }
-.nav-cta .btn:hover {
-  background: var(--ink);
-  color: var(--cream);
-  transform: translateY(-2px);
+.nav-book-btn:hover {
+  transform: scale(1.04) translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35) !important;
+}
+.nav-btn-arrow {
+  font-size: 0.85rem;
+  font-weight: 900;
 }
 
 .burger-toggle {
   display: flex;
-  background: none;
+  background: rgba(33, 26, 20, 0.06);
   border: none;
+  border-radius: 50%;
   cursor: pointer;
   flex-direction: column;
-  gap: 5px;
-  padding: 6px;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+.burger-toggle:hover {
+  background: rgba(33, 26, 20, 0.12);
 }
 .burger-toggle span {
-  width: 26px;
-  height: 3px;
+  width: 18px;
+  height: 2.2px;
   background: var(--ink);
-  border-radius: 3px;
+  border-radius: 2px;
   transition:
     transform 0.25s,
     opacity 0.25s;
 }
 .burger-toggle.open span:nth-child(1) {
-  transform: translateY(8px) rotate(45deg);
+  transform: translateY(6.2px) rotate(45deg);
 }
 .burger-toggle.open span:nth-child(2) {
   opacity: 0;
 }
 .burger-toggle.open span:nth-child(3) {
-  transform: translateY(-8px) rotate(-45deg);
+  transform: translateY(-6.2px) rotate(-45deg);
 }
 
 /* ---------- hero : two rounded cards + spinning badge ---------- */
@@ -2132,13 +2157,15 @@ h2.title.inline .accent {
   margin-top: 2rem;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-auto-rows: 160px;
+  grid-auto-rows: 170px;
   gap: 16px;
   position: relative;
 }
-/* the first photo leads: full width on phones, a 2×2 block from tablet up.
-   the last one widens too, so the wall never ends on a lonely half-row */
-.gallery-mosaic > a:first-child,
+/* the first photo leads: 2x2 hero block on mobile and desktop */
+.gallery-mosaic > a:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
 .gallery-mosaic > a:last-child {
   grid-column: span 2;
 }
@@ -2249,24 +2276,27 @@ h2.title.inline .accent {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.6rem;
   padding-top: 0.55rem;
   padding-inline: 0.3rem;
+  flex-wrap: wrap;
 }
 .mosaic-hero-caption {
   font-family: var(--font-script), cursive;
-  font-size: 1.25rem;
+  font-size: clamp(1.05rem, 3.8vw, 1.3rem);
   color: var(--ink);
   line-height: 1.2;
   margin: 0;
   transform: rotate(-0.5deg);
 }
 .mosaic-hero-tag {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-family: var(--font-body), sans-serif;
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .gallery-grid {
@@ -2712,6 +2742,7 @@ h2.title.inline .accent {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.6rem;
   margin-bottom: 1.2rem;
   border-bottom: 1.5px dashed rgba(33, 26, 20, 0.12);
   padding-bottom: 0.8rem;
@@ -2720,21 +2751,25 @@ h2.title.inline .accent {
 .hours-card-top h3 {
   font-family: var(--font-round), sans-serif;
   font-weight: 800;
-  font-size: 1.3rem;
+  font-size: clamp(1.05rem, 4.2vw, 1.25rem);
   color: var(--ink);
   margin: 0;
+  white-space: nowrap;
 }
 
 .hours-card-badge {
   font-family: var(--font-round), sans-serif;
   font-weight: 800;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   background: rgba(245, 158, 11, 0.12);
   color: var(--ink);
-  padding: 0.25rem 0.65rem;
+  padding: 0.22rem 0.55rem;
   border-radius: 999px;
   border: 1px dashed rgba(118, 58, 18, 0.2);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .hours-list {
@@ -2796,11 +2831,13 @@ h2.title.inline .accent {
 .contact-link {
   color: var(--pink-deep);
   font-weight: 700;
-  text-decoration: underline;
-  transition: color 0.15s ease;
+  text-decoration: none;
+  border-bottom: 1.5px dotted var(--pink-deep);
+  transition: all 0.15s ease;
 }
 .contact-link:hover {
   color: var(--ink);
+  border-bottom-color: var(--ink);
 }
 
 .transit-badges {
@@ -2820,6 +2857,23 @@ h2.title.inline .accent {
   border: 1px solid rgba(33, 26, 20, 0.12);
   border-radius: 999px;
   padding: 0.22rem 0.65rem;
+}
+
+@media (max-width: 640px) {
+  .diner-hours-card {
+    padding: 1.5rem 1.2rem;
+    border-radius: 20px;
+  }
+  .diner-find-box {
+    padding: 1.1rem 1rem;
+    border-radius: 16px;
+  }
+  .hours-list li {
+    font-size: 0.88rem;
+  }
+  .hours-time {
+    font-size: 0.86rem;
+  }
 }
 
 /* ---------- Diner Map Card ---------- */
@@ -3338,12 +3392,6 @@ textarea.input {
    ≥ 640px — large phones / small tablets
    ============================================ */
 @media (min-width: 640px) {
-  .nav .logo-word {
-    display: block;
-  }
-  .nav .logo-mark {
-    display: none;
-  } /* wordmark carries its own icon in the A */
   .hero-card-right {
     height: 320px;
   }
@@ -4115,18 +4163,27 @@ body::before {
   color: var(--muted);
   font-weight: 500;
 }
-.fav-foot {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1.6rem;
-}
-
 /* category count pills — click to filter the rail */
 .fav-tabs {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   gap: 0.65rem;
+  padding: 0.2rem 0.2rem 0.5rem;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
+.fav-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .fav-tabs {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
 .fav-pill {
   display: inline-flex;
   align-items: center;
@@ -4143,6 +4200,8 @@ body::before {
   padding: 0.45rem 0.55rem 0.45rem 1rem;
   cursor: pointer;
   transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .fav-pill:hover {
   transform: translateY(-2px);
@@ -4403,6 +4462,55 @@ body::before {
 
 .fav-diner-card:hover .fav-arrow {
   transform: translateX(5px);
+}
+
+/* ---------- Featured Rail Footer CTA Button ---------- */
+.fav-foot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2.8rem;
+}
+
+.fav-cta-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.6rem !important;
+  padding: 0.85rem 2.4rem !important;
+  font-family: var(--font-round), sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  border-radius: 999px !important;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35) !important;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.fav-cta-btn:hover {
+  transform: translateY(-3px) scale(1.02) !important;
+  box-shadow: 0 14px 32px rgba(245, 158, 11, 0.45) !important;
+}
+
+.fav-foot-arrow {
+  transition: transform 0.22s ease;
+}
+
+.fav-cta-btn:hover .fav-foot-arrow {
+  transform: translateX(4px);
+}
+
+@media (max-width: 640px) {
+  .fav-foot {
+    margin-top: 2rem;
+    width: 100%;
+  }
+  .fav-cta-btn {
+    width: 100% !important;
+    max-width: 22rem !important;
+    justify-content: center !important;
+    padding: 0.9rem 1.6rem !important;
+  }
 }
 
 /* ===================================================================
@@ -5604,6 +5712,83 @@ body::before {
   text-align: center;
 }
 
+@media (max-width: 959px) {
+  .promo-band {
+    padding: 2.2rem 1.1rem !important;
+    border-radius: 28px !important;
+    gap: 1.4rem !important;
+    text-align: center !important;
+  }
+  .promo-starburst-badge {
+    width: 92px !important;
+    height: 92px !important;
+  }
+  .starburst-center {
+    width: 62px !important;
+    height: 62px !important;
+  }
+  .starburst-icon {
+    font-size: 0.95rem !important;
+  }
+  .starburst-big {
+    font-size: 0.8rem !important;
+  }
+  .starburst-small {
+    font-size: 0.52rem !important;
+  }
+  .promo-main {
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .promo-kicker {
+    font-size: 0.74rem !important;
+  }
+  .promo-head {
+    font-size: clamp(1.25rem, 5.2vw, 1.7rem) !important;
+    line-height: 1.2 !important;
+  }
+  .promo-cta-btn {
+    align-self: center !important;
+    margin-top: 0.4rem !important;
+    padding: 0.75rem 1.6rem !important;
+    font-size: 0.84rem !important;
+  }
+  .promo-cards {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    max-width: 380px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+  .promo-ticket-card {
+    flex: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 0.65rem 0.55rem 0.75rem !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+  }
+  .promo-ticket-card.tilt-card {
+    transform: none !important;
+  }
+  .ticket-top-tag {
+    font-size: 0.68rem !important;
+  }
+  .ticket-dish-title {
+    font-size: 0.76rem !important;
+    line-height: 1.25 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    height: 2.5em !important;
+  }
+}
+
 /* The filter pills cycle through three decorative tints and the selected one
    turned orange — four different hues, so "which is on?" was a guess. State
    now reads as state: the active pill is the only dark one. */
@@ -5964,9 +6149,10 @@ body:has(.wa-float) .footer-bottom {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 1.2rem;
+  gap: 0.8rem;
   border-bottom: 1px dashed rgba(248, 242, 224, 0.08);
-  padding-bottom: 0.4rem;
+  padding-bottom: 0.45rem;
+  width: 100%;
 }
 .f-hours-item:last-child {
   border-bottom: none;
@@ -5976,13 +6162,13 @@ body:has(.wa-float) .footer-bottom {
 .f-day-label {
   color: #e2dac9;
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: clamp(0.82rem, 3.4vw, 0.88rem);
   white-space: nowrap;
 }
 
 .f-time-label {
   color: #cfc5b3;
-  font-size: 0.86rem;
+  font-size: clamp(0.8rem, 3.2vw, 0.86rem);
   white-space: nowrap;
 }
 
@@ -5990,7 +6176,7 @@ body:has(.wa-float) .footer-bottom {
 .f-explore-list {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.65rem;
   list-style: none;
   padding: 0;
   margin: 0;
@@ -6046,6 +6232,73 @@ body:has(.wa-float) .footer-bottom {
   color: var(--ink);
   border-color: var(--yellow);
   transform: translateY(-2px);
+}
+
+/* ---------- Mobile Layout: Perfect Unified Left-Alignment ---------- */
+@media (max-width: 639px) {
+  .site-footer {
+    padding: 4.8rem 0 2.2rem;
+  }
+  .footer-master-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2.2rem;
+    text-align: left;
+    align-items: stretch;
+  }
+  .f-col {
+    align-items: flex-start;
+    text-align: left;
+    width: 100%;
+  }
+  .f-col-brand .f-brand-logo {
+    width: 185px;
+    margin-bottom: 0.8rem;
+  }
+  .f-brand-tag {
+    font-size: 0.9rem;
+    max-width: 32ch;
+    margin: 0;
+  }
+  .f-actions {
+    justify-content: flex-start;
+    margin-top: 1.2rem;
+    gap: 0.75rem;
+  }
+  .f-actions .f-cta-btn {
+    padding: 0.65rem 1.3rem !important;
+    font-size: 0.8rem !important;
+  }
+  .f-col-title {
+    margin: 0 0 0.9rem 0;
+    font-size: 0.82rem;
+    text-align: left;
+  }
+  .f-hours-list {
+    width: 100%;
+  }
+  .f-hours-item {
+    gap: 0.4rem;
+    padding-bottom: 0.5rem;
+  }
+  .f-explore-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.7rem 1.4rem;
+    width: 100%;
+  }
+  .footer-bottom-bar {
+    margin-top: 2.4rem;
+    padding-top: 1.4rem;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .f-copyright-text {
+    font-size: 0.76rem;
+    line-height: 1.4;
+  }
 }
 
 /* the wordmark shares the columns' rail — one axis, not two */
@@ -6396,68 +6649,100 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
    CTAs pinned to the bottom edge. */
 @media (max-width: 1023px) {
   body:has(.hero-nav) .hero {
-    padding: calc(var(--nav-h) + 0.75rem) 0 1.1rem;
+    padding: calc(var(--nav-h) + 0.6rem) 0 1.2rem;
   }
   body:has(.hero-nav).has-announce .hero {
-    padding-top: calc(var(--nav-h) + 0.75rem + 44px);
+    padding-top: calc(var(--nav-h) + 0.6rem + 44px);
   }
   body:has(.hero-nav) .hero .container.hero-cards {
     display: flex;
-    min-height: calc(100svh - var(--nav-h) - 0.75rem - 1.1rem);
+    min-height: calc(100svh - var(--nav-h) - 1.8rem);
+    border-radius: 32px;
+    overflow: hidden;
   }
   body:has(.hero-nav).has-announce .hero .container.hero-cards {
-    min-height: calc(100svh - var(--nav-h) - 0.75rem - 1.1rem - 44px);
+    min-height: calc(100svh - var(--nav-h) - 1.8rem - 44px);
+  }
+  body:has(.hero-nav) .hero-price {
+    display: none !important;
   }
   body:has(.hero-nav) .hero-card-left {
     flex: 1;
-    padding: 1.8rem 1.3rem 1.4rem;
+    padding: 3.2rem 1.4rem 2rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    justify-content: space-between !important;
   }
   body:has(.hero-nav) .hero-card-left h1 {
-    margin-top: auto;
+    margin: auto 0 0 !important;
     font-family: var(--font-display), var(--font-serif), serif;
     font-weight: 400;
-    font-size: clamp(3.2rem, 13vw, 5rem);
-    line-height: 0.95;
-    letter-spacing: 0.005em;
+    font-size: clamp(2.4rem, 9.5vw, 3.5rem) !important;
+    line-height: 0.96 !important;
+    letter-spacing: 0.01em;
+    text-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
   }
   body:has(.hero-nav) .hero-card-left h1 .script {
     font-family: var(--font-script), cursive;
-    font-size: 0.72em;
+    font-size: 0.76em;
+    margin-top: 0.2rem;
+    color: var(--yellow) !important;
+    text-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
   }
   body:has(.hero-nav) .hero-card-left p.lead {
-    margin: 1rem 0 0;
-    font-size: 1.02rem;
-    max-width: 30ch;
+    margin: 0.75rem auto 0 !important;
+    font-size: 0.92rem !important;
+    line-height: 1.45 !important;
+    max-width: 26ch;
+    color: rgba(248, 242, 224, 0.92) !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   }
   body:has(.hero-nav) .hero-actions {
-    margin-top: auto;
-    padding-top: 1.6rem;
+    margin-top: auto !important;
+    padding-top: 1.4rem !important;
     width: 100%;
+    max-width: 22rem;
+    display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: 0.7rem;
+    align-items: center;
+    gap: 0.8rem;
   }
-  body:has(.hero-nav) .hero-actions .btn {
+  body:has(.hero-nav) .hero-actions .btn-primary {
+    width: 100%;
     justify-content: center;
-    padding-block: 0.95rem;
+    padding: 0.85rem 1.6rem !important;
+    font-size: 0.92rem !important;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4) !important;
+  }
+  body:has(.hero-nav) .hero-actions .btn-ghost {
+    background: transparent !important;
+    border: none !important;
+    color: var(--cream) !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    padding: 0.2rem !important;
+    text-decoration: underline !important;
+    text-underline-offset: 4px !important;
+    opacity: 0.85;
   }
   body:has(.hero-nav) .hero-thumbs {
-    margin: 0.5rem auto 0;
+    margin: 0.6rem auto 0 !important;
+    gap: 0.55rem !important;
   }
-  /* tablets: full-bleed CTAs read as bars — cap the action column */
-  @media (min-width: 640px) {
-    body:has(.hero-nav) .hero-actions {
-      max-width: 27rem;
-      margin-inline: auto;
-    }
+  body:has(.hero-nav) .hero-thumbs button {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 14px !important;
   }
   body:has(.hero-nav) .hero-scrim {
     background: linear-gradient(
       180deg,
-      rgba(26, 17, 9, 0.5) 0%,
-      rgba(26, 17, 9, 0.28) 34%,
-      rgba(26, 17, 9, 0.62) 62%,
-      rgba(26, 17, 9, 0.9) 100%
+      rgba(26, 17, 9, 0.75) 0%,
+      rgba(26, 17, 9, 0.4) 35%,
+      rgba(26, 17, 9, 0.75) 70%,
+      rgba(26, 17, 9, 0.94) 100%
     );
   }
 }
@@ -6873,6 +7158,88 @@ h2.title .accent,
 .camp-deco-icon { filter: none; }
 /* the photo's heavy dark-card shadow, lightened for the ticket */
 .camp-shot { box-shadow: 0 6px 18px rgba(33, 26, 20, 0.16); }
+
+/* ---------- responsive: mobile layout ---------- */
+@media (max-width: 899px) {
+  .camp-swiper {
+    height: 590px !important;
+    border-radius: 28px !important;
+  }
+  .camp-slide {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 1.2rem 1.2rem 1.4rem 2.8rem !important;
+    gap: 0.75rem !important;
+    border-radius: 28px !important;
+    box-sizing: border-box !important;
+  }
+  .camp-slide::after {
+    inset: 6px !important;
+    border-radius: 22px !important;
+  }
+  .camp-swiper-pagination {
+    left: 0.75rem !important;
+    gap: 0.45rem !important;
+  }
+  .camp-vbullet {
+    width: 7px !important;
+    height: 7px !important;
+  }
+  .camp-vbullet.camp-vbullet-active {
+    height: 22px !important;
+  }
+  .camp-left {
+    height: 210px !important;
+    flex-shrink: 0 !important;
+    width: 100% !important;
+  }
+  .camp-shot {
+    border-radius: 20px !important;
+    box-shadow: 0 4px 14px rgba(33, 26, 20, 0.12) !important;
+  }
+  .camp-copy {
+    padding: 0.2rem 0.2rem 0 !important;
+    gap: 0.55rem !important;
+    justify-content: flex-start !important;
+  }
+  .camp-script-eyebrow {
+    font-size: 1.05rem !important;
+    margin-bottom: 0 !important;
+    display: block !important;
+  }
+  .camp-copy h3 {
+    font-size: clamp(1.2rem, 5vw, 1.55rem) !important;
+    line-height: 1.15 !important;
+    margin: 0 !important;
+  }
+  .camp-details {
+    font-size: 0.86rem !important;
+    line-height: 1.4 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+  .camp-diner-note {
+    font-size: 0.74rem !important;
+    padding: 0.22rem 0.65rem !important;
+    margin: 0 !important;
+  }
+  .camp-actions-row {
+    margin-top: 0.2rem !important;
+  }
+  .camp-cta {
+    padding: 0.65rem 1.3rem !important;
+    font-size: 0.8rem !important;
+  }
+  .camp-vintage-stamp {
+    right: 0.4rem !important;
+    bottom: 0.4rem !important;
+    width: 60px !important;
+    height: 60px !important;
+    opacity: 0.08 !important;
+  }
+}
 
 /* ---------- responsive: desktop layout ---------- */
 @media (min-width: 900px) {

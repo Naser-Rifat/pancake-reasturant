@@ -41,8 +41,8 @@ export default function Nav() {
     <header className={`nav${scrolled ? " scrolled" : ""}${pastHero ? " past-hero" : ""}`}>
       <div className="container nav-inner">
         <Link href="/" className="logo" aria-label="The Pancake Club — home">
-          <span className="logo-mark" aria-hidden="true"><LogoMark /></span>
-          <Image src="/logo.png" alt="The Pancake Club" width={529} height={226} priority className="logo-word" />
+          <span className="logo-mark" aria-hidden="true"><LogoMark size={24} /></span>
+          <span className="logo-brand-text">The Pancake Club</span>
         </Link>
 
         <ul className={`nav-links${open ? " open" : ""}`}>
@@ -60,7 +60,10 @@ export default function Nav() {
         </ul>
 
         <div className="nav-cta">
-          <Link href="/booking" className="btn btn-primary">Book a Table</Link>
+          <Link href="/booking" className="btn btn-primary nav-book-btn">
+            <span className="nav-btn-text">Book</span>
+            <span className="nav-btn-arrow">↗</span>
+          </Link>
           <button
             className={`burger-toggle${open ? " open" : ""}`}
             aria-label="Toggle menu"
