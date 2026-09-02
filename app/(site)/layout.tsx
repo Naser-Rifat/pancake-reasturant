@@ -9,6 +9,7 @@ import WhatsAppFloat from "@/components/WhatsAppFloat";
 import ScrollFx from "@/components/ScrollFx";
 import { getAnnouncement, getSite } from "@/lib/api";
 import { customThemeStyle } from "@/lib/theme";
+import { jsonLd } from "@/lib/utils";
 
 const serif = DM_Serif_Display({ weight: "400", subsets: ["latin"], variable: "--font-serif" });
 const script = Pacifico({ weight: "400", subsets: ["latin"], variable: "--font-script" });
@@ -54,7 +55,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       >
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+          dangerouslySetInnerHTML={{ __html: jsonLd(schema) }}
         />
         <Announce data={announcement} />
         <Nav />

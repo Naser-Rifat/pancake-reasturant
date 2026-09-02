@@ -6,6 +6,7 @@ import Marquee from "@/components/Marquee";
 import DishGallery from "@/components/DishGallery";
 import QtyAdd from "@/components/QtyAdd";
 import { TAG_LABEL, getMenuWithStatus, getReviews, getSite, lines, money } from "@/lib/api";
+import { jsonLd } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -52,7 +53,7 @@ export default async function DishPage({ params }: Props) {
 
   return (
     <main className="dish-page">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />
 
       <div className="container">
         <nav className="dish-crumb" aria-label="Breadcrumb">

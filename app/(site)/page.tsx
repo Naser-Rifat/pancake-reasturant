@@ -23,6 +23,7 @@ import {
   getSite,
   telHref,
 } from "@/lib/api";
+import { safeEmbedUrl } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -364,7 +365,7 @@ export default async function Home() {
             <div className="map-card">
               <iframe
                 title="The Pancake Club location map"
-                src={site.map_embed}
+                src={safeEmbedUrl(site.map_embed)}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               ></iframe>
