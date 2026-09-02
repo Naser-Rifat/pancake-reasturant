@@ -2,16 +2,29 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { ZoomIn, Sparkles, Heart } from "lucide-react";
 import type { ApiGalleryPhoto } from "@/lib/api";
 
 type Album = ApiGalleryPhoto["album"];
 
-const ALBUMS: [Album | "all", string][] = [
-  ["all", "All"],
-  ["food", "Food"],
-  ["interior", "Interior"],
-  ["events", "Events"],
+const ALBUMS: { key: Album | "all"; label: string; icon: string }[] = [
+  { key: "all", label: "All Snaps", icon: "✨" },
+  { key: "food", label: "Pancakes & Food", icon: "🥞" },
+  { key: "interior", label: "The Space", icon: "☕" },
+  { key: "events", label: "Good Times", icon: "🎉" },
 ];
+
+const STAMPS = [
+  { text: "100% Fluffy", icon: "🥞", color: "var(--yellow-deep)" },
+  { text: "Fresh Brew", icon: "☕", color: "var(--brown)" },
+  { text: "Sydney Vibes", icon: "✨", color: "var(--pink)" },
+  { text: "Café Mood", icon: "💛", color: "var(--yellow-deep)" },
+  { text: "Sweet Moments", icon: "🍓", color: "var(--pink-deep)" },
+  { text: "Golden Maple", icon: "🍯", color: "var(--yellow-deep)" },
+  { text: "Sizzling Fresh", icon: "🍳", color: "var(--pink)" },
+];
+
+const TAPES = ["tape-center", "tape-left", "tape-right", "tape-pin"];
 
 export default function GalleryClient({ photos }: { photos: ApiGalleryPhoto[] }) {
   const [album, setAlbum] = useState<Album | "all">("all");
@@ -36,46 +49,120 @@ export default function GalleryClient({ photos }: { photos: ApiGalleryPhoto[] })
 
   const photo = current !== null ? visible[current] : null;
 
+  // lock body scroll while the lightbox is open (mobile: prevents the wall scrolling underneath)
+  useEffect(() => {
+    if (current === null) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [current === null]);
+
   return (
     <>
-      <div className="album-tabs">
-        {ALBUMS.map(([key, label]) => (
-          <button
-            key={key}
-            className={`album-tab${album === key ? " active" : ""}`}
-            onClick={() => { setAlbum(key); setCurrent(null); }}
-          >
-            {label}
-          </button>
-        ))}
+      {/* Retro Pastel Filter Tabs */}
+      <div className="album-tabs-wrapper">
+        <div className="album-tabs">
+          {ALBUMS.map(({ key, label, icon }) => {
+            const count = key === "all" ? photos.length : photos.filter((p) => p.album === key).length;
+            return (
+              <button
+                key={key}
+                type="button"
+                className={`album-tab-btn ${album === key ? "active" : ""}`}
+                onClick={() => {
+                  setAlbum(key);
+                  setCurrent(null);
+                }}
+              >
+                <span className="tab-icon">{icon}</span>
+                <span className="tab-label">{label}</span>
+                <span className="tab-count">{count}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <main className="container" style={{ paddingBottom: "6rem" }}>
-        <div className="gallery-grid" style={{ marginTop: "1rem" }}>
-          {visible.map((p, i) => (
-            <a
-              href="#"
-              key={p.image}
-              onClick={(e) => { e.preventDefault(); show(i); }}
-            >
-              <Image
-                src={p.image}
-                alt={p.alt || p.caption}
-                width={700}
-                height={500}
-                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-                priority={i < 4}
-                style={{ objectPosition: `50% ${p.focus === "top" ? "18%" : p.focus === "bottom" ? "82%" : "50%"}` }}
-              />
-            </a>
-          ))}
+      <main className="container polaroid-wall-container" style={{ paddingBottom: "7rem" }}>
+        <div className="polaroid-wall-grid">
+          {visible.map((p, i) => {
+            const stamp = STAMPS[i % STAMPS.length];
+            const tape = TAPES[i % TAPES.length];
+            const rotationClass = `tilt-${(i % 6) + 1}`;
+            const captionText = p.caption || p.alt || "A sweet moment at The Pancake Club";
+
+            return (
+              <div
+                key={p.image + i}
+                className={`polaroid-card-wrapper ${rotationClass}`}
+              >
+                <a
+                  href="#"
+                  className="polaroid-card"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    show(i);
+                  }}
+                  aria-label={`View photo: ${captionText}`}
+                >
+                  {/* Washi Tape Accent */}
+                  <div className={`washi-tape ${tape}`} aria-hidden="true" />
+
+                  {/* Corner Badge / Stamp on selected photos */}
+                  {i % 2 === 0 && (
+                    <div className="polaroid-stamp" aria-hidden="true">
+                      <span>{stamp.icon}</span> {stamp.text}
+                    </div>
+                  )}
+
+                  {/* Photo Frame */}
+                  <div className="polaroid-photo-frame">
+                    <Image
+                      src={p.image}
+                      alt={p.alt || p.caption || "The Pancake Club gallery photo"}
+                      width={700}
+                      height={520}
+                      sizes="(min-width: 1200px) 30vw, (min-width: 768px) 45vw, 92vw"
+                      priority={i < 4}
+                      className="polaroid-img"
+                      style={{
+                        objectPosition: `50% ${
+                          p.focus === "top" ? "18%" : p.focus === "bottom" ? "82%" : "50%"
+                        }`,
+                      }}
+                    />
+                    <div className="polaroid-hover-overlay">
+                      <div className="polaroid-zoom-pill">
+                        <ZoomIn size={14} className="zoom-icon" />
+                        <span>View Snap</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Polaroid Bottom Chin (Handwritten Script & Stamp) */}
+                  <div className="polaroid-chin">
+                    <p className="polaroid-caption">{captionText}</p>
+                    <div className="polaroid-meta">
+                      <span className="polaroid-location">📍 The Pancake Club, Sydney</span>
+                      <span className="polaroid-album-badge">{p.album}</span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            );
+          })}
         </div>
       </main>
 
+      {/* Lightbox */}
       {photo && (
         <div
           className="lightbox open"
-          onClick={(e) => { if (e.target === e.currentTarget) setCurrent(null); }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setCurrent(null);
+          }}
           onTouchStart={(e) => setTouchX(e.touches[0].clientX)}
           onTouchEnd={(e) => {
             if (touchX === null) return;
@@ -84,15 +171,40 @@ export default function GalleryClient({ photos }: { photos: ApiGalleryPhoto[] })
             setTouchX(null);
           }}
         >
-          <button className="lb-btn lb-close" aria-label="Close" onClick={() => setCurrent(null)}>✕</button>
-          <button className="lb-btn lb-prev" aria-label="Previous photo" onClick={() => show(current! - 1)}>←</button>
-          {/* a fixed 1400x1050 forced every photo into 4:3 — portrait shots came
-              out stretched. A stage plus object-fit letterboxes them instead. */}
+          <button
+            className="lb-btn lb-close"
+            aria-label="Close"
+            onClick={() => setCurrent(null)}
+          >
+            ✕
+          </button>
+          <button
+            className="lb-btn lb-prev"
+            aria-label="Previous photo"
+            onClick={() => show(current! - 1)}
+          >
+            ←
+          </button>
           <div className="lb-stage">
-            <Image src={photo.image.replace("w=700", "w=1400")} alt={photo.alt || photo.caption} fill sizes="92vw" />
+            <Image
+              src={photo.image.replace("w=700", "w=1400")}
+              alt={photo.alt || photo.caption}
+              fill
+              sizes="92vw"
+              className="lb-img"
+            />
           </div>
-          <div className="lb-caption">{photo.caption}</div>
-          <button className="lb-btn lb-next" aria-label="Next photo" onClick={() => show(current! + 1)}>→</button>
+          <div className="lb-caption-bar">
+            <p className="lb-caption-text">{photo.caption}</p>
+            <span className="lb-album-tag">#{photo.album}</span>
+          </div>
+          <button
+            className="lb-btn lb-next"
+            aria-label="Next photo"
+            onClick={() => show(current! + 1)}
+          >
+            →
+          </button>
         </div>
       )}
     </>

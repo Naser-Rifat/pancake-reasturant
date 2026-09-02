@@ -1,7 +1,16 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { stars, type ApiReview } from "@/lib/api";
+import { Quote, Sparkles, CheckCircle2 } from "lucide-react";
+import { type ApiReview } from "@/lib/api";
+
+const DINER_TAGS = [
+  { text: "Verified Diner", icon: "🥞" },
+  { text: "Brunch Regular", icon: "☕" },
+  { text: "Sweet Tooth", icon: "🍓" },
+  { text: "Sydney Local", icon: "✨" },
+  { text: "Weekend Feast", icon: "💛" },
+];
 
 export default function ReviewsCarousel({ reviews }: { reviews: ApiReview[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -9,21 +18,17 @@ export default function ReviewsCarousel({ reviews }: { reviews: ApiReview[] }) {
 
   const step = () => {
     const card = trackRef.current?.querySelector<HTMLElement>(".rev-card");
-    return card ? card.offsetWidth + 22 : 360;
+    return card ? card.offsetWidth + 24 : 360;
   };
 
   const scroll = (dir: number) =>
     trackRef.current?.scrollBy({ left: dir * step(), behavior: "smooth" });
 
-  // the edge fades should only show where there IS more to scroll — a fade over
-  // the first card at rest just looks like a rendering bug
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
     const update = () => {
       track.dataset.atStart = String(track.scrollLeft < 10);
-      // scroll-snap parks on the last card's START, short of scrollWidth — so
-      // "the last card is fully in view" is the real end condition
       const last = track.lastElementChild;
       track.dataset.atEnd = String(
         !!last && last.getBoundingClientRect().right <= track.getBoundingClientRect().right + 10,
@@ -45,7 +50,7 @@ export default function ReviewsCarousel({ reviews }: { reviews: ApiReview[] }) {
       const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 10;
       if (atEnd) track.scrollTo({ left: 0, behavior: "smooth" });
       else track.scrollBy({ left: step(), behavior: "smooth" });
-    }, 4500);
+    }, 5000);
     return () => clearInterval(id);
   }, []);
 
@@ -59,21 +64,50 @@ export default function ReviewsCarousel({ reviews }: { reviews: ApiReview[] }) {
         onMouseEnter={() => (pausedRef.current = true)}
         onMouseLeave={() => (pausedRef.current = false)}
       >
-        {reviews.map((r) => (
-          <article className="rev-card" key={`${r.name}-${r.suburb}`}>
-            <div className="rev-stars">{stars(r.rating)}</div>
-            <p className="quote">&ldquo;{r.quote}&rdquo;</p>
-            <div className="who">
-              <span className="avatar">{r.avatar || "😀"}</span>
-              {r.name}
-              {r.suburb ? ` · ${r.suburb}` : ""}
-            </div>
-          </article>
-        ))}
+        {reviews.map((r, i) => {
+          const tag = DINER_TAGS[i % DINER_TAGS.length];
+          return (
+            <article className="rev-card diner-guest-card" key={`${r.name}-${r.suburb}-${i}`}>
+              {/* Decorative quotation watermark */}
+              <div className="rev-quote-watermark" aria-hidden="true">
+                “
+              </div>
+
+              {/* Card Header: Stars + Diner Tag */}
+              <div className="rev-card-header">
+                <div className="rev-stars" aria-label={`${r.rating} out of 5 stars`}>
+                  {"★".repeat(r.rating)}
+                  {"☆".repeat(5 - r.rating)}
+                </div>
+                <div className="diner-badge">
+                  <span>{tag.icon}</span> {tag.text}
+                </div>
+              </div>
+
+              {/* Review Text */}
+              <p className="quote">&ldquo;{r.quote}&rdquo;</p>
+
+              {/* Guest Footer */}
+              <div className="who">
+                <span className="avatar">{r.avatar || "🥞"}</span>
+                <div className="who-info">
+                  <span className="who-name">{r.name}</span>
+                  {r.suburb && <span className="who-suburb">📍 {r.suburb}, Sydney</span>}
+                </div>
+              </div>
+            </article>
+          );
+        })}
       </div>
+
+      {/* Retro Navigation Buttons */}
       <div className="rev-nav">
-        <button className="rev-btn" aria-label="Previous reviews" onClick={() => scroll(-1)}>←</button>
-        <button className="rev-btn" aria-label="Next reviews" onClick={() => scroll(1)}>→</button>
+        <button className="rev-btn" aria-label="Previous reviews" onClick={() => scroll(-1)}>
+          ←
+        </button>
+        <button className="rev-btn" aria-label="Next reviews" onClick={() => scroll(1)}>
+          →
+        </button>
       </div>
     </div>
   );

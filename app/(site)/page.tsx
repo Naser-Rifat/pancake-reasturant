@@ -57,40 +57,6 @@ export default async function Home() {
             heroCutout={site.hero_cutout}
             dishes={menu.items.filter((m) => m.is_featured)}
           />
-
-          <Link
-            href="/booking"
-            className="round-badge"
-            aria-label="Book a table — open 7 days"
-          >
-            <span className="disc"></span>
-            <svg viewBox="0 0 120 120">
-              <defs>
-                <path
-                  id="badgeCircle"
-                  d="M 60,60 m -44,0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0"
-                />
-              </defs>
-              <circle
-                cx="60"
-                cy="60"
-                r="33"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeDasharray="3.5 6"
-                strokeLinecap="round"
-              />
-              <text>
-                <textPath href="#badgeCircle">
-                  Book a table • open 7 days • est. 1999 •
-                </textPath>
-              </text>
-            </svg>
-            <span className="center-ic">
-              <LogoMark size={44} />
-            </span>
-          </Link>
         </div>
       </section>
 
@@ -104,7 +70,8 @@ export default async function Home() {
           const cards = [
             {
               href: announcement.link_url || "/menu",
-              label: "The offer",
+              label: "The Offer",
+              tag: "✨ Special",
               img: announcement.image,
             },
             ...menu.items
@@ -112,6 +79,7 @@ export default async function Home() {
               .map((d) => ({
                 href: `/menu/${d.slug}`,
                 label: d.name,
+                tag: "🥞 Popular",
                 img: d.photo || d.image,
               })),
           ].slice(0, 2);
@@ -119,61 +87,62 @@ export default async function Home() {
           return (
             <section className="promo">
               <div className="container">
-                <div className="promo-band reveal">
-                  <div className="promo-badge">
-                    <b>{badge.big}</b>
-                    <span>{badge.small}</span>
+                <div className="promo-band diner-promo-band reveal">
+                  {/* Rotating Retro Starburst Badge */}
+                  <div className="promo-starburst-badge">
+                    <svg viewBox="0 0 100 100" className="starburst-rotate-svg" aria-hidden="true">
+                      <path
+                        id="starburstCircle"
+                        d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
+                        fill="none"
+                      />
+                      <text>
+                        <textPath href="#starburstCircle">
+                          • SPECIAL DEAL • LIMITED TIME • HOT STACKS •
+                        </textPath>
+                      </text>
+                    </svg>
+                    <div className="starburst-center">
+                      <span className="starburst-icon">🔥</span>
+                      <b className="starburst-big">{badge.big === "ON" ? "DEAL" : badge.big}</b>
+                      <span className="starburst-small">{badge.small === "now" ? "TODAY" : badge.small}</span>
+                    </div>
                   </div>
 
+                  {/* Middle: Headline, Kicker & CTA Button */}
                   <div className="promo-main">
+                    <span className="promo-kicker">✨ TODAY&apos;S FEATURED SPECIAL</span>
                     <h2 className="promo-head">{announcement.message}</h2>
                     {announcement.link_url && (
-                      <Link href={announcement.link_url} className="promo-cta">
-                        {announcement.link_text || "Find out more"}
-                        <svg
-                          viewBox="0 0 24 24"
-                          width="16"
-                          height="16"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.75"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M9 6l6 6-6 6" />
-                        </svg>
+                      <Link href={announcement.link_url} className="promo-cta-btn">
+                        <span>{announcement.link_text || "Explore Menu & Deals"}</span>
+                        <span className="promo-arrow">→</span>
                       </Link>
                     )}
                   </div>
 
+                  {/* Right: 2 Interactive Voucher Ticket Cards */}
                   <div className="promo-cards">
-                    {cards.map((c) => (
-                      <Link key={c.href} href={c.href} className="promo-card">
-                        <span className="pc-top">
-                          <b>{c.label}</b>
-                          <svg
-                            viewBox="0 0 24 24"
-                            width="16"
-                            height="16"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden="true"
-                          >
-                            <path d="M7 17L17 7M9 7h8v8" />
-                          </svg>
-                        </span>
-                        <span className="pc-ph">
+                    {cards.map((c, i) => (
+                      <Link
+                        key={c.href + i}
+                        href={c.href}
+                        className={`promo-ticket-card ${i === 1 ? "tilt-card" : ""}`}
+                      >
+                        <div className="ticket-top-tag">
+                          <span>{c.tag}</span>
+                          <span className="ticket-open-icon">↗</span>
+                        </div>
+                        <div className="ticket-img-frame">
                           <Image
                             src={c.img}
-                            alt=""
+                            alt={c.label}
                             fill
                             sizes="(min-width: 1024px) 220px, 45vw"
+                            className="ticket-img"
                           />
-                        </span>
+                        </div>
+                        <span className="ticket-dish-title">{c.label}</span>
                       </Link>
                     ))}
                   </div>
@@ -269,24 +238,59 @@ export default async function Home() {
             </Link>
           </div>
 
-          {/* asymmetric mosaic — a photo wall, not another uniform card row */}
+          {/* ================= Scrapbook Polaroid Mosaic (Option 1) ================= */}
           <div className="gallery-mosaic reveal">
-            {gallery.slice(0, 6).map((p) => (
-              <Link href="/gallery" key={p.image}>
-                {/* cells crop to a fixed shape; the photo's own focus decides
-                    which part survives instead of always taking the middle */}
-                <Image
-                  src={p.image}
-                  alt={p.alt || p.caption}
-                  width={900}
-                  height={700}
-                  sizes="(min-width: 1024px) 40vw, 100vw"
-                  style={{
-                    objectPosition: `50% ${p.focus === "top" ? "18%" : p.focus === "bottom" ? "82%" : "50%"}`,
-                  }}
-                />
-              </Link>
-            ))}
+            {gallery.slice(0, 6).map((p, i) => {
+              const tapes = ["tape-left", "tape-right", "tape-center", "tape-left", "tape-pin", "tape-right"];
+              const tape = tapes[i % tapes.length];
+              const stamps = ["🥞 100% Fluffy", "✨ Sydney Vibe", "☕ Fresh Brew", "🍓 Berry Sweet", "💛 Café Mood", "🍯 Golden Maple"];
+              const stamp = stamps[i % stamps.length];
+              const isHero = i === 0;
+
+              return (
+                <Link
+                  href="/gallery"
+                  key={p.image + i}
+                  className={`mosaic-polaroid ${isHero ? "mosaic-hero" : ""}`}
+                >
+                  {/* Washi Tape Accent */}
+                  <div className={`washi-tape ${tape}`} aria-hidden="true" />
+
+                  {/* Corner Stamp */}
+                  {(isHero || i === 2 || i === 4) && (
+                    <div className="mosaic-stamp" aria-hidden="true">
+                      {stamp}
+                    </div>
+                  )}
+
+                  <div className="mosaic-img-box">
+                    <Image
+                      src={p.image}
+                      alt={p.alt || p.caption || "The Pancake Club gallery"}
+                      width={900}
+                      height={700}
+                      sizes="(min-width: 1024px) 40vw, 100vw"
+                      style={{
+                        objectPosition: `50% ${
+                          p.focus === "top" ? "18%" : p.focus === "bottom" ? "82%" : "50%"
+                        }`,
+                      }}
+                    />
+                    <div className="mosaic-hover-badge">
+                      <span>Explore Snap 📸</span>
+                    </div>
+                  </div>
+
+                  {/* Handwritten Chin on the Hero Shot */}
+                  {isHero && p.caption && (
+                    <div className="mosaic-hero-chin">
+                      <p className="mosaic-hero-caption">{p.caption}</p>
+                      <span className="mosaic-hero-tag">📍 Sydney, NSW</span>
+                    </div>
+                  )}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -332,66 +336,109 @@ export default async function Home() {
           style={{ bottom: "4rem", right: "4%" }}
         />
         <div className="container">
-          <div className="reveal" style={{ textAlign: "center" }}>
-            <h2 className="title">
+          <div className="reveal" style={{ textAlign: "center", marginBottom: "2.8rem" }}>
+            <p className="kicker">Come On Over</p>
+            <h2 className="title inline">
               Hours &amp; <span className="accent">Location</span>
             </h2>
+            <p className="section-lead" style={{ margin: "0.5rem auto 0", maxWidth: "540px" }}>
+              Drop by for breakfast, lazy brunch, or an afternoon pancake fix in the heart of Sydney.
+            </p>
           </div>
 
           <div className="hours-grid reveal">
-            <div className="hours-card">
-              <h3>Opening Hours</h3>
+            {/* Retro Diner Chalkboard & Hours Note */}
+            <div className="hours-card diner-hours-card">
+              <div className="hours-card-top">
+                <h3>⏰ Opening Hours</h3>
+                <span className="hours-card-badge">Dine-in &amp; Takeaway</span>
+              </div>
               <ul className="hours-list">
                 {hours.map((h) => (
                   <li key={h.label}>
-                    <span>{h.label}</span>
-                    <span>
+                    <span className="hours-day">{h.label}</span>
+                    <span className="hours-time">
                       {formatTime(h.opens)} – {formatTime(h.closes)}
                     </span>
                   </li>
                 ))}
               </ul>
-              <h3>Find Us</h3>
-              <div className="contact-lines">
-                <span>{site.address}</span>
-                <span>
-                  Phone: <a href={telHref(site.phone)}>{site.phone}</a>
-                </span>
-                <span>
-                  Email: <a href={`mailto:${site.email}`}>{site.email}</a>
-                </span>
+
+              <div className="diner-find-box">
+                <h4 className="find-title">📍 Find Us in Sydney</h4>
+                <div className="contact-lines">
+                  <span className="contact-item">
+                    <strong>Address:</strong> {site.address}
+                  </span>
+                  <span className="contact-item">
+                    <strong>Phone:</strong>{" "}
+                    <a href={telHref(site.phone)} className="contact-link">
+                      {site.phone}
+                    </a>
+                  </span>
+                  <span className="contact-item">
+                    <strong>Email:</strong>{" "}
+                    <a href={`mailto:${site.email}`} className="contact-link">
+                      {site.email}
+                    </a>
+                  </span>
+                </div>
+                <div className="transit-badges">
+                  <span className="transit-chip">🚆 3 min walk from Town Hall</span>
+                  <span className="transit-chip">🚗 2hr Street Parking</span>
+                  <span className="transit-chip">♿ Step-Free Access</span>
+                </div>
               </div>
             </div>
-            <div className="map-card">
-              <iframe
-                title="The Pancake Club location map"
-                src={safeEmbedUrl(site.map_embed)}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              ></iframe>
+
+            {/* Sydney Map Card */}
+            <div className="map-card diner-map-card">
+              <div className="map-frame">
+                <iframe
+                  title="The Pancake Club location map"
+                  src={safeEmbedUrl(site.map_embed)}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+              <div className="map-action-bar">
+                <div className="map-location-info">
+                  <span className="map-spot-name">The Pancake Club Sydney</span>
+                  <span className="map-spot-addr">{site.address}</span>
+                </div>
+                <a
+                  href={`https://maps.google.com/?q=${encodeURIComponent(site.address)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary map-directions-btn"
+                >
+                  Get Directions ↗
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ========== CERTIFICATIONS (FR-06) — quiet trust strip before the CTA ========== */}
+      {/* ========== CERTIFICATIONS (FR-06) — Vintage Farmers Market Quality Seals ========== */}
       {certs.length > 0 && (
         <section className="certs-strip-sec" id="certifications">
           <Sticker kind="ring" color="var(--yellow)" size={40} style={{ top: "1.5rem", right: "6%" }} />
           <div className="container">
             <div style={{ textAlign: "center" }}>
-              <p className="kicker">Certified &amp; Award-Winning</p>
+              <p className="kicker">FEEL GOOD ABOUT EVERY BITE</p>
+              <h3 className="cert-section-heading">Certified &amp; Award-Winning Quality</h3>
             </div>
             <div className="cert-strip reveal">
               {certs.map((c) => (
-                <div className="cert-badge" key={c.title}>
+                <div className="cert-badge quality-seal-badge" key={c.title}>
                   <span className="ic">
                     <CertIcon name={c.icon} />
                   </span>
-                  <span>
+                  <div className="cert-info">
                     <b>{c.title}</b>
                     <small>{c.subtitle}</small>
-                  </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -400,17 +447,30 @@ export default async function Home() {
       )}
 
       {/* ================= BOOKING CTA (FR-25) ================= */}
-      <section className="cta">
+      <section className="cta diner-cta-banner">
+        <Sticker
+          kind="sparkle"
+          color="var(--yellow-deep)"
+          size={50}
+          style={{ top: "2rem", left: "6%", transform: "rotate(-10deg)" }}
+        />
+        <Sticker
+          kind="arc"
+          color="var(--yellow)"
+          size={70}
+          style={{ bottom: "2rem", right: "6%", transform: "rotate(180deg)" }}
+        />
         <div className="container reveal">
+          <p className="cta-kicker">READY FOR A FEAST?</p>
           <h2>
             {site.cta_heading} <span className="accent">{site.cta_script}</span>
           </h2>
-          <p>{site.cta_lead}</p>
+          <p className="cta-lead-text">{site.cta_lead}</p>
           <Link
             href={site.cta_button_url || "/booking"}
-            className="btn btn-primary"
+            className="btn btn-primary cta-action-btn"
           >
-            {site.cta_button_label}
+            <span>🥞 {site.cta_button_label || "Book a Table Now"}</span>
           </Link>
         </div>
       </section>

@@ -1,9 +1,5 @@
 "use client";
 
-// Hero: headline with an inline dish chip, CTAs, and a thumbnail switcher that
-// swaps the photo on the right. Thumbs sit with the buttons (reference layout)
-// so they're part of the reading path, not decoration on the photo.
-
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -45,20 +41,19 @@ export default function HeroShowcase({
     {
       src: heroImage,
       alt: "Signature dish at The Pancake Club",
-      // the reference always states a price; the hero shot quotes the entry point
+      label: "Signature Stack",
       price: cheapest ? `From $${cheapest}` : "",
     },
     ...dishes.slice(0, 2).map((d) => ({
       src: d.photo || d.image,
       alt: `${d.name} pancakes`,
+      label: d.name,
       price: `$${parseFloat(d.price)}`,
     })),
   ].filter((s) => s.src);
 
   const [active, setActive] = useState(0);
   const current = slides[active] ?? slides[0];
-  // the admin picks this; fall back to the first featured dish that has one so
-  // the headline is never left with a gap
   const chip = heroCutout || dishes.find((d) => d.image)?.image;
 
   const headingWords = heading ? heading.trim().split(/\s+/) : ["Stack", "Into"];
@@ -82,22 +77,38 @@ export default function HeroShowcase({
       {/* Full-width hero top navigation bar spanning the hero container */}
       <nav className="hero-nav" aria-label="Main">
         <Link href="/" className="hero-logo" aria-label="The Pancake Club — home">
-          <span className="hero-logo-disc" aria-hidden="true"><LogoMark size={19} /></span>
+          <span className="hero-logo-disc" aria-hidden="true">
+            <LogoMark size={19} />
+          </span>
           <span className="hero-logo-name">The Pancake Club</span>
         </Link>
         <ul className="hero-nav-links">
           {NAV.map((l) => (
-            <li key={l.href}><Link href={l.href}>{l.label}</Link></li>
+            <li key={l.href}>
+              <Link href={l.href}>{l.label}</Link>
+            </li>
           ))}
         </ul>
         <div className="hero-topbar">
           <Link href="/menu" className="hero-find">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
-              <circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" strokeLinecap="round" />
+            <svg
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20 20l-3.5-3.5" strokeLinecap="round" />
             </svg>
             Find a stack
           </Link>
-          <Link href="/menu" className="hero-order">Order Now<ChevronRight className="arrow-icon" size={14} strokeWidth={2.75} /></Link>
+          <Link href="/menu" className="hero-order">
+            Order Now
+            <ChevronRight className="arrow-icon" size={14} strokeWidth={2.75} />
+          </Link>
         </div>
       </nav>
 
@@ -133,7 +144,9 @@ export default function HeroShowcase({
           {ctas.map((c) => (
             <Link key={c.href} href={c.href} className={`btn btn-${c.variant}`}>
               {c.label}
-              {c.variant === "primary" && <ChevronRight className="arrow-icon" size={18} strokeWidth={2.75} />}
+              {c.variant === "primary" && (
+                <ChevronRight className="arrow-icon" size={18} strokeWidth={2.75} />
+              )}
             </Link>
           ))}
 
@@ -143,12 +156,15 @@ export default function HeroShowcase({
                 <button
                   key={s.src}
                   role="tab"
+                  type="button"
                   aria-selected={i === active}
                   aria-label={s.alt}
-                  className={i === active ? "on" : ""}
+                  title={s.label}
+                  className={`hero-thumb-btn ${i === active ? "on" : ""}`}
                   onClick={() => setActive(i)}
                 >
                   <Image src={s.src} alt="" width={120} height={120} sizes="56px" />
+                  {i === active && <span className="thumb-active-dot" />}
                 </button>
               ))}
             </div>

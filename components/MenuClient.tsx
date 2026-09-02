@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Plus, ArrowRight } from "lucide-react";
 import {
   TAG_LABEL,
   money,
@@ -14,6 +14,12 @@ import {
 
 const CART_KEY = "krush-cart-v2";
 const TAG_ORDER = ["sweet", "savoury", "choc"] as const;
+
+const CATEGORY_ICONS: Record<string, string> = {
+  sweet: "🍯",
+  savoury: "🥑",
+  choc: "🍫",
+};
 
 type Cart = Record<string, number>;
 
@@ -38,6 +44,7 @@ export default function MenuClient({
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [placing, setPlacing] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<string>("all");
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // hydrate cart from localStorage, dropping slugs that left the menu
@@ -47,9 +54,6 @@ export default function MenuClient({
       Object.keys(saved).forEach((slug) => {
         if (!items.some((b) => b.slug === slug)) delete saved[slug];
       });
-      // deep link from a dish page: /menu?add=slug drops it straight in the
-      // cart. Merged into `saved` and persisted BEFORE setCart so dev-mode
-      // double-invocation (which re-reads storage) can't wipe it.
       const params = new URLSearchParams(window.location.search);
       const wanted = params.get("add");
       const qty = Math.min(9, Math.max(1, parseInt(params.get("qty") || "1", 10) || 1));
@@ -60,7 +64,9 @@ export default function MenuClient({
         showToast(`${items.find((b) => b.slug === wanted)!.name} added to your order 🥞`);
       }
       setCart(saved);
-    } catch { /* corrupted storage — start fresh */ }
+    } catch {
+      /* corrupted storage — start fresh */
+    }
     setLoaded(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
@@ -122,97 +128,239 @@ export default function MenuClient({
     }
   };
 
+  const visibleTags =
+    selectedTag === "all" ? TAG_ORDER : TAG_ORDER.filter((t) => t === selectedTag);
+
   return (
     <>
-      <main className="container">
+      <main className="container menu-page-container">
         {!live && (
-          <div className="ordering-paused" role="status" style={{ padding: "1.2rem", borderRadius: "12px", background: "rgba(224, 134, 0, 0.12)", border: "1px solid rgba(224, 134, 0, 0.3)", marginBottom: "2rem" }}>
+          <div
+            className="ordering-paused-box"
+            role="status"
+          >
             <p style={{ margin: 0, fontWeight: 500 }}>
               {pauseMessage || "Online ordering is temporarily paused."} Call us on{" "}
-              <a href={telHref(restaurantPhone)} style={{ textDecoration: "underline", fontWeight: 700 }}>{restaurantPhone}</a> to place an order.
+              <a
+                href={telHref(restaurantPhone)}
+                style={{ textDecoration: "underline", fontWeight: 700 }}
+              >
+                {restaurantPhone}
+              </a>{" "}
+              to place an order.
             </p>
             {uberEatsUrl && (
-              <p style={{ margin: "0.5rem 0 0 0", fontSize: "0.95rem" }}>
+              <p style={{ margin: "0.4rem 0 0 0", fontSize: "0.95rem" }}>
                 Delivery is also available on{" "}
-                <a href={uberEatsUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#06C167", fontWeight: 700, textDecoration: "underline" }}>
+                <a
+                  href={uberEatsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#06C167", fontWeight: 700, textDecoration: "underline" }}
+                >
                   Uber Eats 🛵
                 </a>
               </p>
             )}
           </div>
         )}
-        <div className="menu-grid">
+
+        {/* Retro Category Filter Tabs */}
+        <div className="menu-filter-bar">
+          <button
+            type="button"
+            className={`menu-filter-chip ${selectedTag === "all" ? "active" : ""}`}
+            onClick={() => setSelectedTag("all")}
+          >
+            <span>✨ All Stacks</span>
+            <small className="filter-count">{items.length}</small>
+          </button>
           {TAG_ORDER.map((tag) => {
+            const countForTag = items.filter((b) => b.tag === tag).length;
+            if (countForTag === 0) return null;
+            return (
+              <button
+                key={tag}
+                type="button"
+                className={`menu-filter-chip ${selectedTag === tag ? "active" : ""}`}
+                onClick={() => setSelectedTag(tag)}
+              >
+                <span>
+                  {CATEGORY_ICONS[tag]} {TAG_LABEL[tag]}
+                </span>
+                <small className="filter-count">{countForTag}</small>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Segmented Boutique Diner Menu Boards */}
+        <div className="menu-boards-container">
+          {visibleTags.map((tag) => {
             const group = items.filter((b) => b.tag === tag);
             if (group.length === 0) return null;
+
             return (
-              <section className="menu-cat-block" key={tag}>
-                <h2 className="menu-cat">{TAG_LABEL[tag]}</h2>
-                {group.map((b) => (
-                  <article className="menu-card reveal" key={b.slug}>
-                    <div className="thumb">
-                      {/* fall back to the photo; src="" makes the browser refetch the page */}
-                      {(b.image || b.photo) && (
-                        <Image src={b.image || b.photo} alt={`${b.name} pancakes`} width={200} height={200} sizes="80px" />
-                      )}
-                    </div>
-                    <div className="body">
-                      <div className="row1">
-                        <h3><Link href={`/menu/${b.slug}`}>{b.name}</Link></h3>
-                        <span className="lead" aria-hidden="true" />
-                        <span className="price">{money(b.price)}</span>
+              <section className="menu-cat-board reveal" key={tag}>
+                <div className="menu-board-header">
+                  <div className="board-header-left">
+                    <span className="board-cat-icon">{CATEGORY_ICONS[tag]}</span>
+                    <h2 className="board-cat-title">{TAG_LABEL[tag]} Stacks</h2>
+                  </div>
+                  <span className="board-items-badge">
+                    {group.length} {group.length === 1 ? "Dish" : "Dishes"}
+                  </span>
+                </div>
+
+                <div className="menu-board-rows">
+                  {group.map((b) => (
+                    <article className="diner-dish-row" key={b.slug}>
+                      {/* Food Thumbnail */}
+                      <Link
+                        href={`/menu/${b.slug}`}
+                        className="diner-dish-thumb-link"
+                        aria-label={`View ${b.name} details`}
+                      >
+                        <div className="diner-dish-thumb">
+                          {(b.image || b.photo) && (
+                            <Image
+                              src={b.image || b.photo}
+                              alt={`${b.name} pancakes`}
+                              width={160}
+                              height={160}
+                              sizes="80px"
+                              className="diner-dish-img"
+                            />
+                          )}
+                        </div>
+                      </Link>
+
+                      {/* Main Dish Details */}
+                      <div className="diner-dish-body">
+                        <div className="diner-dish-top-row">
+                          <h3 className="diner-dish-name">
+                            <Link href={`/menu/${b.slug}`}>{b.name}</Link>
+                          </h3>
+                          <span className="diner-dot-leader" aria-hidden="true" />
+                          <span className="diner-price-pill">{money(b.price)}</span>
+                        </div>
+
+                        <p className="diner-dish-desc">{b.description}</p>
+
+                        <div className="diner-dish-footer">
+                          <div className="diner-chips-row">
+                            {b.kcal != null && (
+                              <span className="diner-meta-chip">🔥 {b.kcal} kcal</span>
+                            )}
+                            {b.protein_g != null && (
+                              <span className="diner-meta-chip">💪 {b.protein_g}g protein</span>
+                            )}
+                            {b.prep_time && (
+                              <span className="diner-meta-chip">⏱ {b.prep_time}</span>
+                            )}
+                          </div>
+
+                          <div className="diner-dish-actions">
+                            <Link href={`/menu/${b.slug}`} className="diner-view-link">
+                              <span>Details</span>
+                              <ArrowRight size={13} />
+                            </Link>
+
+                            {live && (
+                              <button
+                                type="button"
+                                className="diner-add-btn"
+                                onClick={() => add(b.slug)}
+                                aria-label={`Add ${b.name} to order`}
+                              >
+                                <Plus size={14} strokeWidth={2.75} />
+                                <span>Add</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <p className="desc">{b.description}</p>
-                      <div className="chips">
-                        {b.kcal != null && <span className="chip">🔥 {b.kcal} kcal</span>}
-                        {b.protein_g != null && <span className="chip">💪 {b.protein_g}g protein</span>}
-                        {b.prep_time && <span className="chip">⏱ {b.prep_time}</span>}
-                      </div>
-                    </div>
-                    {live && (
-                      <button className="btn btn-primary" onClick={() => add(b.slug)}>
-                        Add to Order
-                      </button>
-                    )}
-                  </article>
-                ))}
+                    </article>
+                  ))}
+                </div>
               </section>
             );
           })}
         </div>
       </main>
 
+      {/* Cart Button */}
       {live && (
-        <button className="cart-fab" aria-label="Open cart" onClick={() => setOpen(true)}>
+        <button
+          className="cart-fab"
+          aria-label="Open cart"
+          onClick={() => setOpen(true)}
+        >
           <ShoppingCart size={26} strokeWidth={2.2} aria-hidden="true" />
           <span className={`count${pop ? " pop" : ""}`}>{count}</span>
         </button>
       )}
 
-      <div className={`cart-backdrop${open ? " show" : ""}`} onClick={() => setOpen(false)} />
+      {/* Backdrop */}
+      <div
+        className={`cart-backdrop${open ? " show" : ""}`}
+        onClick={() => setOpen(false)}
+      />
 
-      <aside className={`cart-drawer${open ? " open" : ""}`} aria-label="Shopping cart">
+      {/* Cart Drawer */}
+      <aside
+        className={`cart-drawer${open ? " open" : ""}`}
+        aria-label="Shopping cart"
+      >
         <div className="cart-head">
           <h3>Your Order</h3>
-          <button className="cart-close" aria-label="Close cart" onClick={() => setOpen(false)}>✕</button>
+          <button
+            className="cart-close"
+            aria-label="Close cart"
+            onClick={() => setOpen(false)}
+          >
+            ✕
+          </button>
         </div>
         <div className="cart-items">
           {count === 0 ? (
-            <p className="cart-empty">Your order is empty.<br />Go stack something. 🥞</p>
+            <p className="cart-empty">
+              Your order is empty.
+              <br />
+              Go stack something. 🥞
+            </p>
           ) : (
             Object.entries(cart).map(([slug, qty]) => {
               const b = itemBySlug(slug);
               return (
                 <div className="cart-item" key={slug}>
-                  <Image src={b.image} alt={b.name} width={58} height={58} />
+                  <Image
+                    src={b.image || b.photo}
+                    alt={b.name}
+                    width={58}
+                    height={58}
+                  />
                   <div>
                     <div className="n">{b.name}</div>
-                    <div className="p">${parseFloat(b.price)} × {qty} = ${(priceOf(slug) * qty).toFixed(2)}</div>
+                    <div className="p">
+                      ${parseFloat(b.price)} × {qty} = $
+                      {(priceOf(slug) * qty).toFixed(2)}
+                    </div>
                   </div>
                   <div className="qty">
-                    <button aria-label="Remove one" onClick={() => dec(slug)}>−</button>
+                    <button
+                      aria-label="Remove one"
+                      onClick={() => dec(slug)}
+                    >
+                      −
+                    </button>
                     <span>{qty}</span>
-                    <button aria-label="Add one" onClick={() => inc(slug)}>+</button>
+                    <button
+                      aria-label="Add one"
+                      onClick={() => inc(slug)}
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
               );
@@ -241,12 +389,17 @@ export default function MenuClient({
             <span>Total</span>
             <b>${total.toFixed(2)}</b>
           </div>
-          <button className="btn btn-primary" onClick={checkout} disabled={placing}>
+          <button
+            className="btn btn-primary"
+            onClick={checkout}
+            disabled={placing}
+          >
             {placing ? "Placing order…" : "Checkout →"}
           </button>
         </div>
       </aside>
 
+      {/* Toast */}
       <div className={`toast${toast ? " show" : ""}`}>{toast}</div>
     </>
   );

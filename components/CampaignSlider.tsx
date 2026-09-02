@@ -10,6 +10,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 
 import { endsLabel, type ApiAnnouncement } from "@/lib/api";
+import { ArrowRight } from "lucide-react";
 
 const DEFAULT_IMAGE =
   "https://images.unsplash.com/photo-1575853121743-60c24f0a7502?w=800&q=80";
@@ -123,8 +124,8 @@ export default function CampaignSlider({
 
               return (
                 <SwiperSlide key={c.message} className="camp-swiper-slide">
-                  <article className="camp-slide">
-                    {/* Left: Inset rounded image */}
+                  <article className="camp-slide diner-craft-ticket">
+                    {/* Left: Pure mouth-watering food photography */}
                     <div className="camp-left">
                       <div className="camp-shot">
                         <Image
@@ -133,12 +134,12 @@ export default function CampaignSlider({
                           fill
                           sizes="(min-width: 900px) 45vw, 90vw"
                           priority
+                          className="camp-shot-img"
                         />
                       </div>
                     </div>
 
-                    {/* scissors on the tear line — the coupon's own language; the old
-                        signal-wave was drawn for the dark card and read as a stray mark */}
+                    {/* Scissors on the coupon tear line */}
                     <span className="camp-deco-icon" aria-hidden="true">
                       <svg
                         viewBox="0 0 24 24"
@@ -158,17 +159,41 @@ export default function CampaignSlider({
                       </svg>
                     </span>
 
-                    {/* Right: Copy + botanical art */}
+                    {/* Right: Authentic Handcrafted Diner Copy */}
                     <div className="camp-copy">
+                      {/* Handwritten warm signature lead */}
+                      <span className="camp-script-eyebrow">
+                        ~ Fresh off the Griddle ~
+                      </span>
+
                       <h3>{c.message}</h3>
+
                       {c.details && <p className="camp-details">{c.details}</p>}
-                      {urgency && <span className="camp-urgency">{urgency}</span>}
-                      {c.link_url && (
-                        <Link href={c.link_url} className="camp-cta">
-                          <span className="camp-cta-dot" aria-hidden="true" />
-                          {c.link_text || "Book a Table"}
-                        </Link>
+
+                      {/* Clean Urgency Note */}
+                      {urgency && (
+                        <div className="camp-diner-note">
+                          <span className="diner-clock-icon">⏰</span>
+                          <span>{urgency}</span>
+                        </div>
                       )}
+
+                      <div className="camp-actions-row">
+                        {c.link_url && (
+                          <Link href={c.link_url} className="camp-cta">
+                            <span>{c.link_text || "Explore Menu & Deals"}</span>
+                            <ArrowRight size={16} strokeWidth={2.5} className="camp-btn-arrow" />
+                          </Link>
+                        )}
+                      </div>
+
+                      {/* Vintage Rubber Stamp Watermark */}
+                      <div className="camp-vintage-stamp" aria-hidden="true">
+                        <span>FLUFFY</span>
+                        <b>SPECIAL</b>
+                        <small>SYDNEY</small>
+                      </div>
+
                       <span className="camp-botanical" aria-hidden="true" />
                     </div>
                   </article>

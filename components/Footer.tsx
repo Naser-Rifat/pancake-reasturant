@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { formatTime, getHours, getSite, telHref } from "@/lib/api";
+import BackToTop from "@/components/BackToTop";
 
 const LINKS = [
   ["Menu", "/menu"],
@@ -11,33 +12,34 @@ const LINKS = [
 
 export default async function Footer() {
   const [site, hours] = await Promise.all([getSite(), getHours()]);
-  const socials = [
-    ["Instagram", site.instagram_url],
-    ["Facebook", site.facebook_url],
-  ].filter(([, url]) => url);
   const directions = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address)}`;
 
   return (
-    <footer>
+    <footer className="site-footer">
       <div className="container">
-        {/* editorial split: the brand speaks on the left, the directory sits on
-            the right — the flat 3-column grid left a dead zone under Visit and
-            orphaned the buttons in Explore's corner */}
-        <div className="footer-split">
-          <div className="f-brand">
-            {/* the reversed lockup: the real logo's exact shapes, filled cream via
-                a mask — its own dark strokes measure 1.6:1 on this ground, and a
-                cream chip read as a sticker slapped on the footer */}
-            <span className="f-brand-logo" role="img" aria-label="The Pancake Club" />
-            <p className="f-brand-tag">{site.footer_tagline}</p>
+        {/* Single Cohesive 4-Column Master Grid with Perfect Baseline Alignment */}
+        <div className="footer-master-grid">
+          {/* Column 1: Brand & Actions */}
+          <div className="f-col f-col-brand">
+            <span
+              className="f-brand-logo"
+              role="img"
+              aria-label="The Pancake Club"
+            />
+            <p className="f-brand-tag">
+              {site.footer_tagline || "Fluffy stacks · real maple · est. 1999"}
+            </p>
+
             <div className="f-actions">
-              <Link href="/booking" className="btn btn-primary f-cta">Book a Table</Link>
+              <Link href="/booking" className="btn btn-primary f-cta-btn">
+                Book a Table
+              </Link>
               {site.uber_eats_url && (
                 <a
                   href={site.uber_eats_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-secondary f-cta"
+                  className="btn btn-secondary f-cta-btn f-uber-btn"
                 >
                   Uber Eats
                 </a>
@@ -45,60 +47,90 @@ export default async function Footer() {
             </div>
           </div>
 
-          <div className="footer-grid">
-          <div className="f-col">
-            <h2>Visit</h2>
-            <address>
-              <span>{site.address}</span>
-              <a href={directions} target="_blank" rel="noopener noreferrer" className="f-directions">
-                Get directions
+          {/* Column 2: Visit */}
+          <div className="f-col f-col-visit">
+            <h2 className="f-col-title">Visit</h2>
+            <address className="f-address-block">
+              <span className="f-address-text">{site.address}</span>
+              <a
+                href={directions}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="f-directions-link"
+              >
+                Get directions →
               </a>
-              <a href={telHref(site.phone)}>{site.phone}</a>
-              <a href={`mailto:${site.email}`}>{site.email}</a>
+              <a href={telHref(site.phone)} className="f-contact-link">
+                {site.phone}
+              </a>
+              <a href={`mailto:${site.email}`} className="f-contact-link">
+                {site.email}
+              </a>
             </address>
           </div>
 
-          <div className="f-col">
-            <h2>Opening hours</h2>
-            <ul className="f-hours">
+          {/* Column 3: Opening Hours */}
+          <div className="f-col f-col-hours">
+            <h2 className="f-col-title">Opening Hours</h2>
+            <ul className="f-hours-list">
               {hours.map((h) => (
-                <li key={h.label}>
-                  <span>{h.label}</span>
-                  <span>{formatTime(h.opens)} – {formatTime(h.closes)}</span>
+                <li key={h.label} className="f-hours-item">
+                  <span className="f-day-label">{h.label}</span>
+                  <span className="f-time-label">
+                    {formatTime(h.opens)} – {formatTime(h.closes)}
+                  </span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="f-col">
-            <h2>Explore</h2>
-            <ul className="f-links">
+          {/* Column 4: Explore */}
+          <div className="f-col f-col-explore">
+            <h2 className="f-col-title">Explore</h2>
+            <ul className="f-explore-list">
               {LINKS.map(([label, href]) => (
-                <li key={href}><Link href={href}>{label}</Link></li>
+                <li key={href}>
+                  <Link href={href} className="f-explore-link">
+                    {label}
+                  </Link>
+                </li>
               ))}
-              {site.whatsapp && (
+              {site.instagram_url && (
                 <li>
                   <a
-                    href={`https://wa.me/${site.whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent("Hi! I'd like to ask about The Pancake Club")}`}
+                    href={site.instagram_url}
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="f-explore-link"
                   >
-                    WhatsApp
+                    Instagram ↗
                   </a>
                 </li>
               )}
-              {socials.map(([label, url]) => (
-                <li key={label}>
-                  <a href={url} target="_blank" rel="noopener noreferrer">{label}</a>
+              {site.facebook_url && (
+                <li>
+                  <a
+                    href={site.facebook_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="f-explore-link"
+                  >
+                    Facebook ↗
+                  </a>
                 </li>
-              ))}
+              )}
             </ul>
-          </div>
           </div>
         </div>
 
-        <div className="footer-bottom">
-          <span>© {new Date().getFullYear()} The Pancake Club — All rights reserved. {site.abn}</span>
+        {/* Bottom Copyright & Back to Top Bar */}
+        <div className="footer-bottom-bar">
+          <p className="f-copyright-text">
+            © {new Date().getFullYear()} The Pancake Club — All rights reserved. {site.abn}
+          </p>
+          <div className="f-back-to-top-container">
+            <BackToTop />
+          </div>
         </div>
       </div>
     </footer>
