@@ -147,9 +147,13 @@ export interface ApiSiteSettings {
 
 export interface ApiOrder {
   public_id: string;
+  customer_name: string;
   status: string;
+  payment_status: "unpaid" | "paid" | "refunded";
   total: string;
   items: { slug: string; name: string; quantity: number; unit_price: string; line_total: string }[];
+  /** present only in the placeOrder response — where Stripe takes the payment */
+  checkout_url?: string;
 }
 
 export interface ApiBooking {
@@ -331,6 +335,18 @@ export function placeOrder(payload: {
   items: { slug: string; quantity: number }[];
 }): Promise<ApiOrder> {
   return post("/orders/", payload);
+}
+
+/** Client-side order lookup — the success page polls this until Stripe's
+ * webhook flips payment_status to "paid". */
+export async function getOrder(publicId: string): Promise<ApiOrder | null> {
+  try {
+    const res = await fetch(`${API_URL}/orders/${publicId}/`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return (await res.json()) as ApiOrder;
+  } catch {
+    return null;
+  }
 }
 
 export function submitReview(payload: {

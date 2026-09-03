@@ -63,6 +63,10 @@ export default function MenuClient({
         window.history.replaceState(null, "", "/menu");
         showToast(`${items.find((b) => b.slug === wanted)!.name} added to your order 🥞`);
       }
+      if (params.get("payment") === "cancelled") {
+        window.history.replaceState(null, "", "/menu");
+        showToast("Payment cancelled — your order is still in the cart. 🛒");
+      }
       setCart(saved);
     } catch {
       /* corrupted storage — start fresh */
@@ -118,14 +122,17 @@ export default function MenuClient({
         phone: phone.trim(),
         items: Object.entries(cart).map(([slug, quantity]) => ({ slug, quantity })),
       });
-      setCart({});
-      setOpen(false);
-      showToast(`Order received — $${order.total}. See you soon, ${name.trim()}! 🎉`);
+      if (!order.checkout_url) {
+        throw new Error("Payments are unavailable right now — please try again or call us.");
+      }
+      // cart stays in localStorage until the success page confirms payment,
+      // so cancelling on Stripe brings the customer back with nothing lost
+      window.location.assign(order.checkout_url);
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Something went wrong — please try again.");
-    } finally {
       setPlacing(false);
     }
+    // no finally — keep the button in its busy state during the redirect
   };
 
   const visibleTags =
@@ -394,7 +401,7 @@ export default function MenuClient({
             onClick={checkout}
             disabled={placing}
           >
-            {placing ? "Placing order…" : "Checkout →"}
+            {placing ? "Taking you to payment…" : "Pay & place order →"}
           </button>
         </div>
       </aside>

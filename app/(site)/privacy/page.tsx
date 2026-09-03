@@ -29,7 +29,14 @@ export default function PrivacyPage() {
           <li><strong>Table bookings</strong> — your name, email address, phone number, booking date/time, party size and any notes you add.</li>
           <li><strong>Reviews</strong> — the name, suburb and review text you choose to submit.</li>
         </ul>
-        <p>We do not collect payment card details — orders are paid at pickup.</p>
+        <p>
+          Online orders are paid securely through Stripe, our payment processor — your card details
+          go directly to Stripe and are never seen or stored by us. Stripe&rsquo;s handling of your
+          information is described in the{" "}
+          <a href="https://stripe.com/au/privacy" target="_blank" rel="noopener noreferrer">
+            Stripe Privacy Policy
+          </a>.
+        </p>
 
         <h2>How we use it</h2>
         <ul>
