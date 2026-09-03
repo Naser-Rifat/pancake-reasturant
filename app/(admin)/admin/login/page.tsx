@@ -41,7 +41,7 @@ export default function AdminLoginPage() {
       </div>
 
       <div className="w-full max-w-md space-y-4">
-        <Card className="shadow-xl border-border/80 rounded-2xl bg-card/95 backdrop-blur-md">
+        <Card className="shadow-sm border-border/80 rounded-lg bg-card/95 backdrop-blur-md">
           <CardHeader className="text-center pt-8 pb-6 space-y-3">
             <Link href="/" className="inline-block mx-auto transition-transform hover:scale-105">
               <Image
@@ -119,7 +119,7 @@ export default function AdminLoginPage() {
               {/* Error Alert */}
               {error && (
                 <div className="rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-xs font-medium text-destructive flex items-center gap-2">
-                  <span>⚠️</span>
+                  
                   <span>{error}</span>
                 </div>
               )}
@@ -129,7 +129,7 @@ export default function AdminLoginPage() {
                 type="submit"
                 disabled={busy}
                 loading={busy}
-                className="w-full h-11 text-sm font-semibold rounded-xl !text-white bg-zinc-900 hover:bg-zinc-800 shadow-md mt-2 transition-all"
+                className="w-full h-11 text-sm font-semibold rounded-xl !text-white bg-zinc-900 hover:bg-zinc-800 shadow-xs mt-2 transition-all"
                 style={{ color: "#ffffff" }}
               >
                 {busy ? "Signing in..." : "Sign in to Dashboard"}

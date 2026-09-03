@@ -101,7 +101,7 @@ export default function BookingsPage() {
             newBookingChime();
             toast({
               variant: "info",
-              title: fresh.length === 1 ? "New table booking request 📅" : `${fresh.length} new booking requests 📅`,
+              title: fresh.length === 1 ? "New booking request" : `${fresh.length} new booking requests`,
               description: fresh.map((b) => `${b.name} · ${b.date} ${b.time.slice(0, 5)}`).join(", "),
             });
           }
@@ -164,8 +164,8 @@ export default function BookingsPage() {
         variant: "success",
         title:
           status === "confirmed"
-            ? `${b.name}’s booking confirmed! Confirmation email dispatched.`
-            : `${b.name}’s booking cancelled.`,
+            ? `${b.name}’s booking confirmed — email sent`
+            : `${b.name}’s booking cancelled — guest notified`,
       });
     } catch (e) {
       setBookings(prev);
@@ -201,8 +201,8 @@ export default function BookingsPage() {
       load();
       toast({
         variant: "success",
-        title: `Phone booking for ${form.name} confirmed!`,
-        description: form.email ? `Confirmation email dispatched to ${form.email}` : undefined,
+        title: `Phone booking saved for ${form.name}`,
+        description: form.email ? `Confirmation email sent to ${form.email}` : undefined,
       });
     } catch (err) {
       toast({
@@ -265,17 +265,13 @@ export default function BookingsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Banner Header */}
-      <div className="relative overflow-hidden p-6 sm:p-7 rounded-3xl bg-linear-to-r from-[#fffdf9] via-[#fcf6ee] to-[#faf0e1] border-2 border-[#eee3d5] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="relative overflow-hidden p-6 sm:p-7 rounded-xl bg-white border border-zinc-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-black bg-[#763a12] text-white uppercase tracking-wider shadow-2xs">
-            <CalendarDays className="h-3 w-3 text-amber-300" />
-            TABLE RESERVATIONS &amp; GUESTS
-          </div>
-          <h1 className="text-2xl font-black text-[#211a14] tracking-tight">
-            Booking Management Portal
+          <h1 className="text-2xl font-semibold text-[#211a14] tracking-tight">
+            Bookings
           </h1>
           <p className="text-xs font-medium text-zinc-600 max-w-xl">
-            Review incoming table requests, confirm reservations, record phone bookings, and manage seating capacity.
+            Confirm incoming table requests and record phone bookings. New requests appear automatically with a chime.
           </p>
         </div>
 
@@ -284,7 +280,7 @@ export default function BookingsPage() {
             variant="outline"
             size="sm"
             onClick={() => load(true)}
-            className="border-[#d9c7b4] text-[#763a12] bg-white hover:bg-[#faf5ee] text-xs font-bold rounded-2xl h-10 px-4"
+            className="border-zinc-300 text-[#763a12] bg-white hover:bg-zinc-50 text-xs font-bold rounded-lg h-10 px-4"
           >
             <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Refresh
           </Button>
@@ -293,7 +289,7 @@ export default function BookingsPage() {
               setAdding(true);
               setError("");
             }}
-            className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 px-5 h-10 rounded-2xl shadow-md shrink-0 transition-transform active:scale-95"
+            className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 px-5 h-10 rounded-lg shadow-xs shrink-0 transition-transform"
           >
             <Phone className="h-4 w-4" />
             <span>+ Add Phone Booking</span>
@@ -303,60 +299,54 @@ export default function BookingsPage() {
 
       {/* Quick Metrics Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 [&>*]:min-w-0">
-        <div className="p-4 rounded-2xl border-2 border-[#eee3d5] bg-[#fffdf9] shadow-2xs flex items-center justify-between">
+        <div className="p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs flex items-center justify-between">
           <div className="space-y-0.5">
-            <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Total Records</span>
-            <div className="text-2xl font-black text-[#211a14]">
-              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${bookings.length} Bookings`}
+            <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wide">Total Records</span>
+            <div className="text-2xl font-semibold text-[#211a14]">
+              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${bookings.length}`}
             </div>
           </div>
-          <div className="h-10 w-10 rounded-xl bg-amber-100/80 text-[#763a12] flex items-center justify-center font-bold text-lg">
-            📅
-          </div>
+          
         </div>
 
         <div
-          className={`p-4 rounded-2xl border-2 shadow-2xs flex items-center justify-between transition-all ${
-            pendingCount > 0 ? "border-amber-300 bg-amber-50/70" : "border-[#eee3d5] bg-[#fffdf9]"
+          className={`p-4 rounded-lg border shadow-2xs flex items-center justify-between transition-all ${
+            pendingCount > 0 ? "border-amber-300 bg-amber-50/70" : "border-zinc-200 bg-white"
           }`}
         >
           <div className="space-y-0.5">
-            <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wider">Needs Action</span>
-            <div className="text-2xl font-black text-amber-950 flex items-center gap-2">
+            <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wide">Needs Action</span>
+            <div className="text-2xl font-semibold text-amber-950 flex items-center gap-2">
               {loading ? (
                 <Skeleton className="h-7 w-20 rounded-lg" />
               ) : (
                 <>
-                  {pendingCount} Pending
+                  {pendingCount}
                   {pendingCount > 0 && (
-                    <span className="h-2.5 w-2.5 rounded-full bg-amber-500 animate-ping" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
                   )}
                 </>
               )}
             </div>
           </div>
-          <div className="h-10 w-10 rounded-xl bg-amber-200/80 text-amber-900 flex items-center justify-center font-bold text-lg">
-            ⏳
-          </div>
+          
         </div>
 
-        <div className="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50/50 shadow-2xs flex items-center justify-between">
+        <div className="p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs flex items-center justify-between">
           <div className="space-y-0.5">
-            <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Confirmed</span>
-            <div className="text-2xl font-black text-emerald-950">
-              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${confirmedCount} Approved`}
+            <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wide">Confirmed</span>
+            <div className="text-2xl font-semibold text-emerald-950">
+              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${confirmedCount}`}
             </div>
           </div>
-          <div className="h-10 w-10 rounded-xl bg-emerald-200/80 text-emerald-800 flex items-center justify-center font-bold text-lg">
-            ✅
-          </div>
+          
         </div>
 
-        <div className="p-4 rounded-2xl border-2 border-[#eee3d5] bg-[#fffdf9] shadow-2xs flex items-center justify-between">
+        <div className="p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs flex items-center justify-between">
           <div className="space-y-0.5">
-            <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Confirmed Guests</span>
-            <div className="text-2xl font-black text-[#763a12]">
-              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${totalGuests} Guests`}
+            <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wide">Confirmed Guests</span>
+            <div className="text-2xl font-semibold text-[#763a12]">
+              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${totalGuests}`}
             </div>
           </div>
           <div className="h-10 w-10 rounded-xl bg-zinc-100 text-[#763a12] flex items-center justify-center font-bold text-lg">
@@ -371,15 +361,15 @@ export default function BookingsPage() {
       {/* PHONE BOOKING DRAWER / MODAL CARD                                         */}
       {/* ========================================================================= */}
       {adding && (
-        <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#763a12] shadow-xl space-y-6 ring-4 ring-[#763a12]/10">
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#eee3d5]">
+        <div className="bg-white p-6 sm:p-8 rounded-xl border border-[#763a12] shadow-sm space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-zinc-200">
             <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#763a12] text-white uppercase tracking-wider">
-                📞 STAFF PHONE RESERVATION
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#763a12] text-white uppercase tracking-wide">
+                PHONE BOOKING
               </div>
-              <h3 className="text-lg font-black text-[#211a14]">Take Instant Phone Booking</h3>
+              <h3 className="text-lg font-semibold text-[#211a14]">New phone booking</h3>
               <p className="text-xs text-zinc-500">
-                Direct phone reservation. Automatically marked as <strong>Confirmed</strong> on save.
+                Recorded by staff and saved as <strong>confirmed</strong>.
               </p>
             </div>
             <Button
@@ -396,13 +386,13 @@ export default function BookingsPage() {
           <form onSubmit={submitPhoneBooking} className="space-y-5">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="space-y-1 sm:col-span-2">
-                <Label htmlFor="pb-name" className="text-xs font-black text-[#211a14]">
+                <Label htmlFor="pb-name" className="text-xs font-semibold text-[#211a14]">
                   Guest Full Name *
                 </Label>
                 <Input
                   id="pb-name"
                   required
-                  className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                  className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                   placeholder="e.g. Sarah Jenkins"
                   value={form.name}
                   onChange={set("name")}
@@ -410,14 +400,14 @@ export default function BookingsPage() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="pb-phone" className="text-xs font-black text-[#211a14]">
+                <Label htmlFor="pb-phone" className="text-xs font-semibold text-[#211a14]">
                   Contact Phone Number *
                 </Label>
                 <Input
                   id="pb-phone"
                   required
                   type="tel"
-                  className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                  className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                   placeholder="04xx xxx xxx"
                   value={form.phone}
                   onChange={set("phone")}
@@ -425,13 +415,13 @@ export default function BookingsPage() {
               </div>
 
               <div className="space-y-1 sm:col-span-2">
-                <Label htmlFor="pb-email" className="text-xs font-black text-[#211a14]">
+                <Label htmlFor="pb-email" className="text-xs font-semibold text-[#211a14]">
                   Email Address (Optional — sends confirmation email)
                 </Label>
                 <Input
                   id="pb-email"
                   type="email"
-                  className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                  className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                   placeholder="sarah@example.com"
                   value={form.email}
                   onChange={set("email")}
@@ -439,12 +429,12 @@ export default function BookingsPage() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="pb-party" className="text-xs font-black text-[#211a14]">
+                <Label htmlFor="pb-party" className="text-xs font-semibold text-[#211a14]">
                   Party Size (Guests) *
                 </Label>
                 <Select
                   id="pb-party"
-                  className="h-10 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                  className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
                   value={form.party_size}
                   onChange={set("party_size")}
                 >
@@ -457,7 +447,7 @@ export default function BookingsPage() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="pb-date" className="text-xs font-black text-[#211a14]">
+                <Label htmlFor="pb-date" className="text-xs font-semibold text-[#211a14]">
                   Reservation Date *
                 </Label>
                 <Input
@@ -465,33 +455,33 @@ export default function BookingsPage() {
                   required
                   type="date"
                   min={new Date().toISOString().split("T")[0]}
-                  className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                  className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                   value={form.date}
                   onChange={set("date")}
                 />
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="pb-time" className="text-xs font-black text-[#211a14]">
+                <Label htmlFor="pb-time" className="text-xs font-semibold text-[#211a14]">
                   Arrival Time *
                 </Label>
                 <Input
                   id="pb-time"
                   required
                   type="time"
-                  className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                  className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                   value={form.time}
                   onChange={set("time")}
                 />
               </div>
 
               <div className="space-y-1 sm:col-span-2 lg:col-span-3">
-                <Label htmlFor="pb-notes" className="text-xs font-black text-[#211a14]">
+                <Label htmlFor="pb-notes" className="text-xs font-semibold text-[#211a14]">
                   Table Request &amp; Dietary Notes
                 </Label>
                 <Input
                   id="pb-notes"
-                  className="border-[#d9c7b4] text-[#211a14] font-medium text-xs h-10 rounded-xl"
+                  className="border-zinc-300 text-[#211a14] font-medium text-xs h-10 rounded-xl"
                   placeholder="e.g. Birthday celebration, window booth requested, highchair needed"
                   value={form.notes}
                   onChange={set("notes")}
@@ -499,7 +489,7 @@ export default function BookingsPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-4 border-t border-[#eee3d5]">
+            <div className="flex items-center justify-end gap-2 pt-4 border-t border-zinc-200">
               <Button
                 type="button"
                 variant="ghost"
@@ -523,13 +513,13 @@ export default function BookingsPage() {
       {/* ========================================================================= */}
       {/* SEARCH & STATUS FILTER BAR                                                */}
       {/* ========================================================================= */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-[#fffdf9] border-2 border-[#eee3d5] shadow-xs space-y-4">
+      <div className="p-4 sm:p-5 rounded-xl bg-white border border-zinc-200 shadow-xs space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Search Box */}
           <div className="relative flex-1 min-w-[240px]">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
             <Input
-              className="pl-10 h-11 text-xs font-bold border-[#d9c7b4] rounded-2xl bg-white text-[#211a14] placeholder:text-zinc-400"
+              className="pl-10 h-11 text-xs font-bold border-zinc-300 rounded-lg bg-white text-[#211a14] placeholder:text-zinc-400"
               placeholder="Search by guest name, phone, email, date (YYYY-MM-DD), or dish..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -553,7 +543,7 @@ export default function BookingsPage() {
         </div>
 
         {/* Status Filter Tabs */}
-        <div className="flex flex-wrap gap-2 pt-1 border-t border-[#eee3d5]">
+        <div className="flex flex-wrap gap-2 pt-1 border-t border-zinc-200">
           {FILTERS.map((f) => {
             const isSelected = filter === f;
             const count =
@@ -565,13 +555,12 @@ export default function BookingsPage() {
                 key={f}
                 type="button"
                 onClick={() => setFilter(f)}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black capitalize transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
                   isSelected
-                    ? "bg-[#763a12] text-white shadow-xs scale-[1.02]"
-                    : "bg-white text-[#211a14] border border-[#d9c7b4] hover:bg-[#faf5ee]"
+                    ? "bg-[#763a12] text-white shadow-xs"
+                    : "bg-white text-[#211a14] border border-zinc-300 hover:bg-zinc-50"
                 }`}
               >
-                <span>{f === "pending" ? "⏳" : f === "confirmed" ? "✅" : f === "cancelled" ? "❌" : "📅"}</span>
                 <span>{f}</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
@@ -589,15 +578,15 @@ export default function BookingsPage() {
       {/* ========================================================================= */}
       {/* BOOKINGS TABLE                                                            */}
       {/* ========================================================================= */}
-      <div className="bg-[#fffdf9] rounded-3xl border-2 border-[#eee3d5] shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-6">
             <TableSkeleton rows={6} cols={8} />
           </div>
         ) : filteredBookings.length === 0 ? (
           <div className="py-16 text-center space-y-3">
-            <div className="text-4xl">📅</div>
-            <h3 className="text-base font-black text-[#211a14]">No reservations found</h3>
+            
+            <h3 className="text-base font-semibold text-[#211a14]">No reservations found</h3>
             <p className="text-xs text-zinc-500 max-w-sm mx-auto">
               No bookings matched your filter or search query.
             </p>
@@ -606,7 +595,7 @@ export default function BookingsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b-2 border-[#eee3d5] bg-[#faf5ee]/80 text-[#763a12] text-[11px] font-black uppercase tracking-wider">
+                <tr className="border-b border-zinc-200 bg-zinc-50 text-[#763a12] text-[11px] font-semibold uppercase tracking-wide">
                   <th className="py-3.5 px-4">Guest Info</th>
                   <th className="py-3.5 px-3">Date &amp; Arrival</th>
                   <th className="py-3.5 px-3 text-center">Party Size</th>
@@ -615,13 +604,13 @@ export default function BookingsPage() {
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#eee3d5] text-xs font-medium text-[#211a14] [&>tr>td]:align-top">
+              <tbody className="divide-y divide-zinc-100 text-xs font-medium text-[#211a14] [&>tr>td]:align-top">
                 {pageBookings.map((b) => (
-                  <tr key={b.public_id} className="hover:bg-[#fcf8f2] transition-colors">
+                  <tr key={b.public_id} className="hover:bg-zinc-50 transition-colors">
                     {/* Guest Name & Contact */}
                     <td className="py-3.5 px-4 min-w-[200px]">
                       <div className="space-y-0.5">
-                        <div className="font-black text-sm text-[#211a14] whitespace-nowrap">{b.name}</div>
+                        <div className="font-semibold text-sm text-[#211a14] whitespace-nowrap">{b.name}</div>
                         <div className="flex flex-wrap items-center gap-2 text-[11px] text-zinc-500">
                           {b.email && (
                             <span className="flex items-center gap-1 text-zinc-600">
@@ -645,7 +634,7 @@ export default function BookingsPage() {
                     {/* Date & Time */}
                     <td className="py-3.5 px-3 whitespace-nowrap">
                       <div className="space-y-0.5">
-                        <div className="font-black text-xs text-[#211a14]">
+                        <div className="font-semibold text-xs text-[#211a14]">
                           {new Date(`${b.date}T00:00:00`).toLocaleDateString("en-AU", {
                             weekday: "short",
                             day: "numeric",
@@ -653,7 +642,7 @@ export default function BookingsPage() {
                             year: "numeric",
                           })}
                         </div>
-                        <div className="text-[11px] font-bold text-[#763a12] bg-amber-100/70 border border-amber-200 px-2 py-0.5 rounded-md inline-block">
+                        <div className="text-[11px] font-bold text-[#763a12] bg-zinc-50 border border-zinc-200 px-2 py-0.5 rounded-md inline-block">
                           {formatTime12h(b.time)}
                         </div>
                       </div>
@@ -661,7 +650,7 @@ export default function BookingsPage() {
 
                     {/* Party Size */}
                     <td className="py-3.5 px-3 text-center whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black bg-amber-50 text-[#763a12] border border-amber-200">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-[#763a12] border border-amber-200">
                         <Users className="h-3 w-3" />
                         {b.party_size} {b.party_size === 1 ? "Guest" : "Guests"}
                       </span>
@@ -675,9 +664,9 @@ export default function BookingsPage() {
                             {b.preselected_dish.split(", ").map((d) => (
                               <span
                                 key={d}
-                                className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#faf5ee] border border-[#ecdac7] text-[#763a12]"
+                                className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 border border-zinc-200 text-[#763a12]"
                               >
-                                🥞 {d}
+                                {d}
                               </span>
                             ))}
                           </div>
@@ -695,15 +684,15 @@ export default function BookingsPage() {
                     {/* Status Badge */}
                     <td className="py-3.5 px-3 text-center whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wide ${
                           b.status === "confirmed"
                             ? "bg-emerald-100 text-emerald-950 border border-emerald-300"
                             : b.status === "pending"
-                            ? "bg-amber-100 text-amber-950 border border-amber-300 animate-pulse"
+                            ? "bg-amber-100 text-amber-950 border border-amber-300"
                             : "bg-rose-100 text-rose-950 border border-rose-300"
                         }`}
                       >
-                        {b.status === "confirmed" ? "✓ Confirmed" : b.status === "pending" ? "⏳ Pending" : "✕ Cancelled"}
+                        {b.status === "confirmed" ? "Confirmed" : b.status === "pending" ? "Pending" : "Cancelled"}
                       </span>
                     </td>
 

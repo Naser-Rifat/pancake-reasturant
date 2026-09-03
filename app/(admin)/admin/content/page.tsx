@@ -13,7 +13,6 @@ import {
   Award,
   Images,
   ExternalLink,
-  Sparkles,
   Gift,
   Check,
   Calendar,
@@ -284,7 +283,7 @@ export default function ContentPage() {
     setBusy(what);
     try {
       await fn();
-      toast({ variant: "success", title: `${what} saved! ✨`, ...success });
+      toast({ variant: "success", title: `${what} saved`, ...success });
     } catch (e) {
       toast({
         variant: "error",
@@ -299,39 +298,39 @@ export default function ContentPage() {
   if (loading) {
     return (
       <div className="space-y-6 max-w-7xl mx-auto">
-        <div className="p-6 sm:p-7 rounded-3xl bg-[#fffdf9] border-2 border-[#eee3d5] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="p-6 sm:p-7 rounded-xl bg-white border border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-2">
             <Skeleton className="h-5 w-32 rounded-full" />
             <Skeleton className="h-7 w-64 rounded-xl" />
             <Skeleton className="h-4 w-96 rounded-lg" />
           </div>
           <div className="flex gap-2">
-            <Skeleton className="h-10 w-28 rounded-2xl" />
-            <Skeleton className="h-10 w-28 rounded-2xl" />
+            <Skeleton className="h-10 w-28 rounded-lg" />
+            <Skeleton className="h-10 w-28 rounded-lg" />
           </div>
         </div>
 
         {/* 6 Tabs Skeleton */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className="h-14 w-full rounded-2xl" />
+            <Skeleton key={i} className="h-14 w-full rounded-lg" />
           ))}
         </div>
 
         {/* Active Panel Skeleton */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-[#fffdf9] border-2 border-[#eee3d5] space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-[#eee3d5]">
+        <div className="p-6 sm:p-8 rounded-xl bg-white border border-zinc-200 space-y-6">
+          <div className="flex items-center justify-between pb-4 border-b border-zinc-200">
             <div className="space-y-2">
               <Skeleton className="h-6 w-48 rounded-xl" />
               <Skeleton className="h-4 w-72 rounded-lg" />
             </div>
-            <Skeleton className="h-10 w-32 rounded-2xl" />
+            <Skeleton className="h-10 w-32 rounded-lg" />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Skeleton className="h-24 w-full rounded-2xl" />
-            <Skeleton className="h-24 w-full rounded-2xl" />
+            <Skeleton className="h-24 w-full rounded-lg" />
+            <Skeleton className="h-24 w-full rounded-lg" />
           </div>
-          <Skeleton className="h-64 w-full rounded-3xl" />
+          <Skeleton className="h-64 w-full rounded-xl" />
         </div>
       </div>
     );
@@ -411,12 +410,12 @@ export default function ContentPage() {
 
   // Exact step-by-step order of sections on the HOMEPAGE (top to bottom)
   const HOME_SECTIONS = [
-    { num: 1, label: "Top Hero Banner", icon: Flame, color: "from-amber-500 to-orange-500" },
-    { num: 2, label: "Campaigns & Offers (Both 2A & 2B)", icon: Gift, color: "from-rose-500 to-pink-500" },
-    { num: 3, label: "Photo Mosaic", icon: Camera, color: "from-purple-500 to-indigo-500" },
-    { num: 4, label: "Trust Badges", icon: Award, color: "from-emerald-500 to-teal-500" },
-    { num: 5, label: "Booking Banner", icon: Megaphone, color: "from-orange-500 to-amber-600" },
-    { num: 6, label: "Footer Tagline", icon: Coffee, color: "from-blue-500 to-cyan-500" },
+    { num: 1, label: "Top Hero Banner", icon: Flame },
+    { num: 2, label: "Campaigns & Offers (Both 2A & 2B)", icon: Gift },
+    { num: 3, label: "Photo Mosaic", icon: Camera },
+    { num: 4, label: "Trust Badges", icon: Award },
+    { num: 5, label: "Booking Banner", icon: Megaphone },
+    { num: 6, label: "Footer Tagline", icon: Coffee },
   ];
 
   return (
@@ -424,23 +423,15 @@ export default function ContentPage() {
       {/* ========================================================================= */}
       {/* 🌟 HERO BRAND BANNER — WARM GOURMET PANCAKE CLUB AESTHETIC                */}
       {/* ========================================================================= */}
-      <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-[#fff7e6] via-[#fef3d6] to-[#fde8bb] border-2 border-[#e6c88b] p-6 sm:p-8 shadow-sm">
-        <div className="absolute right-[-20px] top-[-20px] text-8xl opacity-10 pointer-events-none select-none font-serif">
-          🥞
-        </div>
+      <div className="relative overflow-hidden rounded-xl bg-white border border-zinc-200 p-6 sm:p-8 shadow-sm">
 
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-5">
           <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#763a12] text-white text-xs font-bold shadow-xs">
-              <span>🥞 The Pancake Club</span>
-              <span className="text-amber-300">·</span>
-              <span className="text-amber-200">1:1 Real Live Visual Studio</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#211a14]">
-              Website Visual Content Studio
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#211a14]">
+              Site Content
             </h1>
             <p className="text-xs sm:text-sm font-medium text-[#763a12]/80 max-w-xl">
-              Type in the inputs below to see a <strong>100% same-to-same, pixel-perfect real preview</strong> using the authentic public website components and fonts.
+              Edit the website below — the preview shows exactly what visitors will see.
             </p>
           </div>
 
@@ -449,7 +440,7 @@ export default function ContentPage() {
               href={activePage === "home" ? "/" : `/${activePage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-xs font-bold text-[#763a12] bg-white/95 hover:bg-white p-3 px-4 rounded-2xl border border-[#e6c88b] shadow-sm hover:shadow-md transition-all shrink-0 group"
+              className="inline-flex items-center gap-2 text-xs font-bold text-[#763a12] bg-white/95 hover:bg-white p-3 px-4 rounded-lg border border-zinc-200 shadow-sm hover:shadow-xs transition-all shrink-0 group"
             >
               <Eye className="h-4 w-4 text-amber-600 transition-transform group-hover:scale-110" />
               <span>Open Live Website</span>
@@ -462,7 +453,7 @@ export default function ContentPage() {
       {/* ========================================================================= */}
       {/* 🥞 LEVEL 1: SLEEK PAGE NAVIGATOR (CAPSULE PILLS)                          */}
       {/* ========================================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-2 bg-[#f4ebe1] rounded-2xl border border-[#e4d3c2]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-2 bg-zinc-100 rounded-lg border border-zinc-200">
         <div className="flex flex-wrap items-center gap-1.5 w-full">
           {PAGES.map((p) => {
             const Icon = p.icon;
@@ -474,7 +465,7 @@ export default function ContentPage() {
                 onClick={() => setActivePage(p.id as PageTab)}
                 className={`flex-1 min-w-[130px] flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-xl font-bold text-xs transition-all ${
                   isSelected
-                    ? "bg-[#763a12] text-white shadow-sm shadow-[#763a12]/30 scale-[1.02]"
+                    ? "bg-[#763a12] text-white shadow-sm shadow-[#763a12]/30"
                     : "bg-white/60 hover:bg-white text-[#763a12] hover:text-[#211a14] border border-transparent"
                 }`}
               >
@@ -499,15 +490,14 @@ export default function ContentPage() {
       {activePage === "home" && (
         <div className="space-y-6">
           {/* Section Step Timeline Selector */}
-          <div className="bg-[#fffdf9] p-4 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-3">
+          <div className="bg-white p-4 rounded-xl border border-zinc-200 shadow-sm space-y-3">
             <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-black uppercase tracking-wider text-[#763a12] flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-amber-600" />
-                <span>Homepage Chronological Flow:</span>
+              <span className="text-xs font-semibold uppercase tracking-wide text-[#763a12] flex items-center gap-2">
+                <span>Homepage sections</span>
               </span>
               <div className="flex items-center gap-3">
                 {/* Desktop / Mobile Preview Mode Switcher */}
-                <div className="flex items-center bg-[#f4ebe1] p-1 rounded-xl border border-[#e4d3c2]">
+                <div className="flex items-center bg-zinc-100 p-1 rounded-xl border border-zinc-200">
                   <button
                     type="button"
                     onClick={() => setViewport("desktop")}
@@ -550,23 +540,23 @@ export default function ContentPage() {
                     key={sec.num}
                     type="button"
                     onClick={() => setHomeStepIndex(sec.num)}
-                    className={`flex items-center gap-2.5 p-2.5 rounded-2xl border text-left transition-all ${
+                    className={`flex items-center gap-2.5 p-2.5 rounded-lg border text-left transition-all ${
                       isActive
-                        ? "bg-[#763a12] text-white border-[#763a12] shadow-md scale-[1.03]"
-                        : "bg-white hover:bg-[#faf5ee] text-[#211a14] border-[#e8dacb]"
+                        ? "bg-[#763a12] text-white border-[#763a12] shadow-xs"
+                        : "bg-white hover:bg-zinc-50 text-[#211a14] border-zinc-200"
                     }`}
                   >
                     <div
                       className={`h-7 w-7 rounded-xl flex items-center justify-center shrink-0 ${
                         isActive
                           ? "bg-white/20 text-white"
-                          : "bg-linear-to-br " + sec.color + " text-white shadow-2xs"
+                          : "bg-zinc-100 text-[#763a12]"
                       }`}
                     >
                       <Icon className="h-3.5 w-3.5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className={`text-[10px] font-black uppercase ${isActive ? "text-amber-300" : "text-zinc-400"}`}>
+                      <div className={`text-[10px] font-semibold uppercase ${isActive ? "text-amber-300" : "text-zinc-400"}`}>
                         Step {sec.num}
                       </div>
                       <div className={`text-xs font-bold truncate ${isActive ? "text-white" : "text-[#211a14]"}`}>
@@ -585,23 +575,20 @@ export default function ContentPage() {
       {/* ========================================================================= */}
       {/* 🌟 ONE PERSISTENT LIVE PREVIEW — never reloads, so no flash on switching   */}
       {/* ========================================================================= */}
-      <div className="rounded-3xl bg-[#f8f2e0] border-2 border-[#e3d1b6] p-4 sm:p-6 shadow-md space-y-3">
+      <div className="rounded-xl bg-white border border-zinc-200 p-4 sm:p-6 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-2">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="px-3.5 py-1 rounded-full text-xs font-black bg-[#763a12] text-white flex items-center gap-1.5 shadow-xs">
-              <Sparkles className="h-3.5 w-3.5 text-amber-300" />
-              {activePage === "home"
-                ? "100% REAL SAME-TO-SAME PUBLIC PREVIEW"
-                : `100% REAL ${activePage.toUpperCase()} PAGE LIVE PREVIEW`}
+            <span className="px-3.5 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white flex items-center gap-1.5 shadow-xs">
+              {activePage === "home" ? "Live preview" : `Live preview — ${activePage} page`}
             </span>
 
             {/* Dual Campaign Channel Switcher in Step 2 */}
             {activePage === "home" && homeStepIndex === 2 && (
-              <div className="inline-flex items-center bg-white p-1 rounded-2xl border border-[#d9c7b4] shadow-xs">
+              <div className="inline-flex items-center bg-white p-1 rounded-lg border border-zinc-300 shadow-xs">
                 <button
                   type="button"
                   onClick={() => setCampaignChannel("channel1")}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold transition-all ${
                     campaignChannel === "channel1"
                       ? "bg-[#763a12] text-white shadow-xs"
                       : "text-[#763a12] hover:text-[#211a14]"
@@ -613,7 +600,7 @@ export default function ContentPage() {
                 <button
                   type="button"
                   onClick={() => setCampaignChannel("channel2")}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold transition-all ${
                     campaignChannel === "channel2"
                       ? "bg-[#763a12] text-white shadow-xs"
                       : "text-[#763a12] hover:text-[#211a14]"
@@ -659,7 +646,7 @@ export default function ContentPage() {
 
         {/* Simulated Public Device Frame */}
         <div className={`mx-auto transition-all ${activePage === "home" && viewport === "mobile" ? "max-w-[420px]" : "w-full"}`}>
-          <div className="rounded-3xl overflow-hidden border-2 border-[#e8dacb] shadow-xl bg-[var(--cream)]">
+          <div className="rounded-xl overflow-hidden border border-zinc-200 shadow-sm bg-[var(--cream)]">
             <iframe
               ref={iframeRef}
               src="/preview"
@@ -707,17 +694,17 @@ export default function ContentPage() {
           {/* STEP 1: TOP HERO BANNER (INPUTS + 3-SLOT CAROUSEL STATION)            */}
           {/* --------------------------------------------------------------------- */}
           {homeStepIndex === 1 && (
-            <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
-              <div className="flex items-center gap-2 pb-2 border-b border-[#eee3d5]">
+            <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
+              <div className="flex items-center gap-2 pb-2 border-b border-zinc-200">
                 <Palette className="h-5 w-5 text-[#aa4c0a]" />
-                <h3 className="text-base font-black text-[#211a14]">Edit Hero Text &amp; Images</h3>
+                <h3 className="text-base font-semibold text-[#211a14]">Edit Hero Text &amp; Images</h3>
               </div>
 
               <div className="grid gap-5 sm:grid-cols-2 [&>*]:min-w-0">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-black text-[#211a14]">1. Main Headline (Bold First Part)</Label>
+                  <Label className="text-xs font-semibold text-[#211a14]">1. Main Headline (Bold First Part)</Label>
                   <Input
-                    className="border-[#d9c7b4] bg-white text-[#211a14] font-bold text-sm h-11 rounded-xl"
+                    className="border-zinc-300 bg-white text-[#211a14] font-bold text-sm h-11 rounded-xl"
                     placeholder="e.g. Stack Into"
                     value={site.hero_heading}
                     onChange={setS("hero_heading")}
@@ -726,9 +713,9 @@ export default function ContentPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-black text-[#211a14]">2. Fancy Handwriting Word (Second Part)</Label>
+                  <Label className="text-xs font-semibold text-[#211a14]">2. Fancy Handwriting Word (Second Part)</Label>
                   <Input
-                    className="border-[#d9c7b4] bg-white text-[#211a14] font-bold text-sm h-11 rounded-xl font-serif italic"
+                    className="border-zinc-300 bg-white text-[#211a14] font-bold text-sm h-11 rounded-xl font-serif italic"
                     placeholder="e.g. Happiness"
                     value={site.hero_script}
                     onChange={setS("hero_script")}
@@ -737,17 +724,17 @@ export default function ContentPage() {
                 </div>
 
                 <div className="sm:col-span-2 space-y-1.5">
-                  <Label className="text-xs font-black text-[#211a14]">3. Welcome Subtitle Tagline</Label>
+                  <Label className="text-xs font-semibold text-[#211a14]">3. Welcome Subtitle Tagline</Label>
                   <Textarea
                     rows={2}
-                    className="border-[#d9c7b4] bg-white text-[#211a14] font-medium text-sm rounded-xl"
+                    className="border-zinc-300 bg-white text-[#211a14] font-medium text-sm rounded-xl"
                     placeholder="e.g. We flip the best homemade pancakes in Sydney..."
                     value={site.hero_lead}
                     onChange={setS("hero_lead")}
                   />
                 </div>
 
-                <div className="sm:col-span-2 grid gap-5 md:grid-cols-2 p-5 rounded-2xl border border-[#ecdac7] bg-[#faf5ee]">
+                <div className="sm:col-span-2 grid gap-5 md:grid-cols-2 p-5 rounded-lg border border-zinc-200 bg-zinc-50">
                   <ImageField
                     id="hero-image"
                     label="Background Pancake Stack Photo (Slide 1 in Carousel)"
@@ -771,18 +758,17 @@ export default function ContentPage() {
                 </div>
 
                 {/* 🌟 3-SLOT HERO CAROUSEL CONTROLLER */}
-                <div className="sm:col-span-2 p-5 sm:p-6 rounded-3xl border-2 border-amber-300 bg-amber-50/40 space-y-5">
+                <div className="sm:col-span-2 p-5 sm:p-6 rounded-xl border border-zinc-200 bg-white space-y-5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-amber-200">
                     <div>
-                      <h4 className="text-sm font-black text-[#211a14] uppercase tracking-wider flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-amber-600" />
-                        The 3 Hero Carousel Slides &amp; Live Price Tag
+                      <h4 className="text-sm font-semibold text-[#211a14] uppercase tracking-wide flex items-center gap-2">
+                        Hero carousel slides &amp; price tag
                       </h4>
                       <p className="text-xs font-medium text-zinc-600 mt-0.5">
-                        These are the exact 3 slides shown on the public website hero switcher. Changes are saved instantly to the database!
+                        The three slides shown in the website's hero switcher. Changes save instantly.
                       </p>
                     </div>
-                    <div className="px-3.5 py-1.5 rounded-full bg-[#763a12] text-amber-300 text-xs font-black self-start sm:self-auto shadow-xs">
+                    <div className="px-3.5 py-1.5 rounded-full bg-[#763a12] text-amber-300 text-xs font-semibold self-start sm:self-auto shadow-xs">
                       Live Price Tag: From ${featuredPrice}
                     </div>
                   </div>
@@ -790,12 +776,12 @@ export default function ContentPage() {
                   {/* 3 Dedicated Slots */}
                   <div className="grid gap-4 sm:grid-cols-3 [&>*]:min-w-0">
                     {/* SLOT 1 */}
-                    <div className="p-4 rounded-2xl border-2 border-amber-400 bg-white shadow-sm space-y-3">
+                    <div className="p-4 rounded-lg border border-zinc-300 bg-white shadow-sm space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500 text-white">
+                        <span className="text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-[#763a12] text-white">
                           Slide 1 (Main)
                         </span>
-                        <span className="text-xs font-black text-amber-800">From ${featuredPrice}</span>
+                        <span className="text-xs font-semibold text-amber-800">From ${featuredPrice}</span>
                       </div>
                       <div className="relative h-28 rounded-xl overflow-hidden bg-zinc-100 border">
                         {site.hero_image ? (
@@ -805,7 +791,7 @@ export default function ContentPage() {
                         )}
                       </div>
                       <div>
-                        <p className="text-xs font-black text-[#211a14]">Signature Hero Stack</p>
+                        <p className="text-xs font-semibold text-[#211a14]">Signature Hero Stack</p>
                         <p className="text-[11px] font-medium text-emerald-700 flex items-center gap-1 mt-0.5">
                           <CheckCircle2 className="h-3.5 w-3.5" /> Background Photo Above
                         </p>
@@ -813,12 +799,12 @@ export default function ContentPage() {
                     </div>
 
                     {/* SLOT 2 */}
-                    <div className="p-4 rounded-2xl border-2 border-[#763a12] bg-[#fffdf9] shadow-md ring-2 ring-[#763a12]/15 space-y-3">
+                    <div className="p-4 rounded-lg border border-[#763a12] bg-white shadow-xs ring-2 ring-[#763a12]/15 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full bg-[#763a12] text-amber-300">
+                        <span className="text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-[#763a12] text-amber-300">
                           Slide 2 (Carousel)
                         </span>
-                        <span className="text-xs font-black text-[#aa4c0a]">
+                        <span className="text-xs font-semibold text-[#aa4c0a]">
                           {slot2Dish ? `$${parseFloat(slot2Dish.price)}` : "Select dish"}
                         </span>
                       </div>
@@ -830,11 +816,11 @@ export default function ContentPage() {
                         )}
                       </div>
                       <div className="space-y-1.5">
-                        <p className="text-xs font-black truncate text-[#211a14]">
+                        <p className="text-xs font-semibold truncate text-[#211a14]">
                           {slot2Dish ? slot2Dish.name : "No dish chosen"}
                         </p>
                         <Select
-                          className="h-9 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                          className="h-9 text-xs border-zinc-300 font-bold rounded-xl"
                           value={slot2Dish?.slug ?? ""}
                           onChange={(e) => {
                             const newSlug = e.target.value;
@@ -849,7 +835,7 @@ export default function ContentPage() {
                                   return x;
                                 })
                               );
-                            }, "Hero Slide 2", { title: "Slide 2 updated & saved! ⭐" });
+                            }, "Hero Slide 2", { title: "Slide 2 updated" });
                           }}
                         >
                           <option value="">-- Choose Dish for Slide 2 --</option>
@@ -863,12 +849,12 @@ export default function ContentPage() {
                     </div>
 
                     {/* SLOT 3 */}
-                    <div className="p-4 rounded-2xl border-2 border-[#763a12] bg-[#fffdf9] shadow-md ring-2 ring-[#763a12]/15 space-y-3">
+                    <div className="p-4 rounded-lg border border-[#763a12] bg-white shadow-xs ring-2 ring-[#763a12]/15 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full bg-[#763a12] text-amber-300">
+                        <span className="text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-[#763a12] text-amber-300">
                           Slide 3 (Carousel)
                         </span>
-                        <span className="text-xs font-black text-[#aa4c0a]">
+                        <span className="text-xs font-semibold text-[#aa4c0a]">
                           {slot3Dish ? `$${parseFloat(slot3Dish.price)}` : "Select dish"}
                         </span>
                       </div>
@@ -880,11 +866,11 @@ export default function ContentPage() {
                         )}
                       </div>
                       <div className="space-y-1.5">
-                        <p className="text-xs font-black truncate text-[#211a14]">
+                        <p className="text-xs font-semibold truncate text-[#211a14]">
                           {slot3Dish ? slot3Dish.name : "No dish chosen"}
                         </p>
                         <Select
-                          className="h-9 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                          className="h-9 text-xs border-zinc-300 font-bold rounded-xl"
                           value={slot3Dish?.slug ?? ""}
                           onChange={(e) => {
                             const newSlug = e.target.value;
@@ -899,7 +885,7 @@ export default function ContentPage() {
                                   return x;
                                 })
                               );
-                            }, "Hero Slide 3", { title: "Slide 3 updated & saved! ⭐" });
+                            }, "Hero Slide 3", { title: "Slide 3 updated" });
                           }}
                         >
                           <option value="">-- Choose Dish for Slide 3 --</option>
@@ -915,7 +901,7 @@ export default function ContentPage() {
 
                   {/* All Menu Dishes Quick Selector */}
                   <div className="pt-3 border-t border-amber-200">
-                    <span className="text-xs font-black text-[#763a12] uppercase tracking-wider block mb-2.5">
+                    <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide block mb-2.5">
                       All Menu Dishes ({menuItems.length} items available in Catalog):
                     </span>
                     <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4 [&>*]:min-w-0">
@@ -938,7 +924,7 @@ export default function ContentPage() {
                               )}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="text-xs font-black truncate text-[#211a14]">{m.name}</p>
+                              <p className="text-xs font-semibold truncate text-[#211a14]">{m.name}</p>
                               <p className="text-[11px] font-bold text-[#aa4c0a]">${parseFloat(m.price)}</p>
                             </div>
                             <button
@@ -951,11 +937,11 @@ export default function ContentPage() {
                                   );
                                 }, "Dish carousel status", {
                                   title: isFeatured
-                                    ? `✓ ${m.name} removed from hero carousel`
-                                    : `✓ ${m.name} added to hero carousel! ⭐`,
+                                    ? `${m.name} removed from the hero carousel`
+                                    : `${m.name} added to the hero carousel`,
                                 })
                               }
-                              className={`px-2 py-1 rounded-lg text-[10px] font-black transition-colors ${
+                              className={`px-2 py-1 rounded-lg text-[10px] font-semibold transition-colors ${
                                 isFeatured
                                   ? "bg-rose-100 text-rose-800 hover:bg-rose-200"
                                   : "bg-[#763a12] text-white hover:bg-[#5e2d0d]"
@@ -971,7 +957,7 @@ export default function ContentPage() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#eee3d5]">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
                 <span className="text-xs font-bold text-zinc-500">Section 1 Complete</span>
                 <Button
                   type="button"
@@ -991,8 +977,8 @@ export default function ContentPage() {
           {homeStepIndex === 2 && (
             <div className="space-y-6">
               {legacyBackend && (
-                <div className="p-4 rounded-2xl border-2 border-amber-300 bg-amber-50 text-xs font-bold text-amber-900 leading-relaxed">
-                  ⚠️ The live server is still running the old backend, so the Band/Slider split and the Section
+                <div className="p-4 rounded-lg border border-amber-300 bg-amber-50 text-xs font-bold text-amber-900 leading-relaxed">
+                  The live server is still running the old backend, so the Band/Slider split and the Section
                   Titles below can&apos;t save yet. For now every deal sits in the <strong>Offers Slider</strong>{" "}
                   station — edit them there. Everything here starts working after the next backend deploy
                   (migrations 0020–0023).
@@ -1000,9 +986,9 @@ export default function ContentPage() {
               )}
 
               {/* Which station am I editing? */}
-              <div className="p-4 sm:p-5 rounded-3xl bg-linear-to-r from-rose-50 via-pink-50 to-amber-50 border-2 border-rose-200 shadow-xs space-y-3">
+              <div className="p-4 sm:p-5 rounded-xl bg-white border border-zinc-200 shadow-xs space-y-3">
                 <p className="text-xs font-bold text-[#211a14] leading-relaxed">
-                  ℹ️ <strong>Two separate campaign spots:</strong> the <strong>Top Deal Band</strong> sits under
+                  <strong>Two separate campaign spots:</strong> the <strong>Top Deal Band</strong> sits under
                   the hero and changes often — the <strong>Offers Slider</strong> comes after the menu and runs
                   long-term offers. Each has its own deals; they never mix.
                 </p>
@@ -1013,10 +999,10 @@ export default function ContentPage() {
                       setCampaignChannel("channel1");
                       setSelectedDealId(null);
                     }}
-                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black transition-all ${
+                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                       campaignChannel === "channel1"
-                        ? "bg-rose-600 text-white shadow-md"
-                        : "bg-white hover:bg-zinc-100 text-[#211a14] border border-rose-200"
+                        ? "bg-[#763a12] text-white shadow-xs"
+                        : "bg-white hover:bg-zinc-100 text-[#211a14] border border-zinc-200"
                     }`}
                   >
                     <Gift className="h-4 w-4" />
@@ -1028,10 +1014,10 @@ export default function ContentPage() {
                       setCampaignChannel("channel2");
                       setSelectedDealId(null);
                     }}
-                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black transition-all ${
+                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                       campaignChannel === "channel2"
-                        ? "bg-[#763a12] text-white shadow-md"
-                        : "bg-white hover:bg-zinc-100 text-[#211a14] border border-rose-200"
+                        ? "bg-[#763a12] text-white shadow-xs"
+                        : "bg-white hover:bg-zinc-100 text-[#211a14] border border-zinc-200"
                     }`}
                   >
                     <Ticket className="h-4 w-4" />
@@ -1041,9 +1027,9 @@ export default function ContentPage() {
               </div>
 
               {/* Section headings for the selected station */}
-              <div className="p-5 rounded-3xl border-2 border-[#eee3d5] bg-white shadow-sm space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[#eee3d5]">
-                  <h4 className="text-sm font-black text-[#211a14]">
+              <div className="p-5 rounded-xl border border-zinc-200 bg-white shadow-sm space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-zinc-200">
+                  <h4 className="text-sm font-semibold text-[#211a14]">
                     {campaignChannel === "channel1" ? "Top Band Section Title" : "Offers Slider Section Titles"}
                   </h4>
                   <span className="text-[11px] font-bold text-zinc-500">Saved by “Save Section Changes” up top</span>
@@ -1051,9 +1037,9 @@ export default function ContentPage() {
                 {campaignChannel === "channel1" ? (
                   <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0">
                     <div className="space-y-1">
-                      <Label className="text-xs font-black text-[#211a14]">Band Kicker</Label>
+                      <Label className="text-xs font-semibold text-[#211a14]">Band Kicker</Label>
                       <Input
-                        className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                        className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                         value={site.promo_kicker ?? ""}
                         onChange={setS("promo_kicker")}
                         placeholder="✨ TODAY'S FEATURED SPECIAL"
@@ -1064,18 +1050,18 @@ export default function ContentPage() {
                 ) : (
                   <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0">
                     <div className="space-y-1">
-                      <Label className="text-xs font-black text-[#211a14]">Slider Eyebrow</Label>
+                      <Label className="text-xs font-semibold text-[#211a14]">Slider Eyebrow</Label>
                       <Input
-                        className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                        className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                         value={site.offers_kicker ?? ""}
                         onChange={setS("offers_kicker")}
                         placeholder="On Right Now"
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-xs font-black text-[#211a14]">Slider Title</Label>
+                      <Label className="text-xs font-semibold text-[#211a14]">Slider Title</Label>
                       <Input
-                        className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                        className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                         value={site.offers_title ?? ""}
                         onChange={setS("offers_title")}
                         placeholder="This Week's Offers"
@@ -1091,7 +1077,7 @@ export default function ContentPage() {
                 {/* Left: the station's deals */}
                 <div className="lg:col-span-5 space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-black text-[#763a12] uppercase tracking-wider block">
+                    <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide block">
                       {campaignChannel === "channel1" ? "Band Deals" : "Slider Offers"} ({stationDeals.length}):
                     </span>
                     <Button
@@ -1121,7 +1107,7 @@ export default function ContentPage() {
                           const landed = (created.placement ?? "slider") === "band" ? "channel1" : "channel2";
                           if (landed !== campaignChannel) setCampaignChannel(landed);
                         }, "Campaign", {
-                          title: "New deal created as hidden — edit it, then turn Show ON",
+                          title: "Deal created as hidden — edit it, then turn Show on",
                           description:
                             legacyBackend && stationPlacement === "band"
                               ? "Old backend: the deal was placed in the Offers Slider station for now"
@@ -1134,8 +1120,8 @@ export default function ContentPage() {
                   </div>
 
                   {campaignChannel === "channel1" && bandUsingFallback && !legacyBackend && (
-                    <p className="text-[11px] font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-2.5">
-                      ⚠️ No live band deal yet — the website is temporarily showing the newest slider offer in
+                    <p className="text-[11px] font-bold text-amber-800 bg-zinc-50 border border-zinc-200 rounded-xl p-2.5">
+                      No live band deal yet — the website is temporarily showing the newest slider offer in
                       the band. Create a band deal and turn Show ON to take over.
                     </p>
                   )}
@@ -1148,10 +1134,10 @@ export default function ContentPage() {
                         <div
                           key={a.id}
                           onClick={() => setSelectedDealId(a.id)}
-                          className={`flex items-center gap-3 p-3.5 rounded-2xl border-2 text-left cursor-pointer transition-all ${
+                          className={`flex items-center gap-3 p-3.5 rounded-lg border text-left cursor-pointer transition-all ${
                             isSelected
-                              ? "bg-[#fffdf9] border-[#763a12] shadow-md ring-4 ring-[#763a12]/15"
-                              : "bg-[#fffdf9] border-[#ecdac7] hover:border-zinc-400 shadow-2xs"
+                              ? "bg-white border-[#763a12] shadow-xs"
+                              : "bg-white border-zinc-200 hover:border-zinc-400 shadow-2xs"
                           }`}
                         >
                           <div className="relative h-12 w-12 rounded-xl overflow-hidden bg-zinc-100 shrink-0 border">
@@ -1166,13 +1152,13 @@ export default function ContentPage() {
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-1.5 mb-1">
                               {isTopBanner && (
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-[#211a14] border border-amber-500">
-                                  ⭐ Live in band
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-400 text-[#211a14] border border-amber-500">
+                                  Live in band
                                 </span>
                               )}
                               {a.is_active ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-950 border border-emerald-300">
-                                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300">
+                                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
                                   Active
                                 </span>
                               ) : (
@@ -1181,10 +1167,10 @@ export default function ContentPage() {
                                 </span>
                               )}
                               {isSelected && (
-                                <span className="text-[10px] font-black text-[#763a12] ml-auto">Editing</span>
+                                <span className="text-[10px] font-semibold text-[#763a12] ml-auto">Editing</span>
                               )}
                             </div>
-                            <p className="text-xs font-black text-[#211a14] truncate">{a.message || "Untitled Deal"}</p>
+                            <p className="text-xs font-semibold text-[#211a14] truncate">{a.message || "Untitled Deal"}</p>
                           </div>
 
                           <button
@@ -1223,11 +1209,11 @@ export default function ContentPage() {
                 </div>
 
                 {/* Right: the editor for this station's selected deal */}
-                <div className="lg:col-span-7 bg-[#fffdf9] p-6 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-5">
+                <div className="lg:col-span-7 bg-white p-6 rounded-xl border border-zinc-200 shadow-sm space-y-5">
                   {activeDeal ? (
                     <>
-                      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#eee3d5]">
-                        <h4 className="text-sm font-black text-[#211a14] truncate max-w-full">
+                      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
+                        <h4 className="text-sm font-semibold text-[#211a14] truncate max-w-full">
                           Edit: {activeDeal.message || "Untitled Deal"}
                         </h4>
                         <Button
@@ -1247,16 +1233,16 @@ export default function ContentPage() {
                                 card1_dish: activeDeal.card1_dish ?? "",
                                 card2_dish: activeDeal.card2_dish ?? "",
                               });
-                            }, "Campaign", { title: "Deal saved!" })
+                            }, "Campaign", { title: "Deal saved" })
                           }
                         >
                           <Save className="h-3.5 w-3.5 mr-1.5" /> Save Deal
                         </Button>
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl border border-[#ecdac7] bg-[#faf5ee]">
+                      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-lg border border-zinc-200 bg-zinc-50">
                         <div>
-                          <div className="text-xs font-black text-[#211a14]">Show on the Website?</div>
+                          <div className="text-xs font-semibold text-[#211a14]">Show on the Website?</div>
                           <div className="text-[11px] font-medium text-zinc-500">
                             {campaignChannel === "channel1"
                               ? "ON = the newest active band deal becomes the big band — saves instantly"
@@ -1270,10 +1256,10 @@ export default function ContentPage() {
                               run(async () => {
                                 await updateAnnouncement(activeDeal.id, { is_active: v });
                                 setActiveDeal((a) => (a ? { ...a, is_active: v } : a));
-                              }, "Deal visibility", { title: v ? "Deal is now LIVE on the website" : "Deal hidden from the website" })
+                              }, "Deal visibility", { title: v ? "Deal is now live on the website" : "Deal hidden from the website" })
                             }
                           />
-                          <span className={`text-xs px-2.5 py-1 rounded-full font-black ${
+                          <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
                             activeDeal.is_active ? "bg-emerald-100 text-emerald-950 border border-emerald-300" : "bg-zinc-200 text-zinc-700"
                           }`}>
                             {activeDeal.is_active ? "LIVE" : "HIDDEN"}
@@ -1282,17 +1268,17 @@ export default function ContentPage() {
                       </div>
 
                       {campaignChannel === "channel1" && (
-                        <div className="p-4 rounded-2xl border border-[#ecdac7] bg-[#faf5ee] space-y-2.5">
-                          <span className="text-xs font-black text-[#211a14] block">Right-side Voucher Cards</span>
+                        <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 space-y-2.5">
+                          <span className="text-xs font-semibold text-[#211a14] block">Right-side Voucher Cards</span>
                           <p className="text-[10px] text-zinc-500 -mt-1">
                             The two little ticket cards on the band&apos;s right — pick any dish, or keep the
                             defaults. Saved with &ldquo;Save Deal&rdquo;.
                           </p>
                           <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0">
                             <div className="space-y-1">
-                              <Label className="text-xs font-black text-[#211a14]">Card 1 (left)</Label>
+                              <Label className="text-xs font-semibold text-[#211a14]">Card 1 (left)</Label>
                               <Select
-                                className="h-10 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                                className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
                                 value={activeDeal.card1_dish ?? ""}
                                 onChange={(e) =>
                                   setActiveDeal((a) => (a ? { ...a, card1_dish: e.target.value } : a))
@@ -1305,9 +1291,9 @@ export default function ContentPage() {
                               </Select>
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs font-black text-[#211a14]">Card 2 (right)</Label>
+                              <Label className="text-xs font-semibold text-[#211a14]">Card 2 (right)</Label>
                               <Select
-                                className="h-10 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                                className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
                                 value={activeDeal.card2_dish ?? ""}
                                 onChange={(e) =>
                                   setActiveDeal((a) => (a ? { ...a, card2_dish: e.target.value } : a))
@@ -1325,18 +1311,18 @@ export default function ContentPage() {
 
                       <div className="grid gap-4">
                         <div className="space-y-1">
-                          <Label className="text-xs font-black text-[#211a14]">Deal Headline</Label>
+                          <Label className="text-xs font-semibold text-[#211a14]">Deal Headline</Label>
                           <Input
-                            className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                            className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                             value={activeDeal.message}
                             onChange={(e) => setActiveDeal((a) => (a ? { ...a, message: e.target.value } : a))}
                             placeholder="e.g. 🥞 20% OFF ALL PANCAKES BEFORE 11AM!"
                           />
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs font-black text-[#211a14]">Conditions &amp; Subtitle</Label>
+                          <Label className="text-xs font-semibold text-[#211a14]">Conditions &amp; Subtitle</Label>
                           <Input
-                            className="border-[#d9c7b4] text-[#211a14] font-medium text-sm h-10 rounded-xl"
+                            className="border-zinc-300 text-[#211a14] font-medium text-sm h-10 rounded-xl"
                             value={activeDeal.details}
                             onChange={(e) => setActiveDeal((a) => (a ? { ...a, details: e.target.value } : a))}
                             placeholder="e.g. Weekend dine-in only · Available this week"
@@ -1344,18 +1330,18 @@ export default function ContentPage() {
                         </div>
                         <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0">
                           <div className="space-y-1">
-                            <Label className="text-xs font-black text-[#211a14]">Button Text</Label>
+                            <Label className="text-xs font-semibold text-[#211a14]">Button Text</Label>
                             <Input
-                              className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                              className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                               value={activeDeal.link_text}
                               onChange={(e) => setActiveDeal((a) => (a ? { ...a, link_text: e.target.value } : a))}
                               placeholder="Explore Menu"
                             />
                           </div>
                           <div className="space-y-1">
-                            <Label className="text-xs font-black text-[#211a14]">Button Link</Label>
+                            <Label className="text-xs font-semibold text-[#211a14]">Button Link</Label>
                             <Input
-                              className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                              className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                               value={activeDeal.link_url}
                               onChange={(e) => setActiveDeal((a) => (a ? { ...a, link_url: e.target.value } : a))}
                               placeholder="/menu"
@@ -1364,8 +1350,8 @@ export default function ContentPage() {
                         </div>
 
                         {/* Run window — the website obeys these on its own */}
-                        <div className="p-4 rounded-2xl border border-[#ecdac7] bg-[#faf5ee] space-y-2.5">
-                          <span className="text-xs font-black text-[#211a14] block">Schedule (Optional)</span>
+                        <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 space-y-2.5">
+                          <span className="text-xs font-semibold text-[#211a14] block">Schedule (Optional)</span>
                           <p className="text-[10px] text-zinc-500 -mt-1">
                             Leave blank to run forever. With an End set, the deal drops off the website by
                             itself at that moment — and the band shows a live countdown stamp. Saved with
@@ -1373,13 +1359,13 @@ export default function ContentPage() {
                           </p>
                           <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0">
                             <div className="space-y-1">
-                              <Label htmlFor="deal-starts" className="text-xs font-black text-[#211a14]">
+                              <Label htmlFor="deal-starts" className="text-xs font-semibold text-[#211a14]">
                                 Starts (optional)
                               </Label>
                               <Input
                                 id="deal-starts"
                                 type="datetime-local"
-                                className="border-[#d9c7b4] text-[#211a14] font-bold text-xs h-10 rounded-xl"
+                                className="border-zinc-300 text-[#211a14] font-bold text-xs h-10 rounded-xl"
                                 value={isoToLocalInput(activeDeal.starts_at)}
                                 onChange={(e) =>
                                   setActiveDeal((a) => (a ? { ...a, starts_at: localInputToIso(e.target.value) } : a))
@@ -1387,13 +1373,13 @@ export default function ContentPage() {
                               />
                             </div>
                             <div className="space-y-1">
-                              <Label htmlFor="deal-ends" className="text-xs font-black text-[#211a14]">
+                              <Label htmlFor="deal-ends" className="text-xs font-semibold text-[#211a14]">
                                 Ends (optional)
                               </Label>
                               <Input
                                 id="deal-ends"
                                 type="datetime-local"
-                                className="border-[#d9c7b4] text-[#211a14] font-bold text-xs h-10 rounded-xl"
+                                className="border-zinc-300 text-[#211a14] font-bold text-xs h-10 rounded-xl"
                                 value={isoToLocalInput(activeDeal.ends_at)}
                                 onChange={(e) =>
                                   setActiveDeal((a) => (a ? { ...a, ends_at: localInputToIso(e.target.value) } : a))
@@ -1402,8 +1388,8 @@ export default function ContentPage() {
                             </div>
                           </div>
                           {activeDeal.ends_at && new Date(activeDeal.ends_at).getTime() < Date.now() && (
-                            <p className="text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-2">
-                              ⚠️ This end time is in the past — the deal is already off the website.
+                            <p className="text-[11px] font-bold text-rose-700 bg-rose-50 border border-zinc-200 rounded-lg p-2">
+                              This end time is in the past — the deal is already off the website.
                             </p>
                           )}
                         </div>
@@ -1424,8 +1410,7 @@ export default function ContentPage() {
                     </>
                   ) : (
                     <div className="py-10 text-center space-y-2">
-                      <div className="text-3xl">🎫</div>
-                      <p className="text-sm font-black text-[#211a14]">No deal selected</p>
+                      <p className="text-sm font-semibold text-[#211a14]">No deal selected</p>
                       <p className="text-xs text-zinc-500 max-w-xs mx-auto">
                         Pick a deal from the list on the left to edit it — or press{" "}
                         <strong>“New Deal”</strong> to create the first one for this station.
@@ -1435,11 +1420,11 @@ export default function ContentPage() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#eee3d5]">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
                 <Button
                   type="button"
                   variant="outline"
-                  className="gap-2 text-xs font-bold border-[#d9c7b4] text-[#763a12] rounded-xl whitespace-normal h-auto"
+                  className="gap-2 text-xs font-bold border-zinc-300 text-[#763a12] rounded-xl whitespace-normal h-auto"
                   onClick={() => setHomeStepIndex(1)}
                 >
                   <ArrowLeft className="h-4 w-4" />
@@ -1462,14 +1447,14 @@ export default function ContentPage() {
           {/* STEP 3: PHOTO MOSAIC (INPUTS)                                         */}
           {/* --------------------------------------------------------------------- */}
           {homeStepIndex === 3 && (
-            <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#eee3d5]">
+            <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
                 <div className="flex items-center gap-2.5">
-                  <span className="px-3 py-1 rounded-full text-xs font-black bg-purple-600 text-white uppercase tracking-wider">
-                    📸 Section 3
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
+                    Section 3
                   </span>
                   <div>
-                    <h3 className="text-base font-black text-[#211a14]">Homepage Polaroid Photo Mosaic</h3>
+                    <h3 className="text-base font-semibold text-[#211a14]">Homepage Polaroid Photo Mosaic</h3>
                     <p className="text-xs text-zinc-500">The 6 featured scrapbook photos displayed in the homepage gallery strip</p>
                   </div>
                 </div>
@@ -1517,8 +1502,7 @@ export default function ContentPage() {
                           boxShadow: "none",
                         }}
                       >
-                        <span className="text-2xl" aria-hidden="true">📸</span>
-                        <span className="text-xs font-black text-[#763a12]">
+                        <span className="text-xs font-semibold text-[#763a12]">
                           Slot #{i + 1}{i === 0 ? " — big hero shot" : ""} · empty
                         </span>
                         <UploadButton
@@ -1533,7 +1517,7 @@ export default function ContentPage() {
                                 sort_order: photos.length,
                               });
                               setPhotos((xs) => [...xs, created]);
-                            }, "Gallery", { title: `Photo added to slot #${i + 1} — now give it a caption!` })
+                            }, "Gallery", { title: `Photo added to slot #${i + 1}` })
                           }
                         />
                       </div>
@@ -1542,7 +1526,7 @@ export default function ContentPage() {
                   return (
                     <div key={p.id} className="studio-slot">
                       <span
-                        className="px-2 py-0.5 rounded-full text-[10px] font-black bg-zinc-950 text-white shadow-xs"
+                        className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-950 text-white shadow-xs"
                         style={{ position: "absolute", top: "10px", left: "10px", zIndex: 6 }}
                       >
                         #{i + 1}{i === 0 ? " · Hero" : ""}
@@ -1583,7 +1567,7 @@ export default function ContentPage() {
                           key={`cap-${p.id}`}
                           defaultValue={p.caption}
                           placeholder={i === 0 ? "Hero caption (shows on the website)" : "Caption…"}
-                          className="h-8 text-xs border-[#e8dacb] font-medium rounded-lg min-w-0"
+                          className="h-8 text-xs border-zinc-200 font-medium rounded-lg min-w-0"
                           onBlur={(e) => {
                             const v = e.target.value.trim();
                             if (v === p.caption) return;
@@ -1610,18 +1594,18 @@ export default function ContentPage() {
 
               <p className="text-[11px] font-medium text-zinc-500">
                 Want more than 6 photos, albums, or the full gallery page? Manage everything in the{" "}
-                <button type="button" className="font-black text-[#763a12] underline" onClick={() => setActivePage("gallery")}>
+                <button type="button" className="font-semibold text-[#763a12] underline" onClick={() => setActivePage("gallery")}>
                   Gallery Page tab
                 </button>
                 .
               </p>
 
 
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#eee3d5]">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
                 <Button
                   type="button"
                   variant="outline"
-                  className="gap-2 text-xs font-bold border-[#d9c7b4] text-[#763a12] rounded-xl whitespace-normal h-auto"
+                  className="gap-2 text-xs font-bold border-zinc-300 text-[#763a12] rounded-xl whitespace-normal h-auto"
                   onClick={() => setHomeStepIndex(2)}
                 >
                   <ArrowLeft className="h-4 w-4" />
@@ -1643,14 +1627,14 @@ export default function ContentPage() {
           {/* STEP 4: TRUST BADGES (INPUTS)                                         */}
           {/* --------------------------------------------------------------------- */}
           {homeStepIndex === 4 && (
-            <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#eee3d5]">
+            <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
                 <div className="flex items-center gap-2.5">
-                  <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-600 text-white uppercase tracking-wider">
-                    🏅 Section 4
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
+                    Section 4
                   </span>
                   <div>
-                    <h3 className="text-base font-black text-[#211a14]">Homepage Trust Badges &amp; Certifications</h3>
+                    <h3 className="text-base font-semibold text-[#211a14]">Homepage Trust Badges &amp; Certifications</h3>
                     <p className="text-xs text-zinc-500">Quality seals, halal/organic stamps, and accreditation awards</p>
                   </div>
                 </div>
@@ -1660,7 +1644,7 @@ export default function ContentPage() {
                 {certs.map((c) => (
                   <div
                     key={c.id}
-                    className="flex flex-wrap items-center gap-3 p-4 rounded-2xl border-2 border-[#eee3d5] bg-white shadow-2xs"
+                    className="flex flex-wrap items-center gap-3 p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs"
                   >
                     {/* real logo beats the built-in icon */}
                     {c.image ? (
@@ -1676,7 +1660,7 @@ export default function ContentPage() {
                             run(async () => {
                               await updateCertification(c.id, { image: "" });
                               setCerts((xs) => xs.map((x) => (x.id === c.id ? { ...x, image: "" } : x)));
-                            }, "Certification", { title: "Logo removed — built-in icon is back" })
+                            }, "Certification", { title: "Logo removed — showing the built-in icon" })
                           }
                         >
                           <X className="h-3.5 w-3.5" />
@@ -1684,7 +1668,7 @@ export default function ContentPage() {
                       </div>
                     ) : (
                       <Select
-                        className="h-10 w-36 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                        className="h-10 w-36 text-xs border-zinc-300 font-bold rounded-xl"
                         value={c.icon}
                         onChange={(e) =>
                           setCerts((xs) =>
@@ -1706,11 +1690,11 @@ export default function ContentPage() {
                         run(async () => {
                           await updateCertification(c.id, { image: url });
                           setCerts((xs) => xs.map((x) => (x.id === c.id ? { ...x, image: url } : x)));
-                        }, "Certification", { title: "Real logo uploaded & live!" })
+                        }, "Certification", { title: "Logo uploaded" })
                       }
                     />
                     <Input
-                      className="min-w-44 flex-1 h-10 text-xs border-[#d9c7b4] text-[#211a14] font-black rounded-xl"
+                      className="min-w-44 flex-1 h-10 text-xs border-zinc-300 text-[#211a14] font-semibold rounded-xl"
                       placeholder="Badge Name (e.g. 100% Pure Canadian Maple)"
                       value={c.title}
                       onChange={(e) =>
@@ -1720,7 +1704,7 @@ export default function ContentPage() {
                       }
                     />
                     <Input
-                      className="min-w-44 flex-1 h-10 text-xs border-[#d9c7b4] text-[#211a14] font-medium rounded-xl"
+                      className="min-w-44 flex-1 h-10 text-xs border-zinc-300 text-[#211a14] font-medium rounded-xl"
                       placeholder="Subtitle (Optional)"
                       value={c.subtitle}
                       onChange={(e) =>
@@ -1729,7 +1713,7 @@ export default function ContentPage() {
                         )
                       }
                     />
-                    <label className="flex items-center gap-2 text-xs font-black px-3 py-1.5 bg-[#f4ebe1] rounded-xl border border-[#e4d3c2] cursor-pointer">
+                    <label className="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 bg-zinc-100 rounded-xl border border-zinc-200 cursor-pointer">
                       <Switch
                         checked={c.is_active}
                         onCheckedChange={(v) =>
@@ -1753,7 +1737,7 @@ export default function ContentPage() {
                             title: c.title,
                             subtitle: c.subtitle,
                           });
-                        }, "Certification", { title: "Badge updated!" })
+                        }, "Certification", { title: "Badge updated" })
                       }
                     >
                       <Save className="h-3.5 w-3.5 mr-1" /> Save
@@ -1782,9 +1766,9 @@ export default function ContentPage() {
                 ))}
 
                 {/* Add New Badge */}
-                <div className="flex flex-wrap items-center gap-3 p-4 rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/50">
-                  <span className="text-xs font-black text-emerald-950 flex items-center gap-1.5">
-                    <Plus className="h-4 w-4 text-emerald-600" /> Add New Badge:
+                <div className="flex flex-wrap items-center gap-3 p-4 rounded-lg border border-dashed border-zinc-300 bg-zinc-50">
+                  <span className="text-xs font-semibold text-[#211a14] flex items-center gap-1.5">
+                    <Plus className="h-4 w-4 text-[#763a12]" /> Add New Badge:
                   </span>
                   {newCert.image ? (
                     <div className="flex items-center gap-1.5">
@@ -1802,7 +1786,7 @@ export default function ContentPage() {
                     </div>
                   ) : (
                     <Select
-                      className="h-10 w-36 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                      className="h-10 w-36 text-xs border-zinc-300 font-bold rounded-xl"
                       value={newCert.icon}
                       onChange={(e) => setNewCert((n) => ({ ...n, icon: e.target.value }))}
                     >
@@ -1818,20 +1802,20 @@ export default function ContentPage() {
                     onUploaded={(url) => setNewCert((n) => ({ ...n, image: url }))}
                   />
                   <Input
-                    className="min-w-44 flex-1 h-10 text-xs border-[#d9c7b4] text-[#211a14] font-bold rounded-xl"
+                    className="min-w-44 flex-1 h-10 text-xs border-zinc-300 text-[#211a14] font-bold rounded-xl"
                     placeholder="Badge Name (e.g. Free Range Eggs)"
                     value={newCert.title}
                     onChange={(e) => setNewCert((n) => ({ ...n, title: e.target.value }))}
                   />
                   <Input
-                    className="min-w-44 flex-1 h-10 text-xs border-[#d9c7b4] text-[#211a14] font-medium rounded-xl"
+                    className="min-w-44 flex-1 h-10 text-xs border-zinc-300 text-[#211a14] font-medium rounded-xl"
                     placeholder="Subtitle (Optional)"
                     value={newCert.subtitle}
                     onChange={(e) => setNewCert((n) => ({ ...n, subtitle: e.target.value }))}
                   />
                   <Button
                     size="sm"
-                    className="h-10 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
+                    className="h-10 text-xs font-bold bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
                     disabled={!newCert.title.trim()}
                     onClick={() =>
                       run(async () => {
@@ -1841,7 +1825,7 @@ export default function ContentPage() {
                         });
                         setCerts((xs) => [...xs, created]);
                         setNewCert(EMPTY_CERT);
-                      }, "Certification", { title: "New badge added!" })
+                      }, "Certification", { title: "Badge added" })
                     }
                   >
                     <Plus className="h-3.5 w-3.5 mr-1" /> Add Badge
@@ -1849,11 +1833,11 @@ export default function ContentPage() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#eee3d5]">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
                 <Button
                   type="button"
                   variant="outline"
-                  className="gap-2 text-xs font-bold border-[#d9c7b4] text-[#763a12] rounded-xl whitespace-normal h-auto"
+                  className="gap-2 text-xs font-bold border-zinc-300 text-[#763a12] rounded-xl whitespace-normal h-auto"
                   onClick={() => setHomeStepIndex(3)}
                 >
                   <ArrowLeft className="h-4 w-4" />
@@ -1875,36 +1859,36 @@ export default function ContentPage() {
           {/* STEP 5: BOTTOM BOOKING BANNER (INPUTS)                                */}
           {/* --------------------------------------------------------------------- */}
           {homeStepIndex === 5 && (
-            <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-5">
-              <h4 className="text-sm font-black text-[#211a14] pb-2 border-b border-[#eee3d5]">Customize Bottom Invitation</h4>
+            <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-5">
+              <h4 className="text-sm font-semibold text-[#211a14] pb-2 border-b border-zinc-200">Customize Bottom Invitation</h4>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1">
-                  <Label className="text-xs font-black text-[#211a14]">Headline Text</Label>
-                  <Input className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.cta_heading} onChange={setS("cta_heading")} />
+                  <Label className="text-xs font-semibold text-[#211a14]">Headline Text</Label>
+                  <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.cta_heading} onChange={setS("cta_heading")} />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs font-black text-[#211a14]">Handwriting Accent Word</Label>
-                  <Input className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.cta_script} onChange={setS("cta_script")} />
+                  <Label className="text-xs font-semibold text-[#211a14]">Handwriting Accent Word</Label>
+                  <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.cta_script} onChange={setS("cta_script")} />
                 </div>
                 <div className="sm:col-span-2 space-y-1">
-                  <Label className="text-xs font-black text-[#211a14]">Short Invitation Description</Label>
-                  <Textarea rows={2} className="border-[#d9c7b4] text-[#211a14] font-medium text-sm rounded-xl" value={site.cta_lead} onChange={setS("cta_lead")} />
+                  <Label className="text-xs font-semibold text-[#211a14]">Short Invitation Description</Label>
+                  <Textarea rows={2} className="border-zinc-300 text-[#211a14] font-medium text-sm rounded-xl" value={site.cta_lead} onChange={setS("cta_lead")} />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs font-black text-[#211a14]">Button Text</Label>
-                  <Input className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.cta_button_label} onChange={setS("cta_button_label")} />
+                  <Label className="text-xs font-semibold text-[#211a14]">Button Text</Label>
+                  <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.cta_button_label} onChange={setS("cta_button_label")} />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs font-black text-[#211a14]">Button Link URL</Label>
-                  <Input className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.cta_button_url} onChange={setS("cta_button_url")} />
+                  <Label className="text-xs font-semibold text-[#211a14]">Button Link URL</Label>
+                  <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.cta_button_url} onChange={setS("cta_button_url")} />
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#eee3d5]">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
                 <Button
                   type="button"
                   variant="outline"
-                  className="gap-2 text-xs font-bold border-[#d9c7b4] text-[#763a12] rounded-xl whitespace-normal h-auto"
+                  className="gap-2 text-xs font-bold border-zinc-300 text-[#763a12] rounded-xl whitespace-normal h-auto"
                   onClick={() => setHomeStepIndex(4)}
                 >
                   <ArrowLeft className="h-4 w-4" />
@@ -1926,14 +1910,14 @@ export default function ContentPage() {
           {/* STEP 6: FOOTER TAGLINE (INPUTS)                                       */}
           {/* --------------------------------------------------------------------- */}
           {homeStepIndex === 6 && (
-            <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#eee3d5]">
+            <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
                 <div className="flex items-center gap-2.5">
-                  <span className="px-3 py-1 rounded-full text-xs font-black bg-blue-600 text-white uppercase tracking-wider">
-                    🥞 Section 6
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
+                    Section 6
                   </span>
                   <div>
-                    <h3 className="text-base font-black text-[#211a14]">Footer Brand Tagline</h3>
+                    <h3 className="text-base font-semibold text-[#211a14]">Footer Brand Tagline</h3>
                     <p className="text-xs text-zinc-500">The founding line shown under the footer logo on every page</p>
                   </div>
                 </div>
@@ -1952,20 +1936,20 @@ export default function ContentPage() {
               </div>
 
               <div className="space-y-2 max-w-lg">
-                <Label className="text-xs font-black text-[#211a14]">Footer Tagline</Label>
+                <Label className="text-xs font-semibold text-[#211a14]">Footer Tagline</Label>
                 <Input
-                  className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-11 rounded-xl"
+                  className="border-zinc-300 text-[#211a14] font-bold text-sm h-11 rounded-xl"
                   value={site.footer_tagline}
                   onChange={setS("footer_tagline")}
                   placeholder="e.g. Fluffy stacks · real maple · est. 1999"
                 />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#eee3d5]">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
                 <Button
                   type="button"
                   variant="outline"
-                  className="gap-2 text-xs font-bold border-[#d9c7b4] text-[#763a12] rounded-xl whitespace-normal h-auto"
+                  className="gap-2 text-xs font-bold border-zinc-300 text-[#763a12] rounded-xl whitespace-normal h-auto"
                   onClick={() => setHomeStepIndex(5)}
                 >
                   <ArrowLeft className="h-4 w-4" />
@@ -1973,10 +1957,10 @@ export default function ContentPage() {
                 </Button>
                 <Button
                   type="button"
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-2 rounded-xl whitespace-normal h-auto"
+                  className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 rounded-xl whitespace-normal h-auto"
                   onClick={() => setActivePage("menu")}
                 >
-                  <span>Go To Next Page: Menu Page ➜</span>
+                  <span>Next: Menu page</span>
                 </Button>
               </div>
             </div>
@@ -1989,13 +1973,13 @@ export default function ContentPage() {
       {/* ========================================================================= */}
       {activePage === "menu" && (
         <div className="space-y-6">
-          <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#eee3d5]">
+          <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
               <div className="flex items-center gap-2.5">
-                <span className="px-3 py-1 rounded-full text-xs font-black bg-blue-600 text-white uppercase tracking-wider">
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
                   Menu Header
                 </span>
-                <h3 className="text-base font-black text-[#211a14]">Menu Page Top Title</h3>
+                <h3 className="text-base font-semibold text-[#211a14]">Menu Page Top Title</h3>
               </div>
               <Button
                 size="sm"
@@ -2017,28 +2001,28 @@ export default function ContentPage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1">
-                <Label className="text-xs font-black text-[#211a14]">Main Word (e.g. Stacks On)</Label>
-                <Input className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.menu_hero_heading} onChange={setS("menu_hero_heading")} />
+                <Label className="text-xs font-semibold text-[#211a14]">Main Word (e.g. Stacks On)</Label>
+                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.menu_hero_heading} onChange={setS("menu_hero_heading")} />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs font-black text-[#211a14]">Handwriting Word (e.g. Stacks.)</Label>
-                <Input className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.menu_hero_script} onChange={setS("menu_hero_script")} />
+                <Label className="text-xs font-semibold text-[#211a14]">Handwriting Word (e.g. Stacks.)</Label>
+                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.menu_hero_script} onChange={setS("menu_hero_script")} />
               </div>
               <div className="sm:col-span-2 space-y-1">
-                <Label className="text-xs font-black text-[#211a14]">Subtitle</Label>
-                <Input className="border-[#d9c7b4] text-[#211a14] font-medium text-sm h-10 rounded-xl" value={site.menu_hero_lead} onChange={setS("menu_hero_lead")} />
+                <Label className="text-xs font-semibold text-[#211a14]">Subtitle</Label>
+                <Input className="border-zinc-300 text-[#211a14] font-medium text-sm h-10 rounded-xl" value={site.menu_hero_lead} onChange={setS("menu_hero_lead")} />
               </div>
             </div>
           </div>
 
           {/* 3-Step Pickup Cards */}
-          <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#eee3d5]">
+          <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
               <div className="flex items-center gap-2.5">
-                <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-500 text-white uppercase tracking-wider">
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
                   Pickup Guide
                 </span>
-                <h3 className="text-base font-black text-[#211a14]">3-Step Ordering Cards on /menu</h3>
+                <h3 className="text-base font-semibold text-[#211a14]">3-Step Ordering Cards on /menu</h3>
               </div>
             </div>
 
@@ -2046,10 +2030,10 @@ export default function ContentPage() {
               {steps.map((st, i) => (
                 <div
                   key={st.id}
-                  className="p-4 rounded-2xl border-2 border-[#eee3d5] bg-white shadow-2xs space-y-3"
+                  className="p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs space-y-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-black px-3 py-1 rounded-full bg-[#763a12] text-white">
+                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#763a12] text-white">
                       STEP 0{i + 1}
                     </span>
                     <Button
@@ -2076,9 +2060,9 @@ export default function ContentPage() {
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="space-y-1">
-                      <Label className="text-[11px] font-black text-[#211a14]">Title</Label>
+                      <Label className="text-[11px] font-semibold text-[#211a14]">Title</Label>
                       <Input
-                        className="h-10 text-xs border-[#d9c7b4] text-[#211a14] font-bold rounded-xl"
+                        className="h-10 text-xs border-zinc-300 text-[#211a14] font-bold rounded-xl"
                         value={st.title}
                         onChange={(e) =>
                           setSteps((xs) =>
@@ -2088,9 +2072,9 @@ export default function ContentPage() {
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-[11px] font-black text-[#211a14]">Description</Label>
+                      <Label className="text-[11px] font-semibold text-[#211a14]">Description</Label>
                       <Input
-                        className="h-10 text-xs border-[#d9c7b4] text-[#211a14] font-medium rounded-xl"
+                        className="h-10 text-xs border-zinc-300 text-[#211a14] font-medium rounded-xl"
                         value={st.text}
                         onChange={(e) =>
                           setSteps((xs) =>
@@ -2105,14 +2089,14 @@ export default function ContentPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-5 rounded-3xl border-2 border-[#eee3d5] bg-white shadow-sm">
+          <div className="flex items-center justify-between p-5 rounded-xl border border-zinc-200 bg-white shadow-sm">
             <div>
-              <h4 className="text-xs font-black text-[#211a14]">Want to add or edit pancake dishes, flavours &amp; prices?</h4>
+              <h4 className="text-xs font-semibold text-[#211a14]">Want to add or edit pancake dishes, flavours &amp; prices?</h4>
               <p className="text-[11px] font-medium text-zinc-500">Dishes are managed in the dedicated Menu Catalog section.</p>
             </div>
             <Link
               href="/admin/menu"
-              className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2.5 rounded-2xl bg-[#763a12] text-white hover:bg-[#5e2d0d] shadow-sm"
+              className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2.5 rounded-lg bg-[#763a12] text-white hover:bg-[#5e2d0d] shadow-sm"
             >
               <span>Go to Menu Catalog</span>
               <ArrowRight className="h-4 w-4" />
@@ -2126,13 +2110,13 @@ export default function ContentPage() {
       {/* ========================================================================= */}
       {activePage === "gallery" && (
         <div className="space-y-6">
-          <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#eee3d5]">
+          <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
               <div className="flex items-center gap-2.5">
-                <span className="px-3 py-1 rounded-full text-xs font-black bg-purple-600 text-white uppercase tracking-wider">
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
                   Gallery Header
                 </span>
-                <h3 className="text-base font-black text-[#211a14]">Gallery Top Title</h3>
+                <h3 className="text-base font-semibold text-[#211a14]">Gallery Top Title</h3>
               </div>
               <Button
                 size="sm"
@@ -2155,33 +2139,33 @@ export default function ContentPage() {
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-1">
-                <Label className="text-xs font-black text-[#211a14]">Small Top Kicker</Label>
-                <Input className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.gallery_hero_kicker} onChange={setS("gallery_hero_kicker")} placeholder="Feast Your Eyes" />
+                <Label className="text-xs font-semibold text-[#211a14]">Small Top Kicker</Label>
+                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.gallery_hero_kicker} onChange={setS("gallery_hero_kicker")} placeholder="Feast Your Eyes" />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs font-black text-[#211a14]">Main Word</Label>
-                <Input className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.gallery_hero_heading} onChange={setS("gallery_hero_heading")} placeholder="The" />
+                <Label className="text-xs font-semibold text-[#211a14]">Main Word</Label>
+                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.gallery_hero_heading} onChange={setS("gallery_hero_heading")} placeholder="The" />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs font-black text-[#211a14]">Handwriting Word</Label>
-                <Input className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.gallery_hero_script} onChange={setS("gallery_hero_script")} placeholder="Gallery." />
+                <Label className="text-xs font-semibold text-[#211a14]">Handwriting Word</Label>
+                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.gallery_hero_script} onChange={setS("gallery_hero_script")} placeholder="Gallery." />
               </div>
               <div className="sm:col-span-3 space-y-1">
-                <Label className="text-xs font-black text-[#211a14]">Subtitle</Label>
-                <Input className="border-[#d9c7b4] text-[#211a14] font-medium text-sm h-10 rounded-xl" value={site.gallery_hero_lead} onChange={setS("gallery_hero_lead")} placeholder="Our food, our space, and the good times in between." />
+                <Label className="text-xs font-semibold text-[#211a14]">Subtitle</Label>
+                <Input className="border-zinc-300 text-[#211a14] font-medium text-sm h-10 rounded-xl" value={site.gallery_hero_lead} onChange={setS("gallery_hero_lead")} placeholder="Our food, our space, and the good times in between." />
               </div>
             </div>
           </div>
 
-          <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#eee3d5]">
+          <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
               <div className="flex items-center gap-2.5">
-                <span className="px-3 py-1 rounded-full text-xs font-black bg-purple-600 text-white uppercase tracking-wider">
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
                   Photo Albums
                 </span>
-                <h3 className="text-base font-black text-[#211a14]">All Uploaded Photos ({photos.length})</h3>
+                <h3 className="text-base font-semibold text-[#211a14]">All Uploaded Photos ({photos.length})</h3>
               </div>
-              <div className="flex items-center gap-1.5 p-1 bg-[#f4ebe1] rounded-2xl border border-[#e4d3c2]">
+              <div className="flex items-center gap-1.5 p-1 bg-zinc-100 rounded-lg border border-zinc-200">
                 {[
                   { id: "all", label: "All" },
                   { id: "food", label: "Food" },
@@ -2205,22 +2189,22 @@ export default function ContentPage() {
             </div>
 
             {/* Add photos to any album — the homepage strip shows the first 6 overall */}
-            <div className="p-4 rounded-2xl border-2 border-dashed border-purple-300 bg-purple-50/50">
+            <div className="p-4 rounded-lg border border-dashed border-zinc-300 bg-zinc-50">
               <div className="grid gap-3 sm:grid-cols-5 [&>*]:min-w-0">
                 <Select
-                  className="h-10 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                  className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
                   value={newPhoto.album}
                   onChange={(e) =>
                     setNewPhoto((n) => ({ ...n, album: e.target.value as AdminGalleryPhoto["album"] }))
                   }
                 >
-                  <option value="food">🥞 Food &amp; Dishes</option>
-                  <option value="interior">☕ Interior &amp; Space</option>
-                  <option value="events">✨ Events &amp; Parties</option>
+                  <option value="food">Food &amp; Dishes</option>
+                  <option value="interior">Interior &amp; Space</option>
+                  <option value="events">Events &amp; Parties</option>
                 </Select>
                 <div className="flex items-center gap-2 sm:col-span-2">
                   <Input
-                    className="h-10 text-xs border-[#d9c7b4] font-medium rounded-xl"
+                    className="h-10 text-xs border-zinc-300 font-medium rounded-xl"
                     placeholder="Image URL or click upload"
                     value={newPhoto.image}
                     onChange={(e) => setNewPhoto((n) => ({ ...n, image: e.target.value }))}
@@ -2228,13 +2212,13 @@ export default function ContentPage() {
                   <UploadButton onUploaded={(url) => setNewPhoto((n) => ({ ...n, image: url }))} />
                 </div>
                 <Input
-                  className="h-10 text-xs border-[#d9c7b4] font-medium rounded-xl"
+                  className="h-10 text-xs border-zinc-300 font-medium rounded-xl"
                   placeholder="Caption (e.g. Fluffy Berry Stack)"
                   value={newPhoto.caption}
                   onChange={(e) => setNewPhoto((n) => ({ ...n, caption: e.target.value }))}
                 />
                 <Button
-                  className="h-10 text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+                  className="h-10 text-xs font-bold bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
                   disabled={!newPhoto.image.trim() || !newPhoto.caption.trim()}
                   onClick={() =>
                     run(async () => {
@@ -2244,7 +2228,7 @@ export default function ContentPage() {
                       });
                       setPhotos((xs) => [...xs, created]);
                       setNewPhoto(EMPTY_PHOTO);
-                    }, "Gallery", { title: "Photo added!" })
+                    }, "Gallery", { title: "Photo added" })
                   }
                 >
                   <Plus className="h-3.5 w-3.5 mr-1" /> Add Photo
@@ -2256,7 +2240,7 @@ export default function ContentPage() {
               {filteredPhotos.map((p) => (
                 <div
                   key={p.id}
-                  className="group relative overflow-hidden rounded-2xl border-2 border-[#eee3d5] bg-white p-2 shadow-xs hover:border-purple-300 transition-all"
+                  className="group relative overflow-hidden rounded-lg border border-zinc-200 bg-white p-2 shadow-xs hover:border-zinc-300 transition-all"
                 >
                   <div className="relative aspect-square rounded-xl overflow-hidden bg-zinc-100">
                     <Image
@@ -2267,7 +2251,7 @@ export default function ContentPage() {
                       className="object-cover"
                       style={{ objectPosition: `50% ${p.focus === "top" ? "18%" : p.focus === "bottom" ? "82%" : "50%"}` }}
                     />
-                    <Badge className="absolute left-1.5 top-1.5 capitalize text-[10px] font-black bg-zinc-950 text-white border-0">
+                    <Badge className="absolute left-1.5 top-1.5 capitalize text-[10px] font-semibold bg-zinc-950 text-white border-0">
                       {p.album}
                     </Badge>
                     <button
@@ -2295,7 +2279,7 @@ export default function ContentPage() {
                       key={`gcap-${p.id}`}
                       defaultValue={p.caption}
                       placeholder="Caption…"
-                      className="h-8 text-xs border-[#e8dacb] font-medium rounded-lg"
+                      className="h-8 text-xs border-zinc-200 font-medium rounded-lg"
                       onBlur={(e) => {
                         const v = e.target.value.trim();
                         if (v === p.caption) return;
@@ -2307,7 +2291,7 @@ export default function ContentPage() {
                     />
                     <div className="flex items-center gap-1.5 [&>*]:min-w-0">
                       <Select
-                        className="h-8 flex-1 text-xs border-[#e8dacb] font-bold rounded-lg"
+                        className="h-8 flex-1 text-xs border-zinc-200 font-bold rounded-lg"
                         aria-label="Which part of the photo stays visible when cropped"
                         value={p.focus}
                         onChange={(e) =>
@@ -2328,7 +2312,7 @@ export default function ContentPage() {
                           run(async () => {
                             await updateGalleryPhoto(p.id, { image: url });
                             setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, image: url } : x)));
-                          }, "Gallery", { title: "Photo replaced!" })
+                          }, "Gallery", { title: "Photo replaced" })
                         }
                       />
                     </div>
@@ -2345,13 +2329,13 @@ export default function ContentPage() {
       {/* ========================================================================= */}
       {activePage === "booking" && (
         <div className="space-y-6">
-          <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#eee3d5]">
+          <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
               <div className="flex items-center gap-2.5">
-                <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-600 text-white uppercase tracking-wider">
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
                   Booking Header
                 </span>
-                <h3 className="text-base font-black text-[#211a14]">Reservation Page Header</h3>
+                <h3 className="text-base font-semibold text-[#211a14]">Reservation Page Header</h3>
               </div>
               <Button
                 size="sm"
@@ -2374,32 +2358,32 @@ export default function ContentPage() {
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-1">
-                <Label className="text-xs font-black text-[#211a14]">Small Top Kicker</Label>
-                <Input className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.booking_hero_kicker} onChange={setS("booking_hero_kicker")} placeholder="Reserve Online" />
+                <Label className="text-xs font-semibold text-[#211a14]">Small Top Kicker</Label>
+                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.booking_hero_kicker} onChange={setS("booking_hero_kicker")} placeholder="Reserve Online" />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs font-black text-[#211a14]">Main Word</Label>
-                <Input className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.booking_hero_heading} onChange={setS("booking_hero_heading")} placeholder="Book a" />
+                <Label className="text-xs font-semibold text-[#211a14]">Main Word</Label>
+                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.booking_hero_heading} onChange={setS("booking_hero_heading")} placeholder="Book a" />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs font-black text-[#211a14]">Handwriting Word</Label>
-                <Input className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.booking_hero_script} onChange={setS("booking_hero_script")} placeholder="Table." />
+                <Label className="text-xs font-semibold text-[#211a14]">Handwriting Word</Label>
+                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.booking_hero_script} onChange={setS("booking_hero_script")} placeholder="Table." />
               </div>
               <div className="sm:col-span-3 space-y-1">
-                <Label className="text-xs font-black text-[#211a14]">Subtitle</Label>
-                <Input className="border-[#d9c7b4] text-[#211a14] font-medium text-sm h-10 rounded-xl" value={site.booking_hero_lead} onChange={setS("booking_hero_lead")} placeholder="Pick a date, pick a time..." />
+                <Label className="text-xs font-semibold text-[#211a14]">Subtitle</Label>
+                <Input className="border-zinc-300 text-[#211a14] font-medium text-sm h-10 rounded-xl" value={site.booking_hero_lead} onChange={setS("booking_hero_lead")} placeholder="Pick a date, pick a time..." />
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-5 rounded-3xl border-2 border-[#eee3d5] bg-white shadow-sm">
+          <div className="flex items-center justify-between p-5 rounded-xl border border-zinc-200 bg-white shadow-sm">
             <div>
-              <h4 className="text-xs font-black text-[#211a14]">Want to view incoming customer table reservations?</h4>
+              <h4 className="text-xs font-semibold text-[#211a14]">Want to view incoming customer table reservations?</h4>
               <p className="text-[11px] font-medium text-zinc-500">Check reservation dates, party sizes, and customer requests.</p>
             </div>
             <Link
               href="/admin/bookings"
-              className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2.5 rounded-2xl bg-[#763a12] text-white hover:bg-[#5e2d0d] shadow-sm"
+              className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2.5 rounded-lg bg-[#763a12] text-white hover:bg-[#5e2d0d] shadow-sm"
             >
               <span>View Bookings Portal</span>
               <ArrowRight className="h-4 w-4" />

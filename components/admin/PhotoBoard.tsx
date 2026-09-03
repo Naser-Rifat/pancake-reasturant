@@ -166,7 +166,7 @@ export default function PhotoBoard({
       onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
       onDragLeave={() => setDragging(false)}
       onDrop={onDrop}
-      className={`grid gap-4 rounded-lg border-2 border-dashed p-5 transition-colors ${
+      className={`grid gap-4 rounded-lg border border-dashed p-5 transition-colors ${
         dragging ? "border-zinc-900 bg-zinc-50" : "border-border"
       }`}
     >
@@ -188,7 +188,7 @@ export default function PhotoBoard({
             return (
               <div
                 key={t.key}
-                className={`relative overflow-hidden rounded-md border-2 ${
+                className={`relative overflow-hidden rounded-md border ${
                   isMain ? "border-zinc-900" : "border-border"
                 }`}
               >

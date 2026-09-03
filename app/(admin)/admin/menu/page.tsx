@@ -9,7 +9,6 @@ import {
   Trash2,
   X,
   Search,
-  Sparkles,
   Star,
   Flame,
   Clock,
@@ -46,21 +45,21 @@ import PhotoBoard from "@/components/admin/PhotoBoard";
 const TAG_INFO: Record<AdminMenuItem["tag"], { label: string; icon: string; bg: string; text: string; border: string }> = {
   sweet: {
     label: "Sweet Stack",
-    icon: "🍯",
+    icon: "",
     bg: "bg-amber-100/80",
     text: "text-amber-950",
     border: "border-amber-300",
   },
   savoury: {
     label: "Savoury Brunch",
-    icon: "🥓",
+    icon: "",
     bg: "bg-orange-100/80",
     text: "text-orange-950",
     border: "border-orange-300",
   },
   choc: {
     label: "Choc Loaded",
-    icon: "🍫",
+    icon: "",
     bg: "bg-[#f4e6dc]",
     text: "text-[#522b14]",
     border: "border-[#d8b8a2]",
@@ -333,23 +332,19 @@ export default function MenuAdminPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Banner Header */}
-      <div className="relative overflow-hidden p-6 sm:p-7 rounded-3xl bg-linear-to-r from-[#fffdf9] via-[#fcf6ee] to-[#faf0e1] border-2 border-[#eee3d5] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="relative overflow-hidden p-6 sm:p-7 rounded-xl bg-white border border-zinc-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-black bg-[#763a12] text-white uppercase tracking-wider shadow-2xs">
-            <UtensilsCrossed className="h-3 w-3 text-amber-300" />
-            MENU CATALOG &amp; DISHES
-          </div>
-          <h1 className="text-2xl font-black text-[#211a14] tracking-tight">
-            Menu Management Studio
+          <h1 className="text-2xl font-semibold text-[#211a14] tracking-tight">
+            Menu
           </h1>
           <p className="text-xs font-medium text-zinc-600 max-w-xl">
-            Add new signature dishes, adjust prices, manage multi-photo galleries, and toggle instant takeaway availability.
+            Add dishes, set prices and photos, and control availability.
           </p>
         </div>
 
         <Button
           onClick={openAdd}
-          className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 px-5 py-2.5 rounded-2xl shadow-md shrink-0 transition-transform active:scale-95"
+          className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 px-5 py-2.5 rounded-lg shadow-xs shrink-0 transition-transform"
         >
           <Plus className="h-4 w-4" />
           <span>Add New Dish</span>
@@ -358,45 +353,39 @@ export default function MenuAdminPage() {
 
       {/* Quick Metrics Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 [&>*]:min-w-0">
-        <div className="p-4 rounded-2xl border-2 border-[#eee3d5] bg-[#fffdf9] shadow-2xs flex items-center justify-between">
+        <div className="p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs flex items-center justify-between">
           <div className="space-y-0.5">
-            <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Total Catalog</span>
-            <div className="text-2xl font-black text-[#211a14]">
-              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${totalCount} Dishes`}
+            <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wide">Total Catalog</span>
+            <div className="text-2xl font-semibold text-[#211a14]">
+              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${totalCount}`}
             </div>
           </div>
-          <div className="h-10 w-10 rounded-xl bg-amber-100/80 text-[#763a12] flex items-center justify-center font-bold text-lg">
-            🥞
-          </div>
+          
         </div>
 
-        <div className="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50/50 shadow-2xs flex items-center justify-between">
+        <div className="p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs flex items-center justify-between">
           <div className="space-y-0.5">
-            <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Live Taking Orders</span>
-            <div className="text-2xl font-black text-emerald-950">
-              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${liveCount} Active`}
+            <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wide">Live Taking Orders</span>
+            <div className="text-2xl font-semibold text-emerald-950">
+              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${liveCount}`}
             </div>
           </div>
-          <div className="h-10 w-10 rounded-xl bg-emerald-200/80 text-emerald-800 flex items-center justify-center font-bold text-lg">
-            🟢
-          </div>
+          
         </div>
 
-        <div className="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50/50 shadow-2xs flex items-center justify-between">
+        <div className="p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs flex items-center justify-between">
           <div className="space-y-0.5">
-            <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wider">Home Featured</span>
-            <div className="text-2xl font-black text-amber-950">
-              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${featuredCount} Starred`}
+            <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wide">Home Featured</span>
+            <div className="text-2xl font-semibold text-amber-950">
+              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${featuredCount}`}
             </div>
           </div>
-          <div className="h-10 w-10 rounded-xl bg-amber-200/80 text-amber-800 flex items-center justify-center font-bold text-lg">
-            ⭐
-          </div>
+          
         </div>
 
-        <div className="p-4 rounded-2xl border-2 border-[#eee3d5] bg-[#fffdf9] shadow-2xs flex items-center justify-between">
+        <div className="p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs flex items-center justify-between">
           <div className="space-y-0.5">
-            <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Categories</span>
+            <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wide">Categories</span>
             <div className="text-xs font-bold text-[#211a14] flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
               {loading ? (
                 <Skeleton className="h-4 w-32 rounded-md" />
@@ -421,13 +410,13 @@ export default function MenuAdminPage() {
       {/* DISH CREATION & EDITING MODAL / CARD                                      */}
       {/* ========================================================================= */}
       {editing !== null && (
-        <div ref={formRef} className="scroll-mt-6 bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#763a12] shadow-xl space-y-6 ring-4 ring-[#763a12]/10">
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#eee3d5]">
+        <div ref={formRef} className="scroll-mt-6 bg-white p-6 sm:p-8 rounded-xl border border-[#763a12] shadow-sm space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-zinc-200">
             <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#763a12] text-white uppercase tracking-wider">
-                {editing ? "✏️ EDITING DISH" : `➕ NEW DISH (STEP ${step} OF 2)`}
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#763a12] text-white uppercase tracking-wide">
+                {editing ? "EDITING DISH" : `NEW DISH — STEP ${step} OF 2`}
               </div>
-              <h3 className="text-lg font-black text-[#211a14]">
+              <h3 className="text-lg font-semibold text-[#211a14]">
                 {editing ? form.name || "Edit Dish Details" : step === 1 ? "Step 1: Dish Details & Pricing" : "Step 2: Dish Photo Gallery"}
               </h3>
               <p className="text-xs text-zinc-500">
@@ -447,88 +436,88 @@ export default function MenuAdminPage() {
             {/* Step 1: Core Details */}
             <div className={`space-y-5 ${!editing && step !== 1 ? "hidden" : ""}`}>
               <div className="space-y-3">
-                <span className="text-xs font-black text-[#763a12] uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide flex items-center gap-1.5">
                   <UtensilsCrossed className="h-3.5 w-3.5" /> Core Menu Information:
                 </span>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   <div className="space-y-1 sm:col-span-2">
-                    <Label htmlFor="mi-name" className="text-xs font-black text-[#211a14]">
+                    <Label htmlFor="mi-name" className="text-xs font-semibold text-[#211a14]">
                       Dish Name *
                     </Label>
                     <Input
                       id="mi-name"
                       required
-                      className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                      className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                       placeholder="e.g. Classic Golden Buttermilk Stack"
                       value={form.name}
                       onChange={set("name")}
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="mi-price" className="text-xs font-black text-[#211a14]">
+                    <Label htmlFor="mi-price" className="text-xs font-semibold text-[#211a14]">
                       Price ($ AUD) *
                     </Label>
                     <Input
                       id="mi-price"
                       required
                       inputMode="decimal"
-                      className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                      className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                       placeholder="e.g. 18.50"
                       value={form.price}
                       onChange={set("price")}
                     />
                   </div>
                   <div className="space-y-1 sm:col-span-2 lg:col-span-3">
-                    <Label htmlFor="mi-desc" className="text-xs font-black text-[#211a14]">
+                    <Label htmlFor="mi-desc" className="text-xs font-semibold text-[#211a14]">
                       Description &amp; Ingredients *
                     </Label>
                     <Textarea
                       id="mi-desc"
                       required
                       rows={2}
-                      className="border-[#d9c7b4] text-[#211a14] font-medium text-xs rounded-xl"
+                      className="border-zinc-300 text-[#211a14] font-medium text-xs rounded-xl"
                       placeholder="e.g. Three fluffy buttermilk pancakes layered with whipped vanilla butter, warm organic maple syrup, and seasonal berries."
                       value={form.description}
                       onChange={set("description")}
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="mi-tag" className="text-xs font-black text-[#211a14]">
+                    <Label htmlFor="mi-tag" className="text-xs font-semibold text-[#211a14]">
                       Menu Category Tag
                     </Label>
                     <Select
                       id="mi-tag"
-                      className="h-10 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                      className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
                       value={form.tag}
                       onChange={set("tag")}
                     >
-                      <option value="sweet">🍯 Sweet Stack</option>
-                      <option value="savoury">🥓 Savoury Brunch</option>
-                      <option value="choc">🍫 Choc Loaded</option>
+                      <option value="sweet">Sweet Stack</option>
+                      <option value="savoury">Savoury Brunch</option>
+                      <option value="choc">Choc Loaded</option>
                     </Select>
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="mi-heat" className="text-xs font-black text-[#211a14]">
+                    <Label htmlFor="mi-heat" className="text-xs font-semibold text-[#211a14]">
                       Spice / Heat Badge
                     </Label>
                     <Select
                       id="mi-heat"
-                      className="h-10 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                      className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
                       value={form.heat}
                       onChange={set("heat")}
                     >
-                      <option value="none">🌿 Mild / No Heat</option>
-                      <option value="medium">🌶️ Medium Heat</option>
-                      <option value="hot">🔥 Hot &amp; Spicy</option>
+                      <option value="none">Mild / No Heat</option>
+                      <option value="medium">Medium Heat</option>
+                      <option value="hot">Hot &amp; Spicy</option>
                     </Select>
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="mi-prep" className="text-xs font-black text-[#211a14]">
+                    <Label htmlFor="mi-prep" className="text-xs font-semibold text-[#211a14]">
                       Estimated Prep Time
                     </Label>
                     <Input
                       id="mi-prep"
-                      className="border-[#d9c7b4] text-[#211a14] font-medium text-xs h-10 rounded-xl"
+                      className="border-zinc-300 text-[#211a14] font-medium text-xs h-10 rounded-xl"
                       placeholder="e.g. 10–12 min"
                       value={form.prep_time}
                       onChange={set("prep_time")}
@@ -538,32 +527,32 @@ export default function MenuAdminPage() {
               </div>
 
               {/* Nutrition */}
-              <div className="pt-4 border-t border-[#eee3d5] space-y-3">
-                <span className="text-xs font-black text-[#763a12] uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="h-3.5 w-3.5" /> Nutrition Details (Optional):
+              <div className="pt-4 border-t border-zinc-200 space-y-3">
+                <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide flex items-center gap-1.5">
+                  Nutrition Details (Optional):
                 </span>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="space-y-1">
-                    <Label htmlFor="mi-kcal" className="text-xs font-black text-[#211a14]">
+                    <Label htmlFor="mi-kcal" className="text-xs font-semibold text-[#211a14]">
                       Calories (kcal)
                     </Label>
                     <Input
                       id="mi-kcal"
                       inputMode="numeric"
-                      className="border-[#d9c7b4] text-[#211a14] font-medium text-xs h-10 rounded-xl"
+                      className="border-zinc-300 text-[#211a14] font-medium text-xs h-10 rounded-xl"
                       placeholder="e.g. 540"
                       value={form.kcal}
                       onChange={set("kcal")}
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="mi-protein" className="text-xs font-black text-[#211a14]">
+                    <Label htmlFor="mi-protein" className="text-xs font-semibold text-[#211a14]">
                       Protein (grams)
                     </Label>
                     <Input
                       id="mi-protein"
                       inputMode="numeric"
-                      className="border-[#d9c7b4] text-[#211a14] font-medium text-xs h-10 rounded-xl"
+                      className="border-zinc-300 text-[#211a14] font-medium text-xs h-10 rounded-xl"
                       placeholder="e.g. 16"
                       value={form.protein_g}
                       onChange={set("protein_g")}
@@ -576,7 +565,7 @@ export default function MenuAdminPage() {
             {/* Step 2: Photos */}
             <div className={`space-y-5 ${!editing && step !== 2 ? "hidden" : ""}`}>
               <div className="space-y-2">
-                <span className="text-xs font-black text-[#763a12] uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide flex items-center gap-1.5">
                   <ImageIcon className="h-3.5 w-3.5" /> High-Resolution Photo Gallery &amp; Cutout:
                 </span>
                 <p className="text-xs text-zinc-500">
@@ -584,7 +573,7 @@ export default function MenuAdminPage() {
                 </p>
               </div>
 
-              <div ref={photosRef} className="p-4 rounded-2xl border-2 border-[#ecdac7] bg-[#faf5ee]">
+              <div ref={photosRef} className="p-4 rounded-lg border border-zinc-200 bg-zinc-50">
                 <PhotoBoard
                   slug={editing ?? ""}
                   name={form.name || "this dish"}
@@ -600,11 +589,11 @@ export default function MenuAdminPage() {
             </div>
 
             {/* Visibility & Homepage Switches */}
-            <div className={`pt-4 border-t border-[#eee3d5] ${!editing && step !== 2 ? "hidden" : ""}`}>
+            <div className={`pt-4 border-t border-zinc-200 ${!editing && step !== 2 ? "hidden" : ""}`}>
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="flex items-center justify-between p-4 rounded-2xl border-2 border-[#eee3d5] bg-white">
+                <div className="flex items-center justify-between p-4 rounded-lg border border-zinc-200 bg-white">
                   <div>
-                    <div className="text-xs font-black text-[#211a14]">Takeaway Available</div>
+                    <div className="text-xs font-semibold text-[#211a14]">Takeaway Available</div>
                     <div className="text-[11px] text-zinc-500">Customers can order this dish online</div>
                   </div>
                   <Switch
@@ -613,9 +602,9 @@ export default function MenuAdminPage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 rounded-2xl border-2 border-[#eee3d5] bg-white">
+                <div className="flex items-center justify-between p-4 rounded-lg border border-zinc-200 bg-white">
                   <div>
-                    <div className="text-xs font-black text-[#211a14]">Featured on Homepage</div>
+                    <div className="text-xs font-semibold text-[#211a14]">Featured on Homepage</div>
                     <div className="text-[11px] text-zinc-500">Highlighted in the hero &amp; menu preview</div>
                   </div>
                   <Switch
@@ -627,7 +616,7 @@ export default function MenuAdminPage() {
             </div>
 
             {/* Sticky Form Action Footer */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#eee3d5]">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
               <span className="text-xs font-bold text-zinc-500">
                 {!editing ? `Step ${step} of 2` : "Editing item in catalog"}
               </span>
@@ -636,7 +625,7 @@ export default function MenuAdminPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="border-[#d9c7b4] text-[#763a12] text-xs font-bold rounded-xl"
+                    className="border-zinc-300 text-[#763a12] text-xs font-bold rounded-xl"
                     onClick={() => setStep(1)}
                   >
                     <ArrowLeft className="h-3.5 w-3.5 mr-1" /> Back to Details
@@ -682,13 +671,13 @@ export default function MenuAdminPage() {
       {/* ========================================================================= */}
       {/* SEARCH & CATEGORY FILTER BAR                                              */}
       {/* ========================================================================= */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-[#fffdf9] border-2 border-[#eee3d5] shadow-xs space-y-4">
+      <div className="p-4 sm:p-5 rounded-xl bg-white border border-zinc-200 shadow-xs space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Search Box */}
           <div className="relative flex-1 min-w-[240px]">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
             <Input
-              className="pl-10 h-11 text-xs font-bold border-[#d9c7b4] rounded-2xl bg-white text-[#211a14] placeholder:text-zinc-400"
+              className="pl-10 h-11 text-xs font-bold border-zinc-300 rounded-lg bg-white text-[#211a14] placeholder:text-zinc-400"
               placeholder="Search dishes by name, ingredients, or price..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -711,14 +700,14 @@ export default function MenuAdminPage() {
         </div>
 
         {/* Category Filter Pills */}
-        <div className="flex flex-wrap gap-2 pt-1 border-t border-[#eee3d5]">
+        <div className="flex flex-wrap gap-2 pt-1 border-t border-zinc-200">
           {[
-            { id: "all", label: "All Dishes", count: totalCount, icon: "🥞" },
-            { id: "sweet", label: "Sweet Stacks", count: sweetCount, icon: "🍯" },
-            { id: "savoury", label: "Savoury Brunch", count: savouryCount, icon: "🥓" },
-            { id: "choc", label: "Choc Loaded", count: chocCount, icon: "🍫" },
-            { id: "featured", label: "Featured", count: featuredCount, icon: "⭐" },
-            { id: "live", label: "Available Now", count: liveCount, icon: "🟢" },
+            { id: "all", label: "All Dishes", count: totalCount },
+            { id: "sweet", label: "Sweet Stacks", count: sweetCount },
+            { id: "savoury", label: "Savoury Brunch", count: savouryCount },
+            { id: "choc", label: "Choc Loaded", count: chocCount },
+            { id: "featured", label: "Featured", count: featuredCount },
+            { id: "live", label: "Available Now", count: liveCount },
           ].map((cat) => {
             const isSelected = categoryFilter === cat.id;
             return (
@@ -726,13 +715,12 @@ export default function MenuAdminPage() {
                 key={cat.id}
                 type="button"
                 onClick={() => setCategoryFilter(cat.id as FilterCategory)}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                   isSelected
-                    ? "bg-[#763a12] text-white shadow-xs scale-[1.02]"
-                    : "bg-white text-[#211a14] border border-[#d9c7b4] hover:bg-[#faf5ee]"
+                    ? "bg-[#763a12] text-white shadow-xs"
+                    : "bg-white text-[#211a14] border border-zinc-300 hover:bg-zinc-50"
                 }`}
               >
-                <span>{cat.icon}</span>
                 <span>{cat.label}</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
@@ -750,22 +738,22 @@ export default function MenuAdminPage() {
       {/* ========================================================================= */}
       {/* MENU ITEMS TABLE                                                          */}
       {/* ========================================================================= */}
-      <div className="bg-[#fffdf9] rounded-3xl border-2 border-[#eee3d5] shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-6">
             <TableSkeleton rows={6} cols={7} />
           </div>
         ) : filteredItems.length === 0 ? (
           <div className="py-16 text-center space-y-3">
-            <div className="text-4xl">🥞</div>
-            <h3 className="text-base font-black text-[#211a14]">No dishes matched your filter</h3>
+            
+            <h3 className="text-base font-semibold text-[#211a14]">No dishes matched your filter</h3>
             <p className="text-xs text-zinc-500 max-w-sm mx-auto">
               Try adjusting your search keyword or selecting a different category filter above.
             </p>
             <Button
               size="sm"
               variant="outline"
-              className="border-[#d9c7b4] text-[#763a12] font-bold text-xs rounded-xl mt-2"
+              className="border-zinc-300 text-[#763a12] font-bold text-xs rounded-xl mt-2"
               onClick={() => {
                 setSearchQuery("");
                 setCategoryFilter("all");
@@ -778,7 +766,7 @@ export default function MenuAdminPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b-2 border-[#eee3d5] bg-[#faf5ee]/80 text-[#763a12] text-[11px] font-black uppercase tracking-wider">
+                <tr className="border-b border-zinc-200 bg-zinc-50 text-[#763a12] text-[11px] font-semibold uppercase tracking-wide">
                   <th className="py-3.5 px-4">Dish &amp; Ingredients</th>
                   <th className="py-3.5 px-3">Category</th>
                   <th className="py-3.5 px-3">Price</th>
@@ -788,14 +776,14 @@ export default function MenuAdminPage() {
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#eee3d5] text-xs font-medium text-[#211a14]">
+              <tbody className="divide-y divide-zinc-100 text-xs font-medium text-[#211a14]">
                 {filteredItems.map((item) => {
                   const tagData = TAG_INFO[item.tag] ?? TAG_INFO.sweet;
                   const photoCount = photoCounts[item.slug] ?? 0;
                   return (
                     <tr
                       key={item.slug}
-                      className="hover:bg-[#fcf8f2] transition-colors group"
+                      className="hover:bg-zinc-50 transition-colors group"
                     >
                       {/* Dish & Image */}
                       <td className="py-3.5 px-4">
@@ -805,7 +793,7 @@ export default function MenuAdminPage() {
                             onClick={() => openEdit(item, true)}
                             title="Click to manage photos"
                             aria-label={`Manage photos for ${item.name}`}
-                            className="relative h-12 w-12 rounded-xl overflow-hidden bg-zinc-100 shrink-0 border-2 border-[#ecdac7] group-hover:border-[#763a12] transition-transform active:scale-95 shadow-2xs"
+                            className="relative h-12 w-12 rounded-xl overflow-hidden bg-zinc-100 shrink-0 border border-zinc-200 group-hover:border-[#763a12] transition-transform shadow-2xs"
                           >
                             {item.photo || item.image ? (
                               <Image
@@ -823,7 +811,7 @@ export default function MenuAdminPage() {
                           </button>
                           <div className="space-y-0.5 min-w-0">
                             <div className="flex items-center gap-1.5">
-                              <span className="font-black text-sm text-[#211a14] truncate">{item.name}</span>
+                              <span className="font-semibold text-sm text-[#211a14] truncate">{item.name}</span>
                               {item.heat === "medium" && <span title="Medium Heat">🌶️</span>}
                               {item.heat === "hot" && <span title="Hot & Spicy">🔥</span>}
                             </div>
@@ -837,16 +825,15 @@ export default function MenuAdminPage() {
                       {/* Category Badge */}
                       <td className="py-3.5 px-3 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black border ${tagData.bg} ${tagData.text} ${tagData.border}`}
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${tagData.bg} ${tagData.text} ${tagData.border}`}
                         >
-                          <span>{tagData.icon}</span>
                           <span>{tagData.label}</span>
                         </span>
                       </td>
 
                       {/* Price */}
                       <td className="py-3.5 px-3 whitespace-nowrap">
-                        <span className="text-sm font-black text-[#763a12] px-2.5 py-1 rounded-xl bg-amber-50 border border-amber-200">
+                        <span className="text-sm font-semibold text-[#763a12] px-2.5 py-1 rounded-xl bg-zinc-50 border border-zinc-200">
                           ${item.price}
                         </span>
                       </td>
@@ -856,7 +843,7 @@ export default function MenuAdminPage() {
                         <button
                           type="button"
                           onClick={() => openEdit(item, true)}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold border border-[#d9c7b4] bg-white text-[#763a12] hover:bg-[#faf5ee] shadow-2xs transition-all"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold border border-zinc-300 bg-white text-[#763a12] hover:bg-zinc-50 shadow-2xs transition-all"
                         >
                           <ImageIcon className="h-3.5 w-3.5" />
                           <span>{photoCount > 0 ? `${photoCount} Photos` : "Add"}</span>
@@ -899,7 +886,7 @@ export default function MenuAdminPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-xs font-bold border-[#d9c7b4] text-[#763a12] hover:bg-[#faf5ee] rounded-xl"
+                            className="h-8 text-xs font-bold border-zinc-300 text-[#763a12] hover:bg-zinc-50 rounded-xl"
                             onClick={() => openEdit(item)}
                           >
                             <Pencil className="h-3 w-3 mr-1" /> Edit

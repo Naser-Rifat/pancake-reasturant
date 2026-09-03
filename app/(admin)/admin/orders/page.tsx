@@ -87,7 +87,7 @@ export default function OrdersPage() {
             newOrderChime();
             toast({
               variant: "info",
-              title: fresh.length === 1 ? "New order received 🎉" : `${fresh.length} new orders received 🎉`,
+              title: fresh.length === 1 ? "New order received" : `${fresh.length} new orders received`,
               description: fresh.map((o) => `${o.customer_name} · $${o.total}`).join(", "),
             });
           }
@@ -160,9 +160,9 @@ export default function OrdersPage() {
           status === "cancelled"
             ? "Order cancelled — customer notified with reason"
             : status === "ready"
-            ? `Order for ${o.customer_name} marked READY for pickup!`
+            ? `Order for ${o.customer_name} marked ready — customer notified`
             : status === "completed"
-            ? `Order for ${o.customer_name} marked COMPLETED!`
+            ? `Order for ${o.customer_name} marked completed`
             : `Order moved to ${status}`,
       });
     } catch (e) {
@@ -224,17 +224,13 @@ export default function OrdersPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Banner Header */}
-      <div className="relative overflow-hidden p-6 sm:p-7 rounded-3xl bg-linear-to-r from-[#fffdf9] via-[#fcf6ee] to-[#faf0e1] border-2 border-[#eee3d5] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="relative overflow-hidden p-6 sm:p-7 rounded-xl bg-white border border-zinc-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-black bg-[#763a12] text-white uppercase tracking-wider shadow-2xs">
-            <ShoppingBag className="h-3 w-3 text-amber-300" />
-            LIVE TAKEAWAY &amp; KITCHEN ORDERS
-          </div>
-          <h1 className="text-2xl font-black text-[#211a14] tracking-tight">
-            Kitchen Orders Dashboard
+          <h1 className="text-2xl font-semibold text-[#211a14] tracking-tight">
+            Orders
           </h1>
           <p className="text-xs font-medium text-zinc-600 max-w-xl">
-            Live incoming takeaway orders with audio chimes. Move orders through kitchen preparation, mark ready for pickup, and notify guests.
+            New orders appear automatically with a chime. Move each order through prep, ready and pickup.
           </p>
         </div>
 
@@ -243,7 +239,7 @@ export default function OrdersPage() {
             variant="outline"
             size="sm"
             onClick={() => load(true)}
-            className="border-[#d9c7b4] text-[#763a12] bg-white hover:bg-[#faf5ee] text-xs font-bold rounded-2xl h-10 px-4"
+            className="border-zinc-300 text-[#763a12] bg-white hover:bg-zinc-50 text-xs font-bold rounded-lg h-10 px-4"
           >
             <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Refresh Orders
           </Button>
@@ -253,68 +249,60 @@ export default function OrdersPage() {
       {/* Quick Metrics Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 [&>*]:min-w-0">
         {/* Total Sales */}
-        <div className="p-4 rounded-2xl border-2 border-[#eee3d5] bg-[#fffdf9] shadow-2xs flex items-center justify-between">
+        <div className="p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs flex items-center justify-between">
           <div className="space-y-0.5">
-            <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Today&apos;s Sales</span>
-            <div className="text-2xl font-black text-[#763a12]">
+            <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wide">Today&apos;s Sales</span>
+            <div className="text-2xl font-semibold text-[#763a12]">
               {loading ? <Skeleton className="h-7 w-24 rounded-lg" /> : `$${todaysSalesRevenue.toFixed(2)}`}
             </div>
           </div>
-          <div className="h-10 w-10 rounded-xl bg-amber-100/80 text-[#763a12] flex items-center justify-center font-bold text-lg">
-            💰
-          </div>
+          
         </div>
 
         {/* Received / New */}
         <div
-          className={`p-4 rounded-2xl border-2 shadow-2xs flex items-center justify-between transition-all ${
-            receivedCount > 0 ? "border-amber-300 bg-amber-50/80" : "border-[#eee3d5] bg-[#fffdf9]"
+          className={`p-4 rounded-lg border shadow-2xs flex items-center justify-between transition-all ${
+            receivedCount > 0 ? "border-amber-300 bg-amber-50/80" : "border-zinc-200 bg-white"
           }`}
         >
           <div className="space-y-0.5">
-            <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wider">New Received</span>
-            <div className="text-2xl font-black text-amber-950 flex items-center gap-2">
+            <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wide">New Received</span>
+            <div className="text-2xl font-semibold text-amber-950 flex items-center gap-2">
               {loading ? (
                 <Skeleton className="h-7 w-20 rounded-lg" />
               ) : (
                 <>
-                  {receivedCount} Orders
+                  {receivedCount}
                   {receivedCount > 0 && (
-                    <span className="h-2.5 w-2.5 rounded-full bg-amber-500 animate-ping" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
                   )}
                 </>
               )}
             </div>
           </div>
-          <div className="h-10 w-10 rounded-xl bg-amber-200/80 text-amber-900 flex items-center justify-center font-bold text-lg">
-            📥
-          </div>
+          
         </div>
 
         {/* In Kitchen Preparing */}
-        <div className="p-4 rounded-2xl border-2 border-orange-200 bg-orange-50/50 shadow-2xs flex items-center justify-between">
+        <div className="p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs flex items-center justify-between">
           <div className="space-y-0.5">
-            <span className="text-[11px] font-bold text-orange-900 uppercase tracking-wider">In Kitchen</span>
-            <div className="text-2xl font-black text-orange-950">
-              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${preparingCount} Cooking`}
+            <span className="text-[11px] font-bold text-orange-900 uppercase tracking-wide">In Kitchen</span>
+            <div className="text-2xl font-semibold text-orange-950">
+              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${preparingCount}`}
             </div>
           </div>
-          <div className="h-10 w-10 rounded-xl bg-orange-200/80 text-orange-900 flex items-center justify-center font-bold text-lg">
-            🍳
-          </div>
+          
         </div>
 
         {/* Ready for Pickup */}
-        <div className="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50/50 shadow-2xs flex items-center justify-between">
+        <div className="p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs flex items-center justify-between">
           <div className="space-y-0.5">
-            <span className="text-[11px] font-bold text-emerald-900 uppercase tracking-wider">Ready for Pickup</span>
-            <div className="text-2xl font-black text-emerald-950">
-              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${readyCount} Packed`}
+            <span className="text-[11px] font-bold text-emerald-900 uppercase tracking-wide">Ready for Pickup</span>
+            <div className="text-2xl font-semibold text-emerald-950">
+              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${readyCount}`}
             </div>
           </div>
-          <div className="h-10 w-10 rounded-xl bg-emerald-200/80 text-emerald-800 flex items-center justify-center font-bold text-lg">
-            🔔
-          </div>
+          
         </div>
       </div>
 
@@ -323,13 +311,13 @@ export default function OrdersPage() {
       {/* ========================================================================= */}
       {/* SEARCH & STATUS FILTER BAR                                                */}
       {/* ========================================================================= */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-[#fffdf9] border-2 border-[#eee3d5] shadow-xs space-y-4">
+      <div className="p-4 sm:p-5 rounded-xl bg-white border border-zinc-200 shadow-xs space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Search Box */}
           <div className="relative flex-1 min-w-[240px]">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
             <Input
-              className="pl-10 h-11 text-xs font-bold border-[#d9c7b4] rounded-2xl bg-white text-[#211a14] placeholder:text-zinc-400"
+              className="pl-10 h-11 text-xs font-bold border-zinc-300 rounded-lg bg-white text-[#211a14] placeholder:text-zinc-400"
               placeholder="Search by customer name, phone, order ID, or ordered dish..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -353,37 +341,24 @@ export default function OrdersPage() {
         </div>
 
         {/* Status Filter Tabs */}
-        <div className="flex flex-wrap gap-2 pt-1 border-t border-[#eee3d5]">
+        <div className="flex flex-wrap gap-2 pt-1 border-t border-zinc-200">
           {FILTERS.map((f) => {
             const isSelected = filter === f;
             const count =
               f === "all"
                 ? orders.length
                 : orders.filter((o) => o.status === f).length;
-            const icon =
-              f === "all"
-                ? "🛍️"
-                : f === "received"
-                ? "📥"
-                : f === "preparing"
-                ? "🍳"
-                : f === "ready"
-                ? "🔔"
-                : f === "completed"
-                ? "✅"
-                : "❌";
             return (
               <button
                 key={f}
                 type="button"
                 onClick={() => setFilter(f)}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black capitalize transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
                   isSelected
-                    ? "bg-[#763a12] text-white shadow-xs scale-[1.02]"
-                    : "bg-white text-[#211a14] border border-[#d9c7b4] hover:bg-[#faf5ee]"
+                    ? "bg-[#763a12] text-white shadow-xs"
+                    : "bg-white text-[#211a14] border border-zinc-300 hover:bg-zinc-50"
                 }`}
               >
-                <span>{icon}</span>
                 <span>{f}</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
@@ -401,15 +376,15 @@ export default function OrdersPage() {
       {/* ========================================================================= */}
       {/* ORDERS TABLE & KITCHEN ACTION SYSTEM                                      */}
       {/* ========================================================================= */}
-      <div className="bg-[#fffdf9] rounded-3xl border-2 border-[#eee3d5] shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-6">
             <TableSkeleton rows={6} cols={7} />
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="py-16 text-center space-y-3">
-            <div className="text-4xl">🛍️</div>
-            <h3 className="text-base font-black text-[#211a14]">No orders found</h3>
+            
+            <h3 className="text-base font-semibold text-[#211a14]">No orders found</h3>
             <p className="text-xs text-zinc-500 max-w-sm mx-auto">
               No orders matched your filter or search query.
             </p>
@@ -418,7 +393,7 @@ export default function OrdersPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b-2 border-[#eee3d5] bg-[#faf5ee]/80 text-[#763a12] text-[11px] font-black uppercase tracking-wider">
+                <tr className="border-b border-zinc-200 bg-zinc-50 text-[#763a12] text-[11px] font-semibold uppercase tracking-wide">
                   <th className="py-3.5 px-4">Order &amp; Customer</th>
                   <th className="py-3.5 px-4">Ordered Items &amp; Notes</th>
                   <th className="py-3.5 px-3">Total Amount</th>
@@ -428,22 +403,22 @@ export default function OrdersPage() {
                   <th className="py-3.5 px-4 text-right">Set Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#eee3d5] text-xs font-medium text-[#211a14] [&>tr>td]:align-top">
+              <tbody className="divide-y divide-zinc-100 text-xs font-medium text-[#211a14] [&>tr>td]:align-top">
                 {pageOrders.map((o) => {
                   const placedDate = new Date(o.created_at);
                   const orderRef = o.public_id ? o.public_id.slice(0, 8).toUpperCase() : "";
                   return (
-                    <tr key={o.public_id} className="hover:bg-[#fcf8f2] transition-colors">
+                    <tr key={o.public_id} className="hover:bg-zinc-50 transition-colors">
                       {/* Customer Info & Order Reference */}
                       <td className="py-3.5 px-4 min-w-[220px]">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 whitespace-nowrap">
                             {orderRef && (
-                              <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-black bg-amber-100/90 text-amber-950 border border-amber-300">
+                              <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200">
                                 #{orderRef}
                               </span>
                             )}
-                            <span className="font-black text-sm text-[#211a14]">{o.customer_name}</span>
+                            <span className="font-semibold text-sm text-[#211a14]">{o.customer_name}</span>
                           </div>
                           <div className="flex flex-wrap items-center gap-2 text-[11px] text-zinc-500">
                             {o.phone ? (
@@ -473,17 +448,17 @@ export default function OrdersPage() {
                             {o.items.map((item, idx) => (
                               <span
                                 key={idx}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-black bg-[#faf5ee] border border-[#ecdac7] text-[#763a12] shadow-2xs"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold bg-zinc-50 border border-zinc-200 text-[#763a12] shadow-2xs"
                               >
                                 <span className="text-amber-800 font-extrabold">{item.quantity}×</span>
-                                <span>🥞 {item.name}</span>
+                                <span>{item.name}</span>
                               </span>
                             ))}
                           </div>
                           {/* Customer Kitchen Notes */}
                           {o.notes && (
                             <div className="p-2 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-950 text-[11px] font-bold flex items-start gap-1.5">
-                              <span className="shrink-0">📝</span>
+                              
                               <span className="line-clamp-2">
                                 <strong>Guest Note:</strong> &ldquo;{o.notes}&rdquo;
                               </span>
@@ -492,7 +467,7 @@ export default function OrdersPage() {
                           {/* Cancellation Reason */}
                           {o.status === "cancelled" && o.cancel_reason && (
                             <div className="p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-[11px] font-bold flex items-start gap-1.5">
-                              <span className="shrink-0">⚠️</span>
+                              
                               <span>
                                 <strong>Cancellation Reason:</strong> &ldquo;{o.cancel_reason}&rdquo;
                               </span>
@@ -503,7 +478,7 @@ export default function OrdersPage() {
 
                       {/* Total Amount */}
                       <td className="py-3.5 px-3 whitespace-nowrap">
-                        <span className="text-sm font-black text-[#763a12] px-2.5 py-1 rounded-xl bg-amber-50 border border-amber-200">
+                        <span className="text-sm font-semibold text-[#763a12] px-2.5 py-1 rounded-xl bg-zinc-50 border border-zinc-200">
                           ${o.total}
                         </span>
                       </td>
@@ -523,27 +498,27 @@ export default function OrdersPage() {
                       {/* Status Badge */}
                       <td className="py-3.5 px-3 text-center whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wide ${
                             o.status === "received"
-                              ? "bg-amber-100 text-amber-950 border border-amber-300 animate-pulse"
+                              ? "bg-amber-100 text-amber-950 border border-amber-300"
                               : o.status === "preparing"
                               ? "bg-orange-100 text-orange-950 border border-orange-300"
                               : o.status === "ready"
-                              ? "bg-emerald-100 text-emerald-950 border border-emerald-300 ring-2 ring-emerald-300/50"
+                              ? "bg-emerald-100 text-emerald-950 border border-emerald-300"
                               : o.status === "completed"
                               ? "bg-zinc-100 text-zinc-700 border border-zinc-300"
                               : "bg-rose-100 text-rose-950 border border-rose-300"
                           }`}
                         >
                           {o.status === "received"
-                            ? "📥 Received"
+                            ? "Received"
                             : o.status === "preparing"
-                            ? "🍳 Preparing"
+                            ? "Preparing"
                             : o.status === "ready"
-                            ? "🔔 Ready"
+                            ? "Ready"
                             : o.status === "completed"
-                            ? "✓ Completed"
-                            : "✕ Cancelled"}
+                            ? "Completed"
+                            : "Cancelled"}
                         </span>
                       </td>
 
@@ -582,7 +557,7 @@ export default function OrdersPage() {
                       <td className="py-3.5 px-4 text-right whitespace-nowrap">
                         <Select
                           aria-label={`Status of ${o.customer_name}'s order`}
-                          className="h-8 text-xs border-[#d9c7b4] font-bold rounded-xl w-28 bg-white"
+                          className="h-8 text-xs border-zinc-300 font-bold rounded-xl w-28 bg-white"
                           value={o.status}
                           onChange={(e) => setStatus(o, e.target.value as AdminOrder["status"])}
                         >

@@ -37,7 +37,7 @@ export function Pagination({
   return (
     <nav
       aria-label="Pagination"
-      className="p-4 flex flex-wrap items-center justify-center gap-1.5 border-t border-[#eee3d5] bg-[#faf5ee]/50"
+      className="p-4 flex flex-wrap items-center justify-center gap-1.5 border-t border-zinc-200 bg-zinc-50"
     >
       <Button
         variant="outline"
@@ -45,7 +45,7 @@ export function Pagination({
         disabled={page <= 1 || loading}
         onClick={() => onPageChange(page - 1)}
         aria-label="Previous page"
-        className="h-9 border-[#d9c7b4] text-[#763a12] font-bold text-xs rounded-xl"
+        className="h-9 border-zinc-300 text-[#763a12] font-bold text-xs rounded-xl"
       >
         <ChevronLeft className="h-4 w-4" /> Prev
       </Button>
@@ -62,10 +62,10 @@ export function Pagination({
             aria-label={`Page ${n}`}
             aria-current={n === page ? "page" : undefined}
             onClick={() => onPageChange(n)}
-            className={`h-9 min-w-9 px-2 rounded-xl text-xs font-black transition-all ${
+            className={`h-9 min-w-9 px-2 rounded-xl text-xs font-semibold transition-all ${
               n === page
                 ? "bg-[#763a12] text-white shadow-xs"
-                : "bg-white text-[#211a14] border border-[#d9c7b4] hover:bg-[#faf5ee]"
+                : "bg-white text-[#211a14] border border-zinc-300 hover:bg-zinc-50"
             }`}
           >
             {n}
@@ -80,7 +80,7 @@ export function Pagination({
         disabled={(page >= knownPages && !serverHasMore) || loading}
         onClick={() => onPageChange(page + 1)}
         aria-label="Next page"
-        className="h-9 border-[#d9c7b4] text-[#763a12] font-bold text-xs rounded-xl"
+        className="h-9 border-zinc-300 text-[#763a12] font-bold text-xs rounded-xl"
       >
         Next <ChevronRight className="h-4 w-4" />
       </Button>

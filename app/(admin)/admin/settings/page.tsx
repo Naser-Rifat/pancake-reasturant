@@ -15,7 +15,6 @@ import {
   Phone,
   MapPin,
   Share2,
-  Sparkles,
   Sliders,
   Check,
   Send,
@@ -193,7 +192,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-6 rounded-3xl bg-[#fffdf9] border-2 border-[#eee3d5]">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-6 rounded-xl bg-white border border-zinc-200">
           <div className="space-y-1">
             <Skeleton className="h-6 w-48 rounded-xl" />
             <Skeleton className="h-4 w-72 rounded-lg" />
@@ -202,10 +201,10 @@ export default function SettingsPage() {
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+            <Skeleton key={i} className="h-20 w-full rounded-lg" />
           ))}
         </div>
-        <Skeleton className="h-96 w-full rounded-3xl" />
+        <Skeleton className="h-96 w-full rounded-xl" />
       </div>
     );
   }
@@ -213,8 +212,8 @@ export default function SettingsPage() {
   if (error && !site) {
     return (
       <div className="space-y-6">
-        <div className="p-6 rounded-3xl bg-[#fffdf9] border-2 border-[#eee3d5]">
-          <h1 className="text-2xl font-black text-[#211a14]">Business Settings</h1>
+        <div className="p-6 rounded-xl bg-white border border-zinc-200">
+          <h1 className="text-2xl font-semibold text-[#211a14]">Business Settings</h1>
           <p className="text-xs font-medium text-zinc-500">
             Manage your restaurant location, kitchen ordering, operating hours, and appearance
           </p>
@@ -261,17 +260,13 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Banner Header */}
-      <div className="relative overflow-hidden p-6 sm:p-7 rounded-3xl bg-linear-to-r from-[#fffdf9] via-[#fcf6ee] to-[#faf0e1] border-2 border-[#eee3d5] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="relative overflow-hidden p-6 sm:p-7 rounded-xl bg-white border border-zinc-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-black bg-[#763a12] text-white uppercase tracking-wider shadow-2xs">
-            <Sliders className="h-3 w-3 text-amber-300" />
-            VENUE &amp; SYSTEM SETTINGS
-          </div>
-          <h1 className="text-2xl font-black text-[#211a14] tracking-tight">
-            Restaurant Configuration
+          <h1 className="text-2xl font-semibold text-[#211a14] tracking-tight">
+            Settings
           </h1>
           <p className="text-xs font-medium text-zinc-600 max-w-xl">
-            Control live online takeaway ordering, trading hours, contact details, social links, and visual branding.
+            Ordering, trading hours, contact details and website theme.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -279,7 +274,7 @@ export default function SettingsPage() {
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2.5 rounded-xl border-2 border-[#d9c7b4] bg-white text-[#763a12] hover:bg-[#faf5ee] shadow-2xs transition-all"
+            className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2.5 rounded-xl border border-zinc-300 bg-white text-[#763a12] hover:bg-zinc-50 shadow-2xs transition-all"
           >
             <span>View Public Site</span>
             <ExternalLink className="h-3.5 w-3.5" />
@@ -297,26 +292,26 @@ export default function SettingsPage() {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as SettingsTab)}
-              className={`relative flex flex-col items-start p-4 rounded-2xl border-2 text-left transition-all ${
+              className={`relative flex flex-col items-start p-4 rounded-lg border text-left transition-all ${
                 isActive
-                  ? "bg-[#763a12] text-white border-[#763a12] shadow-md scale-[1.02] ring-4 ring-[#763a12]/15"
-                  : "bg-[#fffdf9] text-[#211a14] border-[#eee3d5] hover:border-[#d9c7b4] hover:bg-[#fcf8f2] shadow-2xs"
+                  ? "bg-[#763a12] text-white border-[#763a12] shadow-xs"
+                  : "bg-white text-[#211a14] border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 shadow-2xs"
               }`}
             >
               <div className="flex flex-wrap items-center justify-between gap-1.5 w-full mb-1.5">
                 <div className="flex items-center gap-2 min-w-0">
                   <div
                     className={`h-8 w-8 rounded-xl flex items-center justify-center font-bold transition-colors ${
-                      isActive ? "bg-white/20 text-amber-300" : "bg-amber-100/80 text-[#763a12]"
+                      isActive ? "bg-white/20 text-amber-300" : "bg-zinc-100 text-[#763a12]"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
                   </div>
-                  <span className="text-xs font-black">{tab.label}</span>
+                  <span className="text-xs font-semibold">{tab.label}</span>
                 </div>
                 {"badge" in tab && tab.badge && (
                   <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
                       isActive
                         ? "bg-white text-[#763a12]"
                         : "isAlert" in tab && tab.isAlert
@@ -345,13 +340,13 @@ export default function SettingsPage() {
       {/* ========================================================================= */}
       {activeTab === "contact" && (
         <div className="space-y-6">
-          <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
+          <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
             {/* Card Header with Save Button */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#eee3d5]">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-zinc-200">
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-5 w-5 text-[#763a12]" />
-                  <h3 className="text-base font-black text-[#211a14]">Business &amp; Contact Details</h3>
+                  <h3 className="text-base font-semibold text-[#211a14]">Business &amp; Contact Details</h3>
                 </div>
                 <p className="text-xs text-zinc-500">
                   Displayed on the website footer, receipts, location card, and confirmation emails
@@ -375,7 +370,7 @@ export default function SettingsPage() {
                       facebook_url: site.facebook_url,
                       uber_eats_url: site.uber_eats_url,
                     });
-                  }, "Settings", { title: "Contact info saved!" })
+                  }, "Settings", { title: "Contact info saved" })
                 }
               >
                 <Save className="h-3.5 w-3.5 mr-1.5" /> Save Contact Info
@@ -384,78 +379,78 @@ export default function SettingsPage() {
 
             {/* SECTION A: Core Contact & Legal Details */}
             <div className="space-y-4">
-              <span className="text-xs font-black text-[#763a12] uppercase tracking-wider flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide flex items-center gap-1.5">
                 <Phone className="h-3.5 w-3.5" /> Primary Contact &amp; Legal Info:
               </span>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="space-y-1 sm:col-span-2">
-                  <Label htmlFor="s-address" className="text-xs font-black text-[#211a14]">
+                  <Label htmlFor="s-address" className="text-xs font-semibold text-[#211a14]">
                     Street Address (Display on Footer &amp; Booking)
                   </Label>
                   <Input
                     id="s-address"
-                    className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                    className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                     placeholder="e.g. 123 Pancake Lane, Sydney NSW 2000"
                     value={site.address}
                     onChange={setS("address")}
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="s-phone" className="text-xs font-black text-[#211a14]">
+                  <Label htmlFor="s-phone" className="text-xs font-semibold text-[#211a14]">
                     Direct Phone Number
                   </Label>
                   <Input
                     id="s-phone"
-                    className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                    className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                     placeholder="e.g. (02) 9876 5432"
                     value={site.phone}
                     onChange={setS("phone")}
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="s-wa" className="text-xs font-black text-[#211a14]">
+                  <Label htmlFor="s-wa" className="text-xs font-semibold text-[#211a14]">
                     WhatsApp Direct Order (Optional)
                   </Label>
                   <Input
                     id="s-wa"
-                    className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                    className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                     placeholder="+61 4xx xxx xxx"
                     value={site.whatsapp}
                     onChange={setS("whatsapp")}
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="s-email" className="text-xs font-black text-[#211a14]">
+                  <Label htmlFor="s-email" className="text-xs font-semibold text-[#211a14]">
                     Public Inquiries &amp; Alert Email
                   </Label>
                   <Input
                     id="s-email"
                     type="email"
-                    className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                    className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                     placeholder="orders@pancakediner.com.au"
                     value={site.email}
                     onChange={setS("email")}
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="s-abn" className="text-xs font-black text-[#211a14]">
+                  <Label htmlFor="s-abn" className="text-xs font-semibold text-[#211a14]">
                     ABN (Australian Business Number)
                   </Label>
                   <Input
                     id="s-abn"
-                    className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                    className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                     placeholder="e.g. 12 345 678 901"
                     value={site.abn}
                     onChange={setS("abn")}
                   />
                 </div>
                 <div className="space-y-1 sm:col-span-2 lg:col-span-3">
-                  <Label htmlFor="s-tz" className="text-xs font-black text-[#211a14]">
+                  <Label htmlFor="s-tz" className="text-xs font-semibold text-[#211a14]">
                     Venue Operating Timezone
                   </Label>
                   <Select
                     id="s-tz"
-                    className="h-10 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                    className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
                     value={site.timezone}
                     onChange={setS("timezone")}
                   >
@@ -470,53 +465,53 @@ export default function SettingsPage() {
             </div>
 
             {/* SECTION B: Social & Delivery Platform Integrations */}
-            <div className="pt-4 border-t border-[#eee3d5] space-y-4">
-              <span className="text-xs font-black text-[#763a12] uppercase tracking-wider flex items-center gap-1.5">
+            <div className="pt-4 border-t border-zinc-200 space-y-4">
+              <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide flex items-center gap-1.5">
                 <Share2 className="h-3.5 w-3.5" /> Social Media &amp; Online Delivery Links:
               </span>
               <div className="grid gap-4 sm:grid-cols-3">
-                <div className="p-4 rounded-2xl border-2 border-[#ecdac7] bg-[#faf5ee] space-y-2">
+                <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 space-y-2">
                   <div className="flex items-center gap-2 text-[#763a12]">
                     <InstagramIcon className="h-4 w-4 text-pink-600" />
-                    <Label htmlFor="s-insta" className="text-xs font-black text-[#211a14]">
+                    <Label htmlFor="s-insta" className="text-xs font-semibold text-[#211a14]">
                       Instagram Page
                     </Label>
                   </div>
                   <Input
                     id="s-insta"
-                    className="border-[#d9c7b4] bg-white text-[#211a14] font-medium text-xs h-9 rounded-xl"
+                    className="border-zinc-300 bg-white text-[#211a14] font-medium text-xs h-9 rounded-xl"
                     placeholder="https://instagram.com/pancakediner"
                     value={site.instagram_url}
                     onChange={setS("instagram_url")}
                   />
                 </div>
 
-                <div className="p-4 rounded-2xl border-2 border-[#ecdac7] bg-[#faf5ee] space-y-2">
+                <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 space-y-2">
                   <div className="flex items-center gap-2 text-[#763a12]">
                     <FacebookIcon className="h-4 w-4 text-blue-600" />
-                    <Label htmlFor="s-fb" className="text-xs font-black text-[#211a14]">
+                    <Label htmlFor="s-fb" className="text-xs font-semibold text-[#211a14]">
                       Facebook Page
                     </Label>
                   </div>
                   <Input
                     id="s-fb"
-                    className="border-[#d9c7b4] bg-white text-[#211a14] font-medium text-xs h-9 rounded-xl"
+                    className="border-zinc-300 bg-white text-[#211a14] font-medium text-xs h-9 rounded-xl"
                     placeholder="https://facebook.com/pancakediner"
                     value={site.facebook_url}
                     onChange={setS("facebook_url")}
                   />
                 </div>
 
-                <div className="p-4 rounded-2xl border-2 border-[#ecdac7] bg-[#faf5ee] space-y-2">
+                <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 space-y-2">
                   <div className="flex items-center gap-2 text-[#763a12]">
                     <UtensilsCrossed className="h-4 w-4 text-emerald-600" />
-                    <Label htmlFor="s-uber" className="text-xs font-black text-[#211a14]">
+                    <Label htmlFor="s-uber" className="text-xs font-semibold text-[#211a14]">
                       Uber Eats Store Link
                     </Label>
                   </div>
                   <Input
                     id="s-uber"
-                    className="border-[#d9c7b4] bg-white text-[#211a14] font-medium text-xs h-9 rounded-xl"
+                    className="border-zinc-300 bg-white text-[#211a14] font-medium text-xs h-9 rounded-xl"
                     placeholder="https://www.ubereats.com/store/..."
                     value={site.uber_eats_url}
                     onChange={setS("uber_eats_url")}
@@ -526,23 +521,23 @@ export default function SettingsPage() {
             </div>
 
             {/* SECTION C: Google Maps Embed URL */}
-            <div className="pt-4 border-t border-[#eee3d5] space-y-3">
-              <span className="text-xs font-black text-[#763a12] uppercase tracking-wider flex items-center gap-1.5">
+            <div className="pt-4 border-t border-zinc-200 space-y-3">
+              <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide flex items-center gap-1.5">
                 <MapPin className="h-3.5 w-3.5" /> Interactive Location Map (Google Maps Embed):
               </span>
               <div className="space-y-1">
-                <Label htmlFor="s-map" className="text-xs font-black text-[#211a14]">
+                <Label htmlFor="s-map" className="text-xs font-semibold text-[#211a14]">
                   Google Maps Embed iFrame Source URL (src=&quot;...&quot;)
                 </Label>
                 <Input
                   id="s-map"
-                  className="border-[#d9c7b4] text-[#211a14] font-mono text-xs h-10 rounded-xl"
+                  className="border-zinc-300 text-[#211a14] font-mono text-xs h-10 rounded-xl"
                   placeholder="https://www.google.com/maps/embed?pb=..."
                   value={site.map_embed}
                   onChange={setS("map_embed")}
                 />
                 <p className="text-[10px] text-zinc-500">
-                  Tip: On Google Maps, click Share ➜ Embed a map ➜ Copy HTML and paste the URL from <code>src=&quot;...&quot;</code> here.
+                  Tip: On Google Maps, click Share → Embed a map → Copy HTML and paste the URL from <code>src=&quot;...&quot;</code> here.
                 </p>
               </div>
             </div>
@@ -557,26 +552,26 @@ export default function SettingsPage() {
         <div className="space-y-6">
           {/* Main Hero Card for Ordering Status */}
           <div
-            className={`p-6 sm:p-8 rounded-3xl border-2 transition-all shadow-sm space-y-6 ${
+            className={`p-6 sm:p-8 rounded-xl border transition-all shadow-sm space-y-6 ${
               site.online_ordering_enabled
-                ? "bg-linear-to-r from-emerald-50/70 via-[#fffdf9] to-[#fffdf9] border-emerald-300"
-                : "bg-linear-to-r from-amber-50/80 via-[#fffdf9] to-[#fffdf9] border-amber-300"
+                ? "bg-white border-emerald-300"
+                : "bg-white border-amber-300"
             }`}
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#eee3d5]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span
                     className={`h-3 w-3 rounded-full ${
                       site.online_ordering_enabled
-                        ? "bg-emerald-500 ring-4 ring-emerald-200 animate-pulse"
+                        ? "bg-emerald-500 ring-4 ring-emerald-200"
                         : "bg-amber-500 ring-4 ring-amber-200"
                     }`}
                   />
-                  <h3 className="text-base font-black text-[#211a14]">
+                  <h3 className="text-base font-semibold text-[#211a14]">
                     {site.online_ordering_enabled
-                      ? "Online Ordering is LIVE & Taking Orders"
-                      : "Online Ordering is PAUSED (Checkout Disabled)"}
+                      ? "Online ordering is on"
+                      : "Online ordering is paused"}
                   </h3>
                 </div>
                 <p className="text-xs text-zinc-600 max-w-xl">
@@ -587,7 +582,7 @@ export default function SettingsPage() {
               </div>
 
               {/* Big High-Visibility Master Toggle */}
-              <div className="flex items-center gap-3 p-2.5 rounded-2xl border-2 border-[#ecdac7] bg-white shadow-xs shrink-0">
+              <div className="flex items-center gap-3 p-2.5 rounded-lg border border-zinc-200 bg-white shadow-xs shrink-0">
                 <Switch
                   checked={site.online_ordering_enabled}
                   disabled={busy === "OrderingToggle"}
@@ -614,21 +609,21 @@ export default function SettingsPage() {
                   }}
                 />
                 <span
-                  className={`text-xs font-black px-3 py-1 rounded-xl uppercase tracking-wider ${
+                  className={`text-xs font-semibold px-3 py-1 rounded-xl uppercase tracking-wide ${
                     site.online_ordering_enabled
                       ? "bg-emerald-600 text-white shadow-xs"
                       : "bg-amber-600 text-white shadow-xs"
                   }`}
                 >
-                  {site.online_ordering_enabled ? "🟢 ACTIVE" : "⏸️ PAUSED"}
+                  {site.online_ordering_enabled ? "ACTIVE" : "PAUSED"}
                 </span>
               </div>
             </div>
 
             {/* Custom Pause Notice Message */}
             {!site.online_ordering_enabled && (
-              <div className="p-5 rounded-2xl border-2 border-amber-300 bg-amber-50/70 space-y-3">
-                <div className="flex items-center gap-2 text-amber-950 font-black text-xs">
+              <div className="p-5 rounded-lg border border-amber-300 bg-amber-50/70 space-y-3">
+                <div className="flex items-center gap-2 text-amber-950 font-semibold text-xs">
                   <AlertCircle className="h-4 w-4 text-amber-600" />
                   <span>Custom Message Displayed to Visitors on the Menu Page:</span>
                 </div>
@@ -654,7 +649,7 @@ export default function SettingsPage() {
                         });
                       },
                       "PauseMessage",
-                      { title: "Pause notice message saved!" }
+                      { title: "Pause notice saved" }
                     )
                   }
                 >
@@ -665,30 +660,30 @@ export default function SettingsPage() {
           </div>
 
           {/* Email Diagnostics Card */}
-          <div className="bg-[#fffdf9] p-6 sm:p-7 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#eee3d5]">
+          <div className="bg-white p-6 sm:p-7 rounded-xl border border-zinc-200 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
               <div className="flex items-center gap-2">
                 <Mail className="h-5 w-5 text-blue-600" />
                 <div>
-                  <h4 className="text-sm font-black text-[#211a14]">Email Notification System Health</h4>
+                  <h4 className="text-sm font-semibold text-[#211a14]">Email delivery</h4>
                   <p className="text-xs text-zinc-500">
-                    Verify connection to ensure booking confirmations and staff order alerts are delivered reliably
+                    Send a test email to check that confirmations and staff alerts are being delivered
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl border-2 border-[#ecdac7] bg-[#faf5ee]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg border border-zinc-200 bg-zinc-50">
               <div className="space-y-0.5">
-                <p className="text-xs font-black text-[#211a14]">Dispatch Test Email Notification</p>
+                <p className="text-xs font-semibold text-[#211a14]">Send a test email</p>
                 <p className="text-xs text-zinc-600">
-                  Sends an immediate diagnostic probe to <strong>{site.email || "the configured staff inbox"}</strong>
+                  Sends a test message to <strong>{site.email || "the configured staff inbox"}</strong>
                 </p>
               </div>
               <Button
                 size="sm"
                 variant="outline"
-                className="font-bold text-xs border-[#d9c7b4] text-[#763a12] bg-white hover:bg-zinc-50 rounded-xl shrink-0"
+                className="font-bold text-xs border-zinc-300 text-[#763a12] bg-white hover:bg-zinc-50 rounded-xl shrink-0"
                 loading={busy === "TestEmail"}
                 onClick={async () => {
                   setBusy("TestEmail");
@@ -724,12 +719,12 @@ export default function SettingsPage() {
       {/* TAB 3: TRADING & OPERATING HOURS                                          */}
       {/* ========================================================================= */}
       {activeTab === "hours" && (
-        <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-[#eee3d5]">
+        <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between pb-4 border-b border-zinc-200">
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-[#763a12]" />
-                <h3 className="text-base font-black text-[#211a14]">Restaurant Trading Hours</h3>
+                <h3 className="text-base font-semibold text-[#211a14]">Restaurant Trading Hours</h3>
               </div>
               <p className="text-xs text-zinc-500">
                 Opening and closing schedule displayed on the homepage, booking calendar, and footer board
@@ -741,14 +736,14 @@ export default function SettingsPage() {
             {hours.map((h, idx) => (
               <div
                 key={h.id}
-                className="flex flex-wrap items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl border-2 border-[#eee3d5] bg-white shadow-2xs hover:border-[#d9c7b4] transition-all"
+                className="flex flex-wrap items-center justify-between gap-3 p-3.5 sm:p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs hover:border-zinc-300 transition-all"
               >
                 <div className="flex items-center gap-2.5 flex-1 min-w-[200px]">
-                  <span className="h-7 w-7 rounded-xl bg-amber-100/80 text-[#763a12] text-xs font-black flex items-center justify-center shrink-0">
+                  <span className="h-7 w-7 rounded-xl bg-zinc-100 text-[#763a12] text-xs font-semibold flex items-center justify-center shrink-0">
                     #{idx + 1}
                   </span>
                   <Input
-                    className="h-10 text-xs font-bold border-[#d9c7b4] rounded-xl text-[#211a14]"
+                    className="h-10 text-xs font-bold border-zinc-300 rounded-xl text-[#211a14]"
                     placeholder="e.g. Monday – Thursday"
                     value={h.label}
                     onChange={(e) =>
@@ -762,7 +757,7 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-2">
                   <Input
                     type="time"
-                    className="w-24 sm:w-28 h-10 text-xs font-bold border-[#d9c7b4] rounded-xl text-center"
+                    className="w-24 sm:w-28 h-10 text-xs font-bold border-zinc-300 rounded-xl text-center"
                     value={h.opens.slice(0, 5)}
                     onChange={(e) =>
                       setHours((xs) =>
@@ -770,10 +765,10 @@ export default function SettingsPage() {
                       )
                     }
                   />
-                  <span className="text-zinc-400 text-xs font-black">TO</span>
+                  <span className="text-zinc-400 text-xs font-semibold">TO</span>
                   <Input
                     type="time"
-                    className="w-24 sm:w-28 h-10 text-xs font-bold border-[#d9c7b4] rounded-xl text-center"
+                    className="w-24 sm:w-28 h-10 text-xs font-bold border-zinc-300 rounded-xl text-center"
                     value={h.closes.slice(0, 5)}
                     onChange={(e) =>
                       setHours((xs) =>
@@ -783,7 +778,7 @@ export default function SettingsPage() {
                   />
 
                   {/* Formatted AM/PM Badge */}
-                  <span className="hidden sm:inline-block px-2.5 py-1 rounded-xl bg-amber-50 border border-amber-200 text-[11px] font-bold text-amber-900 shrink-0">
+                  <span className="hidden sm:inline-block px-2.5 py-1 rounded-xl bg-zinc-50 border border-zinc-200 text-[11px] font-bold text-amber-900 shrink-0">
                     {formatTime12h(h.opens)} – {formatTime12h(h.closes)}
                   </span>
                 </div>
@@ -834,14 +829,14 @@ export default function SettingsPage() {
             ))}
 
             {/* Add New Schedule Row Box */}
-            <div className="p-5 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/50 space-y-3">
-              <span className="text-xs font-black text-amber-950 flex items-center gap-1.5">
+            <div className="p-5 rounded-lg border border-dashed border-amber-300 bg-amber-50/50 space-y-3">
+              <span className="text-xs font-semibold text-amber-950 flex items-center gap-1.5">
                 <Plus className="h-4 w-4 text-[#763a12]" /> Add New Trading Schedule Row:
               </span>
               <div className="grid gap-3 sm:grid-cols-12">
                 <div className="sm:col-span-5">
                   <Input
-                    className="h-10 text-xs font-bold border-[#d9c7b4] bg-white rounded-xl"
+                    className="h-10 text-xs font-bold border-zinc-300 bg-white rounded-xl"
                     placeholder="Day label (e.g. Friday – Sunday or Public Holidays)"
                     value={newRow.label}
                     onChange={(e) => setNewRow((n) => ({ ...n, label: e.target.value }))}
@@ -850,14 +845,14 @@ export default function SettingsPage() {
                 <div className="sm:col-span-4 flex items-center gap-2">
                   <Input
                     type="time"
-                    className="w-full h-10 text-xs font-bold border-[#d9c7b4] bg-white rounded-xl text-center"
+                    className="w-full h-10 text-xs font-bold border-zinc-300 bg-white rounded-xl text-center"
                     value={newRow.opens}
                     onChange={(e) => setNewRow((n) => ({ ...n, opens: e.target.value }))}
                   />
                   <span className="text-zinc-400 text-xs font-bold">–</span>
                   <Input
                     type="time"
-                    className="w-full h-10 text-xs font-bold border-[#d9c7b4] bg-white rounded-xl text-center"
+                    className="w-full h-10 text-xs font-bold border-zinc-300 bg-white rounded-xl text-center"
                     value={newRow.closes}
                     onChange={(e) => setNewRow((n) => ({ ...n, closes: e.target.value }))}
                   />
@@ -875,7 +870,7 @@ export default function SettingsPage() {
                         });
                         setHours((xs) => [...xs, created]);
                         setNewRow(EMPTY_ROW);
-                      }, "Hours", { title: "New trading hours row added!" })
+                      }, "Hours", { title: "Row added" })
                     }
                   >
                     <Plus className="h-3.5 w-3.5 mr-1" /> Add Row
@@ -891,12 +886,12 @@ export default function SettingsPage() {
       {/* TAB 4: THEME & COLOR BRANDING                                             */}
       {/* ========================================================================= */}
       {activeTab === "theme" && (
-        <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-[#eee3d5]">
+        <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between pb-4 border-b border-zinc-200">
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 <Palette className="h-5 w-5 text-[#763a12]" />
-                <h3 className="text-base font-black text-[#211a14]">Website Color Palette &amp; Theme</h3>
+                <h3 className="text-base font-semibold text-[#211a14]">Website Color Palette &amp; Theme</h3>
               </div>
               <p className="text-xs text-zinc-500">
                 Choose a curated designer theme preset or enter custom hex branding colors
@@ -906,8 +901,8 @@ export default function SettingsPage() {
 
           {/* Theme Preset Cards */}
           <div className="space-y-3">
-            <span className="text-xs font-black text-[#763a12] uppercase tracking-wider block">
-              Curated Aesthetic Presets (1-Click Switch):
+            <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide block">
+              Theme presets:
             </span>
             <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-5">
               {THEMES.map((t) => {
@@ -924,15 +919,15 @@ export default function SettingsPage() {
                         },
                         "Theme",
                         {
-                          title: `${t.label} theme applied!`,
+                          title: `${t.label} theme applied`,
                           description: "Website colors updated live.",
                         }
                       )
                     }
-                    className={`relative rounded-2xl border-2 p-4 text-left transition-all hover:scale-[1.02] flex flex-col justify-between ${
+                    className={`relative rounded-lg border p-4 text-left transition-all flex flex-col justify-between ${
                       isSelected
-                        ? "border-[#763a12] bg-white shadow-md ring-4 ring-[#763a12]/15"
-                        : "border-[#ecdac7] bg-[#fffdf9] hover:border-zinc-400 shadow-2xs"
+                        ? "border-[#763a12] bg-white shadow-xs"
+                        : "border-zinc-200 bg-white hover:border-zinc-400 shadow-2xs"
                     }`}
                   >
                     <div className="space-y-3">
@@ -953,18 +948,18 @@ export default function SettingsPage() {
                         )}
                       </div>
                       <div>
-                        <div className="text-xs font-black text-[#211a14]">{t.label}</div>
+                        <div className="text-xs font-semibold text-[#211a14]">{t.label}</div>
                         <p className="text-[10px] text-zinc-500 line-clamp-2 mt-0.5">{t.desc}</p>
                       </div>
                     </div>
 
-                    <div className="mt-3 pt-2 border-t border-[#eee3d5]">
+                    <div className="mt-3 pt-2 border-t border-zinc-200">
                       <span
-                        className={`text-[10px] font-black uppercase tracking-wider ${
+                        className={`text-[10px] font-semibold uppercase tracking-wide ${
                           isSelected ? "text-[#763a12]" : "text-zinc-400"
                         }`}
                       >
-                        {isSelected ? "✓ Active on Website" : "Click to apply"}
+                        {isSelected ? "Active on website" : "Click to apply"}
                       </span>
                     </div>
                   </button>
@@ -979,12 +974,12 @@ export default function SettingsPage() {
             const primary = site.theme === "custom" ? site.custom_primary : active?.primary ?? "#763a12";
             const accent = site.theme === "custom" ? site.custom_accent : active?.swatches[0] ?? "#efbf38";
             return (
-              <div className="p-5 rounded-2xl border-2 border-[#ecdac7] bg-linear-to-r from-[#faf5ee] to-[#f4ebe1] space-y-3">
+              <div className="p-5 rounded-lg border border-zinc-200 bg-zinc-50 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-xs font-black text-[#763a12] flex items-center gap-1.5">
-                    <Sparkles className="h-4 w-4 text-amber-500" /> Live Theme Sample Preview:
+                  <span className="text-xs font-semibold text-[#763a12] flex items-center gap-1.5">
+                    Sample preview:
                   </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-[#763a12] border border-[#d9c7b4]">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-[#763a12] border border-zinc-300">
                     Current Active: {site.theme.toUpperCase()}
                   </span>
                 </div>
@@ -994,22 +989,22 @@ export default function SettingsPage() {
                   style={{ borderColor: accent }}
                 >
                   <div className="space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: primary }}>
+                    <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: primary }}>
                       SAMPLE SPECIAL DEAL
                     </span>
-                    <h4 className="text-sm font-black text-[#211a14]">
+                    <h4 className="text-sm font-semibold text-[#211a14]">
                       Fluffy Classic Buttermilk Stack with Pure Maple
                     </h4>
                   </div>
                   <div className="flex items-center gap-2">
                     <span
-                      className="px-3 py-1.5 rounded-xl text-xs font-black text-white shadow-xs"
+                      className="px-3 py-1.5 rounded-xl text-xs font-semibold text-white shadow-xs"
                       style={{ background: primary }}
                     >
                       ORDER NOW →
                     </span>
                     <span
-                      className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#fffdf9] border"
+                      className="px-3 py-1.5 rounded-xl text-xs font-bold bg-white border"
                       style={{ color: primary, borderColor: accent }}
                     >
                       VIEW MENU
@@ -1022,15 +1017,15 @@ export default function SettingsPage() {
 
           {/* Custom Palette Override Section */}
           <div
-            className={`p-5 rounded-2xl border-2 transition-all ${
+            className={`p-5 rounded-lg border transition-all ${
               site.theme === "custom"
-                ? "border-[#763a12] bg-white ring-4 ring-[#763a12]/10"
-                : "border-[#ecdac7] bg-[#faf5ee]"
+                ? "border-[#763a12] bg-white"
+                : "border-zinc-200 bg-zinc-50"
             }`}
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="space-y-1">
-                <h4 className="text-xs font-black text-[#211a14]">Custom Brand Color Palette</h4>
+                <h4 className="text-xs font-semibold text-[#211a14]">Custom Brand Color Palette</h4>
                 <p className="text-[11px] text-zinc-600">
                   Override presets and define custom primary and accent hex codes
                 </p>
@@ -1044,7 +1039,7 @@ export default function SettingsPage() {
                   <Input
                     id="c-primary"
                     type="color"
-                    className="h-9 w-14 p-1 cursor-pointer rounded-xl border-[#d9c7b4]"
+                    className="h-9 w-14 p-1 cursor-pointer rounded-xl border-zinc-300"
                     value={site.custom_primary}
                     onChange={setS("custom_primary")}
                   />
@@ -1060,7 +1055,7 @@ export default function SettingsPage() {
                   <Input
                     id="c-accent"
                     type="color"
-                    className="h-9 w-14 p-1 cursor-pointer rounded-xl border-[#d9c7b4]"
+                    className="h-9 w-14 p-1 cursor-pointer rounded-xl border-zinc-300"
                     value={site.custom_accent}
                     onChange={setS("custom_accent")}
                   />
@@ -1084,7 +1079,7 @@ export default function SettingsPage() {
                         setSite((s) => (s ? { ...s, theme: "custom" } : s));
                       },
                       "Theme",
-                      { title: "Custom theme applied to website!" }
+                      { title: "Custom theme applied" }
                     )
                   }
                 >

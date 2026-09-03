@@ -69,26 +69,26 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   if (isLogin) return <ToastProvider>{children}</ToastProvider>;
   if (!ready) {
     return (
-      <div className="flex min-h-screen bg-[#faf5ee]">
+      <div className="flex min-h-screen bg-zinc-50">
         <aside className="hidden md:flex w-56 flex-col bg-[#211a14] p-4 space-y-4">
           <div className="flex items-center gap-2 px-2 py-3">
-            <div className="h-6 w-6 rounded-full bg-white/20 animate-pulse" />
-            <div className="h-4 w-28 bg-white/20 rounded animate-pulse" />
+            <div className="h-6 w-6 rounded-full bg-white/20" />
+            <div className="h-4 w-28 bg-white/20 rounded" />
           </div>
           <div className="space-y-2 pt-2">
             {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <div key={i} className="h-9 w-full rounded-xl bg-white/10 animate-pulse" />
+              <div key={i} className="h-9 w-full rounded-xl bg-white/10" />
             ))}
           </div>
         </aside>
         <main className="flex-1 p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
-          <div className="h-28 rounded-3xl bg-amber-500/10 border-2 border-[#eee3d5] animate-pulse" />
+          <div className="h-28 rounded-xl bg-amber-500/10 border border-zinc-200" />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-24 rounded-3xl bg-white border-2 border-[#eee3d5] animate-pulse" />
+              <div key={i} className="h-24 rounded-xl bg-white border border-zinc-200" />
             ))}
           </div>
-          <div className="h-80 rounded-3xl bg-white border-2 border-[#eee3d5] animate-pulse" />
+          <div className="h-80 rounded-xl bg-white border border-zinc-200" />
         </main>
       </div>
     );
