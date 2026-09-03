@@ -270,10 +270,15 @@ export default function ContentPage() {
   }, [syncPreview]);
 
   // the iframe loads before its React listener mounts, so the very first sync
-  // is lost — re-send everything whenever the preview announces itself ready
+  // is lost — re-send everything whenever the preview announces itself ready.
+  // It also reports its content height so the frame always fits exactly.
+  const [previewH, setPreviewH] = useState(505);
   useEffect(() => {
     const onMsg = (e: MessageEvent) => {
       if (e.data?.type === "PANCAKE_PREVIEW_READY") syncPreview();
+      if (e.data?.type === "PANCAKE_PREVIEW_SIZE" && typeof e.data.height === "number") {
+        setPreviewH(Math.min(1400, Math.max(160, Math.ceil(e.data.height))));
+      }
     };
     window.addEventListener("message", onMsg);
     return () => window.removeEventListener("message", onMsg);
@@ -646,41 +651,15 @@ export default function ContentPage() {
 
         {/* Simulated Public Device Frame */}
         <div className={`mx-auto transition-all ${activePage === "home" && viewport === "mobile" ? "max-w-[420px]" : "w-full"}`}>
-          <div className="rounded-xl overflow-hidden border border-zinc-200 shadow-sm bg-[var(--cream)]">
+          <div className="rounded-xl overflow-hidden border border-zinc-200 shadow-sm bg-white">
             <iframe
               ref={iframeRef}
               src="/preview"
               onLoad={syncPreview}
               className="w-full border-0 transition-all"
-              style={{
-                height:
-                  activePage === "home"
-                    ? homeStepIndex === 1
-                      ? viewport === "mobile"
-                        ? "530px"
-                        : "505px"
-                      : homeStepIndex === 2
-                      ? campaignChannel === "channel2"
-                        ? viewport === "mobile"
-                          ? "440px"
-                          : "390px"
-                        : viewport === "mobile"
-                        ? "420px"
-                        : "370px"
-                      : homeStepIndex === 3
-                      ? viewport === "mobile"
-                        ? "900px"
-                        : "660px"
-                      : homeStepIndex === 4
-                      ? "180px"
-                      : homeStepIndex === 5
-                      ? "380px"
-                      : "260px"
-                    : activePage === "menu"
-                    ? "600px"
-                    : "360px",
-                display: "block",
-              }}
+              // height follows the preview's own content-size reports, so no
+              // section ever renders clipped or with dead space below it
+              style={{ height: `${previewH}px`, display: "block" }}
               title="Public Website Live Preview"
             />
           </div>
@@ -734,7 +713,7 @@ export default function ContentPage() {
                   />
                 </div>
 
-                <div className="sm:col-span-2 grid gap-5 md:grid-cols-2 p-5 rounded-lg border border-zinc-200 bg-zinc-50">
+                <div className="sm:col-span-2 grid gap-5 md:grid-cols-2 p-5 rounded-lg border border-zinc-200 bg-white">
                   <ImageField
                     id="hero-image"
                     label="Background Pancake Stack Photo (Slide 1 in Carousel)"
@@ -1120,7 +1099,7 @@ export default function ContentPage() {
                   </div>
 
                   {campaignChannel === "channel1" && bandUsingFallback && !legacyBackend && (
-                    <p className="text-[11px] font-bold text-amber-800 bg-zinc-50 border border-zinc-200 rounded-xl p-2.5">
+                    <p className="text-[11px] font-bold text-amber-800 bg-white border border-zinc-200 rounded-xl p-2.5">
                       No live band deal yet — the website is temporarily showing the newest slider offer in
                       the band. Create a band deal and turn Show ON to take over.
                     </p>
@@ -1240,7 +1219,7 @@ export default function ContentPage() {
                         </Button>
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-lg border border-zinc-200 bg-zinc-50">
+                      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-lg border border-zinc-200 bg-white">
                         <div>
                           <div className="text-xs font-semibold text-[#211a14]">Show on the Website?</div>
                           <div className="text-[11px] font-medium text-zinc-500">
@@ -1268,7 +1247,7 @@ export default function ContentPage() {
                       </div>
 
                       {campaignChannel === "channel1" && (
-                        <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 space-y-2.5">
+                        <div className="p-4 rounded-lg border border-zinc-200 bg-white space-y-2.5">
                           <span className="text-xs font-semibold text-[#211a14] block">Right-side Voucher Cards</span>
                           <p className="text-[10px] text-zinc-500 -mt-1">
                             The two little ticket cards on the band&apos;s right — pick any dish, or keep the
@@ -1350,7 +1329,7 @@ export default function ContentPage() {
                         </div>
 
                         {/* Run window — the website obeys these on its own */}
-                        <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 space-y-2.5">
+                        <div className="p-4 rounded-lg border border-zinc-200 bg-white space-y-2.5">
                           <span className="text-xs font-semibold text-[#211a14] block">Schedule (Optional)</span>
                           <p className="text-[10px] text-zinc-500 -mt-1">
                             Leave blank to run forever. With an End set, the deal drops off the website by
@@ -1766,7 +1745,7 @@ export default function ContentPage() {
                 ))}
 
                 {/* Add New Badge */}
-                <div className="flex flex-wrap items-center gap-3 p-4 rounded-lg border border-dashed border-zinc-300 bg-zinc-50">
+                <div className="flex flex-wrap items-center gap-3 p-4 rounded-lg border border-dashed border-zinc-300 bg-white">
                   <span className="text-xs font-semibold text-[#211a14] flex items-center gap-1.5">
                     <Plus className="h-4 w-4 text-[#763a12]" /> Add New Badge:
                   </span>
@@ -2189,7 +2168,7 @@ export default function ContentPage() {
             </div>
 
             {/* Add photos to any album — the homepage strip shows the first 6 overall */}
-            <div className="p-4 rounded-lg border border-dashed border-zinc-300 bg-zinc-50">
+            <div className="p-4 rounded-lg border border-dashed border-zinc-300 bg-white">
               <div className="grid gap-3 sm:grid-cols-5 [&>*]:min-w-0">
                 <Select
                   className="h-10 text-xs border-zinc-300 font-bold rounded-xl"

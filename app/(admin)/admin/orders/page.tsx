@@ -393,7 +393,7 @@ export default function OrdersPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-zinc-200 bg-zinc-50 text-[#763a12] text-[11px] font-semibold uppercase tracking-wide">
+                <tr className="border-b border-zinc-200 bg-white text-[#763a12] text-[11px] font-semibold uppercase tracking-wide">
                   <th className="py-3.5 px-4">Order &amp; Customer</th>
                   <th className="py-3.5 px-4">Ordered Items &amp; Notes</th>
                   <th className="py-3.5 px-3">Total Amount</th>
@@ -448,7 +448,7 @@ export default function OrdersPage() {
                             {o.items.map((item, idx) => (
                               <span
                                 key={idx}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold bg-zinc-50 border border-zinc-200 text-[#763a12] shadow-2xs"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold bg-white border border-zinc-200 text-[#763a12] shadow-2xs"
                               >
                                 <span className="text-amber-800 font-extrabold">{item.quantity}×</span>
                                 <span>{item.name}</span>
@@ -478,7 +478,7 @@ export default function OrdersPage() {
 
                       {/* Total Amount */}
                       <td className="py-3.5 px-3 whitespace-nowrap">
-                        <span className="text-sm font-semibold text-[#763a12] px-2.5 py-1 rounded-xl bg-zinc-50 border border-zinc-200">
+                        <span className="text-sm font-semibold text-[#763a12] px-2.5 py-1 rounded-xl bg-white border border-zinc-200">
                           ${o.total}
                         </span>
                       </td>

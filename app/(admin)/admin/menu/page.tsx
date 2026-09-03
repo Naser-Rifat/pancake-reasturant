@@ -573,7 +573,7 @@ export default function MenuAdminPage() {
                 </p>
               </div>
 
-              <div ref={photosRef} className="p-4 rounded-lg border border-zinc-200 bg-zinc-50">
+              <div ref={photosRef} className="p-4 rounded-lg border border-zinc-200 bg-white">
                 <PhotoBoard
                   slug={editing ?? ""}
                   name={form.name || "this dish"}
@@ -766,7 +766,7 @@ export default function MenuAdminPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-zinc-200 bg-zinc-50 text-[#763a12] text-[11px] font-semibold uppercase tracking-wide">
+                <tr className="border-b border-zinc-200 bg-white text-[#763a12] text-[11px] font-semibold uppercase tracking-wide">
                   <th className="py-3.5 px-4">Dish &amp; Ingredients</th>
                   <th className="py-3.5 px-3">Category</th>
                   <th className="py-3.5 px-3">Price</th>
@@ -833,7 +833,7 @@ export default function MenuAdminPage() {
 
                       {/* Price */}
                       <td className="py-3.5 px-3 whitespace-nowrap">
-                        <span className="text-sm font-semibold text-[#763a12] px-2.5 py-1 rounded-xl bg-zinc-50 border border-zinc-200">
+                        <span className="text-sm font-semibold text-[#763a12] px-2.5 py-1 rounded-xl bg-white border border-zinc-200">
                           ${item.price}
                         </span>
                       </td>

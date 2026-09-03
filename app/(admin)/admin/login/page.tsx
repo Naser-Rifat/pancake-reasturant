@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center p-4 bg-muted/20 overflow-hidden">
+    <div className="relative min-h-screen flex flex-col items-center justify-center p-4 bg-white overflow-hidden">
       {/* Subtle Warm Ambient Background Lighting */}
       <div className="absolute inset-0 pointer-events-none -z-10 flex items-center justify-center">
         <div className="w-[600px] h-[600px] rounded-full bg-amber-500/8 blur-[120px]" />

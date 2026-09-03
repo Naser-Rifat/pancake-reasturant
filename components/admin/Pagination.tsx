@@ -37,7 +37,7 @@ export function Pagination({
   return (
     <nav
       aria-label="Pagination"
-      className="p-4 flex flex-wrap items-center justify-center gap-1.5 border-t border-zinc-200 bg-zinc-50"
+      className="p-4 flex flex-wrap items-center justify-center gap-1.5 border-t border-zinc-200 bg-white"
     >
       <Button
         variant="outline"

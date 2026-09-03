@@ -347,7 +347,7 @@ export default function ReviewsAdminPage() {
                       maxLength={4}
                       aria-label={`Emoji shown beside ${r.name}'s review`}
                       title="Custom emoji avatar — click to edit"
-                      className="h-11 w-11 rounded-lg border border-zinc-200 bg-zinc-50 text-center text-xl leading-none shadow-2xs hover:border-[#763a12] transition-colors focus:ring-2 focus:ring-[#763a12]"
+                      className="h-11 w-11 rounded-lg border border-zinc-200 bg-white text-center text-xl leading-none shadow-2xs hover:border-[#763a12] transition-colors focus:ring-2 focus:ring-[#763a12]"
                       onBlur={async (e) => {
                         const v = e.target.value.trim();
                         if (v === r.avatar) return;
@@ -404,7 +404,7 @@ export default function ReviewsAdminPage() {
                 </div>
 
                 {/* Quote Bubble */}
-                <div className="p-3.5 rounded-lg bg-zinc-50/90 border border-zinc-200 text-xs font-medium text-[#211a14] relative">
+                <div className="p-3.5 rounded-lg bg-white/90 border border-zinc-200 text-xs font-medium text-[#211a14] relative">
                   <Quote className="h-3.5 w-3.5 text-[#763a12]/30 mb-1" />
                   <p className="italic leading-relaxed">
                     &ldquo;{r.quote}&rdquo;

@@ -595,7 +595,7 @@ export default function BookingsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-zinc-200 bg-zinc-50 text-[#763a12] text-[11px] font-semibold uppercase tracking-wide">
+                <tr className="border-b border-zinc-200 bg-white text-[#763a12] text-[11px] font-semibold uppercase tracking-wide">
                   <th className="py-3.5 px-4">Guest Info</th>
                   <th className="py-3.5 px-3">Date &amp; Arrival</th>
                   <th className="py-3.5 px-3 text-center">Party Size</th>
@@ -642,7 +642,7 @@ export default function BookingsPage() {
                             year: "numeric",
                           })}
                         </div>
-                        <div className="text-[11px] font-bold text-[#763a12] bg-zinc-50 border border-zinc-200 px-2 py-0.5 rounded-md inline-block">
+                        <div className="text-[11px] font-bold text-[#763a12] bg-white border border-zinc-200 px-2 py-0.5 rounded-md inline-block">
                           {formatTime12h(b.time)}
                         </div>
                       </div>
@@ -664,7 +664,7 @@ export default function BookingsPage() {
                             {b.preselected_dish.split(", ").map((d) => (
                               <span
                                 key={d}
-                                className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-50 border border-zinc-200 text-[#763a12]"
+                                className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white border border-zinc-200 text-[#763a12]"
                               >
                                 {d}
                               </span>

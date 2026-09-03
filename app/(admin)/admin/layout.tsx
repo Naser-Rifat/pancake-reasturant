@@ -69,7 +69,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   if (isLogin) return <ToastProvider>{children}</ToastProvider>;
   if (!ready) {
     return (
-      <div className="flex min-h-screen bg-zinc-50">
+      <div className="flex min-h-screen bg-white">
         <aside className="hidden md:flex w-56 flex-col bg-[#211a14] p-4 space-y-4">
           <div className="flex items-center gap-2 px-2 py-3">
             <div className="h-6 w-6 rounded-full bg-white/20" />
@@ -174,7 +174,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
       </aside>
       {/* min-w-0: as a flex item, main's default min-width:auto let wide tables
           set the page width instead of scrolling inside their own wrapper */}
-      <main className="min-w-0 flex-1 bg-muted/40 p-4 pt-16 md:ml-56 md:p-8 md:pt-8">{children}</main>
+      <main className="min-w-0 flex-1 bg-white p-4 pt-16 md:ml-56 md:p-8 md:pt-8">{children}</main>
     </div>
     </ConfirmProvider>
     </ToastProvider>

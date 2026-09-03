@@ -212,7 +212,7 @@ export default function DashboardPage() {
       </div>
 
       {stats?.total_orders != null && (
-        <div className="px-4 py-2 rounded-lg bg-zinc-50 border border-zinc-200 text-xs font-bold text-zinc-600 flex flex-wrap items-center justify-between gap-2">
+        <div className="px-4 py-2 rounded-lg bg-white border border-zinc-200 text-xs font-bold text-zinc-600 flex flex-wrap items-center justify-between gap-2">
           <span>
             All-time: <strong>{stats.total_orders.toLocaleString()}</strong> orders ·{" "}
             <strong>{stats.total_bookings.toLocaleString()}</strong> bookings
@@ -258,7 +258,7 @@ export default function DashboardPage() {
                 return (
                   <div
                     key={o.public_id}
-                    className="p-3.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    className="p-3.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
@@ -336,7 +336,7 @@ export default function DashboardPage() {
               {recentBookings.map((b) => (
                 <div
                   key={b.public_id}
-                  className="p-3.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  className="p-3.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">

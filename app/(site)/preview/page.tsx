@@ -175,11 +175,31 @@ export default function PreviewPage() {
     window.addEventListener("message", handler);
     window.parent?.postMessage({ type: "PANCAKE_PREVIEW_READY" }, "*");
 
+    // keep the studio's iframe exactly content-sized — report every height change.
+    // Measure the container rect, not scrollHeight: scrollHeight never drops
+    // below the iframe's own viewport, which would lock the height ratcheted up.
+    const sendSize = () => {
+      const el = document.querySelector(".preview-container");
+      if (!el) return;
+      window.parent?.postMessage(
+        { type: "PANCAKE_PREVIEW_SIZE", height: Math.ceil(el.getBoundingClientRect().bottom) },
+        "*",
+      );
+    };
+    const ro = new ResizeObserver(sendSize);
+    const container = document.querySelector(".preview-container");
+    if (container) ro.observe(container);
+    ro.observe(document.body);
+    sendSize();
+
     const params = new URLSearchParams(window.location.search);
     const qSection = params.get("section");
     if (qSection) setSection(qSection);
 
-    return () => window.removeEventListener("message", handler);
+    return () => {
+      window.removeEventListener("message", handler);
+      ro.disconnect();
+    };
   }, []);
 
   // Build slides for Hero
@@ -260,6 +280,11 @@ export default function PreviewPage() {
         .preview-container {
           overflow: hidden !important;
           padding: 8px !important;
+        }
+
+        /* the site's fixed page-frame border is chrome, not content — hide it here */
+        body::after {
+          display: none !important;
         }
 
         .preview-container .promo-band {
