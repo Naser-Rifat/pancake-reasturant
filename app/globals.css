@@ -6886,6 +6886,11 @@ h2.title .accent,
   position: relative;
   width: 100%;
 }
+/* swiper's vertical mode ships touch-action: pan-x, which blocks native page
+   scroll on touch screens — our slides follow page scroll, so pan-y must win */
+.camp-swiper.swiper-vertical {
+  touch-action: pan-y;
+}
 .camp-swiper {
   position: relative;
   width: 100%;

@@ -95,6 +95,10 @@ export default function CampaignSlider({
               swiperRef.current = swiper;
             }}
             direction="vertical"
+            // slides are driven by page scroll, autoplay and the dots — Swiper
+            // must never capture touch, or vertical swipes stop page scroll on
+            // phones (vertical swipers set touch-action: pan-x)
+            allowTouchMove={false}
             slidesPerView={1}
             spaceBetween={0}
             speed={600}
