@@ -256,9 +256,11 @@ export default function DashboardPage() {
                 const placedDate = new Date(o.created_at);
                 const orderRef = o.public_id ? o.public_id.slice(0, 6).toUpperCase() : "";
                 return (
-                  <div
+                  <Link
                     key={o.public_id}
-                    className="p-3.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    href={`/admin/orders?focus=${o.public_id}`}
+                    title="Open this order in Orders"
+                    className="group p-3.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 hover:border-[#763a12]/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
@@ -298,8 +300,9 @@ export default function DashboardPage() {
                       >
                         {o.status}
                       </span>
+                      <ArrowRight className="h-3.5 w-3.5 text-[#763a12] opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
@@ -334,9 +337,11 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-3">
               {recentBookings.map((b) => (
-                <div
+                <Link
                   key={b.public_id}
-                  className="p-3.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  href={`/admin/bookings?focus=${b.public_id}`}
+                  title="Open this reservation in Bookings"
+                  className="group p-3.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 hover:border-[#763a12]/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
@@ -346,6 +351,17 @@ export default function DashboardPage() {
                       </span>
                     </div>
                     <div className="text-[11px] text-zinc-500 flex items-center gap-2">
+                      {(() => {
+                        const day = new Date(`${b.date}T00:00:00`);
+                        const diff = Math.round(
+                          (day.getTime() - new Date(new Date().toDateString()).getTime()) / 86_400_000
+                        );
+                        return diff === 0 || diff === 1 ? (
+                          <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-100 text-amber-950 border border-amber-300">
+                            {diff === 0 ? "Today" : "Tomorrow"}
+                          </span>
+                        ) : null;
+                      })()}
                       <span className="font-bold text-[#211a14]">
                         {new Date(`${b.date}T00:00:00`).toLocaleDateString("en-AU", {
                           weekday: "short",
@@ -377,8 +393,9 @@ export default function DashboardPage() {
                     >
                       {b.status}
                     </span>
+                    <ArrowRight className="h-3.5 w-3.5 text-[#763a12] opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

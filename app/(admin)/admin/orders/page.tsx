@@ -35,6 +35,7 @@ import { ORDER_STATUSES, STATUS_BADGE } from "../status";
 import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm";
 import { Pagination } from "@/components/admin/Pagination";
+import { useRowFocus } from "@/components/admin/use-row-focus";
 
 const PAGE_SIZE = 12; // mirrors the backend's DRF PAGE_SIZE
 
@@ -206,6 +207,27 @@ export default function OrdersPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, knownPages, hasMore, loadingMore]);
   const pageOrders = filteredOrders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  // ?focus=<id> from the dashboard feed lands on that exact row
+  const { highlightId } = useRowFocus({
+    rows: filteredOrders,
+    idOf: useCallback((o: AdminOrder) => o.public_id, []),
+    loading,
+    loadingMore,
+    hasMore,
+    loadMore,
+    setPage,
+    pageSize: PAGE_SIZE,
+    onMiss: useCallback(
+      () =>
+        toast({
+          variant: "info",
+          title: "Order not in the recent list",
+          description: "It may be much older — try the search box instead.",
+        }),
+      [toast]
+    ),
+  });
 
   // Real-Time Kitchen Metrics
   const receivedCount = orders.filter((o) => o.status === "received").length;
@@ -408,7 +430,13 @@ export default function OrdersPage() {
                   const placedDate = new Date(o.created_at);
                   const orderRef = o.public_id ? o.public_id.slice(0, 8).toUpperCase() : "";
                   return (
-                    <tr key={o.public_id} className="hover:bg-zinc-50 transition-colors">
+                    <tr
+                      key={o.public_id}
+                      id={`row-${o.public_id}`}
+                      className={`transition-colors ${
+                        highlightId === o.public_id ? "bg-amber-100" : "hover:bg-zinc-50"
+                      }`}
+                    >
                       {/* Customer Info & Order Reference */}
                       <td className="py-3.5 px-4 min-w-[220px]">
                         <div className="space-y-1">

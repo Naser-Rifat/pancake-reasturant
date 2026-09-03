@@ -35,6 +35,7 @@ import { AdminError } from "@/components/ui/admin-error";
 import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm";
 import { Pagination } from "@/components/admin/Pagination";
+import { useRowFocus } from "@/components/admin/use-row-focus";
 
 const PAGE_SIZE = 12; // mirrors the backend's DRF PAGE_SIZE
 const FILTERS = ["all", "pending", "confirmed", "cancelled"] as const;
@@ -244,6 +245,27 @@ export default function BookingsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, knownPages, hasMore, loadingMore]);
   const pageBookings = filteredBookings.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  // ?focus=<id> from the dashboard feed lands on that exact row
+  const { highlightId } = useRowFocus({
+    rows: filteredBookings,
+    idOf: useCallback((b: AdminBooking) => b.public_id, []),
+    loading,
+    loadingMore,
+    hasMore,
+    loadMore,
+    setPage,
+    pageSize: PAGE_SIZE,
+    onMiss: useCallback(
+      () =>
+        toast({
+          variant: "info",
+          title: "Booking not in the recent list",
+          description: "It may be much older — try the search box instead.",
+        }),
+      [toast]
+    ),
+  });
 
   // Statistics
   const pendingCount = bookings.filter((b) => b.status === "pending").length;
@@ -606,7 +628,13 @@ export default function BookingsPage() {
               </thead>
               <tbody className="divide-y divide-zinc-100 text-xs font-medium text-[#211a14] [&>tr>td]:align-top">
                 {pageBookings.map((b) => (
-                  <tr key={b.public_id} className="hover:bg-zinc-50 transition-colors">
+                  <tr
+                    key={b.public_id}
+                    id={`row-${b.public_id}`}
+                    className={`transition-colors ${
+                      highlightId === b.public_id ? "bg-amber-100" : "hover:bg-zinc-50"
+                    }`}
+                  >
                     {/* Guest Name & Contact */}
                     <td className="py-3.5 px-4 min-w-[200px]">
                       <div className="space-y-0.5">
