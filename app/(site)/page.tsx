@@ -40,6 +40,9 @@ export default async function Home() {
       getSite(),
     ]);
 
+  // slider heading is one editable string; the last word carries the accent colour
+  const offersTitleWords = (site?.offers_title || "This Week's Offers").trim().split(" ");
+
   return (
     <main>
       {/* ================= HERO (FR-01) ================= */}
@@ -111,7 +114,7 @@ export default async function Home() {
 
                   {/* Middle: Headline, Kicker & CTA Button */}
                   <div className="promo-main">
-                    <span className="promo-kicker">✨ TODAY&apos;S FEATURED SPECIAL</span>
+                    <span className="promo-kicker">{site?.promo_kicker || "✨ TODAY'S FEATURED SPECIAL"}</span>
                     <h2 className="promo-head">{announcement.message}</h2>
                     {announcement.link_url && (
                       <Link href={announcement.link_url} className="promo-cta-btn">
@@ -203,9 +206,10 @@ export default async function Home() {
               items={campaigns}
               title={
                 <div className="reveal" style={{ textAlign: "center" }}>
-                  <p className="kicker">On Right Now</p>
+                  <p className="kicker">{site?.offers_kicker || "On Right Now"}</p>
                   <h2 className="title">
-                    This Week&apos;s <span className="accent">Offers</span>
+                    {offersTitleWords.slice(0, -1).join(" ")}{" "}
+                    <span className="accent">{offersTitleWords[offersTitleWords.length - 1]}</span>
                   </h2>
                 </div>
               }

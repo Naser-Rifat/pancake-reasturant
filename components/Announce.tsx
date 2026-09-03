@@ -7,6 +7,9 @@ import type { ApiAnnouncement } from "@/lib/api";
 
 export default function Announce({ data }: { data: ApiAnnouncement | null }) {
   const pathname = usePathname();
+  if (pathname === "/preview" || pathname?.startsWith("/preview")) {
+    return null;
+  }
   const [visible, setVisible] = useState(Boolean(data));
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { listOrders, updateOrder, type AdminOrder } from "@/lib/admin-api";
+import { listOrdersPage, mergeRows, updateOrder, type AdminOrder } from "@/lib/admin-api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { TableSkeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { ORDER_STATUSES, STATUS_BADGE } from "../status";
 import { useToast } from "@/components/ui/toast";
+import { useConfirm } from "@/components/ui/confirm";
 
 const FILTERS = ["all", ...ORDER_STATUSES] as const;
 const POLL_MS = 15_000;
@@ -39,17 +40,21 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState("");
   const knownIds = useRef<Set<string> | null>(null);
+  const nextPage = useRef(2); // page 1 is the polled window; older pages load on demand
   const { toast } = useToast();
+  const { promptText, confirm } = useConfirm();
 
   const load = useCallback(async (isInitial = false) => {
     if (isInitial) setLoading(true);
     try {
-      // always fetch ALL orders so new ones are detected regardless of filter
-      const all = await listOrders();
+      // poll only the newest page — new ones are detected regardless of filter
+      const page = await listOrdersPage(1);
       if (knownIds.current !== null) {
-        const fresh = all.filter((o) => !knownIds.current!.has(o.public_id));
+        const fresh = page.results.filter((o) => !knownIds.current!.has(o.public_id));
         if (fresh.length > 0) {
           newOrderChime();
           toast({
@@ -58,9 +63,12 @@ export default function OrdersPage() {
             description: fresh.map((o) => o.customer_name).join(", "),
           });
         }
+      } else {
+        knownIds.current = new Set();
       }
-      knownIds.current = new Set(all.map((o) => o.public_id));
-      setOrders(all);
+      page.results.forEach((o) => knownIds.current!.add(o.public_id));
+      setOrders((prev) => mergeRows(prev, page.results));
+      if (nextPage.current === 2) setHasMore(page.hasMore);
       setError("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load orders");
@@ -68,6 +76,25 @@ export default function OrdersPage() {
       setLoading(false);
     }
   }, [toast]);
+
+  const loadMore = async () => {
+    setLoadingMore(true);
+    try {
+      const page = await listOrdersPage(nextPage.current);
+      nextPage.current += 1;
+      page.results.forEach((o) => knownIds.current?.add(o.public_id));
+      setOrders((prev) => mergeRows(prev, page.results));
+      setHasMore(page.hasMore);
+    } catch (e) {
+      toast({
+        variant: "error",
+        title: "Could not load older orders",
+        description: e instanceof Error ? e.message : undefined,
+      });
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
     load(true);
@@ -78,12 +105,18 @@ export default function OrdersPage() {
   const setStatus = async (o: AdminOrder, status: AdminOrder["status"]) => {
     let cancel_reason = o.cancel_reason;
     if (status === "cancelled") {
-      const input = window.prompt(
-        "Reason for cancelling (this is emailed to the customer):",
-        cancel_reason || ""
-      );
+      const input = await promptText({
+        title: `Cancel ${o.customer_name}'s order?`,
+        description: "The reason below is emailed to the customer with the cancellation.",
+        label: "Reason",
+        placeholder: "e.g. We've sold out of the Berry Bliss today — so sorry!",
+        initial: cancel_reason || "",
+        confirmLabel: "Cancel the order",
+        cancelLabel: "Keep it",
+        destructive: true,
+      });
       if (input === null) return; // staff backed out — keep current status
-      cancel_reason = input.trim();
+      cancel_reason = input;
     }
     const prev = orders;
     setOrders((os) =>
@@ -113,8 +146,8 @@ export default function OrdersPage() {
   const visible = filter === "all" ? orders : orders.filter((o) => o.status === filter);
 
   return (
-    <div className="grid gap-6">
-      <div className="flex items-center justify-between">
+    <div className="grid gap-6 [&>*]:min-w-0">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Orders</h1>
           <p className="text-sm text-muted-foreground">
@@ -179,6 +212,7 @@ export default function OrdersPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <Select
+                        aria-label={`Status of ${o.customer_name}'s order`}
                         value={o.status}
                         onChange={(e) => setStatus(o, e.target.value as AdminOrder["status"])}
                       >
@@ -198,6 +232,13 @@ export default function OrdersPage() {
                 )}
               </TableBody>
             </Table>
+          )}
+          {!loading && hasMore && (
+            <div className="mt-4 flex justify-center border-t pt-4">
+              <Button variant="outline" size="sm" loading={loadingMore} onClick={loadMore}>
+                Load older orders
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>

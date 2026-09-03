@@ -201,13 +201,14 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.8rem;
-  background: rgba(254, 250, 240, 0.92);
+  gap: 0.75rem;
+  background: rgba(254, 250, 240, 0.94);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1.5px solid rgba(118, 58, 18, 0.12);
   border-radius: 999px;
-  padding: 0.55rem 1.1rem;
+  padding: 0.4rem 0.85rem 0.4rem 1.25rem;
+  min-height: 48px;
   box-shadow:
     0 10px 30px rgba(33, 26, 20, 0.12),
     0 2px 8px rgba(33, 26, 20, 0.04);
@@ -232,7 +233,48 @@ a {
   white-space: nowrap;
 }
 .nav .logo {
-  padding: 0.2rem 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.nav-brand-logo {
+  height: 30px;
+  width: auto;
+  max-width: 115px;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.25s ease;
+}
+.nav .logo:hover .nav-brand-logo {
+  transform: scale(1.03);
+}
+
+@media (min-width: 768px) {
+  .nav-inner {
+    padding: 0.45rem 1rem 0.45rem 1.5rem;
+    min-height: 52px;
+    gap: 1rem;
+  }
+  .nav-brand-logo {
+    height: 34px;
+    max-width: 130px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nav-inner {
+    padding: 0.5rem 1.25rem 0.5rem 1.85rem;
+    min-height: 58px;
+    gap: 1.5rem;
+  }
+  .nav-brand-logo {
+    height: 38px;
+    max-width: 150px;
+  }
 }
 .logo-brand-text {
   font-family: var(--font-round), sans-serif;
@@ -7632,7 +7674,7 @@ footer .btn-secondary:hover {
    reviews/favourites carry it on a parent — every rule lists both.
    ============================================ */
 .reveal .rev-card,
-.reveal .fav-card,
+.reveal .fav-diner-card,
 .gallery-mosaic.reveal > a,
 .cert-strip.reveal > .cert-badge {
   opacity: 0;
@@ -7642,30 +7684,30 @@ footer .btn-secondary:hover {
     transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal.visible .rev-card,
-.reveal.visible .fav-card,
+.reveal.visible .fav-diner-card,
 .gallery-mosaic.reveal.visible > a,
 .cert-strip.reveal.visible > .cert-badge {
   opacity: 1;
   transform: none;
 }
 .reveal.visible .rev-card:nth-child(2),
-.reveal.visible .fav-card:nth-child(2),
+.reveal.visible .fav-diner-card:nth-child(2),
 .gallery-mosaic.reveal.visible > a:nth-child(2),
 .cert-strip.reveal.visible > .cert-badge:nth-child(2) { transition-delay: 0.07s; }
 .reveal.visible .rev-card:nth-child(3),
-.reveal.visible .fav-card:nth-child(3),
+.reveal.visible .fav-diner-card:nth-child(3),
 .gallery-mosaic.reveal.visible > a:nth-child(3),
 .cert-strip.reveal.visible > .cert-badge:nth-child(3) { transition-delay: 0.14s; }
 .reveal.visible .rev-card:nth-child(4),
-.reveal.visible .fav-card:nth-child(4),
+.reveal.visible .fav-diner-card:nth-child(4),
 .gallery-mosaic.reveal.visible > a:nth-child(4),
 .cert-strip.reveal.visible > .cert-badge:nth-child(4) { transition-delay: 0.21s; }
 .reveal.visible .rev-card:nth-child(5),
-.reveal.visible .fav-card:nth-child(5),
+.reveal.visible .fav-diner-card:nth-child(5),
 .gallery-mosaic.reveal.visible > a:nth-child(5),
 .cert-strip.reveal.visible > .cert-badge:nth-child(5) { transition-delay: 0.28s; }
 .reveal.visible .rev-card:nth-child(n + 6),
-.reveal.visible .fav-card:nth-child(n + 6),
+.reveal.visible .fav-diner-card:nth-child(n + 6),
 .gallery-mosaic.reveal.visible > a:nth-child(n + 6),
 .cert-strip.reveal.visible > .cert-badge:nth-child(n + 6) { transition-delay: 0.35s; }
 
@@ -7685,7 +7727,7 @@ body:has(.hero-nav) .hero-bg img { animation: hero-drift 14s ease-out both; }
 /* motion added after the main reduced-motion block needs its own kill switch */
 @media (prefers-reduced-motion: reduce) {
   .reveal .rev-card,
-  .reveal .fav-card,
+  .reveal .fav-diner-card,
   .gallery-mosaic.reveal > a,
   .cert-strip.reveal > .cert-badge {
     opacity: 1;

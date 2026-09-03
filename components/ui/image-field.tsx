@@ -49,7 +49,7 @@ export function ImageField({
       </div>
 
       {value ? (
-        <div className="flex items-start gap-3">
+        <div className="flex flex-wrap items-start gap-3">
           <div
             className="relative w-40 shrink-0 overflow-hidden rounded-md border bg-muted"
             style={{ aspectRatio: ratio, background: fit === "contain" ? CHECKER : undefined }}

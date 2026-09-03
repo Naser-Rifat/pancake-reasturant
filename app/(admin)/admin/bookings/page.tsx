@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Phone, X } from "lucide-react";
 import {
   createAdminBooking,
-  listBookings,
+  listBookingsPage,
+  mergeRows,
   updateBooking,
   type AdminBooking,
 } from "@/lib/admin-api";
@@ -21,6 +22,26 @@ import { STATUS_BADGE } from "../status";
 import { useToast } from "@/components/ui/toast";
 
 const FILTERS = ["all", "pending", "confirmed", "cancelled"] as const;
+const POLL_MS = 20_000;
+
+// same two-tone chime the Orders screen uses for new arrivals
+function newBookingChime() {
+  try {
+    const ctx = new AudioContext();
+    [0, 0.18].forEach((delay, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = i === 0 ? 880 : 1320;
+      gain.gain.setValueAtTime(0.15, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.15);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + 0.16);
+    });
+    setTimeout(() => ctx.close(), 600);
+  } catch { /* audio blocked until first user interaction — fine */ }
+}
 
 const EMPTY_PHONE_BOOKING = {
   name: "",
@@ -36,25 +57,71 @@ export default function BookingsPage() {
   const [bookings, setBookings] = useState<AdminBooking[]>([]);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState("");
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState(EMPTY_PHONE_BOOKING);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
-  const load = useCallback(() => {
-    setLoading(true);
-    setError("");
-    listBookings(filter === "all" ? undefined : filter)
-      .then((res) => {
-        setBookings(res);
+  const knownIds = useRef<Set<string> | null>(null);
+  const nextPage = useRef(2); // page 1 is the polled window; older pages load on demand
+
+  const load = useCallback((isInitial = true) => {
+    if (isInitial) setLoading(true);
+    listBookingsPage(1, filter === "all" ? undefined : filter)
+      .then((page) => {
+        // new-request detection follows newly seen pending rows, not the filter view
+        const fresh = knownIds.current
+          ? page.results.filter((b) => b.status === "pending" && !knownIds.current!.has(b.public_id))
+          : [];
+        if (fresh.length > 0) {
+          newBookingChime();
+          toast({
+            variant: "info",
+            title: fresh.length === 1 ? "New booking request 📅" : `${fresh.length} new booking requests 📅`,
+            description: fresh.map((b) => `${b.name} · ${b.date} ${b.time.slice(0, 5)}`).join(", "),
+          });
+        }
+        if (knownIds.current === null) knownIds.current = new Set();
+        page.results.forEach((b) => knownIds.current!.add(b.public_id));
+        setBookings((prev) => mergeRows(prev, page.results));
+        if (nextPage.current === 2) setHasMore(page.hasMore);
         setError("");
       })
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load bookings"))
       .finally(() => setLoading(false));
-  }, [filter]);
+  }, [filter, toast]);
 
-  useEffect(load, [load]);
+  const loadMore = async () => {
+    setLoadingMore(true);
+    try {
+      const page = await listBookingsPage(nextPage.current, filter === "all" ? undefined : filter);
+      nextPage.current += 1;
+      page.results.forEach((b) => knownIds.current?.add(b.public_id));
+      setBookings((prev) => mergeRows(prev, page.results));
+      setHasMore(page.hasMore);
+    } catch (e) {
+      toast({
+        variant: "error",
+        title: "Could not load older bookings",
+        description: e instanceof Error ? e.message : undefined,
+      });
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  useEffect(() => {
+    // the filter changed (or first mount): restart from page 1 of that view
+    setBookings([]);
+    nextPage.current = 2;
+    setHasMore(false);
+    load(true);
+    const id = setInterval(() => load(false), POLL_MS);
+    return () => clearInterval(id);
+  }, [load]);
 
   const setStatus = async (b: AdminBooking, status: AdminBooking["status"]) => {
     const prev = bookings;
@@ -118,14 +185,14 @@ export default function BookingsPage() {
   };
 
   return (
-    <div className="grid gap-6">
-      <div className="flex items-center justify-between">
+    <div className="grid gap-6 [&>*]:min-w-0">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Bookings</h1>
           <p className="text-sm text-muted-foreground">Confirm or cancel table requests</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={load}>Refresh</Button>
+          <Button variant="outline" size="sm" onClick={() => load(true)}>Refresh</Button>
           <Button size="sm" onClick={() => { setAdding(true); setError(""); }}>
             <Phone className="mr-1 h-4 w-4" /> Add phone booking
           </Button>
@@ -272,6 +339,13 @@ export default function BookingsPage() {
                 )}
               </TableBody>
             </Table>
+          )}
+          {!loading && hasMore && (
+            <div className="mt-4 flex justify-center border-t pt-4">
+              <Button variant="outline" size="sm" loading={loadingMore} onClick={loadMore}>
+                Load older bookings
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>

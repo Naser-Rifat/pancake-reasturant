@@ -71,6 +71,8 @@ export interface AdminStats {
   active_orders: number;
   pending_bookings: number;
   pending_reviews: number;
+  total_orders: number;
+  total_bookings: number;
 }
 
 async function adminFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -104,6 +106,26 @@ async function adminFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
 const unwrap = <T,>(data: { results: T[] } | T[]): T[] =>
   Array.isArray(data) ? data : data.results;
 
+export interface Page<T> {
+  results: T[];
+  hasMore: boolean;
+}
+
+const asPage = <T,>(data: { results: T[]; next: string | null } | T[]): Page<T> =>
+  Array.isArray(data)
+    ? { results: data, hasMore: false }
+    : { results: data.results, hasMore: data.next !== null };
+
+/** Merge freshly fetched rows into what's on screen, newest first, no duplicates. */
+export const mergeRows = <T extends { public_id: string; created_at: string }>(
+  prev: T[],
+  incoming: T[]
+): T[] => {
+  const byId = new Map(prev.map((r) => [r.public_id, r]));
+  incoming.forEach((r) => byId.set(r.public_id, r));
+  return [...byId.values()].sort((a, b) => b.created_at.localeCompare(a.created_at));
+};
+
 // ---------- auth ----------
 
 export async function adminLogin(username: string, password: string) {
@@ -130,6 +152,16 @@ export const listOrders = async (status?: string) =>
 export const listBookings = async (status?: string) =>
   unwrap(await adminFetch<{ results: AdminBooking[] } | AdminBooking[]>(
     `/bookings/${status ? `?status=${status}` : ""}`
+  ));
+
+export const listOrdersPage = async (page: number, status?: string) =>
+  asPage(await adminFetch<{ results: AdminOrder[]; next: string | null } | AdminOrder[]>(
+    `/orders/?page=${page}${status ? `&status=${status}` : ""}`
+  ));
+
+export const listBookingsPage = async (page: number, status?: string) =>
+  asPage(await adminFetch<{ results: AdminBooking[]; next: string | null } | AdminBooking[]>(
+    `/bookings/?page=${page}${status ? `&status=${status}` : ""}`
   ));
 
 export const listReviews = () => adminFetch<AdminReview[]>("/reviews/");
@@ -194,6 +226,8 @@ export interface AdminAnnouncement {
   starts_at: string | null;
   ends_at: string | null;
   is_active: boolean;
+  /** which homepage surface this deal belongs to (old prod rows omit it = slider) */
+  placement?: "band" | "slider";
 }
 
 export interface AdminHours {
@@ -224,6 +258,20 @@ export interface AdminSiteSettings {
   cta_button_url: string;
   marquee_words: string;
   footer_tagline: string;
+  promo_kicker?: string;
+  offers_kicker?: string;
+  offers_title?: string;
+  menu_hero_heading: string;
+  menu_hero_script: string;
+  menu_hero_lead: string;
+  gallery_hero_kicker: string;
+  gallery_hero_heading: string;
+  gallery_hero_script: string;
+  gallery_hero_lead: string;
+  booking_hero_kicker: string;
+  booking_hero_heading: string;
+  booking_hero_script: string;
+  booking_hero_lead: string;
   address: string;
   phone: string;
   whatsapp: string;
@@ -284,6 +332,9 @@ export const updateHomeStep = (id: number, d: Partial<AdminHomeStep>) =>
   adminFetch<AdminHomeStep>(`/home-steps/${id}/`, { method: "PATCH", body: JSON.stringify(d) });
 export const deleteHomeStep = (id: number) =>
   adminFetch<void>(`/home-steps/${id}/`, { method: "DELETE" });
+
+export const sendTestEmail = () =>
+  adminFetch<{ ok: boolean; detail: string; to: string }>("/test-email/", { method: "POST" });
 
 export const listGalleryAdmin = () => adminFetch<AdminGalleryPhoto[]>("/gallery/");
 export const createGalleryPhoto = (d: Partial<AdminGalleryPhoto>) =>

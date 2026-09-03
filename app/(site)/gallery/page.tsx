@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import GalleryClient from "@/components/GalleryClient";
 import Sticker from "@/components/Sticker";
-import { getGallery } from "@/lib/api";
+import { getGallery, getSite } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function GalleryPage() {
-  const photos = await getGallery();
+  const [photos, site] = await Promise.all([getGallery(), getSite()]);
 
   return (
     <div className="gallery-scrapbook-page">
@@ -36,11 +36,14 @@ export default async function GalleryPage() {
           style={{ bottom: "1.5rem", left: "10%", opacity: 0.8 }}
         />
         <div className="container">
-          <p className="kicker">FEAST YOUR EYES</p>
+          <p className="kicker">{site.gallery_hero_kicker || "Feast Your Eyes"}</p>
           <h1>
-            THE <span className="accent">Gallery.</span>
+            {site.gallery_hero_heading || "The"}{" "}
+            <span className="accent">{site.gallery_hero_script || "Gallery."}</span>
           </h1>
-          <p className="hero-subtext">Our food, our space, and the good times in between.</p>
+          <p className="hero-subtext">
+            {site.gallery_hero_lead || "Our food, our space, and the good times in between."}
+          </p>
         </div>
       </section>
       <GalleryClient photos={photos} />

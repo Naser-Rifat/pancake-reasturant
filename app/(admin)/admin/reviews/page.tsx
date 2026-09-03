@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton, CardSkeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
+import { useConfirm } from "@/components/ui/confirm";
 import { useToast } from "@/components/ui/toast";
 
 export default function ReviewsAdminPage() {
@@ -16,6 +17,7 @@ export default function ReviewsAdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   const load = useCallback(() => {
     setLoading(true);
@@ -53,7 +55,13 @@ export default function ReviewsAdminPage() {
   };
 
   const remove = async (r: AdminReview) => {
-    if (!confirm(`Delete the review from ${r.name}? This can't be undone.`)) return;
+    const ok = await confirm({
+      title: `Delete the review from ${r.name}?`,
+      description: "This can't be undone.",
+      confirmLabel: "Delete review",
+      destructive: true,
+    });
+    if (!ok) return;
     const prev = reviews;
     setReviews((rs) => rs.filter((x) => x.id !== r.id));
     try {
@@ -70,8 +78,8 @@ export default function ReviewsAdminPage() {
   };
 
   return (
-    <div className="grid gap-6">
-      <div className="flex items-center justify-between">
+    <div className="grid gap-6 [&>*]:min-w-0">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Reviews</h1>
           <p className="text-sm text-muted-foreground">
@@ -125,9 +133,9 @@ export default function ReviewsAdminPage() {
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">&ldquo;{r.quote}&rdquo;</p>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <label className="flex items-center gap-2 text-sm font-medium">
-                    <Switch checked={r.is_approved} onCheckedChange={(v) => approve(r, v)} />
+                    <Switch aria-label={`Approve review from ${r.name}`} checked={r.is_approved} onCheckedChange={(v) => approve(r, v)} />
                     Show on website
                   </label>
                   <Button size="sm" variant="ghost" onClick={() => remove(r)} aria-label="Delete review">

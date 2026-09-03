@@ -16,6 +16,9 @@ const LINKS = [
 
 export default function Nav() {
   const pathname = usePathname();
+  if (pathname === "/preview" || pathname?.startsWith("/preview")) {
+    return null;
+  }
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [pastHero, setPastHero] = useState(false);
@@ -41,8 +44,14 @@ export default function Nav() {
     <header className={`nav${scrolled ? " scrolled" : ""}${pastHero ? " past-hero" : ""}`}>
       <div className="container nav-inner">
         <Link href="/" className="logo" aria-label="The Pancake Club — home">
-          <span className="logo-mark" aria-hidden="true"><LogoMark size={24} /></span>
-          <span className="logo-brand-text">The Pancake Club</span>
+          <Image
+            src="/logo.png"
+            alt="The Pancake Club"
+            width={132}
+            height={56}
+            priority
+            className="nav-brand-logo"
+          />
         </Link>
 
         <ul className={`nav-links${open ? " open" : ""}`}>

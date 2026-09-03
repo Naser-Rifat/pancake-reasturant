@@ -109,6 +109,20 @@ export interface ApiSiteSettings {
   /** one phrase per line */
   marquee_words: string;
   footer_tagline: string;
+  promo_kicker?: string;
+  offers_kicker?: string;
+  offers_title?: string;
+  menu_hero_heading: string;
+  menu_hero_script: string;
+  menu_hero_lead: string;
+  gallery_hero_kicker: string;
+  gallery_hero_heading: string;
+  gallery_hero_script: string;
+  gallery_hero_lead: string;
+  booking_hero_kicker: string;
+  booking_hero_heading: string;
+  booking_hero_script: string;
+  booking_hero_lead: string;
   address: string;
   phone: string;
   whatsapp: string;

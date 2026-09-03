@@ -59,7 +59,7 @@ export default function DashboardPage() {
       ];
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-6 [&>*]:min-w-0">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground">What&apos;s happening at The Pancake Club right now</p>
@@ -94,8 +94,14 @@ export default function DashboardPage() {
             ))}
       </div>
 
+      {stats?.total_orders != null && (
+        <p className="-mt-3 text-xs text-muted-foreground">
+          All-time: {stats.total_orders.toLocaleString()} orders · {stats.total_bookings.toLocaleString()} bookings
+        </p>
+      )}
+
       {/* Tables Grid */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2 [&>*]:min-w-0">
         {/* Recent Orders */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
@@ -103,7 +109,7 @@ export default function DashboardPage() {
               <CardTitle>Recent Orders</CardTitle>
               <p className="text-xs text-muted-foreground mt-1">Latest takeaway requests</p>
             </div>
-            <Link href="/admin/orders" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            <Link href="/admin/orders" className="-my-2 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">
               View all →
             </Link>
           </CardHeader>
@@ -157,7 +163,7 @@ export default function DashboardPage() {
               <CardTitle>Recent Reservations</CardTitle>
               <p className="text-xs text-muted-foreground mt-1">Upcoming table bookings</p>
             </div>
-            <Link href="/admin/bookings" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            <Link href="/admin/bookings" className="-my-2 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">
               View all →
             </Link>
           </CardHeader>

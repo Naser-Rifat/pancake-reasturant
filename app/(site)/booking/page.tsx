@@ -17,9 +17,12 @@ export default async function BookingPage() {
     <>
       <section className="page-hero">
         <div className="container">
-          <p className="kicker">Reserve Online — Free &amp; Instant</p>
-          <h1>Book a <span className="accent">Table.</span></h1>
-          <p>Pick a date, pick a time — we&apos;ll have the griddle hot when you arrive.</p>
+          <p className="kicker">{site.booking_hero_kicker || "Reserve Online — Free & Instant"}</p>
+          <h1>
+            {site.booking_hero_heading || "Book a"}{" "}
+            <span className="accent">{site.booking_hero_script || "Table."}</span>
+          </h1>
+          <p>{site.booking_hero_lead || "Pick a date, pick a time — we'll have the griddle hot when you arrive."}</p>
         </div>
       </section>
 

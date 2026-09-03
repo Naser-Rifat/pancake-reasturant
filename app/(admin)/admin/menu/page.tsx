@@ -21,6 +21,7 @@ import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+import { useConfirm } from "@/components/ui/confirm";
 import { useToast } from "@/components/ui/toast";
 import { TableSkeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
@@ -72,6 +73,7 @@ export default function MenuAdminPage() {
   const jumpTo = useRef<"top" | "photos">("top");
   const pristine = useRef<FormState>(EMPTY_FORM);
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   // the form opens above a long table — bring it into view instead of
   // leaving staff wondering whether the click registered
@@ -82,9 +84,17 @@ export default function MenuAdminPage() {
     target?.scrollIntoView({ behavior: "smooth", block: jumpTo.current === "photos" ? "center" : "start" });
   }, [editing]);
 
-  const closeForm = () => {
+  const closeForm = async () => {
     const dirty = JSON.stringify(pristine.current) !== JSON.stringify(form);
-    if (dirty && !confirm("Discard unsaved changes?")) return;
+    if (dirty) {
+      const ok = await confirm({
+        title: "Discard unsaved changes?",
+        description: "Everything you typed in this form will be lost.",
+        confirmLabel: "Discard",
+        destructive: true,
+      });
+      if (!ok) return;
+    }
     setEditing(null);
   };
 
@@ -216,7 +226,13 @@ export default function MenuAdminPage() {
   };
 
   const remove = async (item: AdminMenuItem) => {
-    if (!confirm(`Delete “${item.name}” from the menu?`)) return;
+    const ok = await confirm({
+      title: `Delete “${item.name}” from the menu?`,
+      description: "Its photos and page disappear from the website immediately.",
+      confirmLabel: "Delete dish",
+      destructive: true,
+    });
+    if (!ok) return;
     try {
       await deleteMenuItem(item.slug);
       toast({ variant: "success", title: `${item.name} deleted from the menu` });
@@ -247,8 +263,8 @@ export default function MenuAdminPage() {
   };
 
   return (
-    <div className="grid gap-6">
-      <div className="flex items-center justify-between">
+    <div className="grid gap-6 [&>*]:min-w-0">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Menu</h1>
           <p className="text-sm text-muted-foreground">
@@ -482,6 +498,7 @@ export default function MenuAdminPage() {
                     </TableCell>
                     <TableCell>
                       <Switch
+                        aria-label={`${item.name} available`}
                         checked={item.is_available}
                         onCheckedChange={(v) =>
                           toggle(
@@ -494,6 +511,7 @@ export default function MenuAdminPage() {
                     </TableCell>
                     <TableCell>
                       <Switch
+                        aria-label={`${item.name} featured on home page`}
                         checked={item.is_featured}
                         onCheckedChange={(v) =>
                           toggle(

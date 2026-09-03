@@ -29,9 +29,11 @@ export default async function MenuPage() {
     <>
       <section className="menu-hero">
         <div className="container">
-          {/* <p className="kicker">The Lineup</p> */}
-          <h1>Stacks On <span className="accent">Stacks.</span></h1>
-          <p>Signature pancake stacks. Griddled to order. Zero regrets.</p>
+          <h1>
+            {site.menu_hero_heading || "Stacks On"}{" "}
+            <span className="accent">{site.menu_hero_script || "Stacks."}</span>
+          </h1>
+          <p>{site.menu_hero_lead || "Signature pancake stacks. Griddled to order. Zero regrets."}</p>
         </div>
       </section>
 
