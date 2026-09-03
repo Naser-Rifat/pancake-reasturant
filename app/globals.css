@@ -49,6 +49,17 @@
 /* ---------- admin-selectable colour themes (Settings → Website theme) ----------
    Same-lightness hue swaps only, so every existing ink-on-surface pairing keeps
    its contrast. --lavender page frame + --ink stay brand-fixed across themes. */
+/* the site's original launch palette — root now carries maple, so "golden"
+   needs its own block or the preset silently does nothing */
+[data-theme="golden"] {
+  --deep: #4a3320;
+  --yellow: #f2be45;
+  --yellow-deep: #dfa32b;
+  --pink: #f2789c;
+  --pink-deep: #d95f80;
+  --berry: #bf2f63;
+  --blush: #f4bcca;
+}
 [data-theme="berry"] {
   --deep: #4a2033;
   --yellow: #f6aec6;
@@ -2203,12 +2214,13 @@ h2.title.inline .accent {
   gap: 16px;
   position: relative;
 }
-/* the first photo leads: 2x2 hero block on mobile and desktop */
-.gallery-mosaic > a:first-child {
+/* the first photo leads: 2x2 hero block on mobile and desktop
+   (element-agnostic so the admin studio's non-link mosaic gets the same shape) */
+.gallery-mosaic > :first-child {
   grid-column: span 2;
   grid-row: span 2;
 }
-.gallery-mosaic > a:last-child {
+.gallery-mosaic > :last-child {
   grid-column: span 2;
 }
 

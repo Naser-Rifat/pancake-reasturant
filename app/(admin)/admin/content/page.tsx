@@ -41,6 +41,7 @@ import {
   RefreshCw,
   CheckCircle2,
   Ticket,
+  X,
 } from "lucide-react";
 import {
   createAnnouncement,
@@ -94,7 +95,19 @@ const EMPTY_PHOTO: Pick<AdminGalleryPhoto, "album" | "caption" | "image" | "alt"
   image: "",
   alt: "",
 };
-const EMPTY_CERT = { icon: "medal", title: "", subtitle: "" };
+const EMPTY_CERT = { icon: "medal", image: "", title: "", subtitle: "" };
+
+/** ISO datetime ↔ <input type="datetime-local"> value (local wall-clock) */
+function isoToLocalInput(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(+d)) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function localInputToIso(v: string): string | null {
+  return v ? new Date(v).toISOString() : null;
+}
 
 function getDealCadence(a: AdminAnnouncement): "weekly" | "monthly" | "regular" {
   const t = `${a.message} ${a.details}`.toLowerCase();
@@ -108,10 +121,39 @@ function getDealCadence(a: AdminAnnouncement): "weekly" | "monthly" | "regular" 
 }
 
 export default function ContentPage() {
-  const [activePage, setActivePage] = useState<PageTab>("home");
-  const [homeStepIndex, setHomeStepIndex] = useState<number>(1);
-  const [viewport, setViewport] = useState<ViewportMode>("desktop");
-  const [campaignChannel, setCampaignChannel] = useState<"channel1" | "channel2">("channel1");
+  // a reload used to dump staff back to Homepage step 1 — the studio remembers
+  // where they were (tab, step, station, device). Restoring inside the lazy
+  // initializers is hydration-safe here because the first paint is always the
+  // loading skeleton, identical whatever these values are.
+  const [saved] = useState<Record<string, unknown>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      return JSON.parse(localStorage.getItem("studio-position") || "{}");
+    } catch {
+      return {};
+    }
+  });
+  const [activePage, setActivePage] = useState<PageTab>(() =>
+    ["home", "menu", "gallery", "booking"].includes(saved.page as string) ? (saved.page as PageTab) : "home",
+  );
+  const [homeStepIndex, setHomeStepIndex] = useState<number>(() =>
+    typeof saved.step === "number" && saved.step >= 1 && saved.step <= 6 ? saved.step : 1,
+  );
+  const [viewport, setViewport] = useState<ViewportMode>(() =>
+    saved.viewport === "mobile" ? "mobile" : "desktop",
+  );
+  const [campaignChannel, setCampaignChannel] = useState<"channel1" | "channel2">(() =>
+    saved.channel === "channel2" ? "channel2" : "channel1",
+  );
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        "studio-position",
+        JSON.stringify({ page: activePage, step: homeStepIndex, channel: campaignChannel, viewport }),
+      );
+    } catch { /* private mode etc. */ }
+  }, [activePage, homeStepIndex, campaignChannel, viewport]);
   const [site, setSite] = useState<AdminSiteSettings | null>(null);
   const [announcements, setAnnouncements] = useState<AdminAnnouncement[]>([]);
   const [selectedDealId, setSelectedDealId] = useState<number | null>(null);
@@ -228,6 +270,16 @@ export default function ContentPage() {
     syncPreview();
   }, [syncPreview]);
 
+  // the iframe loads before its React listener mounts, so the very first sync
+  // is lost — re-send everything whenever the preview announces itself ready
+  useEffect(() => {
+    const onMsg = (e: MessageEvent) => {
+      if (e.data?.type === "PANCAKE_PREVIEW_READY") syncPreview();
+    };
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
+  }, [syncPreview]);
+
   const run = async (fn: () => Promise<void>, what: string, success?: ToastInput) => {
     setBusy(what);
     try {
@@ -246,9 +298,41 @@ export default function ContentPage() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto space-y-6 pb-20">
-        <div className="h-28 rounded-3xl bg-amber-500/10 animate-pulse border border-amber-500/20" />
-        <div className="h-64 rounded-3xl bg-zinc-100 animate-pulse border" />
+      <div className="space-y-6 max-w-7xl mx-auto">
+        <div className="p-6 sm:p-7 rounded-3xl bg-[#fffdf9] border-2 border-[#eee3d5] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-32 rounded-full" />
+            <Skeleton className="h-7 w-64 rounded-xl" />
+            <Skeleton className="h-4 w-96 rounded-lg" />
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-28 rounded-2xl" />
+            <Skeleton className="h-10 w-28 rounded-2xl" />
+          </div>
+        </div>
+
+        {/* 6 Tabs Skeleton */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Skeleton key={i} className="h-14 w-full rounded-2xl" />
+          ))}
+        </div>
+
+        {/* Active Panel Skeleton */}
+        <div className="p-6 sm:p-8 rounded-3xl bg-[#fffdf9] border-2 border-[#eee3d5] space-y-6">
+          <div className="flex items-center justify-between pb-4 border-b border-[#eee3d5]">
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-48 rounded-xl" />
+              <Skeleton className="h-4 w-72 rounded-lg" />
+            </div>
+            <Skeleton className="h-10 w-32 rounded-2xl" />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Skeleton className="h-24 w-full rounded-2xl" />
+            <Skeleton className="h-24 w-full rounded-2xl" />
+          </div>
+          <Skeleton className="h-64 w-full rounded-3xl" />
+        </div>
       </div>
     );
   }
@@ -495,117 +579,129 @@ export default function ContentPage() {
             </div>
           </div>
 
-          {/* ========================================================================= */}
-          {/* 🌟 100% SAME-TO-SAME AUTHENTIC PUBLIC WEBSITE LIVE IFRAME PREVIEW         */}
-          {/* ========================================================================= */}
-          <div className="rounded-3xl bg-[#f8f2e0] border-2 border-[#e3d1b6] p-4 sm:p-6 shadow-md space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="px-3.5 py-1 rounded-full text-xs font-black bg-[#763a12] text-white flex items-center gap-1.5 shadow-xs">
-                  <Sparkles className="h-3.5 w-3.5 text-amber-300" />
-                  100% REAL SAME-TO-SAME PUBLIC PREVIEW
-                </span>
+        </div>
+      )}
 
-                {/* Dual Campaign Channel Switcher in Step 2 */}
-                {homeStepIndex === 2 && (
-                  <div className="inline-flex items-center bg-white p-1 rounded-2xl border border-[#d9c7b4] shadow-xs">
-                    <button
-                      type="button"
-                      onClick={() => setCampaignChannel("channel1")}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black transition-all ${
-                        campaignChannel === "channel1"
-                          ? "bg-[#763a12] text-white shadow-xs"
-                          : "text-[#763a12] hover:text-[#211a14]"
-                      }`}
-                    >
-                      <Gift className="h-3.5 w-3.5" />
-                      <span>Top Promo Band</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCampaignChannel("channel2")}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black transition-all ${
-                        campaignChannel === "channel2"
-                          ? "bg-[#763a12] text-white shadow-xs"
-                          : "text-[#763a12] hover:text-[#211a14]"
-                      }`}
-                    >
-                      <Ticket className="h-3.5 w-3.5" />
-                      <span>Weekly Offers Slider</span>
-                    </button>
-                  </div>
-                )}
+      {/* ========================================================================= */}
+      {/* 🌟 ONE PERSISTENT LIVE PREVIEW — never reloads, so no flash on switching   */}
+      {/* ========================================================================= */}
+      <div className="rounded-3xl bg-[#f8f2e0] border-2 border-[#e3d1b6] p-4 sm:p-6 shadow-md space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-3.5 py-1 rounded-full text-xs font-black bg-[#763a12] text-white flex items-center gap-1.5 shadow-xs">
+              <Sparkles className="h-3.5 w-3.5 text-amber-300" />
+              {activePage === "home"
+                ? "100% REAL SAME-TO-SAME PUBLIC PREVIEW"
+                : `100% REAL ${activePage.toUpperCase()} PAGE LIVE PREVIEW`}
+            </span>
+
+            {/* Dual Campaign Channel Switcher in Step 2 */}
+            {activePage === "home" && homeStepIndex === 2 && (
+              <div className="inline-flex items-center bg-white p-1 rounded-2xl border border-[#d9c7b4] shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setCampaignChannel("channel1")}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                    campaignChannel === "channel1"
+                      ? "bg-[#763a12] text-white shadow-xs"
+                      : "text-[#763a12] hover:text-[#211a14]"
+                  }`}
+                >
+                  <Gift className="h-3.5 w-3.5" />
+                  <span>Top Promo Band</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCampaignChannel("channel2")}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                    campaignChannel === "channel2"
+                      ? "bg-[#763a12] text-white shadow-xs"
+                      : "text-[#763a12] hover:text-[#211a14]"
+                  }`}
+                >
+                  <Ticket className="h-3.5 w-3.5" />
+                  <span>Weekly Offers Slider</span>
+                </button>
               </div>
-
-              <Button
-                size="sm"
-                className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl shadow-xs"
-                loading={busy === "All content"}
-                onClick={() =>
-                  run(async () => {
-                    await updateSiteSettings({
-                      hero_heading: site.hero_heading,
-                      hero_script: site.hero_script,
-                      hero_lead: site.hero_lead,
-                      hero_image: site.hero_image,
-                      hero_cutout: site.hero_cutout,
-                      promo_kicker: site.promo_kicker,
-                      offers_kicker: site.offers_kicker,
-                      offers_title: site.offers_title,
-                      cta_heading: site.cta_heading,
-                      cta_script: site.cta_script,
-                      cta_lead: site.cta_lead,
-                      cta_button_label: site.cta_button_label,
-                      cta_button_url: site.cta_button_url,
-                      footer_tagline: site.footer_tagline,
-                    });
-                  }, "All content")
-                }
-              >
-                <Save className="h-3.5 w-3.5 mr-1.5" /> Save Section Changes
-              </Button>
-            </div>
-
-            {/* Simulated Public Device Frame */}
-            <div className={`mx-auto transition-all ${viewport === "mobile" ? "max-w-[420px]" : "w-full"}`}>
-              <div className="rounded-3xl overflow-hidden border-2 border-[#e8dacb] shadow-xl bg-[var(--cream)]">
-                <iframe
-                  ref={iframeRef}
-                  src={`/preview?section=${currentPreviewSection}`}
-                  onLoad={syncPreview}
-                  className="w-full border-0 transition-all"
-                  style={{
-                    height:
-                      activePage === "home"
-                        ? homeStepIndex === 1
-                          ? viewport === "mobile"
-                            ? "530px"
-                            : "505px"
-                          : homeStepIndex === 2
-                          ? campaignChannel === "channel2"
-                            ? viewport === "mobile"
-                              ? "440px"
-                              : "390px"
-                            : viewport === "mobile"
-                            ? "420px"
-                            : "370px"
-                          : homeStepIndex === 3
-                          ? "320px"
-                          : homeStepIndex === 4
-                          ? "180px"
-                          : homeStepIndex === 5
-                          ? "280px"
-                          : "110px"
-                        : activePage === "menu"
-                        ? "420px"
-                        : "240px",
-                    display: "block",
-                  }}
-                  title="Public Website Live Preview"
-                />
-              </div>
-            </div>
+            )}
           </div>
+
+          {activePage === "home" && (
+            <Button
+              size="sm"
+              className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl shadow-xs"
+              loading={busy === "All content"}
+              onClick={() =>
+                run(async () => {
+                  await updateSiteSettings({
+                    hero_heading: site.hero_heading,
+                    hero_script: site.hero_script,
+                    hero_lead: site.hero_lead,
+                    hero_image: site.hero_image,
+                    hero_cutout: site.hero_cutout,
+                    promo_kicker: site.promo_kicker,
+                    offers_kicker: site.offers_kicker,
+                    offers_title: site.offers_title,
+                    cta_heading: site.cta_heading,
+                    cta_script: site.cta_script,
+                    cta_lead: site.cta_lead,
+                    cta_button_label: site.cta_button_label,
+                    cta_button_url: site.cta_button_url,
+                    footer_tagline: site.footer_tagline,
+                  });
+                }, "All content")
+              }
+            >
+              <Save className="h-3.5 w-3.5 mr-1.5" /> Save Section Changes
+            </Button>
+          )}
+        </div>
+
+        {/* Simulated Public Device Frame */}
+        <div className={`mx-auto transition-all ${activePage === "home" && viewport === "mobile" ? "max-w-[420px]" : "w-full"}`}>
+          <div className="rounded-3xl overflow-hidden border-2 border-[#e8dacb] shadow-xl bg-[var(--cream)]">
+            <iframe
+              ref={iframeRef}
+              src="/preview"
+              onLoad={syncPreview}
+              className="w-full border-0 transition-all"
+              style={{
+                height:
+                  activePage === "home"
+                    ? homeStepIndex === 1
+                      ? viewport === "mobile"
+                        ? "530px"
+                        : "505px"
+                      : homeStepIndex === 2
+                      ? campaignChannel === "channel2"
+                        ? viewport === "mobile"
+                          ? "440px"
+                          : "390px"
+                        : viewport === "mobile"
+                        ? "420px"
+                        : "370px"
+                      : homeStepIndex === 3
+                      ? viewport === "mobile"
+                        ? "900px"
+                        : "660px"
+                      : homeStepIndex === 4
+                      ? "180px"
+                      : homeStepIndex === 5
+                      ? "380px"
+                      : "260px"
+                    : activePage === "menu"
+                    ? "600px"
+                    : "360px",
+                display: "block",
+              }}
+              title="Public Website Live Preview"
+            />
+          </div>
+        </div>
+      </div>
+
+      {activePage === "home" && (
+        <div className="space-y-6">
 
           {/* --------------------------------------------------------------------- */}
           {/* STEP 1: TOP HERO BANNER (INPUTS + 3-SLOT CAROUSEL STATION)            */}
@@ -1148,6 +1244,8 @@ export default function ContentPage() {
                                 image: activeDeal.image,
                                 starts_at: activeDeal.starts_at,
                                 ends_at: activeDeal.ends_at,
+                                card1_dish: activeDeal.card1_dish ?? "",
+                                card2_dish: activeDeal.card2_dish ?? "",
                               });
                             }, "Campaign", { title: "Deal saved!" })
                           }
@@ -1182,6 +1280,48 @@ export default function ContentPage() {
                           </span>
                         </label>
                       </div>
+
+                      {campaignChannel === "channel1" && (
+                        <div className="p-4 rounded-2xl border border-[#ecdac7] bg-[#faf5ee] space-y-2.5">
+                          <span className="text-xs font-black text-[#211a14] block">Right-side Voucher Cards</span>
+                          <p className="text-[10px] text-zinc-500 -mt-1">
+                            The two little ticket cards on the band&apos;s right — pick any dish, or keep the
+                            defaults. Saved with &ldquo;Save Deal&rdquo;.
+                          </p>
+                          <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0">
+                            <div className="space-y-1">
+                              <Label className="text-xs font-black text-[#211a14]">Card 1 (left)</Label>
+                              <Select
+                                className="h-10 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                                value={activeDeal.card1_dish ?? ""}
+                                onChange={(e) =>
+                                  setActiveDeal((a) => (a ? { ...a, card1_dish: e.target.value } : a))
+                                }
+                              >
+                                <option value="">The Offer photo (default)</option>
+                                {menuItems.map((m) => (
+                                  <option key={m.slug} value={m.slug}>{m.name}</option>
+                                ))}
+                              </Select>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs font-black text-[#211a14]">Card 2 (right)</Label>
+                              <Select
+                                className="h-10 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                                value={activeDeal.card2_dish ?? ""}
+                                onChange={(e) =>
+                                  setActiveDeal((a) => (a ? { ...a, card2_dish: e.target.value } : a))
+                                }
+                              >
+                                <option value="">Auto — first hero-featured dish</option>
+                                {menuItems.map((m) => (
+                                  <option key={m.slug} value={m.slug}>{m.name}</option>
+                                ))}
+                              </Select>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       <div className="grid gap-4">
                         <div className="space-y-1">
@@ -1221,6 +1361,51 @@ export default function ContentPage() {
                               placeholder="/menu"
                             />
                           </div>
+                        </div>
+
+                        {/* Run window — the website obeys these on its own */}
+                        <div className="p-4 rounded-2xl border border-[#ecdac7] bg-[#faf5ee] space-y-2.5">
+                          <span className="text-xs font-black text-[#211a14] block">Schedule (Optional)</span>
+                          <p className="text-[10px] text-zinc-500 -mt-1">
+                            Leave blank to run forever. With an End set, the deal drops off the website by
+                            itself at that moment — and the band shows a live countdown stamp. Saved with
+                            &ldquo;Save Deal&rdquo;.
+                          </p>
+                          <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0">
+                            <div className="space-y-1">
+                              <Label htmlFor="deal-starts" className="text-xs font-black text-[#211a14]">
+                                Starts (optional)
+                              </Label>
+                              <Input
+                                id="deal-starts"
+                                type="datetime-local"
+                                className="border-[#d9c7b4] text-[#211a14] font-bold text-xs h-10 rounded-xl"
+                                value={isoToLocalInput(activeDeal.starts_at)}
+                                onChange={(e) =>
+                                  setActiveDeal((a) => (a ? { ...a, starts_at: localInputToIso(e.target.value) } : a))
+                                }
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label htmlFor="deal-ends" className="text-xs font-black text-[#211a14]">
+                                Ends (optional)
+                              </Label>
+                              <Input
+                                id="deal-ends"
+                                type="datetime-local"
+                                className="border-[#d9c7b4] text-[#211a14] font-bold text-xs h-10 rounded-xl"
+                                value={isoToLocalInput(activeDeal.ends_at)}
+                                onChange={(e) =>
+                                  setActiveDeal((a) => (a ? { ...a, ends_at: localInputToIso(e.target.value) } : a))
+                                }
+                              />
+                            </div>
+                          </div>
+                          {activeDeal.ends_at && new Date(activeDeal.ends_at).getTime() < Date.now() && (
+                            <p className="text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-2">
+                              ⚠️ This end time is in the past — the deal is already off the website.
+                            </p>
+                          )}
                         </div>
                         <ImageField
                           id="deal-image"
@@ -1290,74 +1475,82 @@ export default function ContentPage() {
                 </div>
               </div>
 
-              {/* Upload Box */}
-              <div className="p-5 rounded-2xl border-2 border-dashed border-purple-300 bg-purple-50/50 space-y-3">
-                <span className="text-xs font-black text-purple-950 flex items-center gap-1.5">
-                  <Plus className="h-4 w-4 text-purple-600" /> Upload New Photo to Homepage Strip:
-                </span>
-                <div className="grid gap-3 sm:grid-cols-5 [&>*]:min-w-0">
-                  <Select
-                    className="h-10 text-xs border-[#d9c7b4] font-bold rounded-xl"
-                    value={newPhoto.album}
-                    onChange={(e) =>
-                      setNewPhoto((n) => ({
-                        ...n,
-                        album: e.target.value as AdminGalleryPhoto["album"],
-                      }))
-                    }
-                  >
-                    <option value="food">🥞 Food &amp; Dishes</option>
-                    <option value="interior">☕ Interior &amp; Space</option>
-                    <option value="events">✨ Events &amp; Parties</option>
-                  </Select>
-                  <div className="flex items-center gap-2 sm:col-span-2">
-                    <Input
-                      className="h-10 text-xs border-[#d9c7b4] font-medium rounded-xl"
-                      placeholder="Image URL or click upload"
-                      value={newPhoto.image}
-                      onChange={(e) => setNewPhoto((n) => ({ ...n, image: e.target.value }))}
-                    />
-                    <UploadButton onUploaded={(url) => setNewPhoto((n) => ({ ...n, image: url }))} />
-                  </div>
-                  <Input
-                    className="h-10 text-xs border-[#d9c7b4] font-medium rounded-xl"
-                    placeholder="Caption (e.g. Fluffy Berry Stack)"
-                    value={newPhoto.caption}
-                    onChange={(e) => setNewPhoto((n) => ({ ...n, caption: e.target.value }))}
-                  />
-                  <Button
-                    className="h-10 text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
-                    disabled={!newPhoto.image.trim() || !newPhoto.caption.trim()}
-                    onClick={() =>
-                      run(async () => {
-                        const created = await createGalleryPhoto({
-                          ...newPhoto,
-                          sort_order: photos.length,
-                        });
-                        setPhotos((xs) => [...xs, created]);
-                        setNewPhoto(EMPTY_PHOTO);
-                      }, "Gallery", { title: "Photo added!" })
-                    }
-                  >
-                    <Plus className="h-3.5 w-3.5 mr-1" /> Add Photo
-                  </Button>
-                </div>
-              </div>
+              {/* The manager IS the website layout: same mosaic, slot by slot */}
+              <p className="text-xs font-medium text-zinc-600 -mt-2">
+                This is the exact layout visitors see on the homepage — <strong>slot #1 is the big
+                hero shot</strong>. Drop a photo into any empty slot, or use Replace on a filled one.
+                Captions save when you click away.
+              </p>
 
-              {/* 6 Polaroid Photos Grid */}
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6 pt-2">
-                {photos.slice(0, 6).map((p, idx) => (
-                  <div
-                    key={p.id}
-                    className="group relative overflow-hidden rounded-2xl border-2 border-[#eee3d5] bg-white p-2 shadow-sm hover:shadow-md hover:border-purple-300 transition-all"
-                  >
-                    <div className="relative aspect-square rounded-xl overflow-hidden bg-zinc-100">
-                      <Image src={p.image} alt={p.caption} fill sizes="200px" className="object-cover" />
-                      <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full text-[10px] font-black bg-zinc-950 text-white shadow-xs">
-                        #{idx + 1}
+              {/* admin bundle doesn't load the public stylesheet, so the exact
+                  mosaic geometry ships scoped right here (same numbers as
+                  globals.css .gallery-mosaic) */}
+              <style>{`
+                .studio-mosaic { display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: 170px; gap: 16px; }
+                .studio-mosaic > :first-child { grid-column: span 2; grid-row: span 2; }
+                .studio-mosaic > :last-child { grid-column: span 2; }
+                @media (min-width: 640px) {
+                  .studio-mosaic { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 190px; }
+                  .studio-mosaic > :last-child { grid-column: auto; }
+                }
+                @media (min-width: 1024px) {
+                  .studio-mosaic { grid-template-columns: repeat(5, 1fr); grid-auto-rows: 235px; gap: 18px; }
+                  .studio-mosaic > :last-child { grid-column: span 2; }
+                }
+                .studio-slot { display: flex; flex-direction: column; background: #fff; padding: 8px 8px 10px; border-radius: 14px; border: 1.5px solid rgba(118, 58, 18, 0.1); box-shadow: 0 8px 20px rgba(33, 26, 20, 0.08); position: relative; min-width: 0; }
+                .studio-img { flex: 1; min-height: 0; position: relative; border-radius: 10px; overflow: hidden; background: #f4ebe1; }
+              `}</style>
+              <div className="studio-mosaic">
+                {Array.from({ length: 6 }).map((_, i) => {
+                  const p = photos[i];
+                  if (!p) {
+                    return (
+                      <div
+                        key={`empty-${i}`}
+                        className="studio-slot"
+                        style={{
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "8px",
+                          border: "2px dashed #d9c7b4",
+                          background: "#faf5ee",
+                          boxShadow: "none",
+                        }}
+                      >
+                        <span className="text-2xl" aria-hidden="true">📸</span>
+                        <span className="text-xs font-black text-[#763a12]">
+                          Slot #{i + 1}{i === 0 ? " — big hero shot" : ""} · empty
+                        </span>
+                        <UploadButton
+                          label="Add Photo"
+                          onUploaded={(url) =>
+                            run(async () => {
+                              const created = await createGalleryPhoto({
+                                album: "food",
+                                caption: "",
+                                image: url,
+                                alt: "",
+                                sort_order: photos.length,
+                              });
+                              setPhotos((xs) => [...xs, created]);
+                            }, "Gallery", { title: `Photo added to slot #${i + 1} — now give it a caption!` })
+                          }
+                        />
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={p.id} className="studio-slot">
+                      <span
+                        className="px-2 py-0.5 rounded-full text-[10px] font-black bg-zinc-950 text-white shadow-xs"
+                        style={{ position: "absolute", top: "10px", left: "10px", zIndex: 6 }}
+                      >
+                        #{i + 1}{i === 0 ? " · Hero" : ""}
                       </span>
                       <button
-                        className="absolute right-1.5 top-1.5 rounded-lg bg-black/80 text-white p-1.5 opacity-0 group-hover:opacity-100 hover:bg-destructive transition-opacity"
+                        type="button"
+                        className="rounded-lg bg-black/80 text-white p-1.5 hover:bg-destructive transition-colors"
+                        style={{ position: "absolute", top: "8px", right: "8px", zIndex: 6 }}
                         aria-label={`Delete photo “${p.caption || "Untitled"}”`}
                         onClick={async () => {
                           const ok = await confirmDialog({
@@ -1375,13 +1568,54 @@ export default function ContentPage() {
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
+                      <div className="studio-img">
+                        <Image
+                          src={p.image}
+                          alt={p.caption || "Gallery photo"}
+                          width={900}
+                          height={700}
+                          sizes="(min-width: 1024px) 40vw, 100vw"
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      </div>
+                      <div className="flex items-center gap-1.5 pt-1.5">
+                        <Input
+                          key={`cap-${p.id}`}
+                          defaultValue={p.caption}
+                          placeholder={i === 0 ? "Hero caption (shows on the website)" : "Caption…"}
+                          className="h-8 text-xs border-[#e8dacb] font-medium rounded-lg min-w-0"
+                          onBlur={(e) => {
+                            const v = e.target.value.trim();
+                            if (v === p.caption) return;
+                            run(async () => {
+                              await updateGalleryPhoto(p.id, { caption: v });
+                              setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, caption: v } : x)));
+                            }, "Caption", { title: "Caption saved" });
+                          }}
+                        />
+                        <UploadButton
+                          label="Replace"
+                          onUploaded={(url) =>
+                            run(async () => {
+                              await updateGalleryPhoto(p.id, { image: url });
+                              setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, image: url } : x)));
+                            }, "Gallery", { title: `Slot #${i + 1} photo replaced!` })
+                          }
+                        />
+                      </div>
                     </div>
-                    <div className="p-1.5 pt-2">
-                      <p className="text-xs font-black truncate text-[#211a14]">{p.caption}</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
+
+              <p className="text-[11px] font-medium text-zinc-500">
+                Want more than 6 photos, albums, or the full gallery page? Manage everything in the{" "}
+                <button type="button" className="font-black text-[#763a12] underline" onClick={() => setActivePage("gallery")}>
+                  Gallery Page tab
+                </button>
+                .
+              </p>
+
 
               <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#eee3d5]">
                 <Button
@@ -1428,22 +1662,53 @@ export default function ContentPage() {
                     key={c.id}
                     className="flex flex-wrap items-center gap-3 p-4 rounded-2xl border-2 border-[#eee3d5] bg-white shadow-2xs"
                   >
-                    <Select
-                      className="h-10 w-36 text-xs border-[#d9c7b4] font-bold rounded-xl"
-                      value={c.icon}
-                      onChange={(e) =>
-                        setCerts((xs) =>
-                          xs.map((x) => (x.id === c.id ? { ...x, icon: e.target.value } : x))
-                        )
+                    {/* real logo beats the built-in icon */}
+                    {c.image ? (
+                      <div className="flex items-center gap-1.5">
+                        <div className="relative h-10 w-10 rounded-lg border bg-white overflow-hidden shrink-0">
+                          <Image src={c.image} alt={c.title} fill sizes="40px" className="object-contain p-0.5" />
+                        </div>
+                        <button
+                          type="button"
+                          title="Remove logo — go back to the built-in icon"
+                          className="p-1.5 text-zinc-400 hover:text-destructive hover:bg-destructive/10 rounded-lg"
+                          onClick={() =>
+                            run(async () => {
+                              await updateCertification(c.id, { image: "" });
+                              setCerts((xs) => xs.map((x) => (x.id === c.id ? { ...x, image: "" } : x)));
+                            }, "Certification", { title: "Logo removed — built-in icon is back" })
+                          }
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <Select
+                        className="h-10 w-36 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                        value={c.icon}
+                        onChange={(e) =>
+                          setCerts((xs) =>
+                            xs.map((x) => (x.id === c.id ? { ...x, icon: e.target.value } : x))
+                          )
+                        }
+                      >
+                        {!CERT_ICONS.includes(c.icon) && <option value={c.icon}>Custom: {c.icon}</option>}
+                        {CERT_ICONS.map((ic) => (
+                          <option key={ic} value={ic} className="capitalize">
+                            {ic}
+                          </option>
+                        ))}
+                      </Select>
+                    )}
+                    <UploadButton
+                      label={c.image ? "Change Logo" : "Real Logo"}
+                      onUploaded={(url) =>
+                        run(async () => {
+                          await updateCertification(c.id, { image: url });
+                          setCerts((xs) => xs.map((x) => (x.id === c.id ? { ...x, image: url } : x)));
+                        }, "Certification", { title: "Real logo uploaded & live!" })
                       }
-                    >
-                      {!CERT_ICONS.includes(c.icon) && <option value={c.icon}>Custom: {c.icon}</option>}
-                      {CERT_ICONS.map((ic) => (
-                        <option key={ic} value={ic} className="capitalize">
-                          {ic}
-                        </option>
-                      ))}
-                    </Select>
+                    />
                     <Input
                       className="min-w-44 flex-1 h-10 text-xs border-[#d9c7b4] text-[#211a14] font-black rounded-xl"
                       placeholder="Badge Name (e.g. 100% Pure Canadian Maple)"
@@ -1521,17 +1786,37 @@ export default function ContentPage() {
                   <span className="text-xs font-black text-emerald-950 flex items-center gap-1.5">
                     <Plus className="h-4 w-4 text-emerald-600" /> Add New Badge:
                   </span>
-                  <Select
-                    className="h-10 w-36 text-xs border-[#d9c7b4] font-bold rounded-xl"
-                    value={newCert.icon}
-                    onChange={(e) => setNewCert((n) => ({ ...n, icon: e.target.value }))}
-                  >
-                    {CERT_ICONS.map((ic) => (
-                      <option key={ic} value={ic} className="capitalize">
-                        {ic}
-                      </option>
-                    ))}
-                  </Select>
+                  {newCert.image ? (
+                    <div className="flex items-center gap-1.5">
+                      <div className="relative h-10 w-10 rounded-lg border bg-white overflow-hidden shrink-0">
+                        <Image src={newCert.image} alt="New badge logo" fill sizes="40px" className="object-contain p-0.5" />
+                      </div>
+                      <button
+                        type="button"
+                        title="Remove logo"
+                        className="p-1.5 text-zinc-400 hover:text-destructive hover:bg-destructive/10 rounded-lg"
+                        onClick={() => setNewCert((n) => ({ ...n, image: "" }))}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <Select
+                      className="h-10 w-36 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                      value={newCert.icon}
+                      onChange={(e) => setNewCert((n) => ({ ...n, icon: e.target.value }))}
+                    >
+                      {CERT_ICONS.map((ic) => (
+                        <option key={ic} value={ic} className="capitalize">
+                          {ic}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                  <UploadButton
+                    label="Real Logo"
+                    onUploaded={(url) => setNewCert((n) => ({ ...n, image: url }))}
+                  />
                   <Input
                     className="min-w-44 flex-1 h-10 text-xs border-[#d9c7b4] text-[#211a14] font-bold rounded-xl"
                     placeholder="Badge Name (e.g. Free Range Eggs)"
@@ -1649,7 +1934,7 @@ export default function ContentPage() {
                   </span>
                   <div>
                     <h3 className="text-base font-black text-[#211a14]">Footer Brand Tagline</h3>
-                    <p className="text-xs text-zinc-500">The founding line displayed next to the copyright on every page</p>
+                    <p className="text-xs text-zinc-500">The founding line shown under the footer logo on every page</p>
                   </div>
                 </div>
                 <Button
@@ -1704,24 +1989,6 @@ export default function ContentPage() {
       {/* ========================================================================= */}
       {activePage === "menu" && (
         <div className="space-y-6">
-          {/* Real Preview of Menu Page */}
-          <div className="rounded-3xl bg-[#f8f2e0] border-2 border-[#e3d1b6] p-4 sm:p-6 shadow-md space-y-3">
-            <span className="px-3.5 py-1 rounded-full text-xs font-black bg-[#763a12] text-white inline-flex items-center gap-1.5 shadow-xs">
-              <Sparkles className="h-3.5 w-3.5 text-amber-300" />
-              100% REAL MENU PAGE LIVE PREVIEW
-            </span>
-            <div className="rounded-3xl overflow-hidden border-2 border-[#e8dacb] shadow-xl bg-[var(--cream)]">
-              <iframe
-                ref={iframeRef}
-                src="/preview?section=menu"
-                onLoad={syncPreview}
-                className="w-full border-0"
-                style={{ height: "460px", display: "block" }}
-                title="Menu Live Preview"
-              />
-            </div>
-          </div>
-
           <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#eee3d5]">
               <div className="flex items-center gap-2.5">
@@ -1859,23 +2126,6 @@ export default function ContentPage() {
       {/* ========================================================================= */}
       {activePage === "gallery" && (
         <div className="space-y-6">
-          <div className="rounded-3xl bg-[#f8f2e0] border-2 border-[#e3d1b6] p-4 sm:p-6 shadow-md space-y-3">
-            <span className="px-3.5 py-1 rounded-full text-xs font-black bg-[#763a12] text-white inline-flex items-center gap-1.5 shadow-xs">
-              <Sparkles className="h-3.5 w-3.5 text-amber-300" />
-              100% REAL GALLERY PAGE LIVE PREVIEW
-            </span>
-            <div className="rounded-3xl overflow-hidden border-2 border-[#e8dacb] shadow-xl bg-[var(--cream)]">
-              <iframe
-                ref={iframeRef}
-                src="/preview?section=gallery"
-                onLoad={syncPreview}
-                className="w-full border-0"
-                style={{ height: "240px", display: "block" }}
-                title="Gallery Live Preview"
-              />
-            </div>
-          </div>
-
           <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#eee3d5]">
               <div className="flex items-center gap-2.5">
@@ -1954,14 +2204,69 @@ export default function ContentPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
+            {/* Add photos to any album — the homepage strip shows the first 6 overall */}
+            <div className="p-4 rounded-2xl border-2 border-dashed border-purple-300 bg-purple-50/50">
+              <div className="grid gap-3 sm:grid-cols-5 [&>*]:min-w-0">
+                <Select
+                  className="h-10 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                  value={newPhoto.album}
+                  onChange={(e) =>
+                    setNewPhoto((n) => ({ ...n, album: e.target.value as AdminGalleryPhoto["album"] }))
+                  }
+                >
+                  <option value="food">🥞 Food &amp; Dishes</option>
+                  <option value="interior">☕ Interior &amp; Space</option>
+                  <option value="events">✨ Events &amp; Parties</option>
+                </Select>
+                <div className="flex items-center gap-2 sm:col-span-2">
+                  <Input
+                    className="h-10 text-xs border-[#d9c7b4] font-medium rounded-xl"
+                    placeholder="Image URL or click upload"
+                    value={newPhoto.image}
+                    onChange={(e) => setNewPhoto((n) => ({ ...n, image: e.target.value }))}
+                  />
+                  <UploadButton onUploaded={(url) => setNewPhoto((n) => ({ ...n, image: url }))} />
+                </div>
+                <Input
+                  className="h-10 text-xs border-[#d9c7b4] font-medium rounded-xl"
+                  placeholder="Caption (e.g. Fluffy Berry Stack)"
+                  value={newPhoto.caption}
+                  onChange={(e) => setNewPhoto((n) => ({ ...n, caption: e.target.value }))}
+                />
+                <Button
+                  className="h-10 text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+                  disabled={!newPhoto.image.trim() || !newPhoto.caption.trim()}
+                  onClick={() =>
+                    run(async () => {
+                      const created = await createGalleryPhoto({
+                        ...newPhoto,
+                        sort_order: photos.length,
+                      });
+                      setPhotos((xs) => [...xs, created]);
+                      setNewPhoto(EMPTY_PHOTO);
+                    }, "Gallery", { title: "Photo added!" })
+                  }
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" /> Add Photo
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 [&>*]:min-w-0">
               {filteredPhotos.map((p) => (
                 <div
                   key={p.id}
                   className="group relative overflow-hidden rounded-2xl border-2 border-[#eee3d5] bg-white p-2 shadow-xs hover:border-purple-300 transition-all"
                 >
                   <div className="relative aspect-square rounded-xl overflow-hidden bg-zinc-100">
-                    <Image src={p.image} alt={p.caption} fill sizes="220px" className="object-cover" />
+                    <Image
+                      src={p.image}
+                      alt={p.caption}
+                      fill
+                      sizes="300px"
+                      className="object-cover"
+                      style={{ objectPosition: `50% ${p.focus === "top" ? "18%" : p.focus === "bottom" ? "82%" : "50%"}` }}
+                    />
                     <Badge className="absolute left-1.5 top-1.5 capitalize text-[10px] font-black bg-zinc-950 text-white border-0">
                       {p.album}
                     </Badge>
@@ -1985,8 +2290,48 @@ export default function ContentPage() {
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
-                  <div className="p-1.5 pt-2">
-                    <p className="text-xs font-black truncate text-[#211a14]">{p.caption || "Untitled"}</p>
+                  <div className="grid gap-1.5 p-1.5 pt-2">
+                    <Input
+                      key={`gcap-${p.id}`}
+                      defaultValue={p.caption}
+                      placeholder="Caption…"
+                      className="h-8 text-xs border-[#e8dacb] font-medium rounded-lg"
+                      onBlur={(e) => {
+                        const v = e.target.value.trim();
+                        if (v === p.caption) return;
+                        run(async () => {
+                          await updateGalleryPhoto(p.id, { caption: v });
+                          setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, caption: v } : x)));
+                        }, "Caption", { title: "Caption saved" });
+                      }}
+                    />
+                    <div className="flex items-center gap-1.5 [&>*]:min-w-0">
+                      <Select
+                        className="h-8 flex-1 text-xs border-[#e8dacb] font-bold rounded-lg"
+                        aria-label="Which part of the photo stays visible when cropped"
+                        value={p.focus}
+                        onChange={(e) =>
+                          run(async () => {
+                            const focus = e.target.value as AdminGalleryPhoto["focus"];
+                            await updateGalleryPhoto(p.id, { focus });
+                            setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, focus } : x)));
+                          }, "Photo crop", { title: "Crop focus saved" })
+                        }
+                      >
+                        <option value="center">Focus: Centre</option>
+                        <option value="top">Focus: Top</option>
+                        <option value="bottom">Focus: Bottom</option>
+                      </Select>
+                      <UploadButton
+                        label="Replace"
+                        onUploaded={(url) =>
+                          run(async () => {
+                            await updateGalleryPhoto(p.id, { image: url });
+                            setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, image: url } : x)));
+                          }, "Gallery", { title: "Photo replaced!" })
+                        }
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
@@ -2000,23 +2345,6 @@ export default function ContentPage() {
       {/* ========================================================================= */}
       {activePage === "booking" && (
         <div className="space-y-6">
-          <div className="rounded-3xl bg-[#f8f2e0] border-2 border-[#e3d1b6] p-4 sm:p-6 shadow-md space-y-3">
-            <span className="px-3.5 py-1 rounded-full text-xs font-black bg-[#763a12] text-white inline-flex items-center gap-1.5 shadow-xs">
-              <Sparkles className="h-3.5 w-3.5 text-amber-300" />
-              100% REAL BOOKING PAGE LIVE PREVIEW
-            </span>
-            <div className="rounded-3xl overflow-hidden border-2 border-[#e8dacb] shadow-xl bg-[var(--cream)]">
-              <iframe
-                ref={iframeRef}
-                src="/preview?section=booking"
-                onLoad={syncPreview}
-                className="w-full border-0"
-                style={{ height: "240px", display: "block" }}
-                title="Booking Live Preview"
-              />
-            </div>
-          </div>
-
           <div className="bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#eee3d5] shadow-sm space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#eee3d5]">
               <div className="flex items-center gap-2.5">

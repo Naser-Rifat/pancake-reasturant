@@ -199,6 +199,8 @@ export const createAdminBooking = (data: Partial<AdminBooking>) =>
 export interface AdminCertification {
   id: number;
   icon: string;
+  /** real certificate logo URL — when set it replaces the built-in icon */
+  image?: string;
   title: string;
   subtitle: string;
   sort_order: number;
@@ -228,6 +230,9 @@ export interface AdminAnnouncement {
   is_active: boolean;
   /** which homepage surface this deal belongs to (old prod rows omit it = slider) */
   placement?: "band" | "slider";
+  /** band voucher cards by menu slug; empty = defaults (offer photo / first featured) */
+  card1_dish?: string;
+  card2_dish?: string;
 }
 
 export interface AdminHours {

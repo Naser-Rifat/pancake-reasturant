@@ -7,6 +7,11 @@ import { ChevronRight } from "lucide-react";
 import { CERT_ICONS } from "@/components/CertIcon";
 import CertIcon from "@/components/CertIcon";
 import {
+  OrderOnlineSticker,
+  GriddleFreshSticker,
+  PickUpHotSticker,
+} from "@/components/icons/StepStickers";
+import {
   type AdminSiteSettings,
   type AdminAnnouncement,
   type AdminCertification,
@@ -19,6 +24,9 @@ const DEFAULT_DEAL_PHOTO = "https://images.unsplash.com/photo-1567620905732-2d1e
 
 export default function PreviewPage() {
   const [section, setSection] = useState<string>("hero");
+  // stay invisible until the studio's first sync lands — otherwise the
+  // built-in placeholder data flashes before the real content arrives
+  const [synced, setSynced] = useState(false);
   const [activeSlide, setActiveSlide] = useState<number>(0);
   const [site, setSite] = useState<AdminSiteSettings>({
     hero_heading: "Stack Into",
@@ -161,6 +169,7 @@ export default function PreviewPage() {
       if (nextPhotos) setPhotos(nextPhotos);
       if (nextSteps) setSteps(nextSteps);
       if (nextDishes && Array.isArray(nextDishes) && nextDishes.length > 0) setDishes(nextDishes);
+      setSynced(true);
     };
 
     window.addEventListener("message", handler);
@@ -218,7 +227,10 @@ export default function PreviewPage() {
     (announcement?.is_active ? "SPECIAL" : "DRAFT");
 
   return (
-    <div className="preview-container bg-[var(--cream)] text-[var(--ink)] antialiased">
+    <div
+      className="preview-container bg-[var(--cream)] text-[var(--ink)] antialiased"
+      style={{ visibility: synced ? "visible" : "hidden" }}
+    >
       {/* 
         CRUCIAL: Hide global navbar, top announcement marquee, footer, and whatsapp float in preview mode 
         and prevent unwanted scrollbars inside the iframe!
@@ -238,9 +250,10 @@ export default function PreviewPage() {
         .site-nav,
         .nav-pill,
         .hero-nav,
-        footer,
-        .site-footer,
-        .whatsapp-float {
+        footer:not(.preview-keep),
+        .site-footer:not(.preview-keep),
+        .whatsapp-float,
+        .wa-float {
           display: none !important;
         }
 
@@ -569,26 +582,41 @@ export default function PreviewPage() {
                 </div>
               </div>
 
-              {/* Right: Voucher Ticket Card with Photo */}
+              {/* Right: 2 Voucher Ticket Cards — same picking rules as the live site */}
               <div className="promo-cards">
-                <div className="promo-ticket-card tilt-card" style={{ width: "160px", minWidth: "150px" }}>
-                  <div className="ticket-top-tag">
-                    <span>✨ {displayBadgeTag}</span>
-                    <span className="ticket-open-icon">↗</span>
-                  </div>
-                  <div className="ticket-img-frame" style={{ position: "relative", width: "100%", height: "115px" }}>
-                    <Image
-                      src={dealPhotoSrc}
-                      alt="Deal"
-                      fill
-                      sizes="160px"
-                      className="ticket-img object-cover"
-                    />
-                  </div>
-                  <span className="ticket-dish-title" style={{ fontSize: "0.8rem", fontWeight: 800 }}>
-                    {announcement?.link_text || "The Offer"}
-                  </span>
-                </div>
+                {(() => {
+                  const pick = (slug?: string) =>
+                    slug ? dishes.find((m) => m.slug === slug && (m.photo || m.image)) : undefined;
+                  const card1D = pick(announcement?.card1_dish);
+                  const card2D =
+                    pick(announcement?.card2_dish) ?? featuredDishes.find((m) => m.photo || m.image);
+                  const cards = [
+                    card1D
+                      ? { img: card1D.photo || card1D.image, label: card1D.name, tag: "✨ Special" }
+                      : { img: dealPhotoSrc, label: "The Offer", tag: `✨ ${displayBadgeTag}` },
+                    ...(card2D
+                      ? [{ img: card2D.photo || card2D.image, label: card2D.name, tag: "🥞 Popular" }]
+                      : []),
+                  ];
+                  return cards.map((c, i) => (
+                    <div
+                      key={c.label + i}
+                      className={`promo-ticket-card ${i === 1 ? "tilt-card" : ""}`}
+                      style={{ width: "160px", minWidth: "150px" }}
+                    >
+                      <div className="ticket-top-tag">
+                        <span>{c.tag}</span>
+                        <span className="ticket-open-icon">↗</span>
+                      </div>
+                      <div className="ticket-img-frame" style={{ position: "relative", width: "100%", height: "115px" }}>
+                        <Image src={c.img} alt={c.label} fill sizes="160px" className="ticket-img object-cover" />
+                      </div>
+                      <span className="ticket-dish-title" style={{ fontSize: "0.8rem", fontWeight: 800 }}>
+                        {c.label}
+                      </span>
+                    </div>
+                  ));
+                })()}
               </div>
             </div>
           </div>
@@ -697,17 +725,40 @@ export default function PreviewPage() {
                 The Pancake Gallery
               </h2>
             </div>
-            <div className="mosaic-grid">
-              {photos.slice(0, 6).map((p, idx) => (
-                <div key={p.id || idx} className="mosaic-photo">
-                  <div style={{ position: "relative", width: "100%", height: "160px", borderRadius: "16px", overflow: "hidden" }}>
-                    <Image src={p.image} alt={p.caption} fill className="object-cover" />
+            {/* same scrapbook mosaic markup as the live homepage */}
+            <div className="gallery-mosaic" style={{ marginTop: "0.5rem" }}>
+              {photos.slice(0, 6).map((p, i) => {
+                const tapes = ["tape-left", "tape-right", "tape-center", "tape-left", "tape-pin", "tape-right"];
+                const tape = tapes[i % tapes.length];
+                const stamps = ["🥞 100% Fluffy", "✨ Sydney Vibe", "☕ Fresh Brew", "🍓 Berry Sweet", "💛 Café Mood", "🍯 Golden Maple"];
+                const stamp = stamps[i % stamps.length];
+                const isHero = i === 0;
+                return (
+                  <div key={p.id || i} className={`mosaic-polaroid ${isHero ? "mosaic-hero" : ""}`}>
+                    <div className={`washi-tape ${tape}`} aria-hidden="true" />
+                    {(isHero || i === 2 || i === 4) && (
+                      <div className="mosaic-stamp" aria-hidden="true">
+                        {stamp}
+                      </div>
+                    )}
+                    <div className="mosaic-img-box">
+                      <Image
+                        src={p.image}
+                        alt={p.alt || p.caption || "The Pancake Club gallery"}
+                        width={900}
+                        height={700}
+                        sizes="(min-width: 1024px) 40vw, 100vw"
+                      />
+                    </div>
+                    {isHero && p.caption && (
+                      <div className="mosaic-hero-chin">
+                        <p className="mosaic-hero-caption">{p.caption}</p>
+                        <span className="mosaic-hero-tag">📍 Sydney, NSW</span>
+                      </div>
+                    )}
                   </div>
-                  <p style={{ fontWeight: 800, fontSize: "0.8rem", marginTop: "6px", color: "var(--ink)" }}>
-                    {p.caption}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
@@ -719,15 +770,26 @@ export default function PreviewPage() {
       {section === "certs" && (
         <section style={{ padding: "8px 0" }}>
           <div className="container" style={{ padding: "0" }}>
+            {/* same badge markup as the live homepage */}
             <div className="cert-strip">
               {certs.filter((c) => c.is_active).map((c) => (
-                <div key={c.id} className="cert-item">
-                  <div className="cert-icon-box">
-                    <CertIcon name={c.icon} />
-                  </div>
+                <div key={c.id} className="cert-badge quality-seal-badge">
+                  <span className="ic">
+                    {c.image ? (
+                      <Image
+                        src={c.image}
+                        alt={c.title}
+                        width={48}
+                        height={48}
+                        style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                      />
+                    ) : (
+                      <CertIcon name={c.icon} />
+                    )}
+                  </span>
                   <div className="cert-info">
-                    <h3 className="cert-title">{c.title}</h3>
-                    {c.subtitle && <p className="cert-sub">{c.subtitle}</p>}
+                    <b>{c.title}</b>
+                    <small>{c.subtitle}</small>
                   </div>
                 </div>
               ))}
@@ -740,18 +802,18 @@ export default function PreviewPage() {
       {/* 5. BOTTOM BOOKING BANNER PREVIEW                                          */}
       {/* ========================================================================= */}
       {section === "cta" && (
-        <section className="cta-banner" style={{ padding: "12px 0" }}>
-          <div className="container" style={{ padding: "0" }}>
-            <div className="cta-banner-card">
-              <h2>
-                {site.cta_heading || "Hungry?"}{" "}
-                <span className="script">{site.cta_script || "Book a Table."}</span>
-              </h2>
-              <p className="cta-lead">{site.cta_lead}</p>
-              <Link href={site.cta_button_url || "/booking"} className="btn btn-primary" style={{ marginTop: "12px" }}>
-                {site.cta_button_label || "Book a Table"} →
-              </Link>
-            </div>
+        /* same warm CTA band as the live homepage, with trimmed padding to fit the frame */
+        <section className="cta diner-cta-banner" style={{ padding: "2rem 0 2.8rem" }}>
+          <div className="container">
+            <p className="cta-kicker">READY FOR A FEAST?</p>
+            <h2>
+              {site.cta_heading || "Hungry?"}{" "}
+              <span className="accent">{site.cta_script || "Book a Table."}</span>
+            </h2>
+            <p className="cta-lead-text">{site.cta_lead}</p>
+            <Link href={site.cta_button_url || "/booking"} className="btn btn-primary cta-action-btn">
+              <span>🥞 {site.cta_button_label || "Book a Table Now"}</span>
+            </Link>
           </div>
         </section>
       )}
@@ -760,82 +822,94 @@ export default function PreviewPage() {
       {/* 6. FOOTER TAGLINE PREVIEW                                                 */}
       {/* ========================================================================= */}
       {section === "footer" && (
-        <div style={{ padding: "12px 0" }}>
-          <div className="container" style={{ background: "var(--deep)", color: "white", padding: "16px 20px", borderRadius: "20px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
-            <span style={{ fontSize: "0.82rem", opacity: 0.8 }}>© 2026 The Pancake Club. All rights reserved.</span>
-            <span style={{ fontSize: "0.82rem", color: "var(--yellow)", fontWeight: 700, background: "rgba(255,255,255,0.1)", padding: "4px 12px", borderRadius: "999px" }}>
-              {site.footer_tagline || "Fluffy stacks · real maple · est. 1999"}
-            </span>
+        /* the real footer's brand corner — the tagline lives under the cream logo */
+        <footer className="site-footer preview-keep" style={{ padding: "2.2rem 0" }}>
+          <div className="container">
+            <div className="f-col f-col-brand">
+              <span className="f-brand-logo" role="img" aria-label="The Pancake Club" />
+              <p className="f-brand-tag">
+                {site.footer_tagline || "Fluffy stacks · real maple · est. 1999"}
+              </p>
+            </div>
           </div>
-        </div>
+        </footer>
       )}
 
       {/* ========================================================================= */}
       {/* 7. MENU HEADER & 3-STEP PICKUP PREVIEW                                    */}
       {/* ========================================================================= */}
       {section === "menu" && (
-        <div style={{ padding: "12px 0" }}>
-          <div className="container" style={{ textAlign: "center", marginBottom: "20px" }}>
-            <h1 style={{ fontFamily: "var(--font-display)", fontSize: "2.5rem", color: "var(--ink)" }}>
-              {site.menu_hero_heading || "Stacks On"}{" "}
-              <span className="script" style={{ color: "var(--berry)" }}>
-                {site.menu_hero_script || "Stacks."}
-              </span>
-            </h1>
-            <p style={{ color: "var(--muted)", maxWidth: "500px", margin: "6px auto 0", fontSize: "0.9rem" }}>
-              {site.menu_hero_lead}
-            </p>
-          </div>
-
-          <div className="container">
-            <div className="pickup-steps-grid">
-              {steps.map((st, i) => (
-                <div key={st.id} className="pickup-step-card">
-                  <span className="pickup-step-num">0{i + 1}</span>
-                  <h3 className="pickup-step-title">{st.title}</h3>
-                  <p className="pickup-step-desc">{st.text}</p>
-                </div>
-              ))}
+        /* same hero + sticker step cards as the live /menu page */
+        <>
+          <section className="menu-hero" style={{ padding: "2rem 0 1rem" }}>
+            <div className="container">
+              <h1>
+                {site.menu_hero_heading || "Stacks On"}{" "}
+                <span className="accent">{site.menu_hero_script || "Stacks."}</span>
+              </h1>
+              <p>{site.menu_hero_lead || "Signature pancake stacks. Griddled to order. Zero regrets."}</p>
             </div>
-          </div>
-        </div>
+          </section>
+          {steps.length > 0 && (
+            <section className="pickup-steps-section" style={{ padding: "0 0 1.5rem" }}>
+              <div className="container">
+                <div className="pickup-steps-grid">
+                  {steps.map((st, i) => {
+                    const stickers = [OrderOnlineSticker, GriddleFreshSticker, PickUpHotSticker];
+                    const StickerComp = stickers[i % stickers.length];
+                    return (
+                      <article className="pickup-step-card" key={st.id}>
+                        <div className="ps-icon-badge-wrap">
+                          <div className="ps-sticker-bubble">
+                            <StickerComp />
+                          </div>
+                          <span className="ps-step-pill">STEP 0{i + 1}</span>
+                        </div>
+                        <div className="ps-content">
+                          <h3 className="ps-title">{st.title}</h3>
+                          <p className="ps-desc">{st.text}</p>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+          )}
+        </>
       )}
 
       {/* ========================================================================= */}
       {/* 8. GALLERY & BOOKING HEADER PREVIEWS                                      */}
       {/* ========================================================================= */}
       {section === "gallery" && (
-        <div className="container" style={{ textAlign: "center", padding: "20px 0" }}>
-          <span className="script" style={{ color: "var(--berry)", fontSize: "1.6rem" }}>
-            {site.gallery_hero_kicker || "Feast Your Eyes"}
-          </span>
-          <h1 style={{ fontFamily: "var(--font-display)", fontSize: "2.8rem", color: "var(--ink)" }}>
-            {site.gallery_hero_heading || "The"}{" "}
-            <span className="script" style={{ color: "var(--berry)" }}>
-              {site.gallery_hero_script || "Gallery."}
-            </span>
-          </h1>
-          <p style={{ color: "var(--muted)", maxWidth: "500px", margin: "6px auto 0", fontSize: "0.9rem" }}>
-            {site.gallery_hero_lead}
-          </p>
-        </div>
+        /* same page-hero as the live /gallery page */
+        <section className="page-hero gallery-hero" style={{ padding: "2rem 0" }}>
+          <div className="container">
+            <p className="kicker">{site.gallery_hero_kicker || "Feast Your Eyes"}</p>
+            <h1>
+              {site.gallery_hero_heading || "The"}{" "}
+              <span className="accent">{site.gallery_hero_script || "Gallery."}</span>
+            </h1>
+            <p className="hero-subtext">
+              {site.gallery_hero_lead || "Our food, our space, and the good times in between."}
+            </p>
+          </div>
+        </section>
       )}
 
       {section === "booking" && (
-        <div className="container" style={{ textAlign: "center", padding: "20px 0" }}>
-          <span className="script" style={{ color: "var(--berry)", fontSize: "1.6rem" }}>
-            {site.booking_hero_kicker || "Reserve Online"}
-          </span>
-          <h1 style={{ fontFamily: "var(--font-display)", fontSize: "2.8rem", color: "var(--ink)" }}>
-            {site.booking_hero_heading || "Book a"}{" "}
-            <span className="script" style={{ color: "var(--berry)" }}>
-              {site.booking_hero_script || "Table."}
-            </span>
-          </h1>
-          <p style={{ color: "var(--muted)", maxWidth: "500px", margin: "6px auto 0", fontSize: "0.9rem" }}>
-            {site.booking_hero_lead}
-          </p>
-        </div>
+        /* same page-hero as the live /booking page */
+        <section className="page-hero" style={{ padding: "2rem 0" }}>
+          <div className="container">
+            <p className="kicker">{site.booking_hero_kicker || "Reserve Online — Free & Instant"}</p>
+            <h1>
+              {site.booking_hero_heading || "Book a"}{" "}
+              <span className="accent">{site.booking_hero_script || "Table."}</span>
+            </h1>
+            <p>{site.booking_hero_lead || "Pick a date, pick a time — we'll have the griddle hot when you arrive."}</p>
+          </div>
+        </section>
       )}
     </div>
   );

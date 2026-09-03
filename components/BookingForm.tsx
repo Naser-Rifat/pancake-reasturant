@@ -71,7 +71,7 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
       <input className="input" type="email" placeholder="Email *" required value={form.email} autoComplete="email" onChange={set("email")} />
       <input className="input" placeholder="Phone (optional)" value={form.phone} autoComplete="tel" inputMode="tel" onChange={set("phone")} />
       <div className="bk-row">
-        <input className="input" type="date" required value={form.date} onChange={set("date")} aria-label="Date" />
+        <input className="input" type="date" required min={new Date().toISOString().split("T")[0]} value={form.date} onChange={set("date")} aria-label="Date" />
         <input className="input" type="time" required value={form.time} onChange={set("time")} aria-label="Time" />
       </div>
       <select className="input" value={form.party_size} onChange={set("party_size")} aria-label="Party size">

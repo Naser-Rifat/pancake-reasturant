@@ -1,8 +1,26 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { Image as ImageIcon, Pencil, Plus, Trash2, X } from "lucide-react";
+import {
+  Image as ImageIcon,
+  Pencil,
+  Plus,
+  Trash2,
+  X,
+  Search,
+  Sparkles,
+  Star,
+  Flame,
+  Clock,
+  UtensilsCrossed,
+  Layers,
+  Filter,
+  Check,
+  Save,
+  ArrowRight,
+  ArrowLeft,
+} from "lucide-react";
 import {
   createMenuItem,
   createMenuItemPhoto,
@@ -14,23 +32,39 @@ import {
 } from "@/lib/admin-api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { useConfirm } from "@/components/ui/confirm";
 import { useToast } from "@/components/ui/toast";
-import { TableSkeleton } from "@/components/ui/skeleton";
+import { TableSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import PhotoBoard from "@/components/admin/PhotoBoard";
 
-const TAG_LABEL: Record<AdminMenuItem["tag"], string> = {
-  sweet: "Sweet",
-  savoury: "Savoury",
-  choc: "Choc Loaded",
+const TAG_INFO: Record<AdminMenuItem["tag"], { label: string; icon: string; bg: string; text: string; border: string }> = {
+  sweet: {
+    label: "Sweet Stack",
+    icon: "🍯",
+    bg: "bg-amber-100/80",
+    text: "text-amber-950",
+    border: "border-amber-300",
+  },
+  savoury: {
+    label: "Savoury Brunch",
+    icon: "🥓",
+    bg: "bg-orange-100/80",
+    text: "text-orange-950",
+    border: "border-orange-300",
+  },
+  choc: {
+    label: "Choc Loaded",
+    icon: "🍫",
+    bg: "bg-[#f4e6dc]",
+    text: "text-[#522b14]",
+    border: "border-[#d8b8a2]",
+  },
 };
 
 const EMPTY_FORM = {
@@ -51,6 +85,8 @@ const EMPTY_FORM = {
 
 type FormState = typeof EMPTY_FORM;
 
+type FilterCategory = "all" | "sweet" | "savoury" | "choc" | "featured" | "live";
+
 const slugify = (s: string) =>
   s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
@@ -58,6 +94,8 @@ export default function MenuAdminPage() {
   const [items, setItems] = useState<AdminMenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<FilterCategory>("all");
   // null = form closed, "" = adding new, slug = editing that item
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
@@ -75,11 +113,9 @@ export default function MenuAdminPage() {
   const { toast } = useToast();
   const { confirm } = useConfirm();
 
-  // the form opens above a long table — bring it into view instead of
-  // leaving staff wondering whether the click registered
+  // the form opens above a long table — bring it into view smoothly
   useEffect(() => {
     if (editing === null) return;
-    // opening from the Photos column lands straight on the uploader
     const target = jumpTo.current === "photos" ? photosRef.current : formRef.current;
     target?.scrollIntoView({ behavior: "smooth", block: jumpTo.current === "photos" ? "center" : "start" });
   }, [editing]);
@@ -105,7 +141,11 @@ export default function MenuAdminPage() {
       .then(async (list) => {
         setItems(list);
         const counts = await Promise.all(
-          list.map((i) => listMenuItemPhotos(i.slug).then((ps) => [i.slug, ps.length] as const).catch(() => [i.slug, 0] as const))
+          list.map((i) =>
+            listMenuItemPhotos(i.slug)
+              .then((ps) => [i.slug, ps.length] as const)
+              .catch(() => [i.slug, 0] as const)
+          )
         );
         setPhotoCounts(Object.fromEntries(counts));
       })
@@ -116,6 +156,7 @@ export default function MenuAdminPage() {
   useEffect(load, [load]);
 
   const openAdd = () => {
+    jumpTo.current = "top"; // a previous photo-jump must not aim the scroll at a hidden section
     setForm(EMPTY_FORM);
     setPendingPhotos([]);
     setStep(1);
@@ -191,10 +232,7 @@ export default function MenuAdminPage() {
         toast({ variant: "success", title: `${form.name} updated` });
         setEditing(null);
       } else {
-        // keep the form open on the new dish: photos need a saved slug, and
-        // closing here is exactly where staff lost the thread before
         const created = await createMenuItem(payload);
-        // photos uploaded before the dish existed now get their home
         for (const [i, url] of pendingPhotos.entries()) {
           await createMenuItemPhoto({
             menu_item: created.slug,
@@ -262,290 +300,628 @@ export default function MenuAdminPage() {
     }
   };
 
+  // Filtered & Searched Menu Items
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+      // Search query
+      const matchesSearch =
+        !searchQuery.trim() ||
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.price.includes(searchQuery);
+
+      // Category filter
+      let matchesCat = true;
+      if (categoryFilter === "sweet") matchesCat = item.tag === "sweet";
+      else if (categoryFilter === "savoury") matchesCat = item.tag === "savoury";
+      else if (categoryFilter === "choc") matchesCat = item.tag === "choc";
+      else if (categoryFilter === "featured") matchesCat = item.is_featured;
+      else if (categoryFilter === "live") matchesCat = item.is_available;
+
+      return matchesSearch && matchesCat;
+    });
+  }, [items, searchQuery, categoryFilter]);
+
+  // Statistics
+  const totalCount = items.length;
+  const liveCount = items.filter((i) => i.is_available).length;
+  const featuredCount = items.filter((i) => i.is_featured).length;
+  const sweetCount = items.filter((i) => i.tag === "sweet").length;
+  const savouryCount = items.filter((i) => i.tag === "savoury").length;
+  const chocCount = items.filter((i) => i.tag === "choc").length;
+
   return (
-    <div className="grid gap-6 [&>*]:min-w-0">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Menu</h1>
-          <p className="text-sm text-muted-foreground">
-            Add, edit and remove dishes — changes go live on the website immediately
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Top Banner Header */}
+      <div className="relative overflow-hidden p-6 sm:p-7 rounded-3xl bg-linear-to-r from-[#fffdf9] via-[#fcf6ee] to-[#faf0e1] border-2 border-[#eee3d5] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-black bg-[#763a12] text-white uppercase tracking-wider shadow-2xs">
+            <UtensilsCrossed className="h-3 w-3 text-amber-300" />
+            MENU CATALOG &amp; DISHES
+          </div>
+          <h1 className="text-2xl font-black text-[#211a14] tracking-tight">
+            Menu Management Studio
+          </h1>
+          <p className="text-xs font-medium text-zinc-600 max-w-xl">
+            Add new signature dishes, adjust prices, manage multi-photo galleries, and toggle instant takeaway availability.
           </p>
         </div>
-        <Button onClick={openAdd}>
-          <Plus /> Add item
+
+        <Button
+          onClick={openAdd}
+          className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 px-5 py-2.5 rounded-2xl shadow-md shrink-0 transition-transform active:scale-95"
+        >
+          <Plus className="h-4 w-4" />
+          <span>Add New Dish</span>
         </Button>
+      </div>
+
+      {/* Quick Metrics Bar */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 [&>*]:min-w-0">
+        <div className="p-4 rounded-2xl border-2 border-[#eee3d5] bg-[#fffdf9] shadow-2xs flex items-center justify-between">
+          <div className="space-y-0.5">
+            <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Total Catalog</span>
+            <div className="text-2xl font-black text-[#211a14]">
+              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${totalCount} Dishes`}
+            </div>
+          </div>
+          <div className="h-10 w-10 rounded-xl bg-amber-100/80 text-[#763a12] flex items-center justify-center font-bold text-lg">
+            🥞
+          </div>
+        </div>
+
+        <div className="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50/50 shadow-2xs flex items-center justify-between">
+          <div className="space-y-0.5">
+            <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Live Taking Orders</span>
+            <div className="text-2xl font-black text-emerald-950">
+              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${liveCount} Active`}
+            </div>
+          </div>
+          <div className="h-10 w-10 rounded-xl bg-emerald-200/80 text-emerald-800 flex items-center justify-center font-bold text-lg">
+            🟢
+          </div>
+        </div>
+
+        <div className="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50/50 shadow-2xs flex items-center justify-between">
+          <div className="space-y-0.5">
+            <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wider">Home Featured</span>
+            <div className="text-2xl font-black text-amber-950">
+              {loading ? <Skeleton className="h-7 w-20 rounded-lg" /> : `${featuredCount} Starred`}
+            </div>
+          </div>
+          <div className="h-10 w-10 rounded-xl bg-amber-200/80 text-amber-800 flex items-center justify-center font-bold text-lg">
+            ⭐
+          </div>
+        </div>
+
+        <div className="p-4 rounded-2xl border-2 border-[#eee3d5] bg-[#fffdf9] shadow-2xs flex items-center justify-between">
+          <div className="space-y-0.5">
+            <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Categories</span>
+            <div className="text-xs font-bold text-[#211a14] flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
+              {loading ? (
+                <Skeleton className="h-4 w-32 rounded-md" />
+              ) : (
+                <>
+                  <span className="text-amber-900">{sweetCount} Sweet</span>·
+                  <span className="text-orange-900">{savouryCount} Savoury</span>·
+                  <span className="text-[#522b14]">{chocCount} Choc</span>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="h-10 w-10 rounded-xl bg-zinc-100 text-[#763a12] flex items-center justify-center font-bold text-lg">
+            <Layers className="h-5 w-5" />
+          </div>
+        </div>
       </div>
 
       {error && <AdminError message={error} onRetry={load} />}
 
+      {/* ========================================================================= */}
+      {/* DISH CREATION & EDITING MODAL / CARD                                      */}
+      {/* ========================================================================= */}
       {editing !== null && (
-        <Card ref={formRef} className="scroll-mt-6">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>
-                {editing ? form.name || "Edit dish" : step === 1 ? "New dish — details" : "New dish — photos"}
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
+        <div ref={formRef} className="scroll-mt-6 bg-[#fffdf9] p-6 sm:p-8 rounded-3xl border-2 border-[#763a12] shadow-xl space-y-6 ring-4 ring-[#763a12]/10">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#eee3d5]">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#763a12] text-white uppercase tracking-wider">
+                {editing ? "✏️ EDITING DISH" : `➕ NEW DISH (STEP ${step} OF 2)`}
+              </div>
+              <h3 className="text-lg font-black text-[#211a14]">
+                {editing ? form.name || "Edit Dish Details" : step === 1 ? "Step 1: Dish Details & Pricing" : "Step 2: Dish Photo Gallery"}
+              </h3>
+              <p className="text-xs text-zinc-500">
                 {editing
-                  ? "Changes go live as soon as you save."
+                  ? "Changes save instantly to the live public menu and ordering system."
                   : step === 1
-                    ? "Step 1 of 2 — name, price and description."
-                    : "Step 2 of 2 — add photos and pick the main one."}
+                  ? "Enter the dish name, price, category tag, and culinary description."
+                  : "Upload photos and designate the main thumbnail and background-free cutout."}
               </p>
             </div>
-            <Button variant="ghost" size="icon" onClick={closeForm} aria-label="Close form">
-              <X />
+            <Button variant="ghost" size="icon" onClick={closeForm} aria-label="Close form" className="rounded-xl hover:bg-zinc-100">
+              <X className="h-5 w-5 text-zinc-500" />
             </Button>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={submit} className="grid gap-5">
-              <section className={`grid gap-4 sm:grid-cols-2 ${!editing && step !== 1 ? "hidden" : ""}`}>
-                <p className="sm:col-span-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Details
-                </p>
-              <div className="grid gap-1.5">
-                <Label htmlFor="mi-name">Name *</Label>
-                <Input id="mi-name" required value={form.name} onChange={set("name")} />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="mi-price">Price ($) *</Label>
-                <Input id="mi-price" required inputMode="decimal" value={form.price} onChange={set("price")} />
-              </div>
-              <div className="grid gap-1.5 sm:col-span-2">
-                <Label htmlFor="mi-desc">Description *</Label>
-                <Textarea id="mi-desc" required value={form.description} onChange={set("description")} />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="mi-tag">Tag</Label>
-                <Select id="mi-tag" className="h-9" value={form.tag} onChange={set("tag")}>
-                  <option value="sweet">Sweet</option>
-                  <option value="savoury">Savoury</option>
-                  <option value="choc">Choc Loaded</option>
-                </Select>
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="mi-heat">Heat badge</Label>
-                <Select id="mi-heat" className="h-9" value={form.heat} onChange={set("heat")}>
-                  <option value="none">None</option>
-                  <option value="medium">Medium</option>
-                  <option value="hot">Hot</option>
-                </Select>
-              </div>
-              </section>
+          </div>
 
-              <section className={`grid gap-4 sm:grid-cols-3 ${!editing && step !== 1 ? "hidden" : ""}`}>
-                <p className="sm:col-span-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Nutrition &amp; timing <span className="font-normal normal-case tracking-normal">(optional)</span>
-                </p>
-              <div className="grid gap-1.5">
-                <Label htmlFor="mi-kcal">kcal</Label>
-                <Input id="mi-kcal" inputMode="numeric" value={form.kcal} onChange={set("kcal")} />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="mi-protein">Protein (g)</Label>
-                <Input id="mi-protein" inputMode="numeric" value={form.protein_g} onChange={set("protein_g")} />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="mi-prep">Prep time</Label>
-                <Input id="mi-prep" placeholder="12–14 min" value={form.prep_time} onChange={set("prep_time")} />
-              </div>
-              </section>
-
-              <section className={`grid gap-4 ${!editing && step !== 2 ? "hidden" : ""}`}>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Images</p>
-                  <p className="text-xs text-muted-foreground">
-                    Upload everything here, then mark one as <span className="font-medium">Main</span> —
-                    that is what customers see on cards and at the top of the dish page. A
-                    <span className="font-medium"> Cutout</span> is optional: it is the background-free
-                    version used on tiles.
-                  </p>
+          <form onSubmit={submit} className="space-y-6">
+            {/* Step 1: Core Details */}
+            <div className={`space-y-5 ${!editing && step !== 1 ? "hidden" : ""}`}>
+              <div className="space-y-3">
+                <span className="text-xs font-black text-[#763a12] uppercase tracking-wider flex items-center gap-1.5">
+                  <UtensilsCrossed className="h-3.5 w-3.5" /> Core Menu Information:
+                </span>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="space-y-1 sm:col-span-2">
+                    <Label htmlFor="mi-name" className="text-xs font-black text-[#211a14]">
+                      Dish Name *
+                    </Label>
+                    <Input
+                      id="mi-name"
+                      required
+                      className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                      placeholder="e.g. Classic Golden Buttermilk Stack"
+                      value={form.name}
+                      onChange={set("name")}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="mi-price" className="text-xs font-black text-[#211a14]">
+                      Price ($ AUD) *
+                    </Label>
+                    <Input
+                      id="mi-price"
+                      required
+                      inputMode="decimal"
+                      className="border-[#d9c7b4] text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                      placeholder="e.g. 18.50"
+                      value={form.price}
+                      onChange={set("price")}
+                    />
+                  </div>
+                  <div className="space-y-1 sm:col-span-2 lg:col-span-3">
+                    <Label htmlFor="mi-desc" className="text-xs font-black text-[#211a14]">
+                      Description &amp; Ingredients *
+                    </Label>
+                    <Textarea
+                      id="mi-desc"
+                      required
+                      rows={2}
+                      className="border-[#d9c7b4] text-[#211a14] font-medium text-xs rounded-xl"
+                      placeholder="e.g. Three fluffy buttermilk pancakes layered with whipped vanilla butter, warm organic maple syrup, and seasonal berries."
+                      value={form.description}
+                      onChange={set("description")}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="mi-tag" className="text-xs font-black text-[#211a14]">
+                      Menu Category Tag
+                    </Label>
+                    <Select
+                      id="mi-tag"
+                      className="h-10 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                      value={form.tag}
+                      onChange={set("tag")}
+                    >
+                      <option value="sweet">🍯 Sweet Stack</option>
+                      <option value="savoury">🥓 Savoury Brunch</option>
+                      <option value="choc">🍫 Choc Loaded</option>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="mi-heat" className="text-xs font-black text-[#211a14]">
+                      Spice / Heat Badge
+                    </Label>
+                    <Select
+                      id="mi-heat"
+                      className="h-10 text-xs border-[#d9c7b4] font-bold rounded-xl"
+                      value={form.heat}
+                      onChange={set("heat")}
+                    >
+                      <option value="none">🌿 Mild / No Heat</option>
+                      <option value="medium">🌶️ Medium Heat</option>
+                      <option value="hot">🔥 Hot &amp; Spicy</option>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="mi-prep" className="text-xs font-black text-[#211a14]">
+                      Estimated Prep Time
+                    </Label>
+                    <Input
+                      id="mi-prep"
+                      className="border-[#d9c7b4] text-[#211a14] font-medium text-xs h-10 rounded-xl"
+                      placeholder="e.g. 10–12 min"
+                      value={form.prep_time}
+                      onChange={set("prep_time")}
+                    />
+                  </div>
                 </div>
+              </div>
 
-                <div ref={photosRef}>
-                  <PhotoBoard
-                    slug={editing ?? ""}
-                    name={form.name || "this dish"}
-                    mainUrl={form.photo}
-                    cutoutUrl={form.image}
-                    onSetMain={(url) => setForm((f) => ({ ...f, photo: url }))}
-                    onSetCutout={(url) => setForm((f) => ({ ...f, image: url }))}
-                    onCountChange={(slug, count) => setPhotoCounts((c) => ({ ...c, [slug]: count }))}
-                    pending={pendingPhotos}
-                    onPendingChange={setPendingPhotos}
+              {/* Nutrition */}
+              <div className="pt-4 border-t border-[#eee3d5] space-y-3">
+                <span className="text-xs font-black text-[#763a12] uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="h-3.5 w-3.5" /> Nutrition Details (Optional):
+                </span>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="mi-kcal" className="text-xs font-black text-[#211a14]">
+                      Calories (kcal)
+                    </Label>
+                    <Input
+                      id="mi-kcal"
+                      inputMode="numeric"
+                      className="border-[#d9c7b4] text-[#211a14] font-medium text-xs h-10 rounded-xl"
+                      placeholder="e.g. 540"
+                      value={form.kcal}
+                      onChange={set("kcal")}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="mi-protein" className="text-xs font-black text-[#211a14]">
+                      Protein (grams)
+                    </Label>
+                    <Input
+                      id="mi-protein"
+                      inputMode="numeric"
+                      className="border-[#d9c7b4] text-[#211a14] font-medium text-xs h-10 rounded-xl"
+                      placeholder="e.g. 16"
+                      value={form.protein_g}
+                      onChange={set("protein_g")}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2: Photos */}
+            <div className={`space-y-5 ${!editing && step !== 2 ? "hidden" : ""}`}>
+              <div className="space-y-2">
+                <span className="text-xs font-black text-[#763a12] uppercase tracking-wider flex items-center gap-1.5">
+                  <ImageIcon className="h-3.5 w-3.5" /> High-Resolution Photo Gallery &amp; Cutout:
+                </span>
+                <p className="text-xs text-zinc-500">
+                  Upload food shots below. Mark one as <strong>Main</strong> for card thumbnails and hero display. <strong>Cutout</strong> is the optional transparent PNG for special promo tiles.
+                </p>
+              </div>
+
+              <div ref={photosRef} className="p-4 rounded-2xl border-2 border-[#ecdac7] bg-[#faf5ee]">
+                <PhotoBoard
+                  slug={editing ?? ""}
+                  name={form.name || "this dish"}
+                  mainUrl={form.photo}
+                  cutoutUrl={form.image}
+                  onSetMain={(url) => setForm((f) => ({ ...f, photo: url }))}
+                  onSetCutout={(url) => setForm((f) => ({ ...f, image: url }))}
+                  onCountChange={(slug, count) => setPhotoCounts((c) => ({ ...c, [slug]: count }))}
+                  pending={pendingPhotos}
+                  onPendingChange={setPendingPhotos}
+                />
+              </div>
+            </div>
+
+            {/* Visibility & Homepage Switches */}
+            <div className={`pt-4 border-t border-[#eee3d5] ${!editing && step !== 2 ? "hidden" : ""}`}>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="flex items-center justify-between p-4 rounded-2xl border-2 border-[#eee3d5] bg-white">
+                  <div>
+                    <div className="text-xs font-black text-[#211a14]">Takeaway Available</div>
+                    <div className="text-[11px] text-zinc-500">Customers can order this dish online</div>
+                  </div>
+                  <Switch
+                    checked={form.is_available}
+                    onCheckedChange={(v) => setForm((f) => ({ ...f, is_available: v }))}
                   />
                 </div>
 
-                <p className="text-xs text-muted-foreground">
-                  {editing
-                    ? "Main image and cutout are saved with Save changes; uploads and deletions save instantly."
-                    : "Upload now if you like — the photos attach to the dish when you press Add to menu."}
-                </p>
-              </section>
-
-              <section className={`grid gap-4 ${!editing && step !== 2 ? "hidden" : ""}`}>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Availability</p>
-                <div className="flex flex-wrap items-center gap-6">
-                  <label className="flex items-center gap-2 text-sm font-medium">
-                    <Switch
-                      checked={form.is_available}
-                      onCheckedChange={(v) => setForm((f) => ({ ...f, is_available: v }))}
-                    />
-                    Available
-                  </label>
-                  <label className="flex items-center gap-2 text-sm font-medium">
-                    <Switch
-                      checked={form.is_featured}
-                      onCheckedChange={(v) => setForm((f) => ({ ...f, is_featured: v }))}
-                    />
-                    Featured on home page
-                  </label>
-                </div>
-              </section>
-
-              {/* always reachable: this form is taller than most screens */}
-              <div className="sticky bottom-0 -mx-6 flex items-center justify-between gap-3 border-t bg-background/95 px-6 py-3 backdrop-blur">
-                <span className="text-xs text-muted-foreground">
-                  {!editing && `Step ${step} of 2`}
-                </span>
-                <div className="flex items-center gap-3">
-                  {!editing && step === 2 && (
-                    <Button type="button" variant="ghost" onClick={() => setStep(1)}>← Back</Button>
-                  )}
-                  <Button type="button" variant="ghost" onClick={closeForm}>Cancel</Button>
-                  {/* one button that never swaps type mid-click: swapping it
-                      let the click land on a freshly mounted submit button */}
-                  <Button
-                    type="button"
-                    loading={saving}
-                    onClick={() => (!editing && step === 1 ? goToPhotos() : submit())}
-                  >
-                    {!editing && step === 1 ? "Next: photos →" : editing ? "Save changes" : "Add to menu"}
-                  </Button>
+                <div className="flex items-center justify-between p-4 rounded-2xl border-2 border-[#eee3d5] bg-white">
+                  <div>
+                    <div className="text-xs font-black text-[#211a14]">Featured on Homepage</div>
+                    <div className="text-[11px] text-zinc-500">Highlighted in the hero &amp; menu preview</div>
+                  </div>
+                  <Switch
+                    checked={form.is_featured}
+                    onCheckedChange={(v) => setForm((f) => ({ ...f, is_featured: v }))}
+                  />
                 </div>
               </div>
-            </form>
-          </CardContent>
-        </Card>
+            </div>
+
+            {/* Sticky Form Action Footer */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#eee3d5]">
+              <span className="text-xs font-bold text-zinc-500">
+                {!editing ? `Step ${step} of 2` : "Editing item in catalog"}
+              </span>
+              <div className="flex items-center gap-2">
+                {!editing && step === 2 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="border-[#d9c7b4] text-[#763a12] text-xs font-bold rounded-xl"
+                    onClick={() => setStep(1)}
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5 mr-1" /> Back to Details
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-xs font-bold text-zinc-600 rounded-xl"
+                  onClick={closeForm}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  loading={saving}
+                  className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs"
+                  onClick={() => (!editing && step === 1 ? goToPhotos() : submit())}
+                >
+                  {!editing && step === 1 ? (
+                    <>
+                      <span>Next: Upload Photos</span>
+                      <ArrowRight className="h-3.5 w-3.5 ml-1" />
+                    </>
+                  ) : editing ? (
+                    <>
+                      <Save className="h-3.5 w-3.5 mr-1.5" />
+                      <span>Save Changes</span>
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-3.5 w-3.5 mr-1" />
+                      <span>Add to Menu</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </form>
+        </div>
       )}
 
-      <Card>
-        <CardContent className="pt-6">
-          {loading ? (
+      {/* ========================================================================= */}
+      {/* SEARCH & CATEGORY FILTER BAR                                              */}
+      {/* ========================================================================= */}
+      <div className="p-4 sm:p-5 rounded-3xl bg-[#fffdf9] border-2 border-[#eee3d5] shadow-xs space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          {/* Search Box */}
+          <div className="relative flex-1 min-w-[240px]">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+            <Input
+              className="pl-10 h-11 text-xs font-bold border-[#d9c7b4] rounded-2xl bg-white text-[#211a14] placeholder:text-zinc-400"
+              placeholder="Search dishes by name, ingredients, or price..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Results Summary */}
+          <div className="text-xs font-bold text-zinc-500 shrink-0">
+            Showing <strong>{filteredItems.length}</strong> of {totalCount} items
+          </div>
+        </div>
+
+        {/* Category Filter Pills */}
+        <div className="flex flex-wrap gap-2 pt-1 border-t border-[#eee3d5]">
+          {[
+            { id: "all", label: "All Dishes", count: totalCount, icon: "🥞" },
+            { id: "sweet", label: "Sweet Stacks", count: sweetCount, icon: "🍯" },
+            { id: "savoury", label: "Savoury Brunch", count: savouryCount, icon: "🥓" },
+            { id: "choc", label: "Choc Loaded", count: chocCount, icon: "🍫" },
+            { id: "featured", label: "Featured", count: featuredCount, icon: "⭐" },
+            { id: "live", label: "Available Now", count: liveCount, icon: "🟢" },
+          ].map((cat) => {
+            const isSelected = categoryFilter === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setCategoryFilter(cat.id as FilterCategory)}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
+                  isSelected
+                    ? "bg-[#763a12] text-white shadow-xs scale-[1.02]"
+                    : "bg-white text-[#211a14] border border-[#d9c7b4] hover:bg-[#faf5ee]"
+                }`}
+              >
+                <span>{cat.icon}</span>
+                <span>{cat.label}</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                    isSelected ? "bg-white/20 text-white" : "bg-zinc-100 text-zinc-700"
+                  }`}
+                >
+                  {cat.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* MENU ITEMS TABLE                                                          */}
+      {/* ========================================================================= */}
+      <div className="bg-[#fffdf9] rounded-3xl border-2 border-[#eee3d5] shadow-sm overflow-hidden">
+        {loading ? (
+          <div className="p-6">
             <TableSkeleton rows={6} cols={7} />
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Item</TableHead>
-                  <TableHead>Tag</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Photos</TableHead>
-                  <TableHead>Available</TableHead>
-                  <TableHead>Featured</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map((item) => (
-                  <TableRow key={item.slug}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
+          </div>
+        ) : filteredItems.length === 0 ? (
+          <div className="py-16 text-center space-y-3">
+            <div className="text-4xl">🥞</div>
+            <h3 className="text-base font-black text-[#211a14]">No dishes matched your filter</h3>
+            <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+              Try adjusting your search keyword or selecting a different category filter above.
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-[#d9c7b4] text-[#763a12] font-bold text-xs rounded-xl mt-2"
+              onClick={() => {
+                setSearchQuery("");
+                setCategoryFilter("all");
+              }}
+            >
+              Reset Filters
+            </Button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b-2 border-[#eee3d5] bg-[#faf5ee]/80 text-[#763a12] text-[11px] font-black uppercase tracking-wider">
+                  <th className="py-3.5 px-4">Dish &amp; Ingredients</th>
+                  <th className="py-3.5 px-3">Category</th>
+                  <th className="py-3.5 px-3">Price</th>
+                  <th className="py-3.5 px-3">Photos</th>
+                  <th className="py-3.5 px-3 text-center">Available</th>
+                  <th className="py-3.5 px-3 text-center">Home Star</th>
+                  <th className="py-3.5 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#eee3d5] text-xs font-medium text-[#211a14]">
+                {filteredItems.map((item) => {
+                  const tagData = TAG_INFO[item.tag] ?? TAG_INFO.sweet;
+                  const photoCount = photoCounts[item.slug] ?? 0;
+                  return (
+                    <tr
+                      key={item.slug}
+                      className="hover:bg-[#fcf8f2] transition-colors group"
+                    >
+                      {/* Dish & Image */}
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => openEdit(item, true)}
+                            title="Click to manage photos"
+                            aria-label={`Manage photos for ${item.name}`}
+                            className="relative h-12 w-12 rounded-xl overflow-hidden bg-zinc-100 shrink-0 border-2 border-[#ecdac7] group-hover:border-[#763a12] transition-transform active:scale-95 shadow-2xs"
+                          >
+                            {item.photo || item.image ? (
+                              <Image
+                                src={item.photo || item.image}
+                                alt={item.name}
+                                fill
+                                sizes="48px"
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="h-full w-full flex items-center justify-center text-xs text-zinc-400 font-bold">
+                                🥞
+                              </div>
+                            )}
+                          </button>
+                          <div className="space-y-0.5 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-black text-sm text-[#211a14] truncate">{item.name}</span>
+                              {item.heat === "medium" && <span title="Medium Heat">🌶️</span>}
+                              {item.heat === "hot" && <span title="Hot & Spicy">🔥</span>}
+                            </div>
+                            <p className="text-[11px] text-zinc-500 line-clamp-1 max-w-xs sm:max-w-md">
+                              {item.description}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Category Badge */}
+                      <td className="py-3.5 px-3 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black border ${tagData.bg} ${tagData.text} ${tagData.border}`}
+                        >
+                          <span>{tagData.icon}</span>
+                          <span>{tagData.label}</span>
+                        </span>
+                      </td>
+
+                      {/* Price */}
+                      <td className="py-3.5 px-3 whitespace-nowrap">
+                        <span className="text-sm font-black text-[#763a12] px-2.5 py-1 rounded-xl bg-amber-50 border border-amber-200">
+                          ${item.price}
+                        </span>
+                      </td>
+
+                      {/* Photo Count Button */}
+                      <td className="py-3.5 px-3 whitespace-nowrap">
                         <button
                           type="button"
                           onClick={() => openEdit(item, true)}
-                          aria-label={`Photos for ${item.name}`}
-                          className="rounded-md transition-transform hover:scale-105"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold border border-[#d9c7b4] bg-white text-[#763a12] hover:bg-[#faf5ee] shadow-2xs transition-all"
                         >
-                          {/* a dish may legitimately have no image yet — never
-                              hand next/image an empty src */}
-                          {item.photo || item.image ? (
-                            <Image
-                              src={item.photo || item.image}
-                              alt=""
-                              width={80}
-                              height={80}
-                              className="h-10 w-10 rounded-md object-cover"
-                            />
-                          ) : (
-                            <span className="grid h-10 w-10 place-items-center rounded-md border border-dashed text-[10px] text-muted-foreground">
-                              add
-                            </span>
-                          )}
+                          <ImageIcon className="h-3.5 w-3.5" />
+                          <span>{photoCount > 0 ? `${photoCount} Photos` : "Add"}</span>
                         </button>
-                        <div>
-                          <div className="font-medium">{item.name}</div>
-                          <div className="max-w-72 truncate text-xs text-muted-foreground">
-                            {item.description}
-                          </div>
+                      </td>
+
+                      {/* Available Switch */}
+                      <td className="py-3.5 px-3 text-center whitespace-nowrap">
+                        <Switch
+                          aria-label={`${item.name} available`}
+                          checked={item.is_available}
+                          onCheckedChange={(v) =>
+                            toggle(
+                              item,
+                              { is_available: v },
+                              v ? `${item.name} is now available on menu` : `${item.name} hidden from menu`
+                            )
+                          }
+                        />
+                      </td>
+
+                      {/* Featured Home Star Switch */}
+                      <td className="py-3.5 px-3 text-center whitespace-nowrap">
+                        <Switch
+                          aria-label={`${item.name} featured on home page`}
+                          checked={item.is_featured}
+                          onCheckedChange={(v) =>
+                            toggle(
+                              item,
+                              { is_featured: v },
+                              v ? `${item.name} featured on home page` : `${item.name} removed from featured`
+                            )
+                          }
+                        />
+                      </td>
+
+                      {/* Actions */}
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-xs font-bold border-[#d9c7b4] text-[#763a12] hover:bg-[#faf5ee] rounded-xl"
+                            onClick={() => openEdit(item)}
+                          >
+                            <Pencil className="h-3 w-3 mr-1" /> Edit
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-destructive hover:bg-destructive/10 rounded-xl"
+                            onClick={() => remove(item)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">{TAG_LABEL[item.tag]}</Badge>
-                    </TableCell>
-                    <TableCell className="font-medium">${item.price}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEdit(item, true)}
-                        aria-label={`Manage photos for ${item.name}`}
-                      >
-                        <ImageIcon />
-                        {photoCounts[item.slug] ? `${photoCounts[item.slug]} photos` : "Add"}
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      <Switch
-                        aria-label={`${item.name} available`}
-                        checked={item.is_available}
-                        onCheckedChange={(v) =>
-                          toggle(
-                            item,
-                            { is_available: v },
-                            v ? `${item.name} is available again` : `${item.name} hidden from the menu`
-                          )
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Switch
-                        aria-label={`${item.name} featured on home page`}
-                        checked={item.is_featured}
-                        onCheckedChange={(v) =>
-                          toggle(
-                            item,
-                            { is_featured: v },
-                            v ? `${item.name} featured on the home page` : `${item.name} unfeatured`
-                          )
-                        }
-                      />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button variant="outline" size="sm" onClick={() => openEdit(item)} aria-label={`Edit ${item.name}`}>
-                          <Pencil /> Edit
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => remove(item)} aria-label={`Delete ${item.name}`}>
-                          <Trash2 className="text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {items.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                      No menu items yet. Click &ldquo;Add item&rdquo; to create one.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

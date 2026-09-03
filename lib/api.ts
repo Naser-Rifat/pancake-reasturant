@@ -50,6 +50,9 @@ export interface ApiAnnouncement {
   image: string;
   /** ISO datetime; null = runs until switched off */
   ends_at: string | null;
+  /** band voucher cards by menu slug; empty/absent = defaults (offer photo / first featured) */
+  card1_dish?: string;
+  card2_dish?: string;
 }
 
 /** "Ends today!" / "Ends tomorrow" / "Ends Sunday" — urgency copy for a promo. */
@@ -83,6 +86,8 @@ export interface ApiOpeningHours {
 
 export interface ApiCertification {
   icon: string;
+  /** real certificate logo URL — replaces the built-in icon when set */
+  image?: string;
   title: string;
   subtitle: string;
 }

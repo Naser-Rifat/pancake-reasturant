@@ -70,21 +70,30 @@ export default async function Home() {
       {announcement?.image &&
         (() => {
           const badge = countdownBadge(announcement.ends_at);
+          // both voucher cards are staff-pickable by dish slug; blanks keep the
+          // long-standing defaults (offer photo, then first featured dish)
+          const pickedDish = (slug?: string) =>
+            slug ? menu.items.find((m) => m.slug === slug && (m.photo || m.image)) : undefined;
+          const dishCard = (d: (typeof menu.items)[number], tag: string) => ({
+            href: `/menu/${d.slug}`,
+            label: d.name,
+            tag,
+            img: d.photo || d.image,
+          });
+          const card1Dish = pickedDish(announcement.card1_dish);
+          const card2Dish =
+            pickedDish(announcement.card2_dish) ??
+            menu.items.find((m) => m.is_featured && (m.photo || m.image));
           const cards = [
-            {
-              href: announcement.link_url || "/menu",
-              label: "The Offer",
-              tag: "✨ Special",
-              img: announcement.image,
-            },
-            ...menu.items
-              .filter((m) => m.is_featured && (m.photo || m.image))
-              .map((d) => ({
-                href: `/menu/${d.slug}`,
-                label: d.name,
-                tag: "🥞 Popular",
-                img: d.photo || d.image,
-              })),
+            card1Dish
+              ? dishCard(card1Dish, "✨ Special")
+              : {
+                  href: announcement.link_url || "/menu",
+                  label: "The Offer",
+                  tag: "✨ Special",
+                  img: announcement.image,
+                },
+            ...(card2Dish ? [dishCard(card2Dish, "🥞 Popular")] : []),
           ].slice(0, 2);
 
           return (
@@ -437,7 +446,17 @@ export default async function Home() {
               {certs.map((c) => (
                 <div className="cert-badge quality-seal-badge" key={c.title}>
                   <span className="ic">
-                    <CertIcon name={c.icon} />
+                    {c.image ? (
+                      <Image
+                        src={c.image}
+                        alt={c.title}
+                        width={48}
+                        height={48}
+                        style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                      />
+                    ) : (
+                      <CertIcon name={c.icon} />
+                    )}
                   </span>
                   <div className="cert-info">
                     <b>{c.title}</b>
