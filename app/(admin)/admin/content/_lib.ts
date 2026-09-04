@@ -12,6 +12,11 @@ export type SetSiteField = (
 /** Runs a save action with busy state + success/error toasts (from the studio). */
 export type RunSave = (fn: () => Promise<void>, what: string, success?: ToastInput) => Promise<void>;
 
+/** Updates the currently-selected campaign deal (value or updater function). */
+export type SetActiveDeal = (
+  next: AdminAnnouncement | null | ((a: AdminAnnouncement | null) => AdminAnnouncement | null),
+) => void;
+
 export type PageTab = "home" | "menu" | "gallery" | "booking";
 export type ViewportMode = "desktop" | "mobile";
 export type CampaignFormat = "band" | "slider";
@@ -25,7 +30,9 @@ export const EMPTY_PHOTO: NewPhoto = {
   image: "",
   alt: "",
 };
-export const EMPTY_CERT = { icon: "medal", image: "", title: "", subtitle: "" };
+export type NewCert = { icon: string; image: string; title: string; subtitle: string };
+
+export const EMPTY_CERT: NewCert = { icon: "medal", image: "", title: "", subtitle: "" };
 
 /** ISO datetime ↔ <input type="datetime-local"> value (local wall-clock) */
 export function isoToLocalInput(iso: string | null): string {

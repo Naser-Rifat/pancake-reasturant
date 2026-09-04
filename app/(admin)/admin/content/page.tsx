@@ -1,97 +1,57 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import {
-  Plus,
-  Trash2,
   Save,
   Home,
   ListOrdered,
-  Tag,
   Award,
   Images,
   ExternalLink,
   Gift,
-  Check,
   Calendar,
-  Clock,
   Eye,
-  ArrowRight,
-  ArrowLeft,
-  UtensilsCrossed,
-  Layers,
-  ChevronRight,
-  BadgePercent,
-  BookOpen,
   Coffee,
   Flame,
   Megaphone,
-  ShieldCheck,
-  Heart,
-  Star,
-  Compass,
-  Palette,
   Camera,
   Smartphone,
   Monitor,
-  Maximize2,
-  RefreshCw,
-  CheckCircle2,
   Ticket,
-  X,
 } from "lucide-react";
 import {
-  createAnnouncement,
-  createCertification,
-  deleteAnnouncement,
-  createGalleryPhoto,
-  deleteCertification,
-  deleteGalleryPhoto,
   getSiteSettings,
   listAnnouncements,
   listCertifications,
   listHomeSteps,
   listMenu,
-  updateMenuItem,
-  updateGalleryPhoto,
-  updateHomeStep,
+  listGalleryAdmin,
+  updateSiteSettings,
   type AdminHomeStep,
   type AdminMenuItem,
-  listGalleryAdmin,
-  updateAnnouncement,
-  updateCertification,
-  updateSiteSettings,
   type AdminAnnouncement,
   type AdminCertification,
   type AdminGalleryPhoto,
   type AdminSiteSettings,
 } from "@/lib/admin-api";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { UploadButton } from "@/components/ui/upload-button";
 import { ContentSkeleton } from "./_components/ContentSkeleton";
 import { BookingPageSection } from "./_components/BookingPageSection";
+import { HomeStep1Hero } from "./_components/HomeStep1Hero";
+import { HomeStep2Campaigns } from "./_components/HomeStep2Campaigns";
 import { GalleryPageSection } from "./_components/GalleryPageSection";
+import { HomeStep3Mosaic } from "./_components/HomeStep3Mosaic";
+import { HomeStep4Badges } from "./_components/HomeStep4Badges";
+import { HomeStep5Cta } from "./_components/HomeStep5Cta";
+import { HomeStep6Footer } from "./_components/HomeStep6Footer";
 import { MenuPageSection } from "./_components/MenuPageSection";
 import { AdminError } from "@/components/ui/admin-error";
 import { useToast, type ToastInput } from "@/components/ui/toast";
-import { useConfirm } from "@/components/ui/confirm";
-import { CERT_ICONS } from "@/components/CertIcon";
-import { ImageField } from "@/components/ui/image-field";
 
 import {
   EMPTY_CERT,
   EMPTY_PHOTO,
   getDealCadence,
-  isoToLocalInput,
-  localInputToIso,
   type PageTab,
   type ViewportMode,
 } from "./_lib";
@@ -144,7 +104,6 @@ export default function ContentPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
   const { toast } = useToast();
-  const { confirm: confirmDialog } = useConfirm();
 
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
@@ -294,17 +253,6 @@ export default function ContentPage() {
   const setS = (key: keyof AdminSiteSettings) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setSite((s) => (s ? { ...s, [key]: e.target.value } : s));
-
-  const filteredPhotos =
-    galleryFilter === "all" ? photos : photos.filter((p) => p.album === galleryFilter);
-
-  // Featured dishes in order
-  const featuredDishes = menuItems.filter((m) => m.is_featured);
-  const featuredPrices = featuredDishes.map((m) => parseFloat(m.price)).filter((n) => !isNaN(n));
-  const featuredPrice = featuredPrices.length ? Math.min(...featuredPrices) : 14;
-
-  const slot2Dish = featuredDishes[0] ?? null;
-  const slot3Dish = featuredDishes[1] ?? null;
 
   // Which deal is the big top band right now: the newest ACTIVE band deal
   // inside its date window; if the band list is empty the website falls back
@@ -613,752 +561,41 @@ export default function ContentPage() {
           {/* STEP 1: TOP HERO BANNER (INPUTS + 3-SLOT CAROUSEL STATION)            */}
           {/* --------------------------------------------------------------------- */}
           {homeStepIndex === 1 && (
-            <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
-              <div className="flex items-center gap-2 pb-2 border-b border-zinc-200">
-                <Palette className="h-5 w-5 text-[#aa4c0a]" />
-                <h3 className="text-base font-semibold text-[#211a14]">Edit Hero Text &amp; Images</h3>
-              </div>
-
-              <div className="grid gap-5 sm:grid-cols-2 [&>*]:min-w-0">
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-[#211a14]">1. Main Headline (Bold First Part)</Label>
-                  <Input
-                    className="border-zinc-300 bg-white text-[#211a14] font-bold text-sm h-11 rounded-xl"
-                    placeholder="e.g. Stack Into"
-                    value={site.hero_heading}
-                    onChange={setS("hero_heading")}
-                  />
-                  <p className="text-[11px] font-medium text-zinc-500">The chunky retro title</p>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-[#211a14]">2. Fancy Handwriting Word (Second Part)</Label>
-                  <Input
-                    className="border-zinc-300 bg-white text-[#211a14] font-bold text-sm h-11 rounded-xl font-serif italic"
-                    placeholder="e.g. Happiness"
-                    value={site.hero_script}
-                    onChange={setS("hero_script")}
-                  />
-                  <p className="text-[11px] font-medium text-zinc-500">Rendered in cursive script</p>
-                </div>
-
-                <div className="sm:col-span-2 space-y-1.5">
-                  <Label className="text-xs font-semibold text-[#211a14]">3. Welcome Subtitle Tagline</Label>
-                  <Textarea
-                    rows={2}
-                    className="border-zinc-300 bg-white text-[#211a14] font-medium text-sm rounded-xl"
-                    placeholder="e.g. We flip the best homemade pancakes in Sydney..."
-                    value={site.hero_lead}
-                    onChange={setS("hero_lead")}
-                  />
-                </div>
-
-                <div className="sm:col-span-2 grid gap-5 md:grid-cols-2 p-5 rounded-lg border border-zinc-200 bg-white">
-                  <ImageField
-                    id="hero-image"
-                    label="Background Pancake Stack Photo (Slide 1 in Carousel)"
-                    hint="Square 1:1 · 1400×1400px"
-                    ratio="1 / 1"
-                    value={site.hero_image}
-                    onChange={setS("hero_image")}
-                    onUploaded={(url) => setSite((s) => (s ? { ...s, hero_image: url } : s))}
-                  />
-                  <ImageField
-                    id="hero-cutout"
-                    label="Round Dish Cutout Badge (Inside Headline)"
-                    hint="Transparent PNG · 600px+"
-                    ratio="1 / 1"
-                    fit="contain"
-                    cutout
-                    value={site.hero_cutout}
-                    onChange={setS("hero_cutout")}
-                    onUploaded={(url) => setSite((s) => (s ? { ...s, hero_cutout: url } : s))}
-                  />
-                </div>
-
-                {/* 🌟 3-SLOT HERO CAROUSEL CONTROLLER */}
-                <div className="sm:col-span-2 p-5 sm:p-6 rounded-xl border border-zinc-200 bg-white space-y-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-amber-200">
-                    <div>
-                      <h4 className="text-sm font-semibold text-[#211a14] uppercase tracking-wide flex items-center gap-2">
-                        Hero carousel slides &amp; price tag
-                      </h4>
-                      <p className="text-xs font-medium text-zinc-600 mt-0.5">
-                        The three slides shown in the website's hero switcher. Changes save instantly.
-                      </p>
-                    </div>
-                    <div className="px-3.5 py-1.5 rounded-full bg-[#763a12] text-amber-300 text-xs font-semibold self-start sm:self-auto shadow-xs">
-                      Live Price Tag: From ${featuredPrice}
-                    </div>
-                  </div>
-
-                  {/* 3 Dedicated Slots */}
-                  <div className="grid gap-4 sm:grid-cols-3 [&>*]:min-w-0">
-                    {/* SLOT 1 */}
-                    <div className="p-4 rounded-lg border border-zinc-300 bg-white shadow-sm space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-[#763a12] text-white">
-                          Slide 1 (Main)
-                        </span>
-                        <span className="text-xs font-semibold text-amber-800">From ${featuredPrice}</span>
-                      </div>
-                      <div className="relative h-28 rounded-xl overflow-hidden bg-zinc-100 border">
-                        {site.hero_image ? (
-                          <Image src={site.hero_image} alt="Hero Stack" fill sizes="400px" className="object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-3xl">🥞</div>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-[#211a14]">Signature Hero Stack</p>
-                        <p className="text-[11px] font-medium text-emerald-700 flex items-center gap-1 mt-0.5">
-                          <CheckCircle2 className="h-3.5 w-3.5" /> Background Photo Above
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* SLOT 2 */}
-                    <div className="p-4 rounded-lg border border-[#763a12] bg-white shadow-xs ring-2 ring-[#763a12]/15 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-[#763a12] text-amber-300">
-                          Slide 2 (Carousel)
-                        </span>
-                        <span className="text-xs font-semibold text-[#aa4c0a]">
-                          {slot2Dish ? `$${parseFloat(slot2Dish.price)}` : "Select dish"}
-                        </span>
-                      </div>
-                      <div className="relative h-28 rounded-xl overflow-hidden bg-zinc-100 border">
-                        {slot2Dish?.photo || slot2Dish?.image ? (
-                          <Image src={slot2Dish.photo || slot2Dish?.image} alt={slot2Dish.name} fill sizes="400px" className="object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-3xl text-zinc-300">🥞</div>
-                        )}
-                      </div>
-                      <div className="space-y-1.5">
-                        <p className="text-xs font-semibold truncate text-[#211a14]">
-                          {slot2Dish ? slot2Dish.name : "No dish chosen"}
-                        </p>
-                        <Select
-                          className="h-9 text-xs border-zinc-300 font-bold rounded-xl"
-                          value={slot2Dish?.slug ?? ""}
-                          onChange={(e) => {
-                            const newSlug = e.target.value;
-                            if (!newSlug) return;
-                            run(async () => {
-                              if (slot2Dish) await updateMenuItem(slot2Dish.slug, { is_featured: false });
-                              await updateMenuItem(newSlug, { is_featured: true });
-                              setMenuItems((xs) =>
-                                xs.map((x) => {
-                                  if (x.slug === newSlug) return { ...x, is_featured: true };
-                                  if (slot2Dish && x.slug === slot2Dish.slug) return { ...x, is_featured: false };
-                                  return x;
-                                })
-                              );
-                            }, "Hero Slide 2", { title: "Slide 2 updated" });
-                          }}
-                        >
-                          <option value="">-- Choose Dish for Slide 2 --</option>
-                          {menuItems.map((m) => (
-                            <option key={m.slug} value={m.slug}>
-                              {m.name} (${parseFloat(m.price)})
-                            </option>
-                          ))}
-                        </Select>
-                      </div>
-                    </div>
-
-                    {/* SLOT 3 */}
-                    <div className="p-4 rounded-lg border border-[#763a12] bg-white shadow-xs ring-2 ring-[#763a12]/15 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-[#763a12] text-amber-300">
-                          Slide 3 (Carousel)
-                        </span>
-                        <span className="text-xs font-semibold text-[#aa4c0a]">
-                          {slot3Dish ? `$${parseFloat(slot3Dish.price)}` : "Select dish"}
-                        </span>
-                      </div>
-                      <div className="relative h-28 rounded-xl overflow-hidden bg-zinc-100 border">
-                        {slot3Dish?.photo || slot3Dish?.image ? (
-                          <Image src={slot3Dish.photo || slot3Dish?.image} alt={slot3Dish.name} fill sizes="400px" className="object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-3xl text-zinc-300">🥞</div>
-                        )}
-                      </div>
-                      <div className="space-y-1.5">
-                        <p className="text-xs font-semibold truncate text-[#211a14]">
-                          {slot3Dish ? slot3Dish.name : "No dish chosen"}
-                        </p>
-                        <Select
-                          className="h-9 text-xs border-zinc-300 font-bold rounded-xl"
-                          value={slot3Dish?.slug ?? ""}
-                          onChange={(e) => {
-                            const newSlug = e.target.value;
-                            if (!newSlug) return;
-                            run(async () => {
-                              if (slot3Dish) await updateMenuItem(slot3Dish.slug, { is_featured: false });
-                              await updateMenuItem(newSlug, { is_featured: true });
-                              setMenuItems((xs) =>
-                                xs.map((x) => {
-                                  if (x.slug === newSlug) return { ...x, is_featured: true };
-                                  if (slot3Dish && x.slug === slot3Dish.slug) return { ...x, is_featured: false };
-                                  return x;
-                                })
-                              );
-                            }, "Hero Slide 3", { title: "Slide 3 updated" });
-                          }}
-                        >
-                          <option value="">-- Choose Dish for Slide 3 --</option>
-                          {menuItems.map((m) => (
-                            <option key={m.slug} value={m.slug}>
-                              {m.name} (${parseFloat(m.price)})
-                            </option>
-                          ))}
-                        </Select>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* All Menu Dishes Quick Selector */}
-                  <div className="pt-3 border-t border-amber-200">
-                    <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide block mb-2.5">
-                      All Menu Dishes ({menuItems.length} items available in Catalog):
-                    </span>
-                    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4 [&>*]:min-w-0">
-                      {menuItems.map((m) => {
-                        const isFeatured = m.is_featured;
-                        return (
-                          <div
-                            key={m.slug}
-                            className={`flex items-center gap-2.5 p-2 rounded-xl border text-left transition-all ${
-                              isFeatured
-                                ? "bg-white border-[#763a12] shadow-xs"
-                                : "bg-white/60 border-zinc-200 hover:bg-white"
-                            }`}
-                          >
-                            <div className="relative h-10 w-10 rounded-lg overflow-hidden bg-zinc-100 shrink-0 border">
-                              {m.photo || m.image ? (
-                                <Image src={m.photo || m.image} alt={m.name} fill sizes="40px" className="object-cover" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-sm">🥞</div>
-                              )}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs font-semibold truncate text-[#211a14]">{m.name}</p>
-                              <p className="text-[11px] font-bold text-[#aa4c0a]">${parseFloat(m.price)}</p>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                run(async () => {
-                                  await updateMenuItem(m.slug, { is_featured: !isFeatured });
-                                  setMenuItems((xs) =>
-                                    xs.map((x) => (x.slug === m.slug ? { ...x, is_featured: !isFeatured } : x))
-                                  );
-                                }, "Dish carousel status", {
-                                  title: isFeatured
-                                    ? `${m.name} removed from the hero carousel`
-                                    : `${m.name} added to the hero carousel`,
-                                })
-                              }
-                              className={`px-2 py-1 rounded-lg text-[10px] font-semibold transition-colors ${
-                                isFeatured
-                                  ? "bg-rose-100 text-rose-800 hover:bg-rose-200"
-                                  : "bg-[#763a12] text-white hover:bg-[#5e2d0d]"
-                              }`}
-                            >
-                              {isFeatured ? "Remove" : "+ Carousel"}
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
-                <span className="text-xs font-bold text-zinc-500">Section 1 Complete</span>
-                <Button
-                  type="button"
-                  className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 rounded-xl whitespace-normal h-auto"
-                  onClick={() => setHomeStepIndex(2)}
-                >
-                  <span>Next: Step 2 (Special Deals &amp; Campaigns)</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+            <HomeStep1Hero
+              site={site}
+              setS={setS}
+              setSite={setSite}
+              menuItems={menuItems}
+              setMenuItems={setMenuItems}
+              run={run}
+              setHomeStepIndex={setHomeStepIndex}
+            />
           )}
 
           {/* --------------------------------------------------------------------- */}
           {/* STEP 2: TWO INDEPENDENT CAMPAIGN STATIONS (REAL SEPARATION)           */}
           {/* --------------------------------------------------------------------- */}
           {homeStepIndex === 2 && (
-            <div className="space-y-6">
-              {legacyBackend && (
-                <div className="p-4 rounded-lg border border-amber-300 bg-amber-50 text-xs font-bold text-amber-900 leading-relaxed">
-                  The live server is still running the old backend, so the Band/Slider split and the Section
-                  Titles below can&apos;t save yet. For now every deal sits in the <strong>Offers Slider</strong>{" "}
-                  station — edit them there. Everything here starts working after the next backend deploy
-                  (migrations 0020–0023).
-                </div>
-              )}
-
-              {/* Which station am I editing? */}
-              <div className="p-4 sm:p-5 rounded-xl bg-white border border-zinc-200 shadow-xs space-y-3">
-                <p className="text-xs font-bold text-[#211a14] leading-relaxed">
-                  <strong>Two separate campaign spots:</strong> the <strong>Top Deal Band</strong> sits under
-                  the hero and changes often — the <strong>Offers Slider</strong> comes after the menu and runs
-                  long-term offers. Each has its own deals; they never mix.
-                </p>
-                <div className="grid gap-2 sm:flex sm:gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCampaignChannel("channel1");
-                      setSelectedDealId(null);
-                    }}
-                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                      campaignChannel === "channel1"
-                        ? "bg-[#763a12] text-white shadow-xs"
-                        : "bg-white hover:bg-zinc-100 text-[#211a14] border border-zinc-200"
-                    }`}
-                  >
-                    <Gift className="h-4 w-4" />
-                    <span>1. Top Deal Band — changes often</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCampaignChannel("channel2");
-                      setSelectedDealId(null);
-                    }}
-                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                      campaignChannel === "channel2"
-                        ? "bg-[#763a12] text-white shadow-xs"
-                        : "bg-white hover:bg-zinc-100 text-[#211a14] border border-zinc-200"
-                    }`}
-                  >
-                    <Ticket className="h-4 w-4" />
-                    <span>2. Offers Slider — long-running</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Section headings for the selected station */}
-              <div className="p-5 rounded-xl border border-zinc-200 bg-white shadow-sm space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-zinc-200">
-                  <h4 className="text-sm font-semibold text-[#211a14]">
-                    {campaignChannel === "channel1" ? "Top Band Section Title" : "Offers Slider Section Titles"}
-                  </h4>
-                  <span className="text-[11px] font-bold text-zinc-500">Saved by “Save Section Changes” up top</span>
-                </div>
-                {campaignChannel === "channel1" ? (
-                  <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0">
-                    <div className="space-y-1">
-                      <Label className="text-xs font-semibold text-[#211a14]">Band Kicker</Label>
-                      <Input
-                        className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
-                        value={site.promo_kicker ?? ""}
-                        onChange={setS("promo_kicker")}
-                        placeholder="✨ TODAY'S FEATURED SPECIAL"
-                      />
-                      <p className="text-[10px] text-zinc-500">Gold text above the band headline</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0">
-                    <div className="space-y-1">
-                      <Label className="text-xs font-semibold text-[#211a14]">Slider Eyebrow</Label>
-                      <Input
-                        className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
-                        value={site.offers_kicker ?? ""}
-                        onChange={setS("offers_kicker")}
-                        placeholder="On Right Now"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs font-semibold text-[#211a14]">Slider Title</Label>
-                      <Input
-                        className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
-                        value={site.offers_title ?? ""}
-                        onChange={setS("offers_title")}
-                        placeholder="This Week's Offers"
-                      />
-                      <p className="text-[10px] text-zinc-500">The last word shows in the accent colour</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* This station's deal list + editor */}
-              <div className="grid gap-6 lg:grid-cols-12 items-start [&>*]:min-w-0">
-                {/* Left: the station's deals */}
-                <div className="lg:col-span-5 space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide block">
-                      {campaignChannel === "channel1" ? "Band Deals" : "Slider Offers"} ({stationDeals.length}):
-                    </span>
-                    <Button
-                      size="sm"
-                      className="h-8 text-xs font-bold gap-1.5 bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl shadow-xs"
-                      onClick={() =>
-                        run(async () => {
-                          const created = await createAnnouncement({
-                            message:
-                              stationPlacement === "band"
-                                ? "🥞 New Special — 20% Off This Weekend!"
-                                : "🥞 New Offer — 15% Off All Day!",
-                            details:
-                              stationPlacement === "band"
-                                ? "This weekend only · Dine-in & Takeaway"
-                                : "Everyday special · Dine-in & Takeaway",
-                            link_text: "Explore Menu",
-                            link_url: "/menu",
-                            image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=1200&q=80",
-                            is_active: false,
-                            placement: stationPlacement,
-                          });
-                          setAnnouncements((xs) => [created, ...xs]);
-                          setSelectedDealId(created.id);
-                          // an old backend ignores `placement`, so the deal may land in the
-                          // other station — follow it there instead of looking stuck
-                          const landed = (created.placement ?? "slider") === "band" ? "channel1" : "channel2";
-                          if (landed !== campaignChannel) setCampaignChannel(landed);
-                        }, "Campaign", {
-                          title: "Deal created as hidden — edit it, then turn Show on",
-                          description:
-                            legacyBackend && stationPlacement === "band"
-                              ? "Old backend: the deal was placed in the Offers Slider station for now"
-                              : undefined,
-                        })
-                      }
-                    >
-                      <Plus className="h-3.5 w-3.5" /> New Deal
-                    </Button>
-                  </div>
-
-                  {campaignChannel === "channel1" && bandUsingFallback && !legacyBackend && (
-                    <p className="text-[11px] font-bold text-amber-800 bg-white border border-zinc-200 rounded-xl p-2.5">
-                      No live band deal yet — the website is temporarily showing the newest slider offer in
-                      the band. Create a band deal and turn Show ON to take over.
-                    </p>
-                  )}
-
-                  <div className="grid gap-2.5 [&>*]:min-w-0">
-                    {stationDeals.map((a) => {
-                      const isSelected = (activeDeal?.id ?? null) === a.id;
-                      const isTopBanner = campaignChannel === "channel1" && a.id === topBannerId;
-                      return (
-                        <div
-                          key={a.id}
-                          onClick={() => setSelectedDealId(a.id)}
-                          className={`flex items-center gap-3 p-3.5 rounded-lg border text-left cursor-pointer transition-all ${
-                            isSelected
-                              ? "bg-white border-[#763a12] shadow-xs"
-                              : "bg-white border-zinc-200 hover:border-zinc-400 shadow-2xs"
-                          }`}
-                        >
-                          <div className="relative h-12 w-12 rounded-xl overflow-hidden bg-zinc-100 shrink-0 border">
-                            {a.image ? (
-                              <Image src={a.image} alt={a.message} fill sizes="48px" className="object-cover" />
-                            ) : (
-                              <div className="h-full w-full flex items-center justify-center text-amber-600 bg-amber-50 font-bold">
-                                🎫
-                              </div>
-                            )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                              {isTopBanner && (
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-400 text-[#211a14] border border-amber-500">
-                                  Live in band
-                                </span>
-                              )}
-                              {a.is_active ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300">
-                                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                                  Active
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-700">
-                                  Hidden
-                                </span>
-                              )}
-                              {isSelected && (
-                                <span className="text-[10px] font-semibold text-[#763a12] ml-auto">Editing</span>
-                              )}
-                            </div>
-                            <p className="text-xs font-semibold text-[#211a14] truncate">{a.message || "Untitled Deal"}</p>
-                          </div>
-
-                          <button
-                            type="button"
-                            title="Delete deal"
-                            className="p-1.5 text-zinc-400 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              const ok = await confirmDialog({
-                                title: `Delete “${a.message}”?`,
-                                description: "The deal disappears from the website immediately.",
-                                confirmLabel: "Delete deal",
-                                destructive: true,
-                              });
-                              if (!ok) return;
-                              run(async () => {
-                                await deleteAnnouncement(a.id);
-                                setAnnouncements((xs) => xs.filter((x) => x.id !== a.id));
-                                if (selectedDealId === a.id) setSelectedDealId(null);
-                              }, "Campaign", { title: "Deal deleted" });
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      );
-                    })}
-                    {stationDeals.length === 0 && !(campaignChannel === "channel1" && bandUsingFallback && !legacyBackend) && (
-                      <p className="text-xs text-zinc-500 p-3">
-                        {campaignChannel === "channel1"
-                          ? "No band deals yet — create one with “New Deal”."
-                          : "No slider offers yet — create one with “New Deal”."}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Right: the editor for this station's selected deal */}
-                <div className="lg:col-span-7 bg-white p-6 rounded-xl border border-zinc-200 shadow-sm space-y-5">
-                  {activeDeal ? (
-                    <>
-                      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
-                        <h4 className="text-sm font-semibold text-[#211a14] truncate max-w-full">
-                          Edit: {activeDeal.message || "Untitled Deal"}
-                        </h4>
-                        <Button
-                          size="sm"
-                          className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs"
-                          loading={busy === "Campaign"}
-                          onClick={() =>
-                            run(async () => {
-                              await updateAnnouncement(activeDeal.id, {
-                                message: activeDeal.message,
-                                details: activeDeal.details,
-                                link_text: activeDeal.link_text,
-                                link_url: activeDeal.link_url,
-                                image: activeDeal.image,
-                                starts_at: activeDeal.starts_at,
-                                ends_at: activeDeal.ends_at,
-                                card1_dish: activeDeal.card1_dish ?? "",
-                                card2_dish: activeDeal.card2_dish ?? "",
-                              });
-                            }, "Campaign", { title: "Deal saved" })
-                          }
-                        >
-                          <Save className="h-3.5 w-3.5 mr-1.5" /> Save Deal
-                        </Button>
-                      </div>
-
-                      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-lg border border-zinc-200 bg-white">
-                        <div>
-                          <div className="text-xs font-semibold text-[#211a14]">Show on the Website?</div>
-                          <div className="text-[11px] font-medium text-zinc-500">
-                            {campaignChannel === "channel1"
-                              ? "ON = the newest active band deal becomes the big band — saves instantly"
-                              : "ON = appears in the offers slider — saves instantly"}
-                          </div>
-                        </div>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <Switch
-                            checked={activeDeal.is_active}
-                            onCheckedChange={(v) =>
-                              run(async () => {
-                                await updateAnnouncement(activeDeal.id, { is_active: v });
-                                setActiveDeal((a) => (a ? { ...a, is_active: v } : a));
-                              }, "Deal visibility", { title: v ? "Deal is now live on the website" : "Deal hidden from the website" })
-                            }
-                          />
-                          <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
-                            activeDeal.is_active ? "bg-emerald-100 text-emerald-950 border border-emerald-300" : "bg-zinc-200 text-zinc-700"
-                          }`}>
-                            {activeDeal.is_active ? "LIVE" : "HIDDEN"}
-                          </span>
-                        </label>
-                      </div>
-
-                      {campaignChannel === "channel1" && (
-                        <div className="p-4 rounded-lg border border-zinc-200 bg-white space-y-2.5">
-                          <span className="text-xs font-semibold text-[#211a14] block">Right-side Voucher Cards</span>
-                          <p className="text-[10px] text-zinc-500 -mt-1">
-                            The two little ticket cards on the band&apos;s right — pick any dish, or keep the
-                            defaults. Saved with &ldquo;Save Deal&rdquo;.
-                          </p>
-                          <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0">
-                            <div className="space-y-1">
-                              <Label className="text-xs font-semibold text-[#211a14]">Card 1 (left)</Label>
-                              <Select
-                                className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
-                                value={activeDeal.card1_dish ?? ""}
-                                onChange={(e) =>
-                                  setActiveDeal((a) => (a ? { ...a, card1_dish: e.target.value } : a))
-                                }
-                              >
-                                <option value="">The Offer photo (default)</option>
-                                {menuItems.map((m) => (
-                                  <option key={m.slug} value={m.slug}>{m.name}</option>
-                                ))}
-                              </Select>
-                            </div>
-                            <div className="space-y-1">
-                              <Label className="text-xs font-semibold text-[#211a14]">Card 2 (right)</Label>
-                              <Select
-                                className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
-                                value={activeDeal.card2_dish ?? ""}
-                                onChange={(e) =>
-                                  setActiveDeal((a) => (a ? { ...a, card2_dish: e.target.value } : a))
-                                }
-                              >
-                                <option value="">Auto — first hero-featured dish</option>
-                                {menuItems.map((m) => (
-                                  <option key={m.slug} value={m.slug}>{m.name}</option>
-                                ))}
-                              </Select>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="grid gap-4">
-                        <div className="space-y-1">
-                          <Label className="text-xs font-semibold text-[#211a14]">Deal Headline</Label>
-                          <Input
-                            className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
-                            value={activeDeal.message}
-                            onChange={(e) => setActiveDeal((a) => (a ? { ...a, message: e.target.value } : a))}
-                            placeholder="e.g. 🥞 20% OFF ALL PANCAKES BEFORE 11AM!"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs font-semibold text-[#211a14]">Conditions &amp; Subtitle</Label>
-                          <Input
-                            className="border-zinc-300 text-[#211a14] font-medium text-sm h-10 rounded-xl"
-                            value={activeDeal.details}
-                            onChange={(e) => setActiveDeal((a) => (a ? { ...a, details: e.target.value } : a))}
-                            placeholder="e.g. Weekend dine-in only · Available this week"
-                          />
-                        </div>
-                        <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0">
-                          <div className="space-y-1">
-                            <Label className="text-xs font-semibold text-[#211a14]">Button Text</Label>
-                            <Input
-                              className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
-                              value={activeDeal.link_text}
-                              onChange={(e) => setActiveDeal((a) => (a ? { ...a, link_text: e.target.value } : a))}
-                              placeholder="Explore Menu"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs font-semibold text-[#211a14]">Button Link</Label>
-                            <Input
-                              className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
-                              value={activeDeal.link_url}
-                              onChange={(e) => setActiveDeal((a) => (a ? { ...a, link_url: e.target.value } : a))}
-                              placeholder="/menu"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Run window — the website obeys these on its own */}
-                        <div className="p-4 rounded-lg border border-zinc-200 bg-white space-y-2.5">
-                          <span className="text-xs font-semibold text-[#211a14] block">Schedule (Optional)</span>
-                          <p className="text-[10px] text-zinc-500 -mt-1">
-                            Leave blank to run forever. With an End set, the deal drops off the website by
-                            itself at that moment — and the band shows a live countdown stamp. Saved with
-                            &ldquo;Save Deal&rdquo;.
-                          </p>
-                          <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0">
-                            <div className="space-y-1">
-                              <Label htmlFor="deal-starts" className="text-xs font-semibold text-[#211a14]">
-                                Starts (optional)
-                              </Label>
-                              <Input
-                                id="deal-starts"
-                                type="datetime-local"
-                                className="border-zinc-300 text-[#211a14] font-bold text-xs h-10 rounded-xl"
-                                value={isoToLocalInput(activeDeal.starts_at)}
-                                onChange={(e) =>
-                                  setActiveDeal((a) => (a ? { ...a, starts_at: localInputToIso(e.target.value) } : a))
-                                }
-                              />
-                            </div>
-                            <div className="space-y-1">
-                              <Label htmlFor="deal-ends" className="text-xs font-semibold text-[#211a14]">
-                                Ends (optional)
-                              </Label>
-                              <Input
-                                id="deal-ends"
-                                type="datetime-local"
-                                className="border-zinc-300 text-[#211a14] font-bold text-xs h-10 rounded-xl"
-                                value={isoToLocalInput(activeDeal.ends_at)}
-                                onChange={(e) =>
-                                  setActiveDeal((a) => (a ? { ...a, ends_at: localInputToIso(e.target.value) } : a))
-                                }
-                              />
-                            </div>
-                          </div>
-                          {activeDeal.ends_at && new Date(activeDeal.ends_at).getTime() < Date.now() && (
-                            <p className="text-[11px] font-bold text-rose-700 bg-rose-50 border border-zinc-200 rounded-lg p-2">
-                              This end time is in the past — the deal is already off the website.
-                            </p>
-                          )}
-                        </div>
-                        <ImageField
-                          id="deal-image"
-                          label="Deal Photo"
-                          hint={
-                            campaignChannel === "channel1"
-                              ? "Shown inside the retro ticket frame on the right of the band"
-                              : "Shown on the left side of the coupon ticket in the slider"
-                          }
-                          ratio="16 / 9"
-                          value={activeDeal.image}
-                          onChange={(e) => setActiveDeal((a) => (a ? { ...a, image: e.target.value } : a))}
-                          onUploaded={(url) => setActiveDeal((a) => (a ? { ...a, image: url } : a))}
-                        />
-                      </div>
-                    </>
-                  ) : (
-                    <div className="py-10 text-center space-y-2">
-                      <p className="text-sm font-semibold text-[#211a14]">No deal selected</p>
-                      <p className="text-xs text-zinc-500 max-w-xs mx-auto">
-                        Pick a deal from the list on the left to edit it — or press{" "}
-                        <strong>“New Deal”</strong> to create the first one for this station.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="gap-2 text-xs font-bold border-zinc-300 text-[#763a12] rounded-xl whitespace-normal h-auto"
-                  onClick={() => setHomeStepIndex(1)}
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Previous: Step 1 (Hero)</span>
-                </Button>
-                <Button
-                  type="button"
-                  className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 rounded-xl whitespace-normal h-auto"
-                  onClick={() => setHomeStepIndex(3)}
-                >
-                  <span>Next: Step 3 (Photo Mosaic)</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+            <HomeStep2Campaigns
+              site={site}
+              setS={setS}
+              campaignChannel={campaignChannel}
+              setCampaignChannel={setCampaignChannel}
+              selectedDealId={selectedDealId}
+              setSelectedDealId={setSelectedDealId}
+              setAnnouncements={setAnnouncements}
+              stationDeals={stationDeals}
+              stationPlacement={stationPlacement}
+              activeDeal={activeDeal}
+              setActiveDeal={setActiveDeal}
+              legacyBackend={legacyBackend}
+              topBannerId={topBannerId}
+              bandUsingFallback={bandUsingFallback}
+              menuItems={menuItems}
+              run={run}
+              busy={busy}
+              setHomeStepIndex={setHomeStepIndex}
+            />
           )}
 
 
@@ -1366,523 +603,48 @@ export default function ContentPage() {
           {/* STEP 3: PHOTO MOSAIC (INPUTS)                                         */}
           {/* --------------------------------------------------------------------- */}
           {homeStepIndex === 3 && (
-            <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
-                <div className="flex items-center gap-2.5">
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
-                    Section 3
-                  </span>
-                  <div>
-                    <h3 className="text-base font-semibold text-[#211a14]">Homepage Polaroid Photo Mosaic</h3>
-                    <p className="text-xs text-zinc-500">The 6 featured scrapbook photos displayed in the homepage gallery strip</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* The manager IS the website layout: same mosaic, slot by slot */}
-              <p className="text-xs font-medium text-zinc-600 -mt-2">
-                This is the exact layout visitors see on the homepage — <strong>slot #1 is the big
-                hero shot</strong>. Drop a photo into any empty slot, or use Replace on a filled one.
-                Captions save when you click away.
-              </p>
-
-              {/* admin bundle doesn't load the public stylesheet, so the exact
-                  mosaic geometry ships scoped right here (same numbers as
-                  globals.css .gallery-mosaic) */}
-              <style>{`
-                .studio-mosaic { display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: 170px; gap: 16px; }
-                .studio-mosaic > :first-child { grid-column: span 2; grid-row: span 2; }
-                .studio-mosaic > :last-child { grid-column: span 2; }
-                @media (min-width: 640px) {
-                  .studio-mosaic { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 190px; }
-                  .studio-mosaic > :last-child { grid-column: auto; }
-                }
-                @media (min-width: 1024px) {
-                  .studio-mosaic { grid-template-columns: repeat(5, 1fr); grid-auto-rows: 235px; gap: 18px; }
-                  .studio-mosaic > :last-child { grid-column: span 2; }
-                }
-                .studio-slot { display: flex; flex-direction: column; background: #fff; padding: 8px 8px 10px; border-radius: 14px; border: 1.5px solid rgba(118, 58, 18, 0.1); box-shadow: 0 8px 20px rgba(33, 26, 20, 0.08); position: relative; min-width: 0; }
-                .studio-img { flex: 1; min-height: 0; position: relative; border-radius: 10px; overflow: hidden; background: #f4ebe1; }
-              `}</style>
-              <div className="studio-mosaic">
-                {Array.from({ length: 6 }).map((_, i) => {
-                  const p = photos[i];
-                  if (!p) {
-                    return (
-                      <div
-                        key={`empty-${i}`}
-                        className="studio-slot"
-                        style={{
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: "8px",
-                          border: "2px dashed #d9c7b4",
-                          background: "#faf5ee",
-                          boxShadow: "none",
-                        }}
-                      >
-                        <span className="text-xs font-semibold text-[#763a12]">
-                          Slot #{i + 1}{i === 0 ? " — big hero shot" : ""} · empty
-                        </span>
-                        <UploadButton
-                          label="Add Photo"
-                          onUploaded={(url) =>
-                            run(async () => {
-                              const created = await createGalleryPhoto({
-                                album: "food",
-                                caption: "",
-                                image: url,
-                                alt: "",
-                                sort_order: photos.length,
-                              });
-                              setPhotos((xs) => [...xs, created]);
-                            }, "Gallery", { title: `Photo added to slot #${i + 1}` })
-                          }
-                        />
-                      </div>
-                    );
-                  }
-                  return (
-                    <div key={p.id} className="studio-slot">
-                      <span
-                        className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-950 text-white shadow-xs"
-                        style={{ position: "absolute", top: "10px", left: "10px", zIndex: 6 }}
-                      >
-                        #{i + 1}{i === 0 ? " · Hero" : ""}
-                      </span>
-                      <button
-                        type="button"
-                        className="rounded-lg bg-black/80 text-white p-1.5 hover:bg-destructive transition-colors"
-                        style={{ position: "absolute", top: "8px", right: "8px", zIndex: 6 }}
-                        aria-label={`Delete photo “${p.caption || "Untitled"}”`}
-                        onClick={async () => {
-                          const ok = await confirmDialog({
-                            title: `Delete “${p.caption || "this photo"}”?`,
-                            description: "It is removed from the homepage strip and the gallery.",
-                            confirmLabel: "Delete photo",
-                            destructive: true,
-                          });
-                          if (!ok) return;
-                          run(async () => {
-                            await deleteGalleryPhoto(p.id);
-                            setPhotos((xs) => xs.filter((x) => x.id !== p.id));
-                          }, "Gallery", { title: "Photo deleted" });
-                        }}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                      <div className="studio-img">
-                        <Image
-                          src={p.image}
-                          alt={p.caption || "Gallery photo"}
-                          width={900}
-                          height={700}
-                          sizes="(min-width: 1024px) 40vw, 100vw"
-                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                        />
-                      </div>
-                      <div className="flex items-center gap-1.5 pt-1.5">
-                        <Input
-                          key={`cap-${p.id}`}
-                          defaultValue={p.caption}
-                          placeholder={i === 0 ? "Hero caption (shows on the website)" : "Caption…"}
-                          className="h-8 text-xs border-zinc-200 font-medium rounded-lg min-w-0"
-                          onBlur={(e) => {
-                            const v = e.target.value.trim();
-                            if (v === p.caption) return;
-                            run(async () => {
-                              await updateGalleryPhoto(p.id, { caption: v });
-                              setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, caption: v } : x)));
-                            }, "Caption", { title: "Caption saved" });
-                          }}
-                        />
-                        <UploadButton
-                          label="Replace"
-                          onUploaded={(url) =>
-                            run(async () => {
-                              await updateGalleryPhoto(p.id, { image: url });
-                              setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, image: url } : x)));
-                            }, "Gallery", { title: `Slot #${i + 1} photo replaced!` })
-                          }
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <p className="text-[11px] font-medium text-zinc-500">
-                Want more than 6 photos, albums, or the full gallery page? Manage everything in the{" "}
-                <button type="button" className="font-semibold text-[#763a12] underline" onClick={() => setActivePage("gallery")}>
-                  Gallery Page tab
-                </button>
-                .
-              </p>
-
-
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="gap-2 text-xs font-bold border-zinc-300 text-[#763a12] rounded-xl whitespace-normal h-auto"
-                  onClick={() => setHomeStepIndex(2)}
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Previous: Step 2 (Deals &amp; Campaigns)</span>
-                </Button>
-                <Button
-                  type="button"
-                  className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 rounded-xl whitespace-normal h-auto"
-                  onClick={() => setHomeStepIndex(4)}
-                >
-                  <span>Next: Step 4 (Trust Badges)</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+            <HomeStep3Mosaic
+              photos={photos}
+              setPhotos={setPhotos}
+              run={run}
+              setHomeStepIndex={setHomeStepIndex}
+              setActivePage={setActivePage}
+            />
           )}
 
           {/* --------------------------------------------------------------------- */}
           {/* STEP 4: TRUST BADGES (INPUTS)                                         */}
           {/* --------------------------------------------------------------------- */}
           {homeStepIndex === 4 && (
-            <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
-                <div className="flex items-center gap-2.5">
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
-                    Section 4
-                  </span>
-                  <div>
-                    <h3 className="text-base font-semibold text-[#211a14]">Homepage Trust Badges &amp; Certifications</h3>
-                    <p className="text-xs text-zinc-500">Quality seals, halal/organic stamps, and accreditation awards</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid gap-3.5">
-                {certs.map((c) => (
-                  <div
-                    key={c.id}
-                    className="flex flex-wrap items-center gap-3 p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs"
-                  >
-                    {/* real logo beats the built-in icon */}
-                    {c.image ? (
-                      <div className="flex items-center gap-1.5">
-                        <div className="relative h-10 w-10 rounded-lg border bg-white overflow-hidden shrink-0">
-                          <Image src={c.image} alt={c.title} fill sizes="40px" className="object-contain p-0.5" />
-                        </div>
-                        <button
-                          type="button"
-                          title="Remove logo — go back to the built-in icon"
-                          className="p-1.5 text-zinc-400 hover:text-destructive hover:bg-destructive/10 rounded-lg"
-                          onClick={() =>
-                            run(async () => {
-                              await updateCertification(c.id, { image: "" });
-                              setCerts((xs) => xs.map((x) => (x.id === c.id ? { ...x, image: "" } : x)));
-                            }, "Certification", { title: "Logo removed — showing the built-in icon" })
-                          }
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    ) : (
-                      <Select
-                        className="h-10 w-36 text-xs border-zinc-300 font-bold rounded-xl"
-                        value={c.icon}
-                        onChange={(e) =>
-                          setCerts((xs) =>
-                            xs.map((x) => (x.id === c.id ? { ...x, icon: e.target.value } : x))
-                          )
-                        }
-                      >
-                        {!CERT_ICONS.includes(c.icon) && <option value={c.icon}>Custom: {c.icon}</option>}
-                        {CERT_ICONS.map((ic) => (
-                          <option key={ic} value={ic} className="capitalize">
-                            {ic}
-                          </option>
-                        ))}
-                      </Select>
-                    )}
-                    <UploadButton
-                      label={c.image ? "Change Logo" : "Real Logo"}
-                      onUploaded={(url) =>
-                        run(async () => {
-                          await updateCertification(c.id, { image: url });
-                          setCerts((xs) => xs.map((x) => (x.id === c.id ? { ...x, image: url } : x)));
-                        }, "Certification", { title: "Logo uploaded" })
-                      }
-                    />
-                    <Input
-                      className="min-w-44 flex-1 h-10 text-xs border-zinc-300 text-[#211a14] font-semibold rounded-xl"
-                      placeholder="Badge Name (e.g. 100% Pure Canadian Maple)"
-                      value={c.title}
-                      onChange={(e) =>
-                        setCerts((xs) =>
-                          xs.map((x) => (x.id === c.id ? { ...x, title: e.target.value } : x))
-                        )
-                      }
-                    />
-                    <Input
-                      className="min-w-44 flex-1 h-10 text-xs border-zinc-300 text-[#211a14] font-medium rounded-xl"
-                      placeholder="Subtitle (Optional)"
-                      value={c.subtitle}
-                      onChange={(e) =>
-                        setCerts((xs) =>
-                          xs.map((x) => (x.id === c.id ? { ...x, subtitle: e.target.value } : x))
-                        )
-                      }
-                    />
-                    <label className="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 bg-zinc-100 rounded-xl border border-zinc-200 cursor-pointer">
-                      <Switch
-                        checked={c.is_active}
-                        onCheckedChange={(v) =>
-                          run(async () => {
-                            await updateCertification(c.id, { is_active: v });
-                            setCerts((xs) =>
-                              xs.map((x) => (x.id === c.id ? { ...x, is_active: v } : x))
-                            );
-                          }, "Certification", { title: v ? "Badge shown" : "Badge hidden" })
-                        }
-                      />
-                      <span className="text-[#763a12]">{c.is_active ? "Shown" : "Hidden"}</span>
-                    </label>
-                    <Button
-                      size="sm"
-                      className="h-10 px-4 text-xs font-bold bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
-                      onClick={() =>
-                        run(async () => {
-                          await updateCertification(c.id, {
-                            icon: c.icon,
-                            title: c.title,
-                            subtitle: c.subtitle,
-                          });
-                        }, "Certification", { title: "Badge updated" })
-                      }
-                    >
-                      <Save className="h-3.5 w-3.5 mr-1" /> Save
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-10 w-10 text-destructive hover:bg-destructive/10 rounded-xl"
-                      onClick={async () => {
-                        const ok = await confirmDialog({
-                          title: `Delete “${c.title}”?`,
-                          description: "The badge disappears from the homepage trust strip.",
-                          confirmLabel: "Delete badge",
-                          destructive: true,
-                        });
-                        if (!ok) return;
-                        run(async () => {
-                          await deleteCertification(c.id);
-                          setCerts((xs) => xs.filter((x) => x.id !== c.id));
-                        }, "Certification", { title: "Badge deleted" });
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-
-                {/* Add New Badge */}
-                <div className="flex flex-wrap items-center gap-3 p-4 rounded-lg border border-dashed border-zinc-300 bg-white">
-                  <span className="text-xs font-semibold text-[#211a14] flex items-center gap-1.5">
-                    <Plus className="h-4 w-4 text-[#763a12]" /> Add New Badge:
-                  </span>
-                  {newCert.image ? (
-                    <div className="flex items-center gap-1.5">
-                      <div className="relative h-10 w-10 rounded-lg border bg-white overflow-hidden shrink-0">
-                        <Image src={newCert.image} alt="New badge logo" fill sizes="40px" className="object-contain p-0.5" />
-                      </div>
-                      <button
-                        type="button"
-                        title="Remove logo"
-                        className="p-1.5 text-zinc-400 hover:text-destructive hover:bg-destructive/10 rounded-lg"
-                        onClick={() => setNewCert((n) => ({ ...n, image: "" }))}
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  ) : (
-                    <Select
-                      className="h-10 w-36 text-xs border-zinc-300 font-bold rounded-xl"
-                      value={newCert.icon}
-                      onChange={(e) => setNewCert((n) => ({ ...n, icon: e.target.value }))}
-                    >
-                      {CERT_ICONS.map((ic) => (
-                        <option key={ic} value={ic} className="capitalize">
-                          {ic}
-                        </option>
-                      ))}
-                    </Select>
-                  )}
-                  <UploadButton
-                    label="Real Logo"
-                    onUploaded={(url) => setNewCert((n) => ({ ...n, image: url }))}
-                  />
-                  <Input
-                    className="min-w-44 flex-1 h-10 text-xs border-zinc-300 text-[#211a14] font-bold rounded-xl"
-                    placeholder="Badge Name (e.g. Free Range Eggs)"
-                    value={newCert.title}
-                    onChange={(e) => setNewCert((n) => ({ ...n, title: e.target.value }))}
-                  />
-                  <Input
-                    className="min-w-44 flex-1 h-10 text-xs border-zinc-300 text-[#211a14] font-medium rounded-xl"
-                    placeholder="Subtitle (Optional)"
-                    value={newCert.subtitle}
-                    onChange={(e) => setNewCert((n) => ({ ...n, subtitle: e.target.value }))}
-                  />
-                  <Button
-                    size="sm"
-                    className="h-10 text-xs font-bold bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
-                    disabled={!newCert.title.trim()}
-                    onClick={() =>
-                      run(async () => {
-                        const created = await createCertification({
-                          ...newCert,
-                          sort_order: certs.length,
-                        });
-                        setCerts((xs) => [...xs, created]);
-                        setNewCert(EMPTY_CERT);
-                      }, "Certification", { title: "Badge added" })
-                    }
-                  >
-                    <Plus className="h-3.5 w-3.5 mr-1" /> Add Badge
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="gap-2 text-xs font-bold border-zinc-300 text-[#763a12] rounded-xl whitespace-normal h-auto"
-                  onClick={() => setHomeStepIndex(3)}
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Previous: Step 3 (Photos)</span>
-                </Button>
-                <Button
-                  type="button"
-                  className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 rounded-xl whitespace-normal h-auto"
-                  onClick={() => setHomeStepIndex(5)}
-                >
-                  <span>Next: Step 5 (Bottom Banner)</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+            <HomeStep4Badges
+              certs={certs}
+              setCerts={setCerts}
+              newCert={newCert}
+              setNewCert={setNewCert}
+              run={run}
+              setHomeStepIndex={setHomeStepIndex}
+            />
           )}
 
           {/* --------------------------------------------------------------------- */}
           {/* STEP 5: BOTTOM BOOKING BANNER (INPUTS)                                */}
           {/* --------------------------------------------------------------------- */}
           {homeStepIndex === 5 && (
-            <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-5">
-              <h4 className="text-sm font-semibold text-[#211a14] pb-2 border-b border-zinc-200">Customize Bottom Invitation</h4>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-1">
-                  <Label className="text-xs font-semibold text-[#211a14]">Headline Text</Label>
-                  <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.cta_heading} onChange={setS("cta_heading")} />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs font-semibold text-[#211a14]">Handwriting Accent Word</Label>
-                  <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.cta_script} onChange={setS("cta_script")} />
-                </div>
-                <div className="sm:col-span-2 space-y-1">
-                  <Label className="text-xs font-semibold text-[#211a14]">Short Invitation Description</Label>
-                  <Textarea rows={2} className="border-zinc-300 text-[#211a14] font-medium text-sm rounded-xl" value={site.cta_lead} onChange={setS("cta_lead")} />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs font-semibold text-[#211a14]">Button Text</Label>
-                  <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.cta_button_label} onChange={setS("cta_button_label")} />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs font-semibold text-[#211a14]">Button Link URL</Label>
-                  <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.cta_button_url} onChange={setS("cta_button_url")} />
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="gap-2 text-xs font-bold border-zinc-300 text-[#763a12] rounded-xl whitespace-normal h-auto"
-                  onClick={() => setHomeStepIndex(4)}
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Previous: Step 4 (Badges)</span>
-                </Button>
-                <Button
-                  type="button"
-                  className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 rounded-xl whitespace-normal h-auto"
-                  onClick={() => setHomeStepIndex(6)}
-                >
-                  <span>Next: Step 6 (Footer)</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+            <HomeStep5Cta site={site} setS={setS} setHomeStepIndex={setHomeStepIndex} />
           )}
 
           {/* --------------------------------------------------------------------- */}
           {/* STEP 6: FOOTER TAGLINE (INPUTS)                                       */}
           {/* --------------------------------------------------------------------- */}
           {homeStepIndex === 6 && (
-            <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
-                <div className="flex items-center gap-2.5">
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
-                    Section 6
-                  </span>
-                  <div>
-                    <h3 className="text-base font-semibold text-[#211a14]">Footer Brand Tagline</h3>
-                    <p className="text-xs text-zinc-500">The founding line shown under the footer logo on every page</p>
-                  </div>
-                </div>
-                <Button
-                  size="sm"
-                  className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
-                  loading={busy === "Footer tagline"}
-                  onClick={() =>
-                    run(async () => {
-                      await updateSiteSettings({ footer_tagline: site.footer_tagline });
-                    }, "Footer tagline")
-                  }
-                >
-                  <Save className="h-3.5 w-3.5 mr-1.5" /> Save Footer
-                </Button>
-              </div>
-
-              <div className="space-y-2 max-w-lg">
-                <Label className="text-xs font-semibold text-[#211a14]">Footer Tagline</Label>
-                <Input
-                  className="border-zinc-300 text-[#211a14] font-bold text-sm h-11 rounded-xl"
-                  value={site.footer_tagline}
-                  onChange={setS("footer_tagline")}
-                  placeholder="e.g. Fluffy stacks · real maple · est. 1999"
-                />
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="gap-2 text-xs font-bold border-zinc-300 text-[#763a12] rounded-xl whitespace-normal h-auto"
-                  onClick={() => setHomeStepIndex(5)}
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Previous: Step 5 (Bottom Banner)</span>
-                </Button>
-                <Button
-                  type="button"
-                  className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 rounded-xl whitespace-normal h-auto"
-                  onClick={() => setActivePage("menu")}
-                >
-                  <span>Next: Menu page</span>
-                </Button>
-              </div>
-            </div>
+            <HomeStep6Footer
+              site={site}
+              setS={setS}
+              busy={busy}
+              run={run}
+              setHomeStepIndex={setHomeStepIndex}
+              setActivePage={setActivePage}
+            />
           )}
         </div>
       )}
