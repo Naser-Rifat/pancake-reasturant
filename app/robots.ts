@@ -22,6 +22,5 @@ export default function robots(): MetadataRoute.Robots {
       ...AI_BOTS.map((userAgent) => ({ userAgent, allow: "/", disallow: ["/admin"] })),
     ],
     sitemap: `${BASE}/sitemap.xml`,
-    host: BASE,
   };
 }
