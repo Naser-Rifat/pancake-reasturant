@@ -76,48 +76,22 @@ import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadButton } from "@/components/ui/upload-button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ContentSkeleton } from "./_components/ContentSkeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { useToast, type ToastInput } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm";
 import { CERT_ICONS } from "@/components/CertIcon";
 import { ImageField } from "@/components/ui/image-field";
 
-type PageTab = "home" | "menu" | "gallery" | "booking";
-type ViewportMode = "desktop" | "mobile";
-type CampaignFormat = "band" | "slider";
-type DealCadence = "all" | "weekly" | "monthly" | "regular";
-
-const EMPTY_PHOTO: Pick<AdminGalleryPhoto, "album" | "caption" | "image" | "alt"> = {
-  album: "food",
-  caption: "",
-  image: "",
-  alt: "",
-};
-const EMPTY_CERT = { icon: "medal", image: "", title: "", subtitle: "" };
-
-/** ISO datetime ↔ <input type="datetime-local"> value (local wall-clock) */
-function isoToLocalInput(iso: string | null): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (isNaN(+d)) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-function localInputToIso(v: string): string | null {
-  return v ? new Date(v).toISOString() : null;
-}
-
-function getDealCadence(a: AdminAnnouncement): "weekly" | "monthly" | "regular" {
-  const t = `${a.message} ${a.details}`.toLowerCase();
-  if (t.includes("month") || t.includes("monthly") || t.includes("30 day") || t.includes("september") || t.includes("october")) {
-    return "monthly";
-  }
-  if (t.includes("week") || t.includes("weekend") || t.includes("brunch pass") || t.includes("tuesday") || t.includes("sunday")) {
-    return "weekly";
-  }
-  return "regular";
-}
+import {
+  EMPTY_CERT,
+  EMPTY_PHOTO,
+  getDealCadence,
+  isoToLocalInput,
+  localInputToIso,
+  type PageTab,
+  type ViewportMode,
+} from "./_lib";
 
 export default function ContentPage() {
   // a reload used to dump staff back to Homepage step 1 — the studio remembers
@@ -301,44 +275,7 @@ export default function ContentPage() {
   };
 
   if (loading) {
-    return (
-      <div className="space-y-6 max-w-7xl mx-auto">
-        <div className="p-6 sm:p-7 rounded-xl bg-white border border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <Skeleton className="h-5 w-32 rounded-full" />
-            <Skeleton className="h-7 w-64 rounded-xl" />
-            <Skeleton className="h-4 w-96 rounded-lg" />
-          </div>
-          <div className="flex gap-2">
-            <Skeleton className="h-10 w-28 rounded-lg" />
-            <Skeleton className="h-10 w-28 rounded-lg" />
-          </div>
-        </div>
-
-        {/* 6 Tabs Skeleton */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className="h-14 w-full rounded-lg" />
-          ))}
-        </div>
-
-        {/* Active Panel Skeleton */}
-        <div className="p-6 sm:p-8 rounded-xl bg-white border border-zinc-200 space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-zinc-200">
-            <div className="space-y-2">
-              <Skeleton className="h-6 w-48 rounded-xl" />
-              <Skeleton className="h-4 w-72 rounded-lg" />
-            </div>
-            <Skeleton className="h-10 w-32 rounded-lg" />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Skeleton className="h-24 w-full rounded-lg" />
-            <Skeleton className="h-24 w-full rounded-lg" />
-          </div>
-          <Skeleton className="h-64 w-full rounded-xl" />
-        </div>
-      </div>
-    );
+    return <ContentSkeleton />;
   }
 
   if (error && !site) {

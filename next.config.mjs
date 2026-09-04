@@ -1,10 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // App has multiple root layouts (route groups), so a normal app/not-found
+  // can't compose one global 404 for unmatched URLs — use global-not-found.
+  experimental: {
+    globalNotFound: true,
+  },
   images: {
-    // Menu/gallery/hero image URLs are entered by staff in the admin panel and
-    // may point at any host (Unsplash, Cloudinary, the client's own storage),
-    // so allow any https origin. Local /menu and /logo assets need no entry.
-    remotePatterns: [{ protocol: "https", hostname: "**" }],
+    // Restrict image optimization to the hosts actually used (Cloudinary for
+    // admin uploads, Unsplash for stock/seed images) so the /_next/image
+    // endpoint can't be abused as an open proxy for arbitrary hosts.
+    // Add a host here if staff start using another image source.
+    remotePatterns: [
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "images.unsplash.com" },
+    ],
   },
 };
 
