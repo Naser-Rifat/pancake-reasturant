@@ -9,13 +9,8 @@ import {
   Trash2,
   X,
   Search,
-  Star,
-  Flame,
-  Clock,
   UtensilsCrossed,
   Layers,
-  Filter,
-  Check,
   Save,
   ArrowRight,
   ArrowLeft,
@@ -29,7 +24,6 @@ import {
   updateMenuItem,
   type AdminMenuItem,
 } from "@/lib/admin-api";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,52 +36,13 @@ import { TableSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import PhotoBoard from "@/components/admin/PhotoBoard";
 
-const TAG_INFO: Record<AdminMenuItem["tag"], { label: string; icon: string; bg: string; text: string; border: string }> = {
-  sweet: {
-    label: "Sweet Stack",
-    icon: "",
-    bg: "bg-amber-100/80",
-    text: "text-amber-950",
-    border: "border-amber-300",
-  },
-  savoury: {
-    label: "Savoury Brunch",
-    icon: "",
-    bg: "bg-orange-100/80",
-    text: "text-orange-950",
-    border: "border-orange-300",
-  },
-  choc: {
-    label: "Choc Loaded",
-    icon: "",
-    bg: "bg-[#f4e6dc]",
-    text: "text-[#522b14]",
-    border: "border-[#d8b8a2]",
-  },
-};
-
-const EMPTY_FORM = {
-  slug: "",
-  name: "",
-  description: "",
-  price: "",
-  tag: "sweet" as AdminMenuItem["tag"],
-  heat: "none" as AdminMenuItem["heat"],
-  kcal: "",
-  protein_g: "",
-  prep_time: "",
-  image: "",
-  photo: "",
-  is_available: true,
-  is_featured: false,
-};
-
-type FormState = typeof EMPTY_FORM;
-
-type FilterCategory = "all" | "sweet" | "savoury" | "choc" | "featured" | "live";
-
-const slugify = (s: string) =>
-  s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+import {
+  EMPTY_FORM,
+  TAG_INFO,
+  slugify,
+  type FilterCategory,
+  type FormState,
+} from "./_lib";
 
 export default function MenuAdminPage() {
   const [items, setItems] = useState<AdminMenuItem[]>([]);
