@@ -23,7 +23,7 @@ export function OrderRow({
       className={`transition-colors ${highlighted ? "bg-amber-100" : "hover:bg-zinc-50"}`}
     >
       {/* Customer Info & Order Reference */}
-      <td className="py-3.5 px-4 min-w-[220px]">
+      <td className="py-3.5 px-4 min-w-55">
         <div className="space-y-1">
           <div className="flex items-center gap-2 whitespace-nowrap">
             {orderRef && (
