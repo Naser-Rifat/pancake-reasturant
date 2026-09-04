@@ -150,17 +150,27 @@ export default function MenuClient({
               to place an order.
             </p>
             {uberEatsUrl && (
-              <p style={{ margin: "0.4rem 0 0 0", fontSize: "0.95rem" }}>
-                Delivery is also available on{" "}
-                <a
-                  href={uberEatsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: "#06C167", fontWeight: 700, textDecoration: "underline" }}
-                >
-                  Uber Eats 🛵
-                </a>
-              </p>
+              <a
+                href={uberEatsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  marginTop: "0.9rem",
+                  padding: "0.7rem 1.5rem",
+                  borderRadius: "999px",
+                  background: "#06C167",
+                  color: "#fff",
+                  fontWeight: 800,
+                  fontSize: "0.95rem",
+                  textDecoration: "none",
+                  boxShadow: "0 8px 20px rgba(6, 193, 103, 0.3)",
+                }}
+              >
+                🛵 Order on Uber Eats
+              </a>
             )}
           </div>
         )}
@@ -201,7 +211,7 @@ export default function MenuClient({
             if (group.length === 0) return null;
 
             return (
-              <section className="menu-cat-board reveal" key={tag}>
+              <section className="menu-cat-board" key={tag}>
                 <div className="menu-board-header">
                   <div className="board-header-left">
                     <span className="board-cat-icon">{CATEGORY_ICONS[tag]}</span>
@@ -394,8 +404,26 @@ export default function MenuClient({
             onClick={checkout}
             disabled={placing}
           >
-            {placing ? "Placing order…" : "Checkout →"}
+            {placing ? "Placing order…" : "Checkout for Pickup →"}
           </button>
+          {uberEatsUrl && (
+            <a
+              href={uberEatsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "block",
+                textAlign: "center",
+                marginTop: "0.7rem",
+                fontSize: "0.9rem",
+                fontWeight: 700,
+                color: "#06C167",
+                textDecoration: "underline",
+              }}
+            >
+              Prefer delivery? Order on Uber Eats 🛵
+            </a>
+          )}
         </div>
       </aside>
 

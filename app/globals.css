@@ -4189,6 +4189,16 @@ body::before {
   height: 30px;
   fill: #fff;
 }
+/* On pages that also show the cart FAB (the menu), lift the WhatsApp button
+   above it so the two don't overlap in the bottom-right corner. */
+body:has(.cart-fab) .wa-float {
+  bottom: calc(1.1rem + 58px + 12px);
+}
+@media (min-width: 640px) {
+  body:has(.cart-fab) .wa-float {
+    bottom: calc(1.8rem + 64px + 12px);
+  }
+}
 @media (min-width: 768px) {
   .wa-float {
     right: 26px;
