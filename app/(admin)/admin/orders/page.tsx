@@ -2,22 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ShoppingBag,
   ChefHat,
   Bell,
-  CheckCircle2,
-  Clock,
   Phone,
   Mail,
   Search,
   RefreshCw,
-  AlertCircle,
-  DollarSign,
   X,
-  ArrowRight,
-  Ban,
-  Receipt,
-  Utensils,
   Check,
 } from "lucide-react";
 import {
@@ -31,37 +22,13 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { TableSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
-import { ORDER_STATUSES, STATUS_BADGE } from "../status";
+import { ORDER_STATUSES } from "../status";
 import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm";
 import { Pagination } from "@/components/admin/Pagination";
 import { useRowFocus } from "@/components/admin/use-row-focus";
 
-const PAGE_SIZE = 12; // mirrors the backend's DRF PAGE_SIZE
-
-const FILTERS = ["all", ...ORDER_STATUSES] as const;
-const POLL_MS = 15_000;
-
-// Two short rising beeps for new incoming takeaway orders
-function newOrderChime() {
-  try {
-    const ctx = new AudioContext();
-    [0, 0.18].forEach((delay, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = i === 0 ? 880 : 1320;
-      gain.gain.setValueAtTime(0.15, ctx.currentTime + delay);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.15);
-      osc.start(ctx.currentTime + delay);
-      osc.stop(ctx.currentTime + delay + 0.16);
-    });
-    setTimeout(() => ctx.close(), 600);
-  } catch {
-    /* audio blocked until first user interaction — safe fallback */
-  }
-}
+import { FILTERS, PAGE_SIZE, POLL_MS, newOrderChime } from "./_lib";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
@@ -75,7 +42,7 @@ export default function OrdersPage() {
   const knownIds = useRef<Set<string> | null>(null);
   const nextPage = useRef(2);
   const { toast } = useToast();
-  const { promptText, confirm: confirmDialog } = useConfirm();
+  const { promptText } = useConfirm();
 
   const load = useCallback(
     async (isInitial = false) => {
@@ -233,7 +200,6 @@ export default function OrdersPage() {
   const receivedCount = orders.filter((o) => o.status === "received").length;
   const preparingCount = orders.filter((o) => o.status === "preparing").length;
   const readyCount = orders.filter((o) => o.status === "ready").length;
-  const completedCount = orders.filter((o) => o.status === "completed").length;
 
   // today's takings from the loaded window — matches the dashboard's
   // "Revenue today" (an all-time sum here would lie: only ~24 newest orders
