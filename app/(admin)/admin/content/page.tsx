@@ -77,6 +77,9 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadButton } from "@/components/ui/upload-button";
 import { ContentSkeleton } from "./_components/ContentSkeleton";
+import { BookingPageSection } from "./_components/BookingPageSection";
+import { GalleryPageSection } from "./_components/GalleryPageSection";
+import { MenuPageSection } from "./_components/MenuPageSection";
 import { AdminError } from "@/components/ui/admin-error";
 import { useToast, type ToastInput } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm";
@@ -1888,424 +1891,39 @@ export default function ContentPage() {
       {/* 🥞 PAGE 2: MENU PAGE STUDIO (/menu)                                       */}
       {/* ========================================================================= */}
       {activePage === "menu" && (
-        <div className="space-y-6">
-          <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
-              <div className="flex items-center gap-2.5">
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
-                  Menu Header
-                </span>
-                <h3 className="text-base font-semibold text-[#211a14]">Menu Page Top Title</h3>
-              </div>
-              <Button
-                size="sm"
-                className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
-                loading={busy === "Menu hero"}
-                onClick={() =>
-                  run(async () => {
-                    await updateSiteSettings({
-                      menu_hero_heading: site.menu_hero_heading,
-                      menu_hero_script: site.menu_hero_script,
-                      menu_hero_lead: site.menu_hero_lead,
-                    });
-                  }, "Menu hero")
-                }
-              >
-                <Save className="h-3.5 w-3.5 mr-1.5" /> Save Header
-              </Button>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1">
-                <Label className="text-xs font-semibold text-[#211a14]">Main Word (e.g. Stacks On)</Label>
-                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.menu_hero_heading} onChange={setS("menu_hero_heading")} />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs font-semibold text-[#211a14]">Handwriting Word (e.g. Stacks.)</Label>
-                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.menu_hero_script} onChange={setS("menu_hero_script")} />
-              </div>
-              <div className="sm:col-span-2 space-y-1">
-                <Label className="text-xs font-semibold text-[#211a14]">Subtitle</Label>
-                <Input className="border-zinc-300 text-[#211a14] font-medium text-sm h-10 rounded-xl" value={site.menu_hero_lead} onChange={setS("menu_hero_lead")} />
-              </div>
-            </div>
-          </div>
-
-          {/* 3-Step Pickup Cards */}
-          <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
-              <div className="flex items-center gap-2.5">
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
-                  Pickup Guide
-                </span>
-                <h3 className="text-base font-semibold text-[#211a14]">3-Step Ordering Cards on /menu</h3>
-              </div>
-            </div>
-
-            <div className="grid gap-3.5">
-              {steps.map((st, i) => (
-                <div
-                  key={st.id}
-                  className="p-4 rounded-lg border border-zinc-200 bg-white shadow-2xs space-y-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#763a12] text-white">
-                      STEP 0{i + 1}
-                    </span>
-                    <Button
-                      size="sm"
-                      className="h-8 text-xs font-bold bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
-                      loading={busy === `Step ${st.id}`}
-                      onClick={() =>
-                        run(
-                          async () => {
-                            await updateHomeStep(st.id, {
-                              label: st.label,
-                              title: st.title,
-                              text: st.text,
-                              image: st.image,
-                            });
-                          },
-                          `Step 0${i + 1}`,
-                          { title: `Step 0${i + 1} updated!` }
-                        )
-                      }
-                    >
-                      <Save className="h-3 w-3 mr-1" /> Save Step 0{i + 1}
-                    </Button>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="space-y-1">
-                      <Label className="text-[11px] font-semibold text-[#211a14]">Title</Label>
-                      <Input
-                        className="h-10 text-xs border-zinc-300 text-[#211a14] font-bold rounded-xl"
-                        value={st.title}
-                        onChange={(e) =>
-                          setSteps((xs) =>
-                            xs.map((x) => (x.id === st.id ? { ...x, title: e.target.value } : x))
-                          )
-                        }
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-[11px] font-semibold text-[#211a14]">Description</Label>
-                      <Input
-                        className="h-10 text-xs border-zinc-300 text-[#211a14] font-medium rounded-xl"
-                        value={st.text}
-                        onChange={(e) =>
-                          setSteps((xs) =>
-                            xs.map((x) => (x.id === st.id ? { ...x, text: e.target.value } : x))
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between p-5 rounded-xl border border-zinc-200 bg-white shadow-sm">
-            <div>
-              <h4 className="text-xs font-semibold text-[#211a14]">Want to add or edit pancake dishes, flavours &amp; prices?</h4>
-              <p className="text-[11px] font-medium text-zinc-500">Dishes are managed in the dedicated Menu Catalog section.</p>
-            </div>
-            <Link
-              href="/admin/menu"
-              className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2.5 rounded-lg bg-[#763a12] text-white hover:bg-[#5e2d0d] shadow-sm"
-            >
-              <span>Go to Menu Catalog</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
+        <MenuPageSection
+          site={site}
+          setS={setS}
+          steps={steps}
+          setSteps={setSteps}
+          busy={busy}
+          run={run}
+        />
       )}
 
       {/* ========================================================================= */}
       {/* 📸 PAGE 3: GALLERY STUDIO (/gallery)                                      */}
       {/* ========================================================================= */}
       {activePage === "gallery" && (
-        <div className="space-y-6">
-          <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
-              <div className="flex items-center gap-2.5">
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
-                  Gallery Header
-                </span>
-                <h3 className="text-base font-semibold text-[#211a14]">Gallery Top Title</h3>
-              </div>
-              <Button
-                size="sm"
-                className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
-                loading={busy === "Gallery hero"}
-                onClick={() =>
-                  run(async () => {
-                    await updateSiteSettings({
-                      gallery_hero_kicker: site.gallery_hero_kicker,
-                      gallery_hero_heading: site.gallery_hero_heading,
-                      gallery_hero_script: site.gallery_hero_script,
-                      gallery_hero_lead: site.gallery_hero_lead,
-                    });
-                  }, "Gallery hero")
-                }
-              >
-                <Save className="h-3.5 w-3.5 mr-1.5" /> Save Header
-              </Button>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="space-y-1">
-                <Label className="text-xs font-semibold text-[#211a14]">Small Top Kicker</Label>
-                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.gallery_hero_kicker} onChange={setS("gallery_hero_kicker")} placeholder="Feast Your Eyes" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs font-semibold text-[#211a14]">Main Word</Label>
-                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.gallery_hero_heading} onChange={setS("gallery_hero_heading")} placeholder="The" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs font-semibold text-[#211a14]">Handwriting Word</Label>
-                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.gallery_hero_script} onChange={setS("gallery_hero_script")} placeholder="Gallery." />
-              </div>
-              <div className="sm:col-span-3 space-y-1">
-                <Label className="text-xs font-semibold text-[#211a14]">Subtitle</Label>
-                <Input className="border-zinc-300 text-[#211a14] font-medium text-sm h-10 rounded-xl" value={site.gallery_hero_lead} onChange={setS("gallery_hero_lead")} placeholder="Our food, our space, and the good times in between." />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
-              <div className="flex items-center gap-2.5">
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
-                  Photo Albums
-                </span>
-                <h3 className="text-base font-semibold text-[#211a14]">All Uploaded Photos ({photos.length})</h3>
-              </div>
-              <div className="flex items-center gap-1.5 p-1 bg-zinc-100 rounded-lg border border-zinc-200">
-                {[
-                  { id: "all", label: "All" },
-                  { id: "food", label: "Food" },
-                  { id: "interior", label: "Interior" },
-                  { id: "events", label: "Events" },
-                ].map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setGalleryFilter(cat.id)}
-                    className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
-                      galleryFilter === cat.id
-                        ? "bg-[#763a12] text-white shadow-xs"
-                        : "text-[#763a12] hover:text-[#211a14]"
-                    }`}
-                  >
-                    {cat.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Add photos to any album — the homepage strip shows the first 6 overall */}
-            <div className="p-4 rounded-lg border border-dashed border-zinc-300 bg-white">
-              <div className="grid gap-3 sm:grid-cols-5 [&>*]:min-w-0">
-                <Select
-                  className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
-                  value={newPhoto.album}
-                  onChange={(e) =>
-                    setNewPhoto((n) => ({ ...n, album: e.target.value as AdminGalleryPhoto["album"] }))
-                  }
-                >
-                  <option value="food">Food &amp; Dishes</option>
-                  <option value="interior">Interior &amp; Space</option>
-                  <option value="events">Events &amp; Parties</option>
-                </Select>
-                <div className="flex items-center gap-2 sm:col-span-2">
-                  <Input
-                    className="h-10 text-xs border-zinc-300 font-medium rounded-xl"
-                    placeholder="Image URL or click upload"
-                    value={newPhoto.image}
-                    onChange={(e) => setNewPhoto((n) => ({ ...n, image: e.target.value }))}
-                  />
-                  <UploadButton onUploaded={(url) => setNewPhoto((n) => ({ ...n, image: url }))} />
-                </div>
-                <Input
-                  className="h-10 text-xs border-zinc-300 font-medium rounded-xl"
-                  placeholder="Caption (e.g. Fluffy Berry Stack)"
-                  value={newPhoto.caption}
-                  onChange={(e) => setNewPhoto((n) => ({ ...n, caption: e.target.value }))}
-                />
-                <Button
-                  className="h-10 text-xs font-bold bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
-                  disabled={!newPhoto.image.trim() || !newPhoto.caption.trim()}
-                  onClick={() =>
-                    run(async () => {
-                      const created = await createGalleryPhoto({
-                        ...newPhoto,
-                        sort_order: photos.length,
-                      });
-                      setPhotos((xs) => [...xs, created]);
-                      setNewPhoto(EMPTY_PHOTO);
-                    }, "Gallery", { title: "Photo added" })
-                  }
-                >
-                  <Plus className="h-3.5 w-3.5 mr-1" /> Add Photo
-                </Button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 [&>*]:min-w-0">
-              {filteredPhotos.map((p) => (
-                <div
-                  key={p.id}
-                  className="group relative overflow-hidden rounded-lg border border-zinc-200 bg-white p-2 shadow-xs hover:border-zinc-300 transition-all"
-                >
-                  <div className="relative aspect-square rounded-xl overflow-hidden bg-zinc-100">
-                    <Image
-                      src={p.image}
-                      alt={p.caption}
-                      fill
-                      sizes="300px"
-                      className="object-cover"
-                      style={{ objectPosition: `50% ${p.focus === "top" ? "18%" : p.focus === "bottom" ? "82%" : "50%"}` }}
-                    />
-                    <Badge className="absolute left-1.5 top-1.5 capitalize text-[10px] font-semibold bg-zinc-950 text-white border-0">
-                      {p.album}
-                    </Badge>
-                    <button
-                      className="absolute right-1.5 top-1.5 rounded-lg bg-black/80 text-white p-1.5 opacity-0 group-hover:opacity-100 hover:bg-destructive transition-opacity"
-                      aria-label={`Remove photo “${p.caption || "Untitled"}”`}
-                      onClick={async () => {
-                        const ok = await confirmDialog({
-                          title: `Remove “${p.caption || "this photo"}” from the gallery?`,
-                          description: "It also leaves the homepage strip if it was one of the first six.",
-                          confirmLabel: "Remove photo",
-                          destructive: true,
-                        });
-                        if (!ok) return;
-                        run(async () => {
-                          await deleteGalleryPhoto(p.id);
-                          setPhotos((xs) => xs.filter((x) => x.id !== p.id));
-                        }, "Gallery", { title: "Photo removed" });
-                      }}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                  <div className="grid gap-1.5 p-1.5 pt-2">
-                    <Input
-                      key={`gcap-${p.id}`}
-                      defaultValue={p.caption}
-                      placeholder="Caption…"
-                      className="h-8 text-xs border-zinc-200 font-medium rounded-lg"
-                      onBlur={(e) => {
-                        const v = e.target.value.trim();
-                        if (v === p.caption) return;
-                        run(async () => {
-                          await updateGalleryPhoto(p.id, { caption: v });
-                          setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, caption: v } : x)));
-                        }, "Caption", { title: "Caption saved" });
-                      }}
-                    />
-                    <div className="flex items-center gap-1.5 [&>*]:min-w-0">
-                      <Select
-                        className="h-8 flex-1 text-xs border-zinc-200 font-bold rounded-lg"
-                        aria-label="Which part of the photo stays visible when cropped"
-                        value={p.focus}
-                        onChange={(e) =>
-                          run(async () => {
-                            const focus = e.target.value as AdminGalleryPhoto["focus"];
-                            await updateGalleryPhoto(p.id, { focus });
-                            setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, focus } : x)));
-                          }, "Photo crop", { title: "Crop focus saved" })
-                        }
-                      >
-                        <option value="center">Focus: Centre</option>
-                        <option value="top">Focus: Top</option>
-                        <option value="bottom">Focus: Bottom</option>
-                      </Select>
-                      <UploadButton
-                        label="Replace"
-                        onUploaded={(url) =>
-                          run(async () => {
-                            await updateGalleryPhoto(p.id, { image: url });
-                            setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, image: url } : x)));
-                          }, "Gallery", { title: "Photo replaced" })
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <GalleryPageSection
+          site={site}
+          setS={setS}
+          photos={photos}
+          setPhotos={setPhotos}
+          galleryFilter={galleryFilter}
+          setGalleryFilter={setGalleryFilter}
+          newPhoto={newPhoto}
+          setNewPhoto={setNewPhoto}
+          busy={busy}
+          run={run}
+        />
       )}
 
       {/* ========================================================================= */}
       {/* 📅 PAGE 4: BOOKING STUDIO (/booking)                                      */}
       {/* ========================================================================= */}
       {activePage === "booking" && (
-        <div className="space-y-6">
-          <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
-              <div className="flex items-center gap-2.5">
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#763a12] text-white uppercase tracking-wide">
-                  Booking Header
-                </span>
-                <h3 className="text-base font-semibold text-[#211a14]">Reservation Page Header</h3>
-              </div>
-              <Button
-                size="sm"
-                className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
-                loading={busy === "Booking hero"}
-                onClick={() =>
-                  run(async () => {
-                    await updateSiteSettings({
-                      booking_hero_kicker: site.booking_hero_kicker,
-                      booking_hero_heading: site.booking_hero_heading,
-                      booking_hero_script: site.booking_hero_script,
-                      booking_hero_lead: site.booking_hero_lead,
-                    });
-                  }, "Booking hero")
-                }
-              >
-                <Save className="h-3.5 w-3.5 mr-1.5" /> Save Header
-              </Button>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="space-y-1">
-                <Label className="text-xs font-semibold text-[#211a14]">Small Top Kicker</Label>
-                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.booking_hero_kicker} onChange={setS("booking_hero_kicker")} placeholder="Reserve Online" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs font-semibold text-[#211a14]">Main Word</Label>
-                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.booking_hero_heading} onChange={setS("booking_hero_heading")} placeholder="Book a" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs font-semibold text-[#211a14]">Handwriting Word</Label>
-                <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.booking_hero_script} onChange={setS("booking_hero_script")} placeholder="Table." />
-              </div>
-              <div className="sm:col-span-3 space-y-1">
-                <Label className="text-xs font-semibold text-[#211a14]">Subtitle</Label>
-                <Input className="border-zinc-300 text-[#211a14] font-medium text-sm h-10 rounded-xl" value={site.booking_hero_lead} onChange={setS("booking_hero_lead")} placeholder="Pick a date, pick a time..." />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between p-5 rounded-xl border border-zinc-200 bg-white shadow-sm">
-            <div>
-              <h4 className="text-xs font-semibold text-[#211a14]">Want to view incoming customer table reservations?</h4>
-              <p className="text-[11px] font-medium text-zinc-500">Check reservation dates, party sizes, and customer requests.</p>
-            </div>
-            <Link
-              href="/admin/bookings"
-              className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2.5 rounded-lg bg-[#763a12] text-white hover:bg-[#5e2d0d] shadow-sm"
-            >
-              <span>View Bookings Portal</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
+        <BookingPageSection site={site} setS={setS} busy={busy} run={run} />
       )}
     </div>
   );

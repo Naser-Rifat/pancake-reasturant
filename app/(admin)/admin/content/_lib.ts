@@ -1,13 +1,25 @@
 // Pure types, constants and helpers for the admin content studio. Extracted
 // from page.tsx to keep that component focused on rendering + state.
-import type { AdminAnnouncement, AdminGalleryPhoto } from "@/lib/admin-api";
+import type { ChangeEvent } from "react";
+import type { AdminAnnouncement, AdminGalleryPhoto, AdminSiteSettings } from "@/lib/admin-api";
+import type { ToastInput } from "@/components/ui/toast";
+
+/** Curried onChange handler for a single AdminSiteSettings text field. */
+export type SetSiteField = (
+  key: keyof AdminSiteSettings,
+) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+
+/** Runs a save action with busy state + success/error toasts (from the studio). */
+export type RunSave = (fn: () => Promise<void>, what: string, success?: ToastInput) => Promise<void>;
 
 export type PageTab = "home" | "menu" | "gallery" | "booking";
 export type ViewportMode = "desktop" | "mobile";
 export type CampaignFormat = "band" | "slider";
 export type DealCadence = "all" | "weekly" | "monthly" | "regular";
 
-export const EMPTY_PHOTO: Pick<AdminGalleryPhoto, "album" | "caption" | "image" | "alt"> = {
+export type NewPhoto = Pick<AdminGalleryPhoto, "album" | "caption" | "image" | "alt">;
+
+export const EMPTY_PHOTO: NewPhoto = {
   album: "food",
   caption: "",
   image: "",
