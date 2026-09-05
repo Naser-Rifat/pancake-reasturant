@@ -236,7 +236,7 @@ export default function SettingsPage() {
       {/* TAB 1: BUSINESS & CONTACT DETAILS                                         */}
       {/* ========================================================================= */}
       {activeTab === "contact" && (
-        <ContactTab site={site} setS={setS} busy={busy} run={run} />
+        <ContactTab site={site} setS={setS} setSite={setSite} busy={busy} run={run} />
       )}
 
       {activeTab === "kitchen" && (

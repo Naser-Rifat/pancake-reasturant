@@ -396,11 +396,13 @@ export default async function Home() {
                     </a>
                   </span>
                 </div>
-                <div className="transit-badges">
-                  <span className="transit-chip">🚆 3 min walk from Town Hall</span>
-                  <span className="transit-chip">🚗 2hr Street Parking</span>
-                  <span className="transit-chip">♿ Step-Free Access</span>
-                </div>
+                {site.show_transit_badges && lines(site.transit_badges).length > 0 && (
+                  <div className="transit-badges">
+                    {lines(site.transit_badges).map((chip) => (
+                      <span key={chip} className="transit-chip">{chip}</span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 

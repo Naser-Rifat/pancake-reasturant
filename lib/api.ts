@@ -154,6 +154,9 @@ export interface ApiSiteSettings {
   email: string;
   abn: string;
   map_embed: string;
+  /** one info chip per line, shown under the address block */
+  transit_badges: string;
+  show_transit_badges: boolean;
   instagram_url: string;
   facebook_url: string;
   uber_eats_url: string;

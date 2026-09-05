@@ -49,6 +49,8 @@ export const DEFAULT_SITE: AdminSiteSettings = {
   email: "hello@thepancakeclub.com.au",
   abn: "",
   map_embed: "",
+  transit_badges: "",
+  show_transit_badges: true,
   instagram_url: "",
   facebook_url: "",
   uber_eats_url: "",

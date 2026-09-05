@@ -1,8 +1,11 @@
-import { Building2, MapPin, Phone, Save, Share2, UtensilsCrossed } from "lucide-react";
+import type { Dispatch, SetStateAction } from "react";
+import { Building2, MapPin, Navigation, Phone, Save, Share2, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { updateSiteSettings, type AdminSiteSettings } from "@/lib/admin-api";
 import { AU_TIMEZONES, type RunSave, type SetSiteField } from "../_lib";
 import { FacebookIcon, InstagramIcon } from "./SocialIcons";
@@ -11,11 +14,13 @@ import { FacebookIcon, InstagramIcon } from "./SocialIcons";
 export function ContactTab({
   site,
   setS,
+  setSite,
   busy,
   run,
 }: {
   site: AdminSiteSettings;
   setS: SetSiteField;
+  setSite: Dispatch<SetStateAction<AdminSiteSettings | null>>;
   busy: string;
   run: RunSave;
 }) {
@@ -47,6 +52,8 @@ export function ContactTab({
                   abn: site.abn,
                   timezone: site.timezone,
                   map_embed: site.map_embed,
+                  transit_badges: site.transit_badges,
+                  show_transit_badges: site.show_transit_badges,
                   instagram_url: site.instagram_url,
                   facebook_url: site.facebook_url,
                   uber_eats_url: site.uber_eats_url,
@@ -219,6 +226,39 @@ export function ContactTab({
             />
             <p className="text-[10px] text-zinc-500">
               Tip: On Google Maps, click Share → Embed a map → Copy HTML and paste the URL from <code>src=&quot;...&quot;</code> here.
+            </p>
+          </div>
+        </div>
+
+        {/* SECTION D: Info chips under the address ("Find Us" box) */}
+        <div className="pt-4 border-t border-zinc-200 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide flex items-center gap-1.5">
+              <Navigation className="h-3.5 w-3.5" /> Location Info Chips (transit · parking · access):
+            </span>
+            <label className="flex items-center gap-2 text-xs font-semibold text-[#211a14]">
+              <Switch
+                checked={site.show_transit_badges}
+                onCheckedChange={(v) => setSite((s) => (s ? { ...s, show_transit_badges: v } : s))}
+              />
+              {site.show_transit_badges ? "Shown on site" : "Hidden"}
+            </label>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="s-transit" className="text-xs font-semibold text-[#211a14]">
+              One chip per line — include an emoji if you like
+            </Label>
+            <Textarea
+              id="s-transit"
+              rows={3}
+              disabled={!site.show_transit_badges}
+              className="border-zinc-300 text-[#211a14] font-medium text-xs rounded-xl disabled:opacity-50"
+              placeholder={"🚆 3 min walk from Town Hall\n🚗 2hr Street Parking\n♿ Step-Free Access"}
+              value={site.transit_badges}
+              onChange={setS("transit_badges")}
+            />
+            <p className="text-[10px] text-zinc-500">
+              These small chips sit under your address in the &quot;Find Us&quot; box. Turn the switch off to hide them all without deleting the text.
             </p>
           </div>
         </div>

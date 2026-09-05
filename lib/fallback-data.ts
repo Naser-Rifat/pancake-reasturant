@@ -135,6 +135,8 @@ export const FALLBACK_SITE: ApiSiteSettings = {
   email: "hello@thepancakeclub.com.au",
   abn: "ABN 00 000 000 000",
   map_embed: "https://www.google.com/maps?q=George%20Street%20Sydney%20NSW&output=embed",
+  transit_badges: "🚆 3 min walk from Town Hall\n🚗 2hr Street Parking\n♿ Step-Free Access",
+  show_transit_badges: true,
   instagram_url: "",
   facebook_url: "",
   uber_eats_url: "https://www.ubereats.com",
