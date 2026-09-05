@@ -30,3 +30,21 @@ export function safeEmbedUrl(url: string | null | undefined): string | undefined
     return undefined;
   }
 }
+
+/**
+ * Sanitise an admin-entered link before using it as an href. Relative paths and
+ * in-page anchors pass through, as do http(s)/tel/mailto absolute links; anything
+ * else (e.g. a "javascript:" scheme) is replaced with `fallback`, so a stored
+ * value can never run script when a visitor clicks it.
+ */
+export function safeHref(url: string | null | undefined, fallback = "/"): string {
+  const trimmed = url?.trim();
+  if (!trimmed) return fallback;
+  if (trimmed.startsWith("/") || trimmed.startsWith("#")) return trimmed;
+  try {
+    const { protocol } = new URL(trimmed);
+    return ["http:", "https:", "tel:", "mailto:"].includes(protocol) ? trimmed : fallback;
+  } catch {
+    return fallback; // neither a valid absolute URL nor a relative path
+  }
+}

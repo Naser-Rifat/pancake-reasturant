@@ -93,14 +93,16 @@ export default function MenuClient({
     toastTimer.current = setTimeout(() => setToast(""), 2600);
   };
 
+  // one line can hold at most 9 — matches QtyAdd and the ?add= URL path
+  const MAX_QTY = 9;
   const add = (slug: string) => {
-    setCart((c) => ({ ...c, [slug]: (c[slug] || 0) + 1 }));
+    setCart((c) => ({ ...c, [slug]: Math.min(MAX_QTY, (c[slug] || 0) + 1) }));
     setPop(false);
     requestAnimationFrame(() => setPop(true));
     showToast(`${itemBySlug(slug).name} added to your order 🥞`);
   };
 
-  const inc = (slug: string) => setCart((c) => ({ ...c, [slug]: c[slug] + 1 }));
+  const inc = (slug: string) => setCart((c) => ({ ...c, [slug]: Math.min(MAX_QTY, c[slug] + 1) }));
   const dec = (slug: string) =>
     setCart((c) => {
       const next = { ...c, [slug]: c[slug] - 1 };

@@ -18,8 +18,8 @@ const AI_BOTS = [
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      { userAgent: "*", allow: "/", disallow: ["/admin"] },
-      ...AI_BOTS.map((userAgent) => ({ userAgent, allow: "/", disallow: ["/admin"] })),
+      { userAgent: "*", allow: "/", disallow: ["/admin", "/preview"] },
+      ...AI_BOTS.map((userAgent) => ({ userAgent, allow: "/", disallow: ["/admin", "/preview"] })),
     ],
     sitemap: `${BASE}/sitemap.xml`,
   };

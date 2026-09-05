@@ -4,20 +4,23 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ApiAnnouncement } from "@/lib/api";
+import { safeHref } from "@/lib/utils";
 
 export default function Announce({ data }: { data: ApiAnnouncement | null }) {
   const pathname = usePathname();
-  if (pathname === "/preview" || pathname?.startsWith("/preview")) {
-    return null;
-  }
   const [visible, setVisible] = useState(Boolean(data));
 
   useEffect(() => {
-    if (sessionStorage.getItem("krush-announce-closed")) setVisible(false);
+    try {
+      if (sessionStorage.getItem("krush-announce-closed")) setVisible(false);
+    } catch { /* storage blocked (private mode) — just show it */ }
   }, []);
 
-  // the home page shows the campaign strip instead — never both on one page
-  const shown = Boolean(data) && visible && !(data?.image && pathname === "/");
+  // hidden on the standalone preview route; home shows the campaign strip
+  // instead — never both on one page. Folded into `shown` (not an early return)
+  // so the hook order above never changes between renders.
+  const isPreview = pathname === "/preview" || pathname?.startsWith("/preview");
+  const shown = Boolean(data) && visible && !isPreview && !(data?.image && pathname === "/");
 
   useEffect(() => {
     // the class reserves layout space, so it must follow what actually renders
@@ -31,14 +34,16 @@ export default function Announce({ data }: { data: ApiAnnouncement | null }) {
     <div className="announce">
       <span>
         {data.message}{" "}
-        {data.link_text && <Link href={data.link_url || "/"}>{data.link_text}</Link>}
+        {data.link_text && <Link href={safeHref(data.link_url)}>{data.link_text}</Link>}
       </span>
       <button
         className="announce-close"
         aria-label="Dismiss announcement"
         onClick={() => {
           setVisible(false);
-          sessionStorage.setItem("krush-announce-closed", "1");
+          try {
+            sessionStorage.setItem("krush-announce-closed", "1");
+          } catch { /* storage blocked — dismiss for this view only */ }
         }}
       >
         ✕

@@ -23,7 +23,7 @@ import {
   getSite,
   telHref,
 } from "@/lib/api";
-import { safeEmbedUrl } from "@/lib/utils";
+import { safeEmbedUrl, safeHref } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -88,7 +88,7 @@ export default async function Home() {
             card1Dish
               ? dishCard(card1Dish, "✨ Special")
               : {
-                  href: announcement.link_url || "/menu",
+                  href: safeHref(announcement.link_url, "/menu"),
                   label: "The Offer",
                   tag: "✨ Special",
                   img: announcement.image,
@@ -126,7 +126,7 @@ export default async function Home() {
                     <span className="promo-kicker">{site?.promo_kicker || "✨ TODAY'S FEATURED SPECIAL"}</span>
                     <h2 className="promo-head">{announcement.message}</h2>
                     {announcement.link_url && (
-                      <Link href={announcement.link_url} className="promo-cta-btn">
+                      <Link href={safeHref(announcement.link_url, "/menu")} className="promo-cta-btn">
                         <span>{announcement.link_text || "Explore Menu & Deals"}</span>
                         <span className="promo-arrow">→</span>
                       </Link>
@@ -490,7 +490,7 @@ export default async function Home() {
           </h2>
           <p className="cta-lead-text">{site.cta_lead}</p>
           <Link
-            href={site.cta_button_url || "/booking"}
+            href={safeHref(site.cta_button_url, "/booking")}
             className="btn btn-primary cta-action-btn"
           >
             <span>🥞 {site.cta_button_label || "Book a Table Now"}</span>

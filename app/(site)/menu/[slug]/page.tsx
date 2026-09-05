@@ -76,7 +76,7 @@ export default async function DishPage({ params }: Props) {
   const galleryImages = [
     ...(item.image ? [{ id: "cutout", src: item.image, alt: `${item.name} cutout`, cutout: true }] : []),
     ...(item.photo ? [{ id: "photo-main", src: item.photo, alt: `${item.name} real photo` }] : []),
-    ...item.photos.map((p) => ({ id: String(p.id), src: p.image, alt: p.alt || `${item.name} angle` })),
+    ...(item.photos ?? []).map((p) => ({ id: String(p.id), src: p.image, alt: p.alt || `${item.name} angle` })),
   ];
 
   return (

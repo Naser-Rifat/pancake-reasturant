@@ -16,9 +16,6 @@ const LINKS = [
 
 export default function Nav() {
   const pathname = usePathname();
-  if (pathname === "/preview" || pathname?.startsWith("/preview")) {
-    return null;
-  }
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [pastHero, setPastHero] = useState(false);
@@ -39,6 +36,12 @@ export default function Nav() {
   }, [pathname]);
 
   useEffect(() => setOpen(false), [pathname]);
+
+  // hide the public nav on the standalone live-preview route — must stay AFTER
+  // the hooks above so the hook count never changes between renders
+  if (pathname === "/preview" || pathname?.startsWith("/preview")) {
+    return null;
+  }
 
   return (
     <header className={`nav${scrolled ? " scrolled" : ""}${pastHero ? " past-hero" : ""}`}>

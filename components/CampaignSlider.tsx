@@ -10,6 +10,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 
 import { endsLabel, type ApiAnnouncement } from "@/lib/api";
+import { safeHref } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 
 const DEFAULT_IMAGE =
@@ -184,7 +185,7 @@ export default function CampaignSlider({
 
                       <div className="camp-actions-row">
                         {c.link_url && (
-                          <Link href={c.link_url} className="camp-cta">
+                          <Link href={safeHref(c.link_url)} className="camp-cta">
                             <span>{c.link_text || "Explore Menu & Deals"}</span>
                             <ArrowRight size={16} strokeWidth={2.5} className="camp-btn-arrow" />
                           </Link>
