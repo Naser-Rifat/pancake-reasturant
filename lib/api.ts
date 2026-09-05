@@ -5,6 +5,26 @@
 const rawApiUrl = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api").replace(/\/+$/, "");
 export const API_URL = rawApiUrl.endsWith("/api") ? rawApiUrl : `${rawApiUrl}/api`;
 
+/** Default cap for JSON API calls. Uploads (Cloudinary/background-removal) are
+ *  intentionally NOT wrapped — they can legitimately take much longer. */
+export const API_TIMEOUT_MS = 15_000;
+
+/** fetch() that aborts if the server hasn't responded within `timeoutMs`, so a
+ *  hung backend surfaces as an error instead of a request that never resolves. */
+export async function fetchWithTimeout(
+  input: string,
+  init: RequestInit = {},
+  timeoutMs = API_TIMEOUT_MS
+): Promise<Response> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(id);
+  }
+}
+
 export interface ApiMenuItem {
   slug: string;
   name: string;
@@ -194,7 +214,7 @@ export function formatTime(t: string) {
 
 async function get<T>(path: string, fallback: T): Promise<T> {
   try {
-    const res = await fetch(`${API_URL}${path}`, { cache: "no-store" });
+    const res = await fetchWithTimeout(`${API_URL}${path}`, { cache: "no-store" });
     if (!res.ok) return fallback;
     return (await res.json()) as T;
   } catch {
@@ -206,7 +226,7 @@ async function get<T>(path: string, fallback: T): Promise<T> {
 export async function getMenuWithStatus(): Promise<{ items: ApiMenuItem[]; live: boolean }> {
   const { FALLBACK_MENU } = await import("./fallback-data");
   try {
-    const res = await fetch(`${API_URL}/menu/`, { cache: "no-store" });
+    const res = await fetchWithTimeout(`${API_URL}/menu/`, { cache: "no-store" });
     if (!res.ok) return { items: FALLBACK_MENU, live: false };
     return { items: (await res.json()) as ApiMenuItem[], live: true };
   } catch {
@@ -279,7 +299,7 @@ export async function getAnnouncement(): Promise<ApiAnnouncement | null> {
   // No fallback here on purpose: better to show no promo than a stale one
   // the restaurant may have already ended.
   try {
-    const res = await fetch(`${API_URL}/announcement/`, { cache: "no-store" });
+    const res = await fetchWithTimeout(`${API_URL}/announcement/`, { cache: "no-store" });
     if (!res.ok) return null; // includes 204 = deliberately no announcement
     return (await res.json()) as ApiAnnouncement;
   } catch {
@@ -289,7 +309,7 @@ export async function getAnnouncement(): Promise<ApiAnnouncement | null> {
 
 // ---------- client-side writes ----------
 
-function firstError(body: unknown): string | null {
+export function firstError(body: unknown): string | null {
   if (!body || typeof body !== "object") return null;
   for (const value of Object.values(body as Record<string, unknown>)) {
     if (typeof value === "string") return value;
@@ -303,7 +323,7 @@ function firstError(body: unknown): string | null {
 async function post<T>(path: string, payload: unknown): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`${API_URL}${path}`, {
+    res = await fetchWithTimeout(`${API_URL}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

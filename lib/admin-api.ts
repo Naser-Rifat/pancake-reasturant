@@ -1,7 +1,7 @@
 // Client for the staff-only admin API. Token is kept in localStorage and sent
 // as an Authorization header; any 401/403 clears it and bounces to the login page.
 
-import { API_URL } from "./api";
+import { API_URL, fetchWithTimeout, firstError } from "./api";
 
 const TOKEN_KEY = "krush-admin-token";
 
@@ -77,14 +77,25 @@ export interface AdminStats {
 
 async function adminFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = getToken();
-  const res = await fetch(`${API_URL}/admin${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Token ${token}` } : {}),
-      ...init.headers,
-    },
-  });
+  let res: Response;
+  try {
+    res = await fetchWithTimeout(`${API_URL}/admin${path}`, {
+      ...init,
+      headers: {
+        // only meaningful on requests that actually carry a JSON body
+        ...(init.body ? { "Content-Type": "application/json" } : {}),
+        ...(token ? { Authorization: `Token ${token}` } : {}),
+        ...init.headers,
+      },
+    });
+  } catch (e) {
+    // AbortError (timeout) or a network failure — both surface as a clear message
+    throw new Error(
+      e instanceof DOMException && e.name === "AbortError"
+        ? "The server took too long to respond — please try again."
+        : "Can't reach the server — check your connection and try again."
+    );
+  }
   if (res.status === 401 || res.status === 403) {
     clearToken();
     if (typeof window !== "undefined") window.location.href = "/admin/login";
@@ -94,7 +105,9 @@ async function adminFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
     let msg = "Request failed";
     try {
       const body = await res.json();
-      msg = body.detail ?? JSON.stringify(body);
+      // Prefer a human-readable message: DRF's top-level {"detail": ...}, else
+      // the first field error (e.g. {"price": ["…"]}), never the raw JSON blob.
+      msg = body.detail ?? firstError(body) ?? JSON.stringify(body);
     } catch { /* non-JSON body */ }
     throw new Error(msg);
   }
@@ -129,13 +142,26 @@ export const mergeRows = <T extends { public_id: string; created_at: string }>(
 // ---------- auth ----------
 
 export async function adminLogin(username: string, password: string) {
-  const res = await fetch(`${API_URL}/admin/login/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
+  let res: Response;
+  try {
+    res = await fetchWithTimeout(`${API_URL}/admin/login/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+  } catch (e) {
+    throw new Error(
+      e instanceof DOMException && e.name === "AbortError"
+        ? "The server took too long to respond — please try again."
+        : "Can't reach the server — check your connection and try again."
+    );
+  }
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body.detail ?? "Login failed.");
+  if (typeof body.token !== "string" || !body.token) {
+    // 2xx but no usable token — don't store `undefined` and pretend we're in
+    throw new Error("Login didn't return a valid session — please try again.");
+  }
   setToken(body.token);
   return body as { token: string; username: string };
 }

@@ -10,6 +10,7 @@ import { Scissors, Star, Trash2, UploadCloud } from "lucide-react";
 import { UploadButton } from "@/components/ui/upload-button";
 import { useToast } from "@/components/ui/toast";
 import { API_URL } from "@/lib/api";
+import { cloudinaryReady, uploadToCloudinary } from "@/lib/cloudinary";
 import {
   createMenuItemPhoto,
   deleteMenuItemPhoto,
@@ -17,19 +18,6 @@ import {
   listMenuItemPhotos,
   type AdminMenuItemPhoto,
 } from "@/lib/admin-api";
-
-const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
-const toCloudinary = async (file: File | Blob, name = "upload.png") => {
-  const body = new FormData();
-  body.append("file", file instanceof File ? file : new File([file], name, { type: "image/png" }));
-  body.append("upload_preset", PRESET!);
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, { method: "POST", body });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json?.error?.message ?? "Upload failed");
-  return (json.secure_url as string).replace("/upload/", "/upload/f_auto,q_auto/");
-};
 
 export default function PhotoBoard({
   slug,
@@ -96,13 +84,13 @@ export default function PhotoBoard({
   const onDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setDragging(false);
-    if (!CLOUD || !PRESET) return;
+    if (!cloudinaryReady) return;
     const files = [...e.dataTransfer.files].filter((f) => f.type.startsWith("image/"));
     if (files.length === 0) return;
     setBusy("Uploading…");
     for (const file of files) {
       try {
-        await add(await toCloudinary(file));
+        await add(await uploadToCloudinary(file));
       } catch (err) {
         toast({ variant: "error", title: "Upload failed", description: err instanceof Error ? err.message : undefined });
       }
@@ -142,7 +130,7 @@ export default function PhotoBoard({
         body: form,
       });
       if (!res.ok) throw new Error("Background removal failed — try a photo on a plain background");
-      onSetCutout(await toCloudinary(await res.blob(), "cutout.png"));
+      onSetCutout(await uploadToCloudinary(await res.blob(), "cutout.png"));
       toast({ variant: "success", title: "Cutout created from this photo" });
     } catch (e) {
       toast({ variant: "error", title: "Could not make a cutout", description: e instanceof Error ? e.message : undefined });

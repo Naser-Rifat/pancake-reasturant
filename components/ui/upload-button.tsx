@@ -5,9 +5,7 @@ import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { API_URL } from "@/lib/api";
 import { getToken } from "@/lib/admin-api";
-
-const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+import { cloudinaryReady, uploadToCloudinary } from "@/lib/cloudinary";
 
 /**
  * Uploads an image straight to Cloudinary (unsigned preset, plain REST — no SDK)
@@ -35,21 +33,7 @@ export function UploadButton({
   const [stage, setStage] = useState<"" | "cutting" | "uploading">("");
   const [error, setError] = useState("");
 
-  if (!CLOUD || !PRESET) return null;
-
-  const toCloudinary = async (file: File) => {
-    const form = new FormData();
-    form.append("file", file);
-    form.append("upload_preset", PRESET);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, {
-      method: "POST",
-      body: form,
-    });
-    const body = await res.json();
-    if (!res.ok) throw new Error(body?.error?.message ?? "Upload failed");
-    // serve every upload optimised (WebP/AVIF + right quality) forever
-    return (body.secure_url as string).replace("/upload/", "/upload/f_auto,q_auto/");
-  };
+  if (!cloudinaryReady) return null;
 
   const removeBg = async (file: File) => {
     const form = new FormData();
@@ -69,11 +53,11 @@ export function UploadButton({
     try {
       if (onPair) {
         setStage("uploading");
-        const photo = await toCloudinary(file);
+        const photo = await uploadToCloudinary(file);
         setStage("cutting");
         const cut = await removeBg(file);
         setStage("uploading");
-        onPair({ photo, cutout: await toCloudinary(cut) });
+        onPair({ photo, cutout: await uploadToCloudinary(cut) });
         return;
       }
       let payload: File = file;
@@ -82,7 +66,7 @@ export function UploadButton({
         payload = await removeBg(file);
       }
       setStage("uploading");
-      onUploaded?.(await toCloudinary(payload));
+      onUploaded?.(await uploadToCloudinary(payload));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");
     } finally {
