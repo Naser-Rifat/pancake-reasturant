@@ -25,6 +25,7 @@ import { Pagination } from "@/components/admin/Pagination";
 import { useRowFocus } from "@/components/admin/use-row-focus";
 
 import { BookingRow } from "./_components/BookingRow";
+import { formatTime12h } from "../settings/_lib";
 import { PhoneBookingModal } from "./_components/PhoneBookingModal";
 import {
   EMPTY_PHONE_BOOKING,
@@ -109,15 +110,34 @@ export default function BookingsPage() {
   }, [load]);
 
   const setStatus = async (b: AdminBooking, status: AdminBooking["status"]) => {
-    if (status === "cancelled") {
-      const ok = await confirmDialog({
-        title: `Cancel ${b.name}’s reservation?`,
-        description: "A cancellation email will be sent to the guest immediately.",
-        confirmLabel: "Cancel Booking",
-        destructive: true,
-      });
-      if (!ok) return;
-    }
+    // both actions email the guest, so both get a deliberate confirm step —
+    // and we never claim an email was sent when there is no address on file
+    const when = `${new Date(`${b.date}T00:00:00`).toLocaleDateString("en-AU", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    })} at ${formatTime12h(b.time)} · ${b.party_size} ${b.party_size === 1 ? "guest" : "guests"}`;
+    const emailLine = b.email
+      ? status === "confirmed"
+        ? `A confirmation email goes to ${b.email} right away.`
+        : `A cancellation email goes to ${b.email} right away.`
+      : `No email on file — please call ${b.phone || "the guest"} to let them know.`;
+
+    const ok = await confirmDialog(
+      status === "cancelled"
+        ? {
+            title: `Cancel ${b.name}’s reservation?`,
+            description: `${when}\n${emailLine}`,
+            confirmLabel: "Cancel Booking",
+            destructive: true,
+          }
+        : {
+            title: `Confirm ${b.name}’s table?`,
+            description: `${when}\n${emailLine}`,
+            confirmLabel: "Confirm Booking",
+          }
+    );
+    if (!ok) return;
 
     const prev = bookings;
     setBookings((bs) => bs.map((x) => (x.public_id === b.public_id ? { ...x, status } : x)));
@@ -127,8 +147,11 @@ export default function BookingsPage() {
         variant: "success",
         title:
           status === "confirmed"
-            ? `${b.name}’s booking confirmed — email sent`
-            : `${b.name}’s booking cancelled — guest notified`,
+            ? `${b.name}’s booking confirmed`
+            : `${b.name}’s booking cancelled`,
+        description: b.email
+          ? `Email sent to ${b.email}`
+          : "No email on file — call the guest to let them know",
       });
     } catch (e) {
       setBookings(prev);

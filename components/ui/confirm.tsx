@@ -127,7 +127,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
                   {opts.title}
                 </h2>
                 {opts.description && (
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{opts.description}</p>
+                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">{opts.description}</p>
                 )}
                 {pending.mode === "prompt" && (
                   <div className="mt-3">
