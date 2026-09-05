@@ -244,7 +244,7 @@ export default function SettingsPage() {
       )}
 
       {activeTab === "hours" && (
-        <HoursTab hours={hours} setHours={setHours} newRow={newRow} setNewRow={setNewRow} run={run} />
+        <HoursTab hours={hours} setHours={setHours} newRow={newRow} setNewRow={setNewRow} busy={busy} run={run} />
       )}
 
       {activeTab === "theme" && (

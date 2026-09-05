@@ -176,6 +176,7 @@ export function HomeStep2Campaigns({
             <Button
               size="sm"
               className="h-8 text-xs font-bold gap-1.5 bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl shadow-xs"
+              loading={busy === "Campaign"}
               onClick={() =>
                 run(async () => {
                   const created = await createAnnouncement({

@@ -621,6 +621,7 @@ export default function ContentPage() {
               setCerts={setCerts}
               newCert={newCert}
               setNewCert={setNewCert}
+              busy={busy}
               run={run}
               setHomeStepIndex={setHomeStepIndex}
             />

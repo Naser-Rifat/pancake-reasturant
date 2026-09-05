@@ -140,6 +140,23 @@ export async function adminLogin(username: string, password: string) {
   return body as { token: string; username: string };
 }
 
+/** Invalidate the token server-side, then clear it locally. Best-effort: even if
+ *  the network call fails we still drop the local token so the UI logs out. */
+export async function adminLogout() {
+  const token = getToken();
+  if (token) {
+    try {
+      await fetch(`${API_URL}/admin/logout/`, {
+        method: "POST",
+        headers: { Authorization: `Token ${token}` },
+      });
+    } catch {
+      /* offline — local clear below still logs the user out */
+    }
+  }
+  clearToken();
+}
+
 // ---------- reads ----------
 
 export const getStats = () => adminFetch<AdminStats>("/stats/");

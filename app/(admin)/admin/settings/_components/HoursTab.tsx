@@ -12,12 +12,14 @@ export function HoursTab({
   setHours,
   newRow,
   setNewRow,
+  busy,
   run,
 }: {
   hours: AdminHours[];
   setHours: Dispatch<SetStateAction<AdminHours[]>>;
   newRow: HoursRow;
   setNewRow: Dispatch<SetStateAction<HoursRow>>;
+  busy: string;
   run: RunSave;
 }) {
   const { confirm: confirmDialog } = useConfirm();
@@ -166,6 +168,7 @@ export function HoursTab({
                 size="sm"
                 className="w-full h-10 bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs"
                 disabled={!newRow.label.trim()}
+                loading={busy === "Hours"}
                 onClick={() =>
                   run(async () => {
                     const created = await createHours({

@@ -96,7 +96,7 @@ export function MenuPageSection({
                 <Button
                   size="sm"
                   className="h-8 text-xs font-bold bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
-                  loading={busy === `Step ${st.id}`}
+                  loading={busy === `Step 0${i + 1}`}
                   onClick={() =>
                     run(
                       async () => {

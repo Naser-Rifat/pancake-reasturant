@@ -19,7 +19,7 @@ import {
 import LogoMark from "@/components/LogoMark";
 import { ConfirmProvider } from "@/components/ui/confirm";
 import { ToastProvider } from "@/components/ui/toast";
-import { clearToken, getStats, getToken } from "@/lib/admin-api";
+import { adminLogout, getStats, getToken } from "@/lib/admin-api";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -161,8 +161,8 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             View site
           </a>
           <button
-            onClick={() => {
-              clearToken();
+            onClick={async () => {
+              await adminLogout();
               router.replace("/admin/login");
             }}
             className="flex items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"

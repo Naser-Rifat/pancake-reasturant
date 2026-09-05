@@ -22,6 +22,7 @@ export function HomeStep4Badges({
   setCerts,
   newCert,
   setNewCert,
+  busy,
   run,
   setHomeStepIndex,
 }: {
@@ -29,6 +30,7 @@ export function HomeStep4Badges({
   setCerts: Dispatch<SetStateAction<AdminCertification[]>>;
   newCert: NewCert;
   setNewCert: Dispatch<SetStateAction<NewCert>>;
+  busy: string;
   run: RunSave;
   setHomeStepIndex: Dispatch<SetStateAction<number>>;
 }) {
@@ -225,6 +227,7 @@ export function HomeStep4Badges({
             size="sm"
             className="h-10 text-xs font-bold bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
             disabled={!newCert.title.trim()}
+            loading={busy === "Certification"}
             onClick={() =>
               run(async () => {
                 const created = await createCertification({

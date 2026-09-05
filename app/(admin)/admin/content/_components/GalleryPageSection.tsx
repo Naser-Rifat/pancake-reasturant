@@ -158,6 +158,7 @@ export function GalleryPageSection({
             <Button
               className="h-10 text-xs font-bold bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
               disabled={!newPhoto.image.trim() || !newPhoto.caption.trim()}
+              loading={busy === "Gallery"}
               onClick={() =>
                 run(async () => {
                   const created = await createGalleryPhoto({

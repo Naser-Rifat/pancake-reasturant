@@ -137,17 +137,32 @@ export default function MenuAdminPage() {
     setError("");
   };
 
-  /** don't let staff reach the photo step with an unnamed, priceless dish */
-  const goToPhotos = () => {
+  /** shared required-field + numeric-price guard for both the wizard and edit save */
+  const validate = (): boolean => {
     const missing = (["name", "price", "description"] as const).find((k) => !form[k].trim());
     if (missing) {
       const el = document.getElementById(`mi-${missing === "description" ? "desc" : missing}`);
       el?.focus();
       toast({ variant: "error", title: `Add the ${missing === "description" ? "description" : missing} first` });
-      return;
+      return false;
     }
+    const price = Number(form.price);
+    if (!Number.isFinite(price) || price < 0) {
+      document.getElementById("mi-price")?.focus();
+      toast({ variant: "error", title: "Enter a valid price", description: "Numbers only, e.g. 18.50" });
+      return false;
+    }
+    return true;
+  };
+
+  /** don't let staff reach the photo step with an unnamed, priceless dish */
+  const goToPhotos = () => {
+    if (!validate()) return;
     setStep(2);
   };
+
+  /** free-text number field → a real number, or null when blank/invalid (never NaN) */
+  const numOrNull = (v: string) => (v.trim() && Number.isFinite(Number(v)) ? Number(v) : null);
 
   const set = (key: keyof FormState) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -155,6 +170,8 @@ export default function MenuAdminPage() {
 
   const submit = async (e?: React.FormEvent) => {
     e?.preventDefault();
+    // edit save skips the wizard, so guard both paths here before hitting the API
+    if (!validate()) return;
     setSaving(true);
     setError("");
     const payload: Partial<AdminMenuItem> = {
@@ -164,8 +181,8 @@ export default function MenuAdminPage() {
       price: form.price,
       tag: form.tag,
       heat: form.heat,
-      kcal: form.kcal ? Number(form.kcal) : null,
-      protein_g: form.protein_g ? Number(form.protein_g) : null,
+      kcal: numOrNull(form.kcal),
+      protein_g: numOrNull(form.protein_g),
       prep_time: form.prep_time,
       image: form.image,
       photo: form.photo,
@@ -180,23 +197,39 @@ export default function MenuAdminPage() {
         setEditing(null);
       } else {
         const created = await createMenuItem(payload);
-        for (const [i, url] of pendingPhotos.entries()) {
-          await createMenuItemPhoto({
-            menu_item: created.slug,
-            image: url,
-            alt: `${created.name} photo`,
-            sort_order: i,
-          });
-        }
-        setPhotoCounts((c) => ({ ...c, [created.slug]: pendingPhotos.length }));
-        setPendingPhotos([]);
+        // The dish now exists. Switch to edit mode *before* attaching photos so a
+        // failed photo upload can't strand the form in create mode — a retry would
+        // otherwise re-POST the same slug and be rejected as a duplicate.
         pristine.current = form;
         setEditing(created.slug);
-        toast({
-          variant: "success",
-          title: `${created.name} added to the menu`,
-          description: "You can add extra photos now.",
-        });
+        const failed: string[] = [];
+        for (const [i, url] of pendingPhotos.entries()) {
+          try {
+            await createMenuItemPhoto({
+              menu_item: created.slug,
+              image: url,
+              alt: `${created.name} photo`,
+              sort_order: i,
+            });
+          } catch {
+            failed.push(url); // keep it queued and visible instead of losing it
+          }
+        }
+        setPendingPhotos(failed);
+        setPhotoCounts((c) => ({ ...c, [created.slug]: pendingPhotos.length - failed.length }));
+        if (failed.length) {
+          toast({
+            variant: "error",
+            title: `${created.name} saved — but ${failed.length} photo(s) didn't upload`,
+            description: "They're still shown below; try adding them again.",
+          });
+        } else {
+          toast({
+            variant: "success",
+            title: `${created.name} added to the menu`,
+            description: "You can add extra photos now.",
+          });
+        }
       }
       load();
     } catch (err) {
