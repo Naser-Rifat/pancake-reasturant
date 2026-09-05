@@ -93,6 +93,7 @@ export function HoursTab({
               <Button
                 size="sm"
                 className="h-10 px-3.5 bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs"
+                loading={busy === `Hours ${h.id}`}
                 onClick={() =>
                   run(
                     async () => {
@@ -102,7 +103,7 @@ export function HoursTab({
                         closes: h.closes,
                       });
                     },
-                    "Hours",
+                    `Hours ${h.id}`,
                     { title: `Schedule updated for ${h.label}` }
                   )
                 }
@@ -167,7 +168,7 @@ export function HoursTab({
               <Button
                 size="sm"
                 className="w-full h-10 bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs"
-                disabled={!newRow.label.trim()}
+                disabled={!newRow.label.trim() || !newRow.opens || !newRow.closes}
                 loading={busy === "Hours"}
                 onClick={() =>
                   run(async () => {
