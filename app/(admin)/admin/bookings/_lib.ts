@@ -26,15 +26,7 @@ export const EMPTY_PHONE_BOOKING: PhoneBooking = {
   notes: "",
 };
 
-/** 24h "13:30" → friendly "1:30 PM". */
-export function formatTime12h(t: string): string {
-  if (!t) return "";
-  const [hStr, mStr] = t.split(":");
-  const h = parseInt(hStr || "0", 10);
-  const ampm = h >= 12 ? "PM" : "AM";
-  const h12 = h % 12 || 12;
-  return `${h12}:${mStr || "00"} ${ampm}`;
-}
+export { formatTime12h } from "@/lib/format";
 
 // Two-tone chime for new incoming booking requests.
 export function newBookingChime() {

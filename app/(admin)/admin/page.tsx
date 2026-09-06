@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton, TableSkeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { StatusBadge } from "@/components/admin/StatusBadge";
+import { formatTime12h } from "@/lib/format";
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -77,16 +78,6 @@ export default function DashboardPage() {
     const id = setInterval(() => loadData(false), 60_000);
     return () => clearInterval(id);
   }, [loadData]);
-
-  // Format 12-hour time
-  const formatTime12h = (t: string) => {
-    if (!t) return "";
-    const [hStr, mStr] = t.split(":");
-    const h = parseInt(hStr || "0", 10);
-    const ampm = h >= 12 ? "PM" : "AM";
-    const h12 = h % 12 || 12;
-    return `${h12}:${mStr || "00"} ${ampm}`;
-  };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
