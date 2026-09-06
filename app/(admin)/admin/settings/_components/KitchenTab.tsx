@@ -1,5 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
-import { AlertCircle, Mail, Save, Send } from "lucide-react";
+import { AlertCircle, Mail, Send } from "lucide-react";
+import { SaveButton } from "@/components/admin/SaveButton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -112,9 +113,7 @@ export function KitchenTab({
                 setSite((s) => (s ? { ...s, online_ordering_disabled_message: e.target.value } : s))
               }
             />
-            <Button
-              size="sm"
-              className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl"
+            <SaveButton
               loading={busy === "PauseMessage"}
               onClick={() =>
                 run(
@@ -128,8 +127,8 @@ export function KitchenTab({
                 )
               }
             >
-              <Save className="h-3.5 w-3.5 mr-1" /> Save Pause Message
-            </Button>
+              Save Pause Message
+            </SaveButton>
           </div>
         )}
       </div>

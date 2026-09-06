@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
 import { Check, Palette } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { SaveButton } from "@/components/admin/SaveButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateSiteSettings, type AdminSiteSettings } from "@/lib/admin-api";
@@ -199,9 +199,8 @@ export function ThemeTab({
               </span>
             </div>
 
-            <Button
-              size="sm"
-              className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs"
+            <SaveButton
+              icon={false}
               loading={busy === "Theme"}
               onClick={() =>
                 run(
@@ -219,7 +218,7 @@ export function ThemeTab({
               }
             >
               Apply Custom Colors
-            </Button>
+            </SaveButton>
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@ import type { Dispatch, SetStateAction } from "react";
 import Link from "next/link";
 import { ArrowRight, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SaveBar, SaveButton } from "@/components/admin/SaveButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -55,12 +56,8 @@ export function MenuPageSection({
           </div>
         </div>
 
-        <div className="flex justify-end pt-3 border-t border-zinc-200">
-          <Button
-            size="sm"
-            className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
-            loading={busy === "Menu hero"}
-            onClick={() =>
+        <SaveBar>
+          <SaveButton loading={busy === "Menu hero"} onClick={() =>
               run(async () => {
                 await updateSiteSettings({
                   menu_hero_heading: site.menu_hero_heading,
@@ -68,11 +65,8 @@ export function MenuPageSection({
                   menu_hero_lead: site.menu_hero_lead,
                 });
               }, "Menu hero")
-            }
-          >
-            <Save className="h-3.5 w-3.5 mr-1.5" /> Save Header
-          </Button>
-        </div>
+            }>Save Header</SaveButton>
+        </SaveBar>
       </div>
 
       {/* 3-Step Pickup Cards */}

@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
-import { Building2, MapPin, Navigation, Phone, Save, Share2, UtensilsCrossed } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Building2, MapPin, Navigation, Phone, Share2, UtensilsCrossed } from "lucide-react";
+import { SaveBar, SaveButton } from "@/components/admin/SaveButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -238,10 +238,8 @@ export function ContactTab({
 
         {/* Save sits at the END of the form — where the eye lands after the
             last field — instead of back up in the card header */}
-        <div className="pt-4 border-t border-zinc-200 flex justify-end">
-          <Button
-            size="sm"
-            className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs"
+        <SaveBar>
+          <SaveButton
             loading={busy === "Settings"}
             onClick={() =>
               run(async () => {
@@ -262,9 +260,9 @@ export function ContactTab({
               }, "Settings", { title: "Contact info saved" })
             }
           >
-            <Save className="h-3.5 w-3.5 mr-1.5" /> Save Contact Info
-          </Button>
-        </div>
+            Save Contact Info
+          </SaveButton>
+        </SaveBar>
       </div>
     </div>
   );

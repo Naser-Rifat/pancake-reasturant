@@ -1,7 +1,8 @@
 import type { Dispatch, SetStateAction } from "react";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight, Gift, Plus, Save, Ticket, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Gift, Plus, Ticket, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SaveBar, SaveButton } from "@/components/admin/SaveButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -479,10 +480,8 @@ export function HomeStep2Campaigns({
                   onUploaded={(url) => setActiveDeal((a) => (a ? { ...a, image: url } : a))}
                 />
 
-                <div className="flex justify-end pt-3 border-t border-zinc-200">
-                  <Button
-                    size="sm"
-                    className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs"
+                <SaveBar>
+                  <SaveButton
                     loading={busy === "Campaign"}
                     onClick={() =>
                       run(async () => {
@@ -500,9 +499,9 @@ export function HomeStep2Campaigns({
                       }, "Campaign", { title: "Deal saved" })
                     }
                   >
-                    <Save className="h-3.5 w-3.5 mr-1.5" /> Save Deal
-                  </Button>
-                </div>
+                    Save Deal
+                  </SaveButton>
+                </SaveBar>
               </div>
             </>
           ) : (

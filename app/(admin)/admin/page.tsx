@@ -32,6 +32,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton, TableSkeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
+import { StatusBadge } from "@/components/admin/StatusBadge";
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -285,21 +286,7 @@ export default function DashboardPage() {
                       <span className="text-[10px] font-bold text-zinc-400">
                         {placedDate.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" })}
                       </span>
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${
-                          o.status === "received"
-                            ? "bg-amber-100 text-amber-950 border border-amber-300"
-                            : o.status === "preparing"
-                            ? "bg-orange-100 text-orange-950 border border-orange-300"
-                            : o.status === "ready"
-                            ? "bg-emerald-100 text-emerald-950 border border-emerald-300"
-                            : o.status === "completed"
-                            ? "bg-zinc-100 text-zinc-700 border border-zinc-300"
-                            : "bg-rose-100 text-rose-950 border border-rose-300"
-                        }`}
-                      >
-                        {o.status}
-                      </span>
+                      <StatusBadge status={o.status} />
                       <ArrowRight className="h-3.5 w-3.5 text-[#763a12] opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                   </Link>
@@ -382,17 +369,7 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${
-                        b.status === "confirmed"
-                          ? "bg-emerald-100 text-emerald-950 border border-emerald-300"
-                          : b.status === "pending"
-                          ? "bg-amber-100 text-amber-950 border border-amber-300"
-                          : "bg-rose-100 text-rose-950 border border-rose-300"
-                      }`}
-                    >
-                      {b.status}
-                    </span>
+                    <StatusBadge status={b.status} />
                     <ArrowRight className="h-3.5 w-3.5 text-[#763a12] opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </Link>

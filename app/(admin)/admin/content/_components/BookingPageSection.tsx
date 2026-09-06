@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, Save } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+import { SaveBar, SaveButton } from "@/components/admin/SaveButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateSiteSettings, type AdminSiteSettings } from "@/lib/admin-api";
@@ -49,12 +49,8 @@ export function BookingPageSection({
           </div>
         </div>
 
-        <div className="flex justify-end pt-3 border-t border-zinc-200">
-          <Button
-            size="sm"
-            className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
-            loading={busy === "Booking hero"}
-            onClick={() =>
+        <SaveBar>
+          <SaveButton loading={busy === "Booking hero"} onClick={() =>
               run(async () => {
                 await updateSiteSettings({
                   booking_hero_kicker: site.booking_hero_kicker,
@@ -63,11 +59,8 @@ export function BookingPageSection({
                   booking_hero_lead: site.booking_hero_lead,
                 });
               }, "Booking hero")
-            }
-          >
-            <Save className="h-3.5 w-3.5 mr-1.5" /> Save Header
-          </Button>
-        </div>
+            }>Save Header</SaveButton>
+        </SaveBar>
       </div>
 
       <div className="flex items-center justify-between p-5 rounded-xl border border-zinc-200 bg-white shadow-sm">

@@ -1,8 +1,9 @@
 import type { Dispatch, SetStateAction } from "react";
 import Image from "next/image";
-import { Plus, Save, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SaveBar, SaveButton } from "@/components/admin/SaveButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -77,12 +78,8 @@ export function GalleryPageSection({
           </div>
         </div>
 
-        <div className="flex justify-end pt-3 border-t border-zinc-200">
-          <Button
-            size="sm"
-            className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
-            loading={busy === "Gallery hero"}
-            onClick={() =>
+        <SaveBar>
+          <SaveButton loading={busy === "Gallery hero"} onClick={() =>
               run(async () => {
                 await updateSiteSettings({
                   gallery_hero_kicker: site.gallery_hero_kicker,
@@ -91,11 +88,8 @@ export function GalleryPageSection({
                   gallery_hero_lead: site.gallery_hero_lead,
                 });
               }, "Gallery hero")
-            }
-          >
-            <Save className="h-3.5 w-3.5 mr-1.5" /> Save Header
-          </Button>
-        </div>
+            }>Save Header</SaveButton>
+        </SaveBar>
       </div>
 
       <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">

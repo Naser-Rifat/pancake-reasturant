@@ -1,5 +1,6 @@
 import { Bell, Check, ChefHat, Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Select } from "@/components/ui/select";
 import type { AdminOrder } from "@/lib/admin-api";
 import { ORDER_STATUSES } from "../../status";
@@ -111,29 +112,7 @@ export function OrderRow({
 
       {/* Status Badge */}
       <td className="py-3.5 px-3 text-center whitespace-nowrap">
-        <span
-          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wide ${
-            o.status === "received"
-              ? "bg-amber-100 text-amber-950 border border-amber-300"
-              : o.status === "preparing"
-              ? "bg-orange-100 text-orange-950 border border-orange-300"
-              : o.status === "ready"
-              ? "bg-emerald-100 text-emerald-950 border border-emerald-300"
-              : o.status === "completed"
-              ? "bg-zinc-100 text-zinc-700 border border-zinc-300"
-              : "bg-rose-100 text-rose-950 border border-rose-300"
-          }`}
-        >
-          {o.status === "received"
-            ? "Received"
-            : o.status === "preparing"
-            ? "Preparing"
-            : o.status === "ready"
-            ? "Ready"
-            : o.status === "completed"
-            ? "Completed"
-            : "Cancelled"}
-        </span>
+        <StatusBadge status={o.status} />
       </td>
 
       {/* One-Tap Kitchen Flow Action */}

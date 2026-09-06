@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import Image from "next/image";
-import { ArrowRight, CheckCircle2, Palette, Save } from "lucide-react";
+import { ArrowRight, CheckCircle2, Palette } from "lucide-react";
+import { SaveButton } from "@/components/admin/SaveButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -301,9 +302,7 @@ export function HomeStep1Hero({
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
-        <Button
-          size="sm"
-          className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
+        <SaveButton
           loading={busy === "Hero content"}
           onClick={() =>
             run(async () => {
@@ -317,8 +316,8 @@ export function HomeStep1Hero({
             }, "Hero content")
           }
         >
-          <Save className="h-3.5 w-3.5 mr-1.5" /> Save Hero
-        </Button>
+          Save Hero
+        </SaveButton>
         <Button
           type="button"
           variant="outline"

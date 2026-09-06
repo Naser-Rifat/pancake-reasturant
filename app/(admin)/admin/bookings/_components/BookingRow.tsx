@@ -1,5 +1,6 @@
 import { Ban, Check, Mail, Phone, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/admin/StatusBadge";
 import type { AdminBooking } from "@/lib/admin-api";
 import { formatTime12h } from "../_lib";
 
@@ -97,17 +98,7 @@ export function BookingRow({
 
       {/* Status Badge */}
       <td className="py-3.5 px-3 text-center whitespace-nowrap">
-        <span
-          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wide ${
-            b.status === "confirmed"
-              ? "bg-emerald-100 text-emerald-950 border border-emerald-300"
-              : b.status === "pending"
-              ? "bg-amber-100 text-amber-950 border border-amber-300"
-              : "bg-rose-100 text-rose-950 border border-rose-300"
-          }`}
-        >
-          {b.status === "confirmed" ? "Confirmed" : b.status === "pending" ? "Pending" : "Cancelled"}
-        </span>
+        <StatusBadge status={b.status} />
       </td>
 
       {/* Action Buttons */}
