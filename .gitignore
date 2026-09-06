@@ -14,7 +14,17 @@
 /coverage
 /docs
 .claude
-/backend
+
+# backend (Django) — code IS tracked; local-only artifacts are not.
+# backend/.env is already covered by the .env* rule below.
+backend/.venv/
+backend/db.sqlite3
+backend/staticfiles/
+__pycache__/
+*.pyc
+# the Dockerfile deploy path is broken (hangs after migrate — caused an
+# outage); Railway must keep building with NIXPACKS via backend/railway.json
+backend/Dockerfile
 
 # next.js
 /.next/
@@ -23,6 +33,7 @@
 # production
 /build
 /docs
+
 
 # misc
 .DS_Store
