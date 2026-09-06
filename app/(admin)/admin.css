@@ -8,8 +8,10 @@
   --card-foreground: hsl(222.2 84% 4.9%);
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(222.2 84% 4.9%);
-  --primary: hsl(222.2 47.4% 11.2%);
-  --primary-foreground: hsl(210 40% 98%);
+  /* brand brown — every default-variant button, checked switch and focus ring
+     follows the same primary as the explicit save buttons */
+  --primary: #763a12;
+  --primary-foreground: #ffffff;
   --secondary: hsl(210 40% 96.1%);
   --secondary-foreground: hsl(222.2 47.4% 11.2%);
   --muted: hsl(210 40% 96.1%);
@@ -20,9 +22,11 @@
   --destructive-foreground: hsl(210 40% 98%);
   --border: hsl(214.3 31.8% 91.4%);
   --input: hsl(214.3 31.8% 91.4%);
-  --ring: hsl(222.2 84% 4.9%);
+  --ring: #763a12;
   --radius: 0.5rem;
-  --sidebar: hsl(222.2 47.4% 11.2%);
+  /* matches the desktop aside's dark espresso, so the mobile drawer and
+     top bar are the same surface */
+  --sidebar: #211a14;
   --sidebar-foreground: hsl(210 40% 98%);
 }
 

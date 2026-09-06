@@ -34,6 +34,19 @@ export function HomeStep6Footer({
             <p className="text-xs text-zinc-500">The founding line shown under the footer logo on every page</p>
           </div>
         </div>
+      </div>
+
+      <div className="space-y-2 max-w-lg">
+        <Label className="text-xs font-semibold text-[#211a14]">Footer Tagline</Label>
+        <Input
+          className="border-zinc-300 text-[#211a14] font-bold text-sm h-11 rounded-xl"
+          value={site.footer_tagline}
+          onChange={setS("footer_tagline")}
+          placeholder="e.g. Fluffy stacks · real maple · est. 1999"
+        />
+      </div>
+
+      <div className="flex justify-end">
         <Button
           size="sm"
           className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
@@ -46,16 +59,6 @@ export function HomeStep6Footer({
         >
           <Save className="h-3.5 w-3.5 mr-1.5" /> Save Footer
         </Button>
-      </div>
-
-      <div className="space-y-2 max-w-lg">
-        <Label className="text-xs font-semibold text-[#211a14]">Footer Tagline</Label>
-        <Input
-          className="border-zinc-300 text-[#211a14] font-bold text-sm h-11 rounded-xl"
-          value={site.footer_tagline}
-          onChange={setS("footer_tagline")}
-          placeholder="e.g. Fluffy stacks · real maple · est. 1999"
-        />
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">

@@ -28,23 +28,6 @@ export function BookingPageSection({
             </span>
             <h3 className="text-base font-semibold text-[#211a14]">Reservation Page Header</h3>
           </div>
-          <Button
-            size="sm"
-            className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
-            loading={busy === "Booking hero"}
-            onClick={() =>
-              run(async () => {
-                await updateSiteSettings({
-                  booking_hero_kicker: site.booking_hero_kicker,
-                  booking_hero_heading: site.booking_hero_heading,
-                  booking_hero_script: site.booking_hero_script,
-                  booking_hero_lead: site.booking_hero_lead,
-                });
-              }, "Booking hero")
-            }
-          >
-            <Save className="h-3.5 w-3.5 mr-1.5" /> Save Header
-          </Button>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
@@ -64,6 +47,26 @@ export function BookingPageSection({
             <Label className="text-xs font-semibold text-[#211a14]">Subtitle</Label>
             <Input className="border-zinc-300 text-[#211a14] font-medium text-sm h-10 rounded-xl" value={site.booking_hero_lead} onChange={setS("booking_hero_lead")} placeholder="Pick a date, pick a time..." />
           </div>
+        </div>
+
+        <div className="flex justify-end pt-3 border-t border-zinc-200">
+          <Button
+            size="sm"
+            className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
+            loading={busy === "Booking hero"}
+            onClick={() =>
+              run(async () => {
+                await updateSiteSettings({
+                  booking_hero_kicker: site.booking_hero_kicker,
+                  booking_hero_heading: site.booking_hero_heading,
+                  booking_hero_script: site.booking_hero_script,
+                  booking_hero_lead: site.booking_hero_lead,
+                });
+              }, "Booking hero")
+            }
+          >
+            <Save className="h-3.5 w-3.5 mr-1.5" /> Save Header
+          </Button>
         </div>
       </div>
 

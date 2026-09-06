@@ -306,32 +306,10 @@ export function HomeStep2Campaigns({
         <div className="lg:col-span-7 bg-white p-6 rounded-xl border border-zinc-200 shadow-sm space-y-5">
           {activeDeal ? (
             <>
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-200">
+              <div className="pb-3 border-b border-zinc-200">
                 <h4 className="text-sm font-semibold text-[#211a14] truncate max-w-full">
                   Edit: {activeDeal.message || "Untitled Deal"}
                 </h4>
-                <Button
-                  size="sm"
-                  className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs"
-                  loading={busy === "Campaign"}
-                  onClick={() =>
-                    run(async () => {
-                      await updateAnnouncement(activeDeal.id, {
-                        message: activeDeal.message,
-                        details: activeDeal.details,
-                        link_text: activeDeal.link_text,
-                        link_url: activeDeal.link_url,
-                        image: activeDeal.image,
-                        starts_at: activeDeal.starts_at,
-                        ends_at: activeDeal.ends_at,
-                        card1_dish: activeDeal.card1_dish ?? "",
-                        card2_dish: activeDeal.card2_dish ?? "",
-                      });
-                    }, "Campaign", { title: "Deal saved" })
-                  }
-                >
-                  <Save className="h-3.5 w-3.5 mr-1.5" /> Save Deal
-                </Button>
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-lg border border-zinc-200 bg-white">
@@ -500,6 +478,31 @@ export function HomeStep2Campaigns({
                   onChange={(e) => setActiveDeal((a) => (a ? { ...a, image: e.target.value } : a))}
                   onUploaded={(url) => setActiveDeal((a) => (a ? { ...a, image: url } : a))}
                 />
+
+                <div className="flex justify-end pt-3 border-t border-zinc-200">
+                  <Button
+                    size="sm"
+                    className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs"
+                    loading={busy === "Campaign"}
+                    onClick={() =>
+                      run(async () => {
+                        await updateAnnouncement(activeDeal.id, {
+                          message: activeDeal.message,
+                          details: activeDeal.details,
+                          link_text: activeDeal.link_text,
+                          link_url: activeDeal.link_url,
+                          image: activeDeal.image,
+                          starts_at: activeDeal.starts_at,
+                          ends_at: activeDeal.ends_at,
+                          card1_dish: activeDeal.card1_dish ?? "",
+                          card2_dish: activeDeal.card2_dish ?? "",
+                        });
+                      }, "Campaign", { title: "Deal saved" })
+                    }
+                  >
+                    <Save className="h-3.5 w-3.5 mr-1.5" /> Save Deal
+                  </Button>
+                </div>
               </div>
             </>
           ) : (

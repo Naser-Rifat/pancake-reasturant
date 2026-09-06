@@ -38,6 +38,24 @@ export function MenuPageSection({
             </span>
             <h3 className="text-base font-semibold text-[#211a14]">Menu Page Top Title</h3>
           </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold text-[#211a14]">Main Word (e.g. Stacks On)</Label>
+            <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.menu_hero_heading} onChange={setS("menu_hero_heading")} />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold text-[#211a14]">Handwriting Word (e.g. Stacks.)</Label>
+            <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.menu_hero_script} onChange={setS("menu_hero_script")} />
+          </div>
+          <div className="sm:col-span-2 space-y-1">
+            <Label className="text-xs font-semibold text-[#211a14]">Subtitle</Label>
+            <Input className="border-zinc-300 text-[#211a14] font-medium text-sm h-10 rounded-xl" value={site.menu_hero_lead} onChange={setS("menu_hero_lead")} />
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-3 border-t border-zinc-200">
           <Button
             size="sm"
             className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
@@ -54,21 +72,6 @@ export function MenuPageSection({
           >
             <Save className="h-3.5 w-3.5 mr-1.5" /> Save Header
           </Button>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1">
-            <Label className="text-xs font-semibold text-[#211a14]">Main Word (e.g. Stacks On)</Label>
-            <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl" value={site.menu_hero_heading} onChange={setS("menu_hero_heading")} />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs font-semibold text-[#211a14]">Handwriting Word (e.g. Stacks.)</Label>
-            <Input className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl font-serif italic" value={site.menu_hero_script} onChange={setS("menu_hero_script")} />
-          </div>
-          <div className="sm:col-span-2 space-y-1">
-            <Label className="text-xs font-semibold text-[#211a14]">Subtitle</Label>
-            <Input className="border-zinc-300 text-[#211a14] font-medium text-sm h-10 rounded-xl" value={site.menu_hero_lead} onChange={setS("menu_hero_lead")} />
-          </div>
         </div>
       </div>
 

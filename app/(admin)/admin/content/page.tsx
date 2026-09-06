@@ -567,6 +567,7 @@ export default function ContentPage() {
               setSite={setSite}
               menuItems={menuItems}
               setMenuItems={setMenuItems}
+              busy={busy}
               run={run}
               setHomeStepIndex={setHomeStepIndex}
             />

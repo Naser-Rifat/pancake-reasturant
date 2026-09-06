@@ -1,13 +1,13 @@
 import type { Dispatch, SetStateAction } from "react";
 import Image from "next/image";
-import { ArrowRight, CheckCircle2, Palette } from "lucide-react";
+import { ArrowRight, CheckCircle2, Palette, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageField } from "@/components/ui/image-field";
-import { updateMenuItem, type AdminMenuItem, type AdminSiteSettings } from "@/lib/admin-api";
+import { updateMenuItem, updateSiteSettings, type AdminMenuItem, type AdminSiteSettings } from "@/lib/admin-api";
 import type { RunSave, SetSiteField } from "../_lib";
 
 // Home studio · Step 1: hero headline/images + the 3-slot hero carousel controller.
@@ -17,6 +17,7 @@ export function HomeStep1Hero({
   setSite,
   menuItems,
   setMenuItems,
+  busy,
   run,
   setHomeStepIndex,
 }: {
@@ -25,6 +26,7 @@ export function HomeStep1Hero({
   setSite: Dispatch<SetStateAction<AdminSiteSettings | null>>;
   menuItems: AdminMenuItem[];
   setMenuItems: Dispatch<SetStateAction<AdminMenuItem[]>>;
+  busy: string;
   run: RunSave;
   setHomeStepIndex: Dispatch<SetStateAction<number>>;
 }) {
@@ -299,10 +301,28 @@ export function HomeStep1Hero({
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
-        <span className="text-xs font-bold text-zinc-500">Section 1 Complete</span>
+        <Button
+          size="sm"
+          className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl"
+          loading={busy === "Hero content"}
+          onClick={() =>
+            run(async () => {
+              await updateSiteSettings({
+                hero_heading: site.hero_heading,
+                hero_script: site.hero_script,
+                hero_lead: site.hero_lead,
+                hero_image: site.hero_image,
+                hero_cutout: site.hero_cutout,
+              });
+            }, "Hero content")
+          }
+        >
+          <Save className="h-3.5 w-3.5 mr-1.5" /> Save Hero
+        </Button>
         <Button
           type="button"
-          className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 rounded-xl whitespace-normal h-auto"
+          variant="outline"
+          className="border-zinc-300 text-[#763a12] font-bold text-xs gap-2 rounded-xl whitespace-normal h-auto"
           onClick={() => setHomeStepIndex(2)}
         >
           <span>Next: Step 2 (Special Deals &amp; Campaigns)</span>

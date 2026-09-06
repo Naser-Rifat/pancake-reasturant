@@ -129,7 +129,7 @@ export default function AdminLoginPage() {
                 type="submit"
                 disabled={busy}
                 loading={busy}
-                className="w-full h-11 text-sm font-semibold rounded-xl !text-white bg-zinc-900 hover:bg-zinc-800 shadow-xs mt-2 transition-all"
+                className="w-full h-11 text-sm font-semibold rounded-xl !text-white bg-[#763a12] hover:bg-[#5e2d0d] shadow-xs mt-2 transition-all"
                 style={{ color: "#ffffff" }}
               >
                 {busy ? "Signing in..." : "Sign in to Dashboard"}

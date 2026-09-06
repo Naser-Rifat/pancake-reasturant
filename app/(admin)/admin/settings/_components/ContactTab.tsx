@@ -27,42 +27,15 @@ export function ContactTab({
   return (
     <div className="space-y-6">
       <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
-        {/* Card Header with Save Button */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-zinc-200">
-          <div className="space-y-0.5">
-            <div className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-[#763a12]" />
-              <h3 className="text-base font-semibold text-[#211a14]">Business &amp; Contact Details</h3>
-            </div>
-            <p className="text-xs text-zinc-500">
-              Displayed on the website footer, receipts, location card, and confirmation emails
-            </p>
+        {/* Card Header */}
+        <div className="pb-4 border-b border-zinc-200 space-y-0.5">
+          <div className="flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-[#763a12]" />
+            <h3 className="text-base font-semibold text-[#211a14]">Business &amp; Contact Details</h3>
           </div>
-          <Button
-            size="sm"
-            className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs"
-            loading={busy === "Settings"}
-            onClick={() =>
-              run(async () => {
-                await updateSiteSettings({
-                  address: site.address,
-                  phone: site.phone,
-                  whatsapp: site.whatsapp,
-                  email: site.email,
-                  abn: site.abn,
-                  timezone: site.timezone,
-                  map_embed: site.map_embed,
-                  transit_badges: site.transit_badges,
-                  show_transit_badges: site.show_transit_badges,
-                  instagram_url: site.instagram_url,
-                  facebook_url: site.facebook_url,
-                  uber_eats_url: site.uber_eats_url,
-                });
-              }, "Settings", { title: "Contact info saved" })
-            }
-          >
-            <Save className="h-3.5 w-3.5 mr-1.5" /> Save Contact Info
-          </Button>
+          <p className="text-xs text-zinc-500">
+            Displayed on the website footer, receipts, location card, and confirmation emails
+          </p>
         </div>
 
         {/* SECTION A: Core Contact & Legal Details */}
@@ -261,6 +234,36 @@ export function ContactTab({
               These small chips sit under your address in the &quot;Find Us&quot; box. Turn the switch off to hide them all without deleting the text.
             </p>
           </div>
+        </div>
+
+        {/* Save sits at the END of the form — where the eye lands after the
+            last field — instead of back up in the card header */}
+        <div className="pt-4 border-t border-zinc-200 flex justify-end">
+          <Button
+            size="sm"
+            className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs"
+            loading={busy === "Settings"}
+            onClick={() =>
+              run(async () => {
+                await updateSiteSettings({
+                  address: site.address,
+                  phone: site.phone,
+                  whatsapp: site.whatsapp,
+                  email: site.email,
+                  abn: site.abn,
+                  timezone: site.timezone,
+                  map_embed: site.map_embed,
+                  transit_badges: site.transit_badges,
+                  show_transit_badges: site.show_transit_badges,
+                  instagram_url: site.instagram_url,
+                  facebook_url: site.facebook_url,
+                  uber_eats_url: site.uber_eats_url,
+                });
+              }, "Settings", { title: "Contact info saved" })
+            }
+          >
+            <Save className="h-3.5 w-3.5 mr-1.5" /> Save Contact Info
+          </Button>
         </div>
       </div>
     </div>
