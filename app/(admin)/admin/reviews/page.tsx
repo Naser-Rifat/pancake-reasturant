@@ -66,8 +66,20 @@ export default function ReviewsAdminPage() {
     load();
   }, [load]);
 
+  // review ids with a request in flight — locks that card's switch
+  const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
+  const markPending = (id: number, on: boolean) =>
+    setPendingIds((s) => {
+      const next = new Set(s);
+      if (on) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+
   const approve = async (r: AdminReview, is_approved: boolean) => {
+    if (pendingIds.has(r.id)) return;
     const prev = reviews;
+    markPending(r.id, true);
     setReviews((rs) => rs.map((x) => (x.id === r.id ? { ...x, is_approved } : x)));
     try {
       await updateReview(r.id, { is_approved });
@@ -84,6 +96,8 @@ export default function ReviewsAdminPage() {
         title: "Update failed",
         description: e instanceof Error ? e.message : undefined,
       });
+    } finally {
+      markPending(r.id, false);
     }
   };
 
@@ -416,6 +430,7 @@ export default function ReviewsAdminPage() {
                   <label className="flex items-center gap-2 text-xs font-semibold text-[#211a14] cursor-pointer select-none">
                     <Switch
                       aria-label={`Publish review from ${r.name}`}
+                      disabled={pendingIds.has(r.id)}
                       checked={r.is_approved}
                       onCheckedChange={(v) => approve(r, v)}
                     />

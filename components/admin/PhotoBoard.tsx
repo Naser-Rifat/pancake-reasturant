@@ -99,6 +99,8 @@ export default function PhotoBoard({
   };
 
   const remove = async (p: AdminMenuItemPhoto) => {
+    if (busy) return; // one photo mutation at a time — no double-delete 404s
+    setBusy("Removing photo…");
     try {
       await deleteMenuItemPhoto(p.id);
       let count = 0;
@@ -114,6 +116,8 @@ export default function PhotoBoard({
       toast({ variant: "success", title: "Photo removed" });
     } catch (e) {
       toast({ variant: "error", title: "Could not remove photo", description: e instanceof Error ? e.message : undefined });
+    } finally {
+      setBusy("");
     }
   };
 

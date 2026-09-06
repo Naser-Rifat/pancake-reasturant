@@ -243,7 +243,19 @@ export default function MenuAdminPage() {
     }
   };
 
+  // slugs with a PATCH/DELETE in flight — locks that row's switches and trash
+  // button so a double-tap can't fire the same mutation twice
+  const [pendingSlugs, setPendingSlugs] = useState<Set<string>>(new Set());
+  const markPending = (slug: string, on: boolean) =>
+    setPendingSlugs((s) => {
+      const next = new Set(s);
+      if (on) next.add(slug);
+      else next.delete(slug);
+      return next;
+    });
+
   const remove = async (item: AdminMenuItem) => {
+    if (pendingSlugs.has(item.slug)) return;
     const ok = await confirm({
       title: `Delete “${item.name}” from the menu?`,
       description: "Its photos and page disappear from the website immediately.",
@@ -251,21 +263,28 @@ export default function MenuAdminPage() {
       destructive: true,
     });
     if (!ok) return;
+    const prev = items;
+    markPending(item.slug, true);
+    setItems((xs) => xs.filter((x) => x.slug !== item.slug));
     try {
       await deleteMenuItem(item.slug);
       toast({ variant: "success", title: `${item.name} deleted from the menu` });
-      load();
     } catch (err) {
+      setItems(prev);
       toast({
         variant: "error",
         title: "Delete failed",
         description: err instanceof Error ? err.message : undefined,
       });
+    } finally {
+      markPending(item.slug, false);
     }
   };
 
   const toggle = async (item: AdminMenuItem, changes: Partial<AdminMenuItem>, note: string) => {
+    if (pendingSlugs.has(item.slug)) return;
     const prev = items;
+    markPending(item.slug, true);
     setItems((xs) => xs.map((x) => (x.slug === item.slug ? { ...x, ...changes } : x)));
     try {
       await updateMenuItem(item.slug, changes);
@@ -277,6 +296,8 @@ export default function MenuAdminPage() {
         title: "Update failed",
         description: err instanceof Error ? err.message : undefined,
       });
+    } finally {
+      markPending(item.slug, false);
     }
   };
 
@@ -596,6 +617,7 @@ export default function MenuAdminPage() {
                       <td className="py-3.5 px-3 text-center whitespace-nowrap">
                         <Switch
                           aria-label={`${item.name} available`}
+                          disabled={pendingSlugs.has(item.slug)}
                           checked={item.is_available}
                           onCheckedChange={(v) =>
                             toggle(
@@ -611,6 +633,7 @@ export default function MenuAdminPage() {
                       <td className="py-3.5 px-3 text-center whitespace-nowrap">
                         <Switch
                           aria-label={`${item.name} featured on home page`}
+                          disabled={pendingSlugs.has(item.slug)}
                           checked={item.is_featured}
                           onCheckedChange={(v) =>
                             toggle(
@@ -637,6 +660,7 @@ export default function MenuAdminPage() {
                             size="icon"
                             variant="ghost"
                             className="h-8 w-8 text-destructive hover:bg-destructive/10 rounded-xl"
+                            disabled={pendingSlugs.has(item.slug)}
                             onClick={() => remove(item)}
                           >
                             <Trash2 className="h-3.5 w-3.5" />

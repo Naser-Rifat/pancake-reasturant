@@ -90,7 +90,12 @@ export default function OrdersPage() {
     return () => clearInterval(id);
   }, [load]);
 
+  // the order whose status change is in flight — its row controls lock so a
+  // double-tap can't fire the same transition twice
+  const [pendingId, setPendingId] = useState<string | null>(null);
+
   const setStatus = async (o: AdminOrder, status: AdminOrder["status"]) => {
+    if (pendingId === o.public_id) return;
     let cancel_reason = o.cancel_reason;
     if (status === "cancelled") {
       const input = await promptText({
@@ -107,6 +112,7 @@ export default function OrdersPage() {
       cancel_reason = input;
     }
     const prev = orders;
+    setPendingId(o.public_id);
     setOrders((os) =>
       os.map((x) => (x.public_id === o.public_id ? { ...x, status, cancel_reason } : x))
     );
@@ -130,6 +136,8 @@ export default function OrdersPage() {
         title: "Status update failed",
         description: e instanceof Error ? e.message : undefined,
       });
+    } finally {
+      setPendingId(null);
     }
   };
 
@@ -387,6 +395,7 @@ export default function OrdersPage() {
                     key={o.public_id}
                     o={o}
                     highlighted={highlightId === o.public_id}
+                    pending={pendingId === o.public_id}
                     onSetStatus={setStatus}
                   />
                 ))}

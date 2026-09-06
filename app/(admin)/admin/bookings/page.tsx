@@ -25,7 +25,7 @@ import { Pagination } from "@/components/admin/Pagination";
 import { useRowFocus } from "@/components/admin/use-row-focus";
 
 import { BookingRow } from "./_components/BookingRow";
-import { formatTime12h } from "../settings/_lib";
+import { formatTime12h } from "./_lib";
 import { PhoneBookingModal } from "./_components/PhoneBookingModal";
 import {
   EMPTY_PHONE_BOOKING,
@@ -109,7 +109,11 @@ export default function BookingsPage() {
     return () => clearInterval(id);
   }, [load]);
 
+  // the booking whose status change is in flight — locks that row's buttons
+  const [pendingId, setPendingId] = useState<string | null>(null);
+
   const setStatus = async (b: AdminBooking, status: AdminBooking["status"]) => {
+    if (pendingId === b.public_id) return;
     // both actions email the guest, so both get a deliberate confirm step —
     // and we never claim an email was sent when there is no address on file
     const when = `${new Date(`${b.date}T00:00:00`).toLocaleDateString("en-AU", {
@@ -140,6 +144,7 @@ export default function BookingsPage() {
     if (!ok) return;
 
     const prev = bookings;
+    setPendingId(b.public_id);
     setBookings((bs) => bs.map((x) => (x.public_id === b.public_id ? { ...x, status } : x)));
     try {
       await updateBooking(b.public_id, { status });
@@ -160,6 +165,8 @@ export default function BookingsPage() {
         title: "Update failed",
         description: e instanceof Error ? e.message : undefined,
       });
+    } finally {
+      setPendingId(null);
     }
   };
 
@@ -469,6 +476,7 @@ export default function BookingsPage() {
                     key={b.public_id}
                     b={b}
                     highlighted={highlightId === b.public_id}
+                    pending={pendingId === b.public_id}
                     onSetStatus={setStatus}
                   />
                 ))}

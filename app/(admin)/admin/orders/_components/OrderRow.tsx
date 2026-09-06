@@ -8,10 +8,13 @@ import { ORDER_STATUSES } from "../../status";
 export function OrderRow({
   o,
   highlighted,
+  pending = false,
   onSetStatus,
 }: {
   o: AdminOrder;
   highlighted: boolean;
+  /** a status change for THIS order is in flight — lock its controls */
+  pending?: boolean;
   onSetStatus: (o: AdminOrder, status: AdminOrder["status"]) => void;
 }) {
   const placedDate = new Date(o.created_at);
@@ -139,6 +142,7 @@ export function OrderRow({
           <Button
             size="sm"
             className="h-8 text-xs font-bold bg-orange-600 hover:bg-orange-700 text-white rounded-xl shadow-xs"
+            loading={pending}
             onClick={() => onSetStatus(o, "preparing")}
           >
             <ChefHat className="h-3.5 w-3.5 mr-1" /> Start Prep
@@ -147,6 +151,7 @@ export function OrderRow({
           <Button
             size="sm"
             className="h-8 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs"
+            loading={pending}
             onClick={() => onSetStatus(o, "ready")}
           >
             <Bell className="h-3.5 w-3.5 mr-1" /> Mark Ready
@@ -155,6 +160,7 @@ export function OrderRow({
           <Button
             size="sm"
             className="h-8 text-xs font-bold bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl shadow-xs"
+            loading={pending}
             onClick={() => onSetStatus(o, "completed")}
           >
             <Check className="h-3.5 w-3.5 mr-1" /> Complete
@@ -170,6 +176,7 @@ export function OrderRow({
           aria-label={`Status of ${o.customer_name}'s order`}
           className="h-8 text-xs border-zinc-300 font-bold rounded-xl w-28 bg-white"
           value={o.status}
+          disabled={pending}
           onChange={(e) => onSetStatus(o, e.target.value as AdminOrder["status"])}
         >
           {ORDER_STATUSES.map((s) => (

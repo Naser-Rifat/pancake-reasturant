@@ -7,10 +7,13 @@ import { formatTime12h } from "../_lib";
 export function BookingRow({
   b,
   highlighted,
+  pending = false,
   onSetStatus,
 }: {
   b: AdminBooking;
   highlighted: boolean;
+  /** a status change for THIS booking is in flight — lock its buttons */
+  pending?: boolean;
   onSetStatus: (b: AdminBooking, status: AdminBooking["status"]) => void;
 }) {
   return (
@@ -114,6 +117,7 @@ export function BookingRow({
             <Button
               size="sm"
               className="h-8 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs"
+              loading={pending}
               onClick={() => onSetStatus(b, "confirmed")}
             >
               <Check className="h-3.5 w-3.5 mr-1" /> Confirm
@@ -124,6 +128,7 @@ export function BookingRow({
               size="sm"
               variant="ghost"
               className="h-8 text-xs font-bold text-destructive hover:bg-destructive/10 rounded-xl"
+              loading={pending}
               onClick={() => onSetStatus(b, "cancelled")}
             >
               <Ban className="h-3.5 w-3.5 mr-1" /> Cancel
