@@ -34,6 +34,21 @@ export type NewCert = { icon: string; image: string; title: string; subtitle: st
 
 export const EMPTY_CERT: NewCert = { icon: "medal", image: "", title: "", subtitle: "" };
 
+/** What the PUBLIC website would do with this deal right now — mirrors the
+ *  backend's Announcement.live() filter (is_active + schedule window). */
+export type DealVisibility = "live" | "scheduled" | "expired" | "hidden";
+export function dealVisibility(a: {
+  is_active: boolean;
+  starts_at: string | null;
+  ends_at: string | null;
+}): DealVisibility {
+  if (!a.is_active) return "hidden";
+  const now = Date.now();
+  if (a.starts_at && new Date(a.starts_at).getTime() > now) return "scheduled";
+  if (a.ends_at && new Date(a.ends_at).getTime() < now) return "expired";
+  return "live";
+}
+
 /** ISO datetime ↔ <input type="datetime-local"> value (local wall-clock) */
 export function isoToLocalInput(iso: string | null): string {
   if (!iso) return "";

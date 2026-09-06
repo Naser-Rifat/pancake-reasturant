@@ -28,6 +28,51 @@ import {
   DEFAULT_STEPS,
 } from "./_lib";
 
+/** Honest banner over the deal preview: the design below is shown as you're
+ *  building it, but visitors only see it while the deal is actually live. */
+function DealStatusNote({
+  status,
+  announcement,
+}: {
+  status: "live" | "scheduled" | "expired" | "hidden";
+  announcement: AdminAnnouncement | null;
+}) {
+  if (status === "live") return null;
+  const nice = (iso: string | null | undefined) =>
+    iso
+      ? new Date(iso).toLocaleString("en-AU", {
+          day: "numeric",
+          month: "short",
+          hour: "numeric",
+          minute: "2-digit",
+        })
+      : "";
+  const text =
+    status === "scheduled"
+      ? `Scheduled — visitors will start seeing this from ${nice(announcement?.starts_at)}`
+      : status === "expired"
+      ? `Ended ${nice(announcement?.ends_at)} — visitors no longer see this deal`
+      : "Hidden — “Show on the Website” is OFF, visitors don't see this deal";
+  return (
+    <div
+      style={{
+        margin: "0 0 10px",
+        padding: "8px 14px",
+        borderRadius: "10px",
+        background: status === "scheduled" ? "#fef3c7" : "#f4f4f5",
+        border: `1px solid ${status === "scheduled" ? "#fcd34d" : "#d4d4d8"}`,
+        color: "#211a14",
+        fontSize: "0.75rem",
+        fontWeight: 700,
+        textAlign: "center",
+      }}
+    >
+      {status === "scheduled" ? "⏳ " : status === "expired" ? "🕰️ " : "🙈 "}
+      {text} — the design below is your work-in-progress preview.
+    </div>
+  );
+}
+
 export default function PreviewPage() {
   const [section, setSection] = useState<string>("hero");
   // stay invisible until the studio's first sync lands — otherwise the
@@ -37,6 +82,8 @@ export default function PreviewPage() {
   const [site, setSite] = useState<AdminSiteSettings>(DEFAULT_SITE);
 
   const [announcement, setAnnouncement] = useState<AdminAnnouncement | null>(DEFAULT_ANNOUNCEMENT);
+  // what the public site would do with the edited deal right now
+  const [dealStatus, setDealStatus] = useState<"live" | "scheduled" | "expired" | "hidden">("live");
 
   // Custom customizable section titles from admin
   const [section1Kicker, setSection1Kicker] = useState<string>("✨ TODAY'S FEATURED SPECIAL");
@@ -56,6 +103,7 @@ export default function PreviewPage() {
         section: s,
         site: nextSite,
         announcement: nextAnn,
+        dealStatus: nextDealStatus,
         section1Kicker: nextK1,
         section2Kicker: nextK2,
         section2Title: nextT2,
@@ -68,6 +116,7 @@ export default function PreviewPage() {
       if (s) setSection(s);
       if (nextSite) setSite(nextSite);
       if (nextAnn !== undefined) setAnnouncement(nextAnn);
+      if (nextDealStatus !== undefined) setDealStatus(nextDealStatus);
       if (nextK1 !== undefined) setSection1Kicker(nextK1);
       if (nextK2 !== undefined) setSection2Kicker(nextK2);
       if (nextT2 !== undefined) setSection2Title(nextT2);
@@ -473,6 +522,7 @@ export default function PreviewPage() {
       {section === "deals" && (
         <section className="promo" style={{ padding: "0" }}>
           <div className="container" style={{ padding: "0" }}>
+            <DealStatusNote status={dealStatus} announcement={announcement} />
             <div className="promo-band diner-promo-band reveal visible" style={{ margin: "0" }}>
               {/* Rotating Retro Starburst Badge */}
               <div className="promo-starburst-badge">
@@ -561,6 +611,7 @@ export default function PreviewPage() {
       {section === "deals_slider" && (
         <section style={{ padding: "0" }}>
           <div className="container" style={{ padding: "0" }}>
+            <DealStatusNote status={dealStatus} announcement={announcement} />
             <div style={{ textAlign: "center", marginBottom: "12px" }}>
               <p style={{ color: "var(--pink-deep)", fontWeight: 800, textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.06em", margin: 0 }}>
                 {section2Kicker?.trim() || "On Right Now"}

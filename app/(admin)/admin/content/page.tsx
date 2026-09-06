@@ -50,6 +50,7 @@ import { useToast, type ToastInput } from "@/components/ui/toast";
 
 import {
   EMPTY_CERT,
+  dealVisibility,
   EMPTY_PHOTO,
   getDealCadence,
   type PageTab,
@@ -188,6 +189,9 @@ export default function ContentPage() {
         section: currentPreviewSection,
         site,
         announcement: activeDeal,
+        // what the PUBLIC site would do with this deal right now — the preview
+        // overlays an honest "Scheduled/Expired/Hidden" note when it differs
+        dealStatus: activeDeal ? dealVisibility(activeDeal) : "live",
         section1Kicker: site.promo_kicker || "✨ TODAY'S FEATURED SPECIAL",
         section2Kicker: site.offers_kicker || "On Right Now",
         section2Title: site.offers_title || "This Week's Offers",

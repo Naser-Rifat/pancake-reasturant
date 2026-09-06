@@ -18,6 +18,7 @@ import {
   type AdminSiteSettings,
 } from "@/lib/admin-api";
 import {
+  dealVisibility,
   isoToLocalInput,
   localInputToIso,
   type CampaignFormat,
@@ -251,16 +252,27 @@ export function HomeStep2Campaigns({
                           Live in band
                         </span>
                       )}
-                      {a.is_active ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                          Active
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-700">
-                          Hidden
-                        </span>
-                      )}
+                      {(() => {
+                        const v = dealVisibility(a);
+                        return v === "live" ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                            Live
+                          </span>
+                        ) : v === "scheduled" ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-950 border border-amber-300">
+                            Scheduled
+                          </span>
+                        ) : v === "expired" ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-950 border border-rose-300">
+                            Expired
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-700">
+                            Hidden
+                          </span>
+                        );
+                      })()}
                       {isSelected && (
                         <span className="text-[10px] font-semibold text-[#763a12] ml-auto">Editing</span>
                       )}
