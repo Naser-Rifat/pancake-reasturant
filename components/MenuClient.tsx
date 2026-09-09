@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart, Plus, ArrowRight } from "lucide-react";
@@ -11,8 +11,8 @@ import {
   telHref,
   type ApiMenuItem,
 } from "@/lib/api";
+import { useCart } from "@/lib/cart";
 
-const CART_KEY = "krush-cart-v2";
 const TAG_ORDER = ["sweet", "savoury", "choc"] as const;
 
 const CATEGORY_ICONS: Record<string, string> = {
@@ -20,8 +20,6 @@ const CATEGORY_ICONS: Record<string, string> = {
   savoury: "🥑",
   choc: "🍫",
 };
-
-type Cart = Record<string, number>;
 
 export default function MenuClient({
   items,
@@ -36,44 +34,32 @@ export default function MenuClient({
   pauseMessage?: string;
   uberEatsUrl?: string;
 }) {
-  const [cart, setCart] = useState<Cart>({});
-  const [loaded, setLoaded] = useState(false);
+  // the cart itself lives in lib/cart so the dish page can add to it too
+  const { cart, loaded, count, add: addToCart, inc, dec, clear, reconcile, showToast, addedAt } =
+    useCart();
   const [open, setOpen] = useState(false);
-  const [toast, setToast] = useState("");
   const [pop, setPop] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [placing, setPlacing] = useState(false);
   const [selectedTag, setSelectedTag] = useState<string>("all");
-  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // hydrate cart from localStorage, dropping slugs that left the menu
+  // drop slugs that have left the menu, then honour ?add= — the dish page adds
+  // in place now, but shared and bookmarked links still land here
   useEffect(() => {
-    try {
-      const saved: Cart = JSON.parse(localStorage.getItem(CART_KEY) || "{}");
-      Object.keys(saved).forEach((slug) => {
-        if (!items.some((b) => b.slug === slug)) delete saved[slug];
-      });
-      const params = new URLSearchParams(window.location.search);
-      const wanted = params.get("add");
-      const qty = Math.min(9, Math.max(1, parseInt(params.get("qty") || "1", 10) || 1));
-      if (wanted && items.some((b) => b.slug === wanted)) {
-        saved[wanted] = (saved[wanted] || 0) + qty;
-        localStorage.setItem(CART_KEY, JSON.stringify(saved));
-        window.history.replaceState(null, "", "/menu");
-        showToast(`${items.find((b) => b.slug === wanted)!.name} added to your order 🥞`);
-      }
-      setCart(saved);
-    } catch {
-      /* corrupted storage — start fresh */
+    if (!loaded) return;
+    reconcile(items.map((b) => b.slug));
+    const params = new URLSearchParams(window.location.search);
+    const wanted = params.get("add");
+    if (!wanted) return;
+    const qty = Math.min(9, Math.max(1, parseInt(params.get("qty") || "1", 10) || 1));
+    const hit = items.find((b) => b.slug === wanted);
+    if (hit) {
+      addToCart(wanted, qty);
+      window.history.replaceState(null, "", "/menu");
+      showToast(`${hit.name} added to your order 🥞`);
     }
-    setLoaded(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items]);
-
-  useEffect(() => {
-    if (loaded) localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  }, [cart, loaded]);
+  }, [items, loaded]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
@@ -84,31 +70,20 @@ export default function MenuClient({
   const itemBySlug = (slug: string) => items.find((b) => b.slug === slug)!;
   const priceOf = (slug: string) => parseFloat(itemBySlug(slug).price);
 
-  const count = Object.values(cart).reduce((s, q) => s + q, 0);
   const total = Object.entries(cart).reduce((s, [slug, q]) => s + priceOf(slug) * q, 0);
 
-  const showToast = (msg: string) => {
-    setToast(msg);
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(""), 2600);
-  };
-
-  // one line can hold at most 9 — matches QtyAdd and the ?add= URL path
-  const MAX_QTY = 9;
-  const add = (slug: string) => {
-    setCart((c) => ({ ...c, [slug]: Math.min(MAX_QTY, (c[slug] || 0) + 1) }));
+  // replay the FAB's pop whenever anything lands in the cart, wherever from
+  useEffect(() => {
+    if (!addedAt) return;
     setPop(false);
-    requestAnimationFrame(() => setPop(true));
+    const id = requestAnimationFrame(() => setPop(true));
+    return () => cancelAnimationFrame(id);
+  }, [addedAt]);
+
+  const add = (slug: string) => {
+    addToCart(slug);
     showToast(`${itemBySlug(slug).name} added to your order 🥞`);
   };
-
-  const inc = (slug: string) => setCart((c) => ({ ...c, [slug]: Math.min(MAX_QTY, c[slug] + 1) }));
-  const dec = (slug: string) =>
-    setCart((c) => {
-      const next = { ...c, [slug]: c[slug] - 1 };
-      if (next[slug] <= 0) delete next[slug];
-      return next;
-    });
 
   const checkout = async () => {
     if (!count) return showToast("Your order is empty!");
@@ -120,7 +95,7 @@ export default function MenuClient({
         phone: phone.trim(),
         items: Object.entries(cart).map(([slug, quantity]) => ({ slug, quantity })),
       });
-      setCart({});
+      clear();
       setOpen(false);
       showToast(`Order received — $${order.total}. See you soon, ${name.trim()}! 🎉`);
     } catch (err) {
@@ -433,7 +408,6 @@ export default function MenuClient({
       </aside>
 
       {/* Toast */}
-      <div className={`toast${toast ? " show" : ""}`}>{toast}</div>
     </>
   );
 }

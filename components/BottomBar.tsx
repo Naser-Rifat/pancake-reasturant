@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CalendarDays, House, Menu as MenuIcon, UtensilsCrossed } from "lucide-react";
+import { useCart } from "@/lib/cart";
 
 const TABS = [
   { href: "/", label: "Home", Icon: House },
@@ -23,6 +24,7 @@ export const TOGGLE_MENU_EVENT = "pancakeclub:toggle-menu";
 export default function BottomBar() {
   const pathname = usePathname();
   const [shown, setShown] = useState(false);
+  const { count } = useCart();
 
   useEffect(() => {
     const hero = document.querySelector(".hero");
@@ -66,7 +68,16 @@ export default function BottomBar() {
             aria-current={active ? "page" : undefined}
             tabIndex={shown ? undefined : -1}
           >
-            <Icon size={21} strokeWidth={2.2} aria-hidden="true" />
+            <span className="tabbar-icon">
+              <Icon size={21} strokeWidth={2.2} aria-hidden="true" />
+              {/* an order in progress is only visible on the menu page's own
+                  FAB; this carries it to every other screen */}
+              {href === "/menu" && count > 0 && (
+                <span className="tabbar-badge" aria-label={`${count} in your order`}>
+                  {count}
+                </span>
+              )}
+            </span>
             <span>{label}</span>
           </Link>
         );

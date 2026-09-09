@@ -13,8 +13,9 @@ test("home renders hero, featured slider and reviews from the API", async ({ pag
   const menu = await (await page.request.get(`${API}/menu/`)).json();
   await page.goto("/");
   await expect(page.locator(".hero-card-left h1")).toBeVisible();
-  // "Our Favourites" grid shows the top picks (up to eight)
-  await expect(page.locator("#featured .fav-card")).toHaveCount(Math.min(8, menu.length));
+  // "Our Favourites" shows the top picks — keep in step with MAX in
+  // components/FavouritesRail.tsx (four, so the home page stays a teaser)
+  await expect(page.locator("#featured .fav-card")).toHaveCount(Math.min(4, menu.length));
   await expect(page.locator(".rev-card").first()).toBeVisible();
 });
 

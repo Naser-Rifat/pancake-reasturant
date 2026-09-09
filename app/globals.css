@@ -6933,6 +6933,228 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   }
 }
 
+/* ---- mobile/tablet dish page ----
+   The desktop page opens with 290px of cream, frames the dish twice (a brown
+   deep-frame plus the gallery rail below repeating the same single photo) and
+   parks "Add to order" 1,600px down. Phones get the app shape instead: compact
+   top bar, the dish on a tinted ground with the same keyline as the cards,
+   spec rows, and a pinned price + add bar. */
+/* app-bar-only parts. The arrow is NOT here: desktop keeps "← Back to the
+   menu" exactly as it read before; phones hide the label instead. */
+.spec-label,
+.dish-topbar-title,
+.dish-topbar-more {
+  display: none;
+}
+.dish-back-arrow {
+  margin-right: 0.35rem;
+}
+@media (max-width: 1023px) {
+  /* one continuous tinted ground, edge to edge — the reference has no card
+     around the dish, the whole screen is the card */
+  .dish-page {
+    padding-top: 0;
+    background: color-mix(in srgb, var(--card-a) 34%, var(--cream-card));
+  }
+  body.has-announce .dish-page {
+    padding-top: 0;
+  }
+  /* the site nav pill steps aside: this page gets an app bar instead, and two
+     stacked headers would eat the fold */
+  body:has(.dish-buy) .nav .nav-inner {
+    display: none;
+  }
+
+  /* ---- app bar: back, title, menu ---- */
+  .dish-page .dish-crumb {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    align-items: center;
+    min-height: 56px;
+    margin: 0 0 0.2rem;
+    padding-top: 0.4rem;
+    background: color-mix(in srgb, var(--card-a) 34%, var(--cream-card));
+  }
+  body.has-announce .dish-page .dish-crumb {
+    top: 44px;
+  }
+  .dish-page .dish-back {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(253, 249, 238, 0.85);
+    font-size: 1.15rem;
+    color: var(--ink);
+  }
+  .dish-page .dish-back-arrow { margin: 0; }
+  .dish-page .dish-back-label,
+  .dish-page .dish-crumb-sep,
+  .dish-page .dish-crumb-tag {
+    display: none;
+  }
+  .dish-page .dish-topbar-title {
+    display: block;
+    text-align: center;
+    font-family: var(--font-round);
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--ink);
+    /* one line: the h1 below carries the full name */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dish-page .dish-topbar-more {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(253, 249, 238, 0.85);
+    color: var(--ink);
+    font-size: 0.9rem;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+  /* hero: no deep frame, no inner white box — the dish stands on a tinted
+     ground with the keyline the menu and home cards already use */
+  .dish-page .hf {
+    border: none !important;
+    box-shadow: none !important;
+    background: none;
+    border-radius: 0;
+    padding: 0;
+    /* run to the screen edges: the container is 92% wide, and the dish is
+       supposed to be cropped by the screen, not by a card */
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    overflow: visible;
+  }
+  .dish-page .hf-photo,
+  .dish-page .hf-photo.dish {
+    background: none;
+    border: none;
+    border-radius: 0;
+    height: 340px;
+    overflow: visible;
+    /* the app bar is sticky; without this the dish slid up behind it */
+    margin-top: 0.4rem;
+  }
+  .dish-page .hf-photo .as-cutout {
+    object-fit: contain;
+    object-position: bottom;
+    padding: 0;
+    filter:
+      drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
+      drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
+      drop-shadow(0 10px 16px rgba(33, 26, 20, 0.2));
+  }
+  /* the price is pinned to the bottom bar now, so the badge is a second copy
+     sitting on top of the food */
+  .dish-page .price-spin {
+    display: none;
+  }
+  /* when the gallery holds only the hero again, it is pure duplication */
+  .dish-page .dprod-art:has(.dpanel:only-child) {
+    display: none;
+  }
+
+  /* reference order: name, chips, description, specs */
+  .dish-page .dprod,
+  .dish-page .dprod-copy {
+    display: flex;
+    flex-direction: column;
+  }
+  .dish-page .dprod-copy h1 { order: 1; font-size: clamp(1.7rem, 7vw, 2.3rem); }
+  .dish-page .dprod-copy > div:first-child { order: 2; }
+  .dish-page .dish-stars { order: 3; }
+  .dish-page .dish-desc { order: 4; }
+  .dish-page .dish-specs { order: 5; }
+  .dish-page .dish-buy,
+  .dish-page .dish-paused-cta { order: 6; }
+  .dish-page .dish-note { order: 7; }
+
+  /* specs as label-and-value rows */
+  .spec-label { display: inline; }
+  .dish-page .dish-specs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.45rem;
+    margin: 1.1rem 0 0;
+  }
+  .dish-page .dish-specs .chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--card-a) 30%, var(--cream-card));
+    font-size: 0.9rem;
+  }
+  .dish-page .spec-label {
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .dish-page .spec-value {
+    font-weight: 800;
+  }
+
+  /* price + add pinned to the bottom, the way a product screen works */
+  .dish-page .dish-buy {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 115;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 1.1rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
+    /* the reference has no seam here — the bar is the page ground, held down
+       by a soft shadow instead of a border */
+    background: color-mix(in srgb, var(--card-a) 34%, var(--cream-card));
+    box-shadow: 0 -14px 26px -8px color-mix(in srgb, var(--card-a) 34%, var(--cream-card));
+  }
+  .dish-page .dish-buy .dish-price {
+    margin: 0;
+    white-space: nowrap;
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+  /* "per stack" is a menu-page caption; in a 393px action bar it costs a line */
+  .dish-page .dish-buy .dish-price span {
+    display: none;
+  }
+  .dish-page .dish-buy .qty-add {
+    margin: 0;
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+  .dish-page .dish-buy .qty-add .btn {
+    white-space: nowrap;
+    padding-inline: 1.1rem;
+  }
+  /* the bar takes the tab bar's place — a product screen swaps navigation for
+     the action, and two stacked bars would eat a third of the screen */
+  body:has(.dish-buy) .tabbar {
+    display: none;
+  }
+  /* clear the pinned bar */
+  .dish-page {
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 /* ---- mobile/tablet home favourites: same card as /menu ----
    One card per row on phones, two on tablets — name and price on top, the dish
    filling the card and bleeding off its bottom edge. Desktop keeps the four-up
@@ -7247,6 +7469,33 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   .tabbar-item:active {
     transform: scale(0.94);
   }
+  .tabbar-icon {
+    position: relative;
+    display: block;
+    line-height: 0;
+  }
+  .tabbar-badge {
+    position: absolute;
+    top: -6px;
+    right: -9px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: var(--yellow);
+    color: var(--ink);
+    font-size: 0.6rem;
+    font-weight: 800;
+    line-height: 1;
+    border: 1.5px solid rgba(26, 17, 9, 0.9);
+  }
+  .tabbar-item.on .tabbar-badge {
+    background: var(--ink);
+    color: var(--yellow);
+    border-color: var(--yellow);
+  }
   .tabbar-item.on {
     color: var(--ink);
     background: var(--yellow);
@@ -7266,18 +7515,18 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
      links twice. The header element itself stays in the tree because the menu
      panel lives inside it (and it is position:fixed, so transforming .nav
      would re-base it and break the drop). */
-  body:has(.tabbar.on) .nav {
+  body:has(.tabbar.on):not(:has(.dish-buy)) .nav {
     pointer-events: none;
   }
-  body:has(.tabbar.on) .nav-inner {
+  body:has(.tabbar.on):not(:has(.dish-buy)) .nav-inner {
     background: transparent;
     border-color: transparent;
     box-shadow: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
-  body:has(.tabbar.on) .nav .logo,
-  body:has(.tabbar.on) .nav .nav-cta {
+  body:has(.tabbar.on):not(:has(.dish-buy)) .nav .logo,
+  body:has(.tabbar.on):not(:has(.dish-buy)) .nav .nav-cta {
     display: none;
   }
   body:has(.tabbar.on) .nav-links {

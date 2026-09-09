@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import ScrollFx from "@/components/ScrollFx";
 import BottomBar from "@/components/BottomBar";
+import { CartProvider } from "@/lib/cart";
 import { getAnnouncement, getHours, getReviews, getSite } from "@/lib/api";
 import { customThemeStyle } from "@/lib/theme";
 import { jsonLd } from "@/lib/utils";
@@ -131,15 +132,19 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLd(schema) }}
         />
-        <Announce data={announcement} />
-        <Nav />
-        {children}
-        <Footer />
-        {site.whatsapp &&
-         <WhatsAppFloat phone={site.whatsapp} />
-         }
-        <ScrollFx />
-        <BottomBar />
+        {/* the cart wraps everything: the menu page owns the drawer, the dish
+            page adds to it, and the tab bar reads its count */}
+        <CartProvider>
+          <Announce data={announcement} />
+          <Nav />
+          {children}
+          <Footer />
+          {site.whatsapp &&
+           <WhatsAppFloat phone={site.whatsapp} />
+           }
+          <ScrollFx />
+          <BottomBar />
+        </CartProvider>
       </body>
     </html>
   );

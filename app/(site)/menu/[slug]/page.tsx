@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Sparkles, Star } from "lucide-react";
 import Marquee from "@/components/Marquee";
 import DishGallery from "@/components/DishGallery";
 import QtyAdd from "@/components/QtyAdd";
+import DishMenuButton from "@/components/DishMenuButton";
 import { TAG_LABEL, getMenuWithStatus, getReviews, getSite, lines, money, type ApiMenuItem } from "@/lib/api";
 import { jsonLd } from "@/lib/utils";
 
@@ -85,12 +86,19 @@ export default async function DishPage({ params }: Props) {
 
       <div className="container">
         {/* Breadcrumb Navigation */}
+        {/* Breadcrumb on desktop; on phones globals.css turns this into the
+            app bar — back arrow, the dish name centred, and a menu button */}
         <nav className="dish-crumb" aria-label="Breadcrumb">
-          <Link href="/menu">← Back to the menu</Link>
-          <span style={{ margin: "0 0.5rem", opacity: 0.4 }}>/</span>
-          <span style={{ textTransform: "capitalize", color: "var(--deep)", fontWeight: 700 }}>
+          <Link href="/menu" className="dish-back">
+            <span className="dish-back-arrow" aria-hidden="true">←</span>
+            <span className="dish-back-label">Back to the menu</span>
+          </Link>
+          <span className="dish-crumb-sep" style={{ margin: "0 0.5rem", opacity: 0.4 }}>/</span>
+          <span className="dish-crumb-tag" style={{ textTransform: "capitalize", color: "var(--deep)", fontWeight: 700 }}>
             {TAG_ICONS[item.tag]} {TAG_LABEL[item.tag]}
           </span>
+          <span className="dish-topbar-title">{item.name}</span>
+          <DishMenuButton />
         </nav>
 
         {/* 1. Large Hero Photo Deep Frame */}
@@ -156,19 +164,37 @@ export default async function DishPage({ params }: Props) {
 
             <p className="dish-desc">{item.description}</p>
 
-            {/* Nutrition & Timing Chips */}
-            <div className="chips">
-              {item.kcal != null && <span className="chip">🔥 {item.kcal} kcal</span>}
-              {item.protein_g != null && <span className="chip">💪 {item.protein_g}g protein</span>}
-              {item.prep_time && <span className="chip">⏱ {item.prep_time}</span>}
+            {/* Nutrition & timing. One markup, two shapes: chips on desktop,
+                label-and-value rows on phones (globals.css hides .spec-label
+                above 1023px, so the desktop chip is unchanged). */}
+            <div className="chips dish-specs">
+              {item.prep_time && (
+                <span className="chip">
+                  <span className="spec-label">Prep time</span>
+                  <span className="spec-value">⏱ {item.prep_time}</span>
+                </span>
+              )}
+              {item.kcal != null && (
+                <span className="chip">
+                  <span className="spec-label">Energy</span>
+                  <span className="spec-value">🔥 {item.kcal} kcal</span>
+                </span>
+              )}
+              {item.protein_g != null && (
+                <span className="chip">
+                  <span className="spec-label">Protein</span>
+                  <span className="spec-value">💪 {item.protein_g}g protein</span>
+                </span>
+              )}
             </div>
 
-            <p className="dish-price">
-              {money(item.price)} <span>per stack</span>
-            </p>
-
             {site.online_ordering_enabled ? (
-              <QtyAdd slug={item.slug} />
+              <div className="dish-buy">
+                <p className="dish-price">
+                  {money(item.price)} <span>per stack</span>
+                </p>
+                <QtyAdd slug={item.slug} name={item.name} />
+              </div>
             ) : (
               <div className="dish-paused-cta" style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap", margin: "1rem 0" }}>
                 <Link href="/booking" className="btn btn-primary">
@@ -186,6 +212,12 @@ export default async function DishPage({ params }: Props) {
                   </a>
                 )}
               </div>
+            )}
+
+            {!site.online_ordering_enabled && (
+              <p className="dish-price">
+                {money(item.price)} <span>per stack</span>
+              </p>
             )}
 
             <p className="dish-note">
