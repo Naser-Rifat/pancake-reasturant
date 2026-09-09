@@ -1,16 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { Plus, ArrowRight } from "lucide-react";
 import {
   TAG_LABEL,
-  money,
   telHref,
   type ApiMenuItem,
 } from "@/lib/api";
 import { useCart } from "@/lib/cart";
+import DishCard from "@/components/DishCard";
 
 const TAG_ORDER = ["sweet", "savoury", "choc"] as const;
 
@@ -160,76 +158,12 @@ export default function MenuClient({
 
                 <div className="menu-board-rows">
                   {group.map((b) => (
-                    <article className="diner-dish-row" key={b.slug}>
-                      {/* Food Thumbnail */}
-                      <Link
-                        href={`/menu/${b.slug}`}
-                        className="diner-dish-thumb-link"
-                        aria-label={`View ${b.name} details`}
-                      >
-                        {/* the mobile card floats the art on a tinted ground with a
-                            white keyline, which only reads on a transparent cutout —
-                            a framed photo would get a rectangle drawn round it */}
-                        <div className={`diner-dish-thumb${b.image ? " is-cutout" : ""}`}>
-                          {(b.image || b.photo) && (
-                            <Image
-                              src={b.image || b.photo}
-                              alt={`${b.name} pancakes`}
-                              width={320}
-                              height={320}
-                              sizes="(min-width: 1024px) 80px, 45vw"
-                              className="diner-dish-img"
-                            />
-                          )}
-                        </div>
-                      </Link>
-
-                      {/* Main Dish Details */}
-                      <div className="diner-dish-body">
-                        <div className="diner-dish-top-row">
-                          <h3 className="diner-dish-name">
-                            <Link href={`/menu/${b.slug}`}>{b.name}</Link>
-                          </h3>
-                          <span className="diner-dot-leader" aria-hidden="true" />
-                          <span className="diner-price-pill">{money(b.price)}</span>
-                        </div>
-
-                        <p className="diner-dish-desc">{b.description}</p>
-
-                        <div className="diner-dish-footer">
-                          <div className="diner-chips-row">
-                            {b.kcal != null && (
-                              <span className="diner-meta-chip">🔥 {b.kcal} kcal</span>
-                            )}
-                            {b.protein_g != null && (
-                              <span className="diner-meta-chip">💪 {b.protein_g}g protein</span>
-                            )}
-                            {b.prep_time && (
-                              <span className="diner-meta-chip">⏱ {b.prep_time}</span>
-                            )}
-                          </div>
-
-                          <div className="diner-dish-actions">
-                            <Link href={`/menu/${b.slug}`} className="diner-view-link">
-                              <span>Details</span>
-                              <ArrowRight size={13} />
-                            </Link>
-
-                            {live && (
-                              <button
-                                type="button"
-                                className="diner-add-btn"
-                                onClick={() => add(b.slug)}
-                                aria-label={`Add ${b.name} to order`}
-                              >
-                                <Plus size={14} strokeWidth={2.75} />
-                                <span>Add</span>
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </article>
+                    <DishCard
+                      item={b}
+                      variant="row"
+                      key={b.slug}
+                      onAdd={live ? add : undefined}
+                    />
                   ))}
                 </div>
               </section>

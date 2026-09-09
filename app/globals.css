@@ -276,7 +276,7 @@ a {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   .nav-inner {
     padding: 0.5rem 1.25rem 0.5rem 1.85rem;
     min-height: 58px;
@@ -1631,7 +1631,7 @@ body.has-announce .page-hero {
   right: 20px;
   bottom: 20px;
 }
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   .hf-photo {
     height: 48vh;
     min-height: 360px;
@@ -1715,7 +1715,7 @@ body.has-announce .page-hero {
   margin-top: 0.7rem;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   .dprod {
     grid-template-columns: 1fr 1.15fr;
     gap: 3rem;
@@ -2058,7 +2058,7 @@ body.has-announce .dish-page {
 .dish-related .title {
   margin-bottom: 0.4rem;
 }
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   .dish-stage-grid {
     grid-template-columns: 1.05fr 1fr;
     gap: 3rem;
@@ -2749,7 +2749,7 @@ h2.title.inline .accent {
   align-items: stretch;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   .hours-grid {
     grid-template-columns: 1fr 1.05fr;
     gap: 2.6rem;
@@ -3598,7 +3598,7 @@ textarea.input {
 /* ============================================
    ≥ 1024px — desktop
    ============================================ */
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* full inline navbar, burger hidden */
   .nav-links {
     position: static;
@@ -3974,7 +3974,7 @@ body::before {
 }
 
 /* --- slim, on-brand scrollbar (desktop WebKit) --- */
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   ::-webkit-scrollbar {
     width: 12px;
   }
@@ -4282,343 +4282,299 @@ body:has(.cart-fab) .wa-float {
     margin-top: 1.6rem;
   }
 }
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   .fav-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1.4rem;
   }
 }
-/* the whole tile is the tap target, and it presses like a native cell.
-   Same treatment as the /menu cards — tinted ground, cutout standing on the
-   floor with a white keyline — so a dish looks like a dish everywhere. The
-   layout stays different on purpose: photo on top and name below keeps the
-   square photo, where the /menu arrangement would cost this 174px tile 40% of
-   its picture. */
-.fav-card {
-  display: flex;
-  flex-direction: column;
-  background: color-mix(in srgb, var(--card-a) 42%, var(--cream-card));
-  border-radius: 26px;
-  padding: 0.5rem 0.5rem 0.85rem;
-  box-shadow: 0 2px 10px rgba(33, 26, 20, 0.07);
-  transition:
-    transform 0.16s ease,
-    box-shadow 0.25s ease;
-}
-.fav-card:nth-child(3n + 2) { background: var(--card-b); }
-.fav-card:nth-child(3n) { background: color-mix(in srgb, var(--pink) 16%, var(--cream-card)); }
-.fav-card:active { transform: scale(0.97); }
-.fav-card .ph {
-  display: block;
+
+/* ===================================================================
+   DISH CARD — one card, two skins (components/DishCard.tsx)
+
+   Replaces .fav-card (home rail), .diner-dish-row (/menu) and
+   .fav-diner-card (dish page): three hand-built layouts for one object,
+   so a change to "the dish card" meant editing three blocks and usually
+   missing one. The third was even marked "kept as-is" — a leftover from
+   a redesign that only landed on the other two.
+
+   Phone/tablet: both skins are the same card — tinted ground, badge and
+   price on top, the dish standing on the card floor and cropped by it.
+   Desktop: .dc-tile keeps the card; .dc-row becomes the menu's horizontal
+   row, because a menu reads as a list, not a gallery.
+   =================================================================== */
+.dish-card {
   position: relative;
-  /* transparent: the cutout stands on the tile's own ground, not in a white box */
-  background: none;
-  border-radius: 20px;
-  /* square keeps every row of the grid aligned at any column count */
-  aspect-ratio: 1 / 1;
   overflow: hidden;
+  height: 190px;
+  padding: 0.95rem 1rem 0;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--card-a) 42%, var(--cream-card));
+  box-shadow: 0 2px 10px rgba(33, 26, 20, 0.07);
+  transition: transform 0.16s ease, box-shadow 0.25s ease;
 }
-/* No hover flood on these tiles. It was built for the old 282x250 rail card;
-   on a 2-up grid tile it covered the dish photo completely at every width
-   measured (740/900/1440), and on a food menu the photo is the whole point.
-   The description is one tap away on the dish page. Hover now just lifts the
-   tile — the photo zoom below carries the rest. */
+/* three soft grounds so a long list does not read as one block */
+.dish-card:nth-child(3n + 2) { background: var(--card-b); }
+.dish-card:nth-child(3n) { background: color-mix(in srgb, var(--pink) 16%, var(--cream-card)); }
+.dish-card:active { transform: scale(0.98); }
 @media (hover: hover) and (pointer: fine) {
-  .fav-card:hover {
+  .dish-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 24px rgba(33, 26, 20, 0.14);
   }
 }
 
-/* a real photo fills the frame edge-to-edge — and keeps its white box, since a
-   keyline round a rectangle is just a border */
-.fav-card .ph.framed {
-  background: #fff;
+/* the hit area covers the card; the text above keeps its own anchors */
+.dc-hit { position: absolute; inset: 0; z-index: 0; }
+
+.dc-photo {
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+  transform: translateX(-50%);
+  width: 78%;
+  height: 142px;
 }
-.fav-card .ph.framed img {
+.dc-img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  padding: 0;
-  filter: none;
-}
-.fav-card .ph img {
-  object-fit: contain;
-  /* the dish stands on the frame's floor instead of floating in the middle */
+  /* the dish sits ON the card floor and is cropped by it — centred left a gap
+     and the card stopped reading as one object */
   object-position: bottom;
-  padding: 0.75rem 0.75rem 0;
-  /* four offset shadows stroke the cutout's alpha edge — same trick as /menu */
+  border-radius: 16px 16px 0 0;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+/* four offset shadows are how you stroke an alpha edge in CSS — no new asset */
+.dc-img.is-cutout {
+  object-fit: contain;
+  border-radius: 0;
   filter:
     drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
     drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
-    drop-shadow(0 10px 16px rgba(33, 26, 20, 0.2));
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    drop-shadow(0 8px 14px rgba(33, 26, 20, 0.22));
 }
-.fav-card:hover .ph img { transform: scale(1.05) rotate(-1.2deg); }
-.fav-card .nm {
+.dish-card:hover .dc-img { transform: scale(1.04); }
+
+.dc-body {
+  position: relative;
+  z-index: 1;
+  pointer-events: none; /* taps fall through to the card link */
+  padding-right: 3rem;
+}
+.dc-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+.dc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px dashed rgba(33, 26, 20, 0.22);
+  background: rgba(253, 249, 238, 0.7);
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 0.63rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.dc-dots { display: none; }
+.dc-price {
+  margin-left: auto;
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.dc-name {
+  margin: 0;
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 1.02rem;
+  line-height: 1.22;
+  color: var(--ink);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  font-family: var(--font-round);
-  font-weight: 800;
-  color: var(--ink);
-  font-size: 0.98rem;
-  line-height: 1.25;
-  margin-top: 0.6rem;
-  padding-inline: 0.3rem;
 }
-/* a 320px phone gives the tile ~140px: two lines truncated "Classic Buttermilk
-   St…", which is worse than an uneven row, so narrow screens get a third line */
+.dc-name a { pointer-events: auto; color: inherit; text-decoration: none; }
+/* the phone card is name and price over the dish — the rest is one tap away */
+.dc-desc,
+.dc-chips,
+.dc-details { display: none; }
+
+.dc-actions { position: absolute; top: 0.75rem; right: 0.75rem; z-index: 2; }
+.dc-add {
+  display: inline-grid;
+  place-items: center;
+  /* 44pt minimum; the label is redundant next to a + */
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--cream-card);
+  border: 1.5px solid rgba(33, 26, 20, 0.12);
+  box-shadow: 0 3px 10px rgba(33, 26, 20, 0.14);
+  color: var(--ink);
+  cursor: pointer;
+}
+.dc-add span { display: none; }
+/* a 320px phone truncates a two-line name to "Classic Buttermilk St…" */
 @media (max-width: 359px) {
-  .fav-card .nm { -webkit-line-clamp: 3; font-size: 0.92rem; }
-}
-/* auto margin pins the price to the tile floor, so prices line up across a row
-   whether the name above ran one line or two */
-.fav-card .pr {
-  display: block;
-  margin-top: auto;
-  padding: 0.3rem 0.3rem 0;
-  color: var(--ink);
-  font-family: var(--font-round);
-  font-weight: 800;
-  font-size: 0.95rem;
-}
-@media (min-width: 768px) {
-  .fav-card { padding: 0.6rem 0.6rem 1rem; }
-  .fav-card .ph img { padding: 1.4rem; }
-  .fav-card .nm { font-size: 1.08rem; margin-top: 0.75rem; }
-  .fav-card .pr { font-size: 1rem; }
+  .dc-name { -webkit-line-clamp: 3; font-size: 0.94rem; }
 }
 
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
+  /* the tile keeps the card shape, taller so the photo has room in a 4-up grid */
+  .dish-card.dc-tile { height: 300px; padding: 1.05rem 1.15rem 0; border-radius: 26px; }
+  .dish-card.dc-tile .dc-photo { width: 84%; height: 210px; }
+  .dish-card.dc-tile .dc-name { font-size: 1.08rem; }
+  .dish-card.dc-tile .dc-price { font-size: 1rem; }
 
-/* ===================================================================
-   DISH PAGE — "you might also like" cards (kept as-is; the homepage
-   rail above went back to the original scroll-snap design)
-   =================================================================== */
+  /* the menu is a list: thumb, name, leader, price, detail beneath */
+  .dish-card.dc-row {
+    height: auto;
+    display: grid;
+    grid-template-columns: 84px 1fr auto;
+    align-items: start;
+    column-gap: 1.1rem;
+    padding: 1.1rem 0.4rem;
+    border-radius: 0;
+    border-bottom: 1px dashed rgba(33, 26, 20, 0.14);
+    background: none;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .dish-card.dc-row:nth-child(3n),
+  .dish-card.dc-row:nth-child(3n + 2) { background: none; }
+  .dish-card.dc-row:last-child { border-bottom: none; }
+  .dish-card.dc-row:hover { transform: none; box-shadow: none; }
+  .dish-card.dc-row .dc-photo {
+    position: static;
+    transform: none;
+    width: 84px;
+    height: 84px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .dish-card.dc-row .dc-img { border-radius: 16px; }
+  .dish-card.dc-row .dc-img.is-cutout { filter: none; }
+  /* name, leader and price share one line the way a printed menu sets them.
+     .dc-head is display:contents so its children join this grid directly —
+     they are siblings of .dc-name in the markup, and a menu line needs them
+     on the same row without a wrapper the phone card would also inherit. */
+  .dish-card.dc-row .dc-body {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "name dots price"
+      "desc desc desc"
+      "chips chips chips";
+    align-items: center;
+    column-gap: 0.6rem;
+    padding-right: 0;
+  }
+  .dish-card.dc-row .dc-head { display: contents; }
+  .dish-card.dc-row .dc-name { grid-area: name; }
+  .dish-card.dc-row .dc-dots { grid-area: dots; }
+  .dish-card.dc-row .dc-price { grid-area: price; margin-left: 0; }
+  .dish-card.dc-row .dc-desc { grid-area: desc; }
+  .dish-card.dc-row .dc-chips { grid-area: chips; }
+  .dish-card.dc-row .dc-badge { display: none; }
+  .dish-card.dc-row .dc-dots {
+    display: block;
+    flex: 1;
+    height: 0;
+    border-bottom: 1px dotted rgba(33, 26, 20, 0.3);
+  }
+  .dish-card.dc-row .dc-price {
+    padding: 0.28rem 0.75rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--yellow) 34%, var(--cream-card));
+  }
+  .dish-card.dc-row .dc-name { -webkit-line-clamp: 1; font-size: 1.05rem; }
+  .dish-card.dc-row .dc-desc {
+    display: block;
+    margin: 0.45rem 0 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  .dish-card.dc-row .dc-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.55rem; }
+  .dish-card.dc-row .dc-chip {
+    padding: 0.22rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(33, 26, 20, 0.1);
+    background: rgba(253, 249, 238, 0.8);
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .dish-card.dc-row .dc-actions {
+    position: static;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    align-self: center;
+  }
+  .dish-card.dc-row .dc-details {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    pointer-events: auto;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .dish-card.dc-row .dc-details:hover { color: var(--berry); }
+  .dish-card.dc-row .dc-add {
+    width: auto;
+    height: auto;
+    padding: 0.45rem 0.95rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: var(--yellow-deep);
+    border: 1px solid var(--ink);
+  }
+  .dish-card.dc-row .dc-add span {
+    display: inline;
+    font-family: var(--font-round);
+    font-weight: 800;
+    font-size: 0.82rem;
+  }
+}
+
+/* the dish page's related grid — the card itself is .dish-card now */
 .dish-related-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.6rem;
   margin-top: 2rem;
 }
-
 @media (min-width: 640px) {
   .dish-related-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.8rem;
   }
 }
-
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   .dish-related-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 2.2rem;
   }
 }
-
-.fav-diner-card {
-  display: flex;
-  flex-direction: column;
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 16px 16px 20px 16px;
-  border: 1.5px solid rgba(118, 58, 18, 0.1);
-  box-shadow:
-    0 10px 26px rgba(33, 26, 20, 0.08),
-    0 2px 6px rgba(33, 26, 20, 0.03);
-  text-decoration: none;
-  color: inherit;
-  position: relative;
-  overflow: hidden;
-  transition:
-    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 0.35s ease,
-    border-color 0.35s ease;
-}
-
-.fav-diner-card:hover {
-  transform: translateY(-8px);
-  box-shadow:
-    0 22px 42px rgba(33, 26, 20, 0.14),
-    0 6px 14px rgba(33, 26, 20, 0.06);
-  border-color: rgba(118, 58, 18, 0.24);
-}
-
-/* ---------- Card Top Bar ---------- */
-.fav-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.85rem;
-}
-
-.fav-tag-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-family: var(--font-round), sans-serif;
-  font-weight: 800;
-  font-size: 0.74rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  border-radius: 999px;
-  padding: 0.25rem 0.65rem;
-  border: 1px dashed rgba(118, 58, 18, 0.2);
-}
-
-.fav-tag-badge.tag-sweet {
-  background: rgba(245, 158, 11, 0.12);
-  color: var(--ink);
-}
-.fav-tag-badge.tag-choc {
-  background: rgba(242, 120, 156, 0.15);
-  color: var(--pink-deep);
-}
-.fav-tag-badge.tag-savoury {
-  background: rgba(184, 230, 196, 0.35);
-  color: #1a5e32;
-}
-
-.fav-price-pill {
-  font-family: var(--font-round), sans-serif;
-  font-weight: 800;
-  font-size: 0.95rem;
-  color: var(--ink);
-  background: var(--yellow-deep);
-  padding: 0.25rem 0.8rem;
-  border-radius: 999px;
-  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
-  transition: transform 0.2s ease;
-}
-
-.fav-diner-card:hover .fav-price-pill {
-  transform: scale(1.08);
-}
-
-/* ---------- Photo Stage with Soft Radial Glow ---------- */
-.fav-photo-stage {
-  position: relative;
-  width: 100%;
-  height: 220px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border: 1px solid rgba(33, 26, 20, 0.06);
-}
-
-.fav-photo-stage.stage-sweet {
-  background: radial-gradient(circle at center, rgba(254, 243, 199, 0.95) 0%, rgba(254, 243, 199, 0.35) 65%, #ffffff 100%);
-}
-.fav-photo-stage.stage-choc {
-  background: radial-gradient(circle at center, rgba(254, 215, 226, 0.95) 0%, rgba(254, 215, 226, 0.35) 65%, #ffffff 100%);
-}
-.fav-photo-stage.stage-savoury {
-  background: radial-gradient(circle at center, rgba(220, 252, 231, 0.95) 0%, rgba(220, 252, 231, 0.35) 65%, #ffffff 100%);
-}
-
-.fav-dish-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: 0.9rem;
-  filter: drop-shadow(0 14px 18px rgba(33, 26, 20, 0.16));
-  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.fav-diner-card:hover .fav-dish-img {
-  transform: scale(1.08) rotate(-1.5deg);
-}
-
-.fav-dish-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  color: var(--muted);
-}
-.placeholder-icon {
-  font-size: 3.2rem;
-}
-.placeholder-text {
-  font-family: var(--font-round);
-  font-weight: 700;
-  font-size: 0.85rem;
-}
-
-.fav-crowd-marker {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(4px);
-  color: var(--pink-deep);
-  font-family: var(--font-round), sans-serif;
-  font-weight: 800;
-  font-size: 0.72rem;
-  border-radius: 999px;
-  padding: 0.18rem 0.55rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(242, 120, 156, 0.3);
-}
-
-/* ---------- Card Body (Inside Card) ---------- */
-.fav-card-body {
-  padding: 1.1rem 0.4rem 0.2rem;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.fav-card-name {
-  font-family: var(--font-round), sans-serif;
-  font-weight: 800;
-  font-size: 1.22rem;
-  color: var(--ink);
-  margin: 0 0 0.45rem;
-  line-height: 1.25;
-  transition: color 0.2s ease;
-}
-
-.fav-diner-card:hover .fav-card-name {
-  color: var(--pink-deep);
-}
-
-.fav-card-desc {
-  font-size: 0.86rem;
-  color: var(--muted);
-  line-height: 1.45;
-  margin: 0 0 1rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  flex: 1;
-}
-
-.fav-card-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: var(--font-round), sans-serif;
-  font-weight: 800;
-  font-size: 0.84rem;
-  color: var(--pink-deep);
-  letter-spacing: 0.02em;
-  margin-top: auto;
-  border-top: 1px dashed rgba(33, 26, 20, 0.1);
-  padding-top: 0.75rem;
-}
-
-.fav-arrow {
-  transition: transform 0.25s ease;
-}
-
-.fav-diner-card:hover .fav-arrow {
-  transform: translateX(5px);
-}
-
 
 /* ===================================================================
    MENU PAGE — Boutique Diner Menu Boards (Option 1)
@@ -4762,198 +4718,6 @@ body:has(.cart-fab) .wa-float {
   gap: 1.2rem;
 }
 
-/* ---------- Individual Dish Row ---------- */
-.diner-dish-row {
-  display: grid;
-  grid-template-columns: 72px 1fr;
-  gap: 1.2rem;
-  align-items: center;
-  padding: 1rem 0.8rem;
-  border-radius: 20px;
-  border-bottom: 1px dashed rgba(33, 26, 20, 0.1);
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.diner-dish-row:last-child {
-  border-bottom: none;
-}
-
-.diner-dish-row:hover {
-  background: rgba(254, 247, 230, 0.65);
-  transform: translateX(4px);
-}
-
-@media (min-width: 768px) {
-  .diner-dish-row {
-    grid-template-columns: 82px 1fr;
-    gap: 1.5rem;
-    padding: 1.1rem 1.2rem;
-  }
-}
-
-.diner-dish-thumb-link {
-  display: block;
-}
-
-.diner-dish-thumb {
-  width: 72px;
-  height: 72px;
-  border-radius: 18px;
-  overflow: hidden;
-  background: var(--cream);
-  border: 1px solid rgba(33, 26, 20, 0.08);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(33, 26, 20, 0.08);
-}
-
-@media (min-width: 768px) {
-  .diner-dish-thumb {
-    width: 82px;
-    height: 82px;
-  }
-}
-
-.diner-dish-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.35s ease;
-}
-
-.diner-dish-row:hover .diner-dish-img {
-  transform: scale(1.08) rotate(-2deg);
-}
-
-.diner-dish-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  min-width: 0;
-}
-
-.diner-dish-top-row {
-  display: flex;
-  align-items: baseline;
-  gap: 0.65rem;
-}
-
-.diner-dish-name {
-  font-family: var(--font-round), sans-serif;
-  font-weight: 800;
-  font-size: 1.15rem;
-  color: var(--ink);
-  margin: 0;
-  white-space: nowrap;
-}
-
-.diner-dish-name a {
-  color: var(--ink);
-  transition: color 0.15s ease;
-}
-
-.diner-dish-name a:hover {
-  color: var(--pink-deep);
-}
-
-.diner-dot-leader {
-  flex: 1;
-  border-bottom: 2.5px dotted rgba(33, 26, 20, 0.22);
-  transform: translateY(-4px);
-  min-width: 20px;
-}
-
-.diner-price-pill {
-  font-family: var(--font-round), sans-serif;
-  font-weight: 800;
-  font-size: 1.05rem;
-  color: var(--pink-deep);
-  background: rgba(245, 158, 11, 0.14);
-  padding: 0.2rem 0.65rem;
-  border-radius: 999px;
-  border: 1px dashed rgba(245, 158, 11, 0.35);
-  white-space: nowrap;
-}
-
-.diner-dish-desc {
-  color: var(--muted);
-  font-size: 0.88rem;
-  line-height: 1.45;
-  margin: 0;
-}
-
-.diner-dish-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  margin-top: 0.35rem;
-}
-
-.diner-chips-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-}
-
-.diner-meta-chip {
-  font-family: var(--font-body), sans-serif;
-  font-weight: 700;
-  font-size: 0.72rem;
-  color: var(--ink);
-  background: #ffffff;
-  border: 1px solid rgba(33, 26, 20, 0.1);
-  padding: 0.18rem 0.55rem;
-  border-radius: 999px;
-}
-
-.diner-dish-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.diner-view-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-family: var(--font-round), sans-serif;
-  font-weight: 800;
-  font-size: 0.78rem;
-  color: var(--muted);
-  transition: color 0.15s ease;
-}
-
-.diner-view-link:hover {
-  color: var(--pink-deep);
-}
-
-.diner-add-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  background: var(--yellow-deep);
-  color: var(--ink);
-  border: 1.5px solid var(--ink);
-  font-family: var(--font-round), sans-serif;
-  font-weight: 800;
-  font-size: 0.78rem;
-  padding: 0.35rem 0.85rem;
-  border-radius: 999px;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
-  transition: all 0.2s ease;
-}
-
-.diner-add-btn:hover {
-  background: var(--yellow);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
-}
-
 /* ---------- hero-embedded nav (reference layout) ---------- */
 .hero-nav {
   display: none;
@@ -4961,7 +4725,7 @@ body:has(.cart-fab) .wa-float {
 .hero-topbar {
   display: none;
 }
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the fixed nav steps aside on the home page only */
   /* the panel nav owns the fold; this header takes over below it */
   body:has(.hero-nav) .nav:not(.past-hero) {
@@ -5053,7 +4817,7 @@ body:has(.cart-fab) .wa-float {
    HERO — reference alignment pass
    full-bleed panels, dominant headline, dark CTA
    ============================================ */
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* panels run to the page edges, only a hairline of cream showing */
   body:has(.hero-nav) .hero {
     padding: 12px 0 0;
@@ -5118,7 +4882,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the desktop rule pins the panel to a clamp height; in the reference layout
      both panels simply share the row */
   body:has(.hero-nav) .hero-card-left {
@@ -5126,7 +4890,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the hero must end at the fold — thumbs were landing just below it */
   body:has(.hero-nav) .hero .container.hero-cards {
     min-height: calc(100svh - 24px);
@@ -5148,7 +4912,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* min-height let tall content push past the fold; pin the row instead */
   body:has(.hero-nav) .hero .container.hero-cards {
     height: calc(100svh - 24px);
@@ -5162,7 +4926,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* ---- reference proportions: outer inset, radius, headline mass ---- */
   body:has(.hero-nav) .hero {
     padding: 16px 0 0;
@@ -5212,7 +4976,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the top bar owns the photo's top edge, so the price moves down-left */
   body:has(.hero-nav) .hero-price {
     top: auto;
@@ -5229,7 +4993,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the page frame is 14px; a 16px inset left a 2px sliver, so the hero looked
      glued to it. 28px gives frame + a real breathing gap on every side. */
   body:has(.hero-nav) .hero {
@@ -5247,7 +5011,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* nowrap forced the CTA + switcher row 23px past the padding box, and the
      panel's overflow:hidden clipped the last thumb. Let it wrap: wide screens
      still get the reference one-liner, 1440 drops the switcher to its own row. */
@@ -5258,7 +5022,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the hero brand is the supplied wordmark, not the SVG mark — size it so its
      optical centre lands on the same line as the nav links */
   /* it's a stacked lockup (THE / PANCAKE / CLUB), so it needs more height
@@ -5279,7 +5043,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the wordmark's thin THE/CLUB lines are tan — 1.01:1 on the gold panel, i.e.
      invisible. A cream chip (same pill language as FIND A STACK opposite it)
      gives the whole lockup a light ground to sit on. */
@@ -5304,7 +5068,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* ---- closing the gap with the reference layout ----
      it splits 57/43, carries ONE call to action, and puts three large product
      thumbs on that same line. Two CTAs is what pushed our switcher to its own
@@ -5342,7 +5106,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the chip's own padding pushed the artwork to 82px while the headline, lead
      and CTA all start at 64px. Optical alignment wins: pull the chip out by its
      padding so the wordmark itself sits on the column's rail. */
@@ -5351,7 +5115,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* ---- nav rhythm, measured against the reference ----
      its brand is a one-line lockup ~26px tall, so the links get to spread over
      ~61% of the panel. Ours is a stacked 3-line lockup, so it has to come down
@@ -5375,7 +5139,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* ---- left panel, measured against the reference ---- */
 
   /* its CTA takes ~38% of the panel and reads as a statement; ours was a
@@ -5398,7 +5162,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* ---- brand lockup: mark in a white disc + wordmark, as in the reference ----
      replaces the cream chip; the disc gives the mark its own light ground so
      nothing has to sit on the gold at low contrast. */
@@ -5442,7 +5206,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* these three were hand-tuned (800 weight, 0.06–0.08em tracking) and sat just
      off the site's own button scale — same family, subtly different rhythm,
      which is exactly what reads as "not ours". Snap them to .btn's typography. */
@@ -5458,7 +5222,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the reference nav is set in its chunky display face, not its body text
      font. Ours is Baloo 2 — already the brand voice (logo, dish names) — so the
      hero panel's nav and pills speak it too instead of body-font DM Sans. */
@@ -5483,7 +5247,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the pill carried Tailwind's `flex items-center gap-2`, but the public site
      never loads Tailwind — so it stayed display:block and the chevron sat on
      the text baseline, 6.5px above the centre. Do the layout in real CSS. */
@@ -5498,7 +5262,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the reference sets FIND FLAVORS as plain text on the photo, no pill. Plain
      text is only safe if the photo behind it is guaranteed dark — and clients
      upload their own — so a soft top scrim gives the text its own ground while
@@ -5529,7 +5293,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the reference CTA carries a chevron; .btn already lays its children out
      in a row, the icon just needs to stop shrinking */
   body:has(.hero-nav) .hero-actions .btn-primary .arrow-icon {
@@ -5542,7 +5306,7 @@ body:has(.cart-fab) .wa-float {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* 40px read heavier than the reference's ~30px; the scrim has to follow the
      panel's corner or it shows a square edge over the photo */
   body:has(.hero-nav) .hero-card-left,
@@ -5918,7 +5682,7 @@ body:has(.cart-fab) .wa-float {
   color: var(--deep);
 }
 
-@media (min-width: 1024px) and (max-width: 1279px) {
+@media (min-width: 1024px) and (max-width: 1279px) and (pointer: fine) {
   /* At 1024 the gold panel's content box is only ~415px but the nav needs 563
      and the action row 504 — both were being silently clipped by the panel's
      overflow:hidden. Tighten the panel and let the disc carry the brand on its
@@ -5996,7 +5760,7 @@ body:has(.wa-float) .footer-bottom {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* The photo panel's bar was pinned 18px from the top while the gold panel's
      nav starts at the panel padding — so the two sat 39px apart and the whole
      header line looked crooked. Drop the bar onto the same rail. */
@@ -6017,7 +5781,7 @@ body:has(.wa-float) .footer-bottom {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* The panel centres its column, so the nav's y drifted with the content
      height (5.9px outside the padding box at 1600) while the photo panel's bar
      is pinned to a fixed top — the two could only line up by luck. Anchor the
@@ -6033,7 +5797,7 @@ body:has(.wa-float) .footer-bottom {
    column ran 29px past the bottom padding — and overflow:hidden was quietly
    clipping the CTA and the switcher. Scale the vertical rhythm with the
    viewport height; the headline is capped by height as well as width. */
-@media (min-width: 1024px) and (max-height: 899px) {
+@media (min-width: 1367px) and (max-height: 899px), (min-width: 1024px) and (pointer: fine) and (max-height: 899px) {
   body:has(.hero-nav) .hero-card-left {
     padding-block: 2.4rem;
   }
@@ -6050,7 +5814,7 @@ body:has(.wa-float) .footer-bottom {
     margin-top: 1.6rem;
   }
 }
-@media (min-width: 1024px) and (max-height: 779px) {
+@media (min-width: 1367px) and (max-height: 779px), (min-width: 1024px) and (pointer: fine) and (max-height: 779px) {
   body:has(.hero-nav) .hero-card-left {
     padding-block: 1.9rem;
   }
@@ -6073,7 +5837,7 @@ body:has(.wa-float) .footer-bottom {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the disc ran 3.9x the wordmark's cap height and swallowed the name beside
      it; the nav row keeps its 46px min-height so the header rail doesn't move */
   .hero-logo-disc {
@@ -6132,7 +5896,7 @@ body:has(.wa-float) .footer-bottom {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   .footer-master-grid {
     grid-template-columns: 1.35fr 1fr 1.3fr 0.85fr;
     gap: 3.5rem;
@@ -6690,7 +6454,7 @@ body:has(.hero-nav) .hero-find {
   display: none;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   body:has(.hero-nav) .hero .container.hero-cards {
     display: block;
   }
@@ -6732,7 +6496,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   border-color: var(--cream);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   /* the hero headline takes the reference's chunky hand-cut caps; the script
      word stays Pacifico so the handmade signature isn't lost to one heavy block */
   body:has(.hero-nav) .hero-card-left h1 {
@@ -6754,7 +6518,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
    The lead paragraph is desktop-only here: it measured 3.31:1 over the photo
    (4.5:1 needed) and the copy it carried is mood, not a decision the fold has
    to serve. Nav chrome floats on the photo — see the block below. */
-@media (max-width: 1023px) {
+@media (max-width: 1023px), (max-width: 1366px) and (pointer: coarse) {
   body:has(.hero-nav) .hero {
     padding: 0;
   }
@@ -6871,7 +6635,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
    like the app onboarding pattern. Past the hero the normal pill returns.
    "Book" leaves the bar on the home fold because the hero already carries it
    as a full-width CTA — the same action twice in one screen. */
-@media (max-width: 1023px) {
+@media (max-width: 1023px), (max-width: 1366px) and (pointer: coarse) {
   body:has(.hero-nav) .nav:not(.past-hero) .nav-inner {
     background: transparent;
     border-color: transparent;
@@ -6930,7 +6694,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
 .dish-back-arrow {
   margin-right: 0.35rem;
 }
-@media (max-width: 1023px) {
+@media (max-width: 1023px), (max-width: 1366px) and (pointer: coarse) {
   /* one continuous tinted ground, edge to edge — the reference has no card
      around the dish, the whole screen is the card */
   .dish-page {
@@ -7181,7 +6945,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
    filling the card and bleeding off its bottom edge. Desktop keeps the four-up
    square tiles; the wide card is a phone shape and a 1440px screen has room for
    a proper grid. */
-@media (max-width: 1023px) {
+@media (max-width: 1023px), (max-width: 1366px) and (pointer: coarse) {
   .fav-grid {
     grid-template-columns: 1fr;
     gap: 0.85rem;
@@ -7191,57 +6955,6 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1rem;
     }
-  }
-  .fav-card {
-    position: relative;
-    height: 215px;
-    padding: 0.95rem 1rem 0;
-    border-radius: 24px;
-    overflow: hidden;
-  }
-  /* the markup is photo-then-name; order flips it without touching the JSX,
-     which keeps the desktop tile's source order intact */
-  .fav-card .nm {
-    order: 1;
-    margin-top: 0;
-    padding-inline: 0;
-    font-size: 1.02rem;
-    line-height: 1.22;
-  }
-  .fav-card .pr {
-    order: 2;
-    margin-top: 0.2rem;
-    padding: 0;
-    font-size: 0.95rem;
-  }
-  .fav-card .ph {
-    order: 3;
-    position: absolute;
-    left: 50%;
-    bottom: -18px;
-    transform: translateX(-50%);
-    width: 78%;
-    height: 142px;
-    aspect-ratio: auto;
-    border-radius: 0;
-  }
-  .fav-card .ph img {
-    padding: 0;
-    object-position: bottom;
-  }
-  .fav-card .ph.framed {
-    background: none;
-  }
-  .fav-card .ph.framed img {
-    border-radius: 16px 16px 0 0;
-    object-position: bottom;
-  }
-  /* name and price sit above the art and let taps through to the card link */
-  .fav-card .nm,
-  .fav-card .pr {
-    position: relative;
-    z-index: 1;
-    pointer-events: none;
   }
 }
 
@@ -7253,7 +6966,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
    and bleeding off the bottom edge. Description and the kcal/protein chips move
    to the dish page: the menu is where you scan, the dish page is where you
    decide. Desktop keeps the row — at 8.3 rows a screen it works. */
-@media (max-width: 1023px) {
+@media (max-width: 1023px), (max-width: 1366px) and (pointer: coarse) {
   /* the white category panel cost 53px of card width and its header repeated
      the filter chips directly above it */
   .menu-cat-board {
@@ -7303,131 +7016,6 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     }
   }
 
-  .diner-dish-row {
-    position: relative;
-    display: block;
-    height: 190px;
-    padding: 0.95rem 1rem 0;
-    border-radius: 24px;
-    border-bottom: none;
-    overflow: hidden;
-    background: color-mix(in srgb, var(--card-a) 42%, var(--cream-card));
-    box-shadow: 0 2px 10px rgba(33, 26, 20, 0.07);
-    transition: transform 0.16s ease;
-  }
-  /* three soft grounds so a long list does not read as one block */
-  .diner-dish-row:nth-child(3n + 2) {
-    background: var(--card-b);
-  }
-  .diner-dish-row:nth-child(3n) {
-    background: color-mix(in srgb, var(--pink) 16%, var(--cream-card));
-  }
-  .diner-dish-row:hover {
-    background: color-mix(in srgb, var(--card-a) 42%, var(--cream-card));
-  }
-  .diner-dish-row:active {
-    transform: scale(0.98);
-  }
-
-  /* the thumb link stretches over the whole card, so the card is the target */
-  .diner-dish-thumb-link {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    display: block;
-  }
-  .diner-dish-thumb {
-    position: absolute;
-    left: 50%;
-    bottom: -18px;
-    transform: translateX(-50%);
-    width: 78%;
-    height: 142px;
-    background: none;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-  }
-  .diner-dish-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    /* the dish sits ON the card floor and is cropped by it — centring it left a
-       gap and the card stopped reading as one object */
-    object-position: bottom;
-    border-radius: 16px 16px 0 0;
-  }
-  /* four offset shadows are how you stroke an alpha edge in CSS — no new asset */
-  .diner-dish-thumb.is-cutout .diner-dish-img {
-    object-fit: contain;
-    border-radius: 0;
-    filter:
-      drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
-      drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
-      drop-shadow(0 8px 14px rgba(33, 26, 20, 0.22));
-  }
-
-  .diner-dish-body {
-    position: static;
-  }
-  .diner-dish-top-row {
-    position: relative;
-    z-index: 1;
-    display: block;
-    /* taps fall through to the card link; the name keeps its own anchor */
-    pointer-events: none;
-    padding-right: 3rem;
-  }
-  .diner-dish-name {
-    /* nowrap is what pushed the price pill off the row on a phone */
-    white-space: normal;
-    font-size: 1.02rem;
-    line-height: 1.22;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .diner-dish-name a {
-    pointer-events: auto;
-  }
-  .diner-dot-leader,
-  .diner-dish-desc,
-  .diner-chips-row,
-  .diner-view-link {
-    display: none;
-  }
-  .diner-price-pill {
-    display: block;
-    margin-top: 0.2rem;
-    padding: 0;
-    background: none;
-    border: none;
-    font-size: 0.95rem;
-    color: var(--ink);
-  }
-
-  .diner-dish-footer {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    z-index: 2;
-    display: block;
-  }
-  .diner-add-btn {
-    /* was 70x33 — under the 44pt minimum, and the label is redundant next to a + */
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    justify-content: center;
-    border-radius: 50%;
-    background: var(--cream-card);
-    border: 1.5px solid rgba(33, 26, 20, 0.12);
-    box-shadow: 0 3px 10px rgba(33, 26, 20, 0.14);
-  }
-  .diner-add-btn span {
-    display: none;
-  }
 }
 
 /* ---- mobile/tablet bottom tab bar ----
@@ -7436,7 +7024,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
 .tabbar {
   display: none;
 }
-@media (max-width: 1023px) {
+@media (max-width: 1023px), (max-width: 1366px) and (pointer: coarse) {
   .tabbar {
     position: fixed;
     left: 50%;
@@ -8242,7 +7830,7 @@ h2.title .accent,
   background: var(--pink-deep);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   .ab-frame {
     aspect-ratio: 5 / 6;
   }
@@ -8254,7 +7842,7 @@ h2.title .accent,
 }
 
 /* ---------- Full-Width Hero Header Bar with Centered Links & Balanced Breathing Gaps ---------- */
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   body:has(.hero-nav) .hero .container.hero-cards {
     min-height: 680px;
   }
@@ -8315,7 +7903,7 @@ h2.title .accent,
     bottom: clamp(3.4rem, 6vh, 4.8rem) !important;
   }
 }
-@media (min-width: 1024px) and (max-height: 899px) {
+@media (min-width: 1367px) and (max-height: 899px), (min-width: 1024px) and (pointer: fine) and (max-height: 899px) {
   body:has(.hero-nav) .hero-nav {
     top: 2.2rem;
     left: 2.6rem;
@@ -8483,7 +8071,7 @@ footer .btn-secondary:hover {
    reviews/favourites carry it on a parent — every rule lists both.
    ============================================ */
 .reveal .rev-card,
-.reveal .fav-card,
+.reveal .dish-card,
 .gallery-mosaic.reveal > a,
 .cert-strip.reveal > .cert-badge {
   opacity: 0;
@@ -8493,30 +8081,30 @@ footer .btn-secondary:hover {
     transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal.visible .rev-card,
-.reveal.visible .fav-card,
+.reveal.visible .dish-card,
 .gallery-mosaic.reveal.visible > a,
 .cert-strip.reveal.visible > .cert-badge {
   opacity: 1;
   transform: none;
 }
 .reveal.visible .rev-card:nth-child(2),
-.reveal.visible .fav-card:nth-child(2),
+.reveal.visible .dish-card:nth-child(2),
 .gallery-mosaic.reveal.visible > a:nth-child(2),
 .cert-strip.reveal.visible > .cert-badge:nth-child(2) { transition-delay: 0.07s; }
 .reveal.visible .rev-card:nth-child(3),
-.reveal.visible .fav-card:nth-child(3),
+.reveal.visible .dish-card:nth-child(3),
 .gallery-mosaic.reveal.visible > a:nth-child(3),
 .cert-strip.reveal.visible > .cert-badge:nth-child(3) { transition-delay: 0.14s; }
 .reveal.visible .rev-card:nth-child(4),
-.reveal.visible .fav-card:nth-child(4),
+.reveal.visible .dish-card:nth-child(4),
 .gallery-mosaic.reveal.visible > a:nth-child(4),
 .cert-strip.reveal.visible > .cert-badge:nth-child(4) { transition-delay: 0.21s; }
 .reveal.visible .rev-card:nth-child(5),
-.reveal.visible .fav-card:nth-child(5),
+.reveal.visible .dish-card:nth-child(5),
 .gallery-mosaic.reveal.visible > a:nth-child(5),
 .cert-strip.reveal.visible > .cert-badge:nth-child(5) { transition-delay: 0.28s; }
 .reveal.visible .rev-card:nth-child(n + 6),
-.reveal.visible .fav-card:nth-child(n + 6),
+.reveal.visible .dish-card:nth-child(n + 6),
 .gallery-mosaic.reveal.visible > a:nth-child(n + 6),
 .cert-strip.reveal.visible > .cert-badge:nth-child(n + 6) { transition-delay: 0.35s; }
 
@@ -8536,7 +8124,7 @@ body:has(.hero-nav) .hero-bg img { animation: hero-drift 14s ease-out both; }
 /* motion added after the main reduced-motion block needs its own kill switch */
 @media (prefers-reduced-motion: reduce) {
   .reveal .rev-card,
-  .reveal .fav-card,
+  .reveal .dish-card,
   .gallery-mosaic.reveal > a,
   .cert-strip.reveal > .cert-badge {
     opacity: 1;
@@ -8701,7 +8289,7 @@ body:has(.hero-nav) .hero-bg img { animation: hero-drift 14s ease-out both; }
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   .polaroid-wall-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 3.5rem 2.6rem;

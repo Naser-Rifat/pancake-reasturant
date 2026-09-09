@@ -5,8 +5,8 @@
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { TAG_LABEL, money, type ApiMenuItem } from "@/lib/api";
+import DishCard from "@/components/DishCard";
+import { TAG_LABEL, type ApiMenuItem } from "@/lib/api";
 
 const TAGS: ApiMenuItem["tag"][] = ["sweet", "savoury", "choc"];
 // Four, not eight: on phones and tablets each favourite now gets a full-width
@@ -93,18 +93,7 @@ export default function FavouritesRail({
 
       <div className={s.rail}>
         {shown.map((m) => (
-          <Link href={`/menu/${m.slug}`} className={s.card} key={m.slug}>
-            <span className={`ph${m.photo ? " framed" : ""}`}>
-              <Image
-                src={m.photo || m.image}
-                alt={m.name}
-                fill
-                sizes="(min-width: 1024px) 22vw, (min-width: 768px) 30vw, 45vw"
-              />
-            </span>
-            <span className="nm">{m.name}</span>
-            <span className="pr">{money(m.price)}</span>
-          </Link>
+          <DishCard item={m} variant="tile" key={m.slug} />
         ))}
       </div>
 

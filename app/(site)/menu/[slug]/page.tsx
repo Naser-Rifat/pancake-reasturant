@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, Sparkles, Star } from "lucide-react";
+import { ArrowLeft, Star } from "lucide-react";
 import DishGallery from "@/components/DishGallery";
+import DishCard, { TAG_ICONS } from "@/components/DishCard";
 import QtyAdd from "@/components/QtyAdd";
 import DishMenuButton from "@/components/DishMenuButton";
 import CartButton from "@/components/CartButton";
@@ -13,12 +14,6 @@ import { jsonLd } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ slug: string }> };
-
-const TAG_ICONS: Record<ApiMenuItem["tag"], string> = {
-  sweet: "🍯",
-  savoury: "🥓",
-  choc: "🍫",
-};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -267,64 +262,9 @@ export default async function DishPage({ params }: Props) {
 
             {/* Boutique Diner Menu Cards Grid */}
             <div className="dish-related-grid">
-              {related.map((m) => {
-                const imgSrc = m.photo || m.image;
-                const stageClass = `stage-${m.tag || "sweet"}`;
-
-                return (
-                  <Link href={`/menu/${m.slug}`} className="fav-diner-card" key={m.slug}>
-                    {/* Top Bar: Tag Badge + Price Pill */}
-                    <div className="fav-card-top">
-                      <span className={`fav-tag-badge tag-${m.tag}`}>
-                        <span>{TAG_ICONS[m.tag] || "🥞"}</span>
-                        <span>{TAG_LABEL[m.tag] || "Pancake"}</span>
-                      </span>
-                      <span className="fav-price-pill">{money(m.price)}</span>
-                    </div>
-
-                    {/* Dish Photo Stage with Glow */}
-                    <div className={`fav-photo-stage ${stageClass}`}>
-                      {imgSrc ? (
-                        <Image
-                          src={imgSrc}
-                          alt={m.name}
-                          width={400}
-                          height={300}
-                          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 45vw, 85vw"
-                          className="fav-dish-img"
-                        />
-                      ) : (
-                        <div className="fav-dish-placeholder">
-                          <span className="placeholder-icon">🥞</span>
-                          <span className="placeholder-text">Chef&apos;s Special</span>
-                        </div>
-                      )}
-
-                      {/* Special Marker */}
-                      {parseFloat(String(m.price)) > 18 && (
-                        <span className="fav-crowd-marker">
-                          <Sparkles size={11} className="inline mr-1" />
-                          Special
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Bottom Body Content */}
-                    <div className="fav-card-body">
-                      <h3 className="fav-card-name">{m.name}</h3>
-                      <p className="fav-card-desc">
-                        {m.description || "Freshly griddled fluffy pancake stack served with whipped butter and maple syrup."}
-                      </p>
-
-                      {/* Card Action Link */}
-                      <div className="fav-card-action">
-                        <span>View Details</span>
-                        <ArrowRight size={14} className="fav-arrow" />
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
+              {related.map((m) => (
+                <DishCard item={m} variant="tile" key={m.slug} />
+              ))}
             </div>
           </section>
         </div>
