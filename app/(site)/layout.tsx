@@ -7,9 +7,11 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import ScrollFx from "@/components/ScrollFx";
+import CartDrawer from "@/components/CartDrawer";
+import CartButton from "@/components/CartButton";
 import BottomBar from "@/components/BottomBar";
 import { CartProvider } from "@/lib/cart";
-import { getAnnouncement, getHours, getReviews, getSite } from "@/lib/api";
+import { getAnnouncement, getHours, getMenuWithStatus, getReviews, getSite } from "@/lib/api";
 import { customThemeStyle } from "@/lib/theme";
 import { jsonLd } from "@/lib/utils";
 import { aggregateRating, openingHoursSpec } from "@/lib/seo";
@@ -86,11 +88,14 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const [site, announcement, hours, reviews] = await Promise.all([
+  const [site, announcement, hours, reviews, menu] = await Promise.all([
     getSite(),
     getAnnouncement(),
     getHours(),
     getReviews(),
+    // the drawer needs names and prices for whatever is in the cart, on every
+    // page — not just /menu, which is the only page that used to render it
+    getMenuWithStatus(),
   ]);
   const themeStyle =
     site.theme === "custom" ? customThemeStyle(site.custom_primary, site.custom_accent) : null;
@@ -132,11 +137,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLd(schema) }}
         />
-        {/* the cart wraps everything: the menu page owns the drawer, the dish
-            page adds to it, and the tab bar reads its count */}
+        {/* the cart wraps everything: the drawer mounts once here, every page's
+            cart button opens it, and the tab bar reads its count */}
         <CartProvider>
           <Announce data={announcement} />
-          <Nav />
+          <Nav live={site.online_ordering_enabled} />
           {children}
           <Footer />
           {site.whatsapp &&
@@ -144,6 +149,14 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
            }
           <ScrollFx />
           <BottomBar />
+          {/* desktop's cart — mobile/tablet use the app header's, which sits
+              in Nav. globals.css shows exactly one of them per breakpoint. */}
+          <CartButton live={site.online_ordering_enabled} className="cart-fab" size={26} />
+          <CartDrawer
+            items={menu.items}
+            live={site.online_ordering_enabled}
+            uberEatsUrl={site.uber_eats_url}
+          />
         </CartProvider>
       </body>
     </html>

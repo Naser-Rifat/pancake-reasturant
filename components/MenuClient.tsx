@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart, Plus, ArrowRight } from "lucide-react";
+import { Plus, ArrowRight } from "lucide-react";
 import {
   TAG_LABEL,
   money,
-  placeOrder,
   telHref,
   type ApiMenuItem,
 } from "@/lib/api";
@@ -34,14 +33,9 @@ export default function MenuClient({
   pauseMessage?: string;
   uberEatsUrl?: string;
 }) {
-  // the cart itself lives in lib/cart so the dish page can add to it too
-  const { cart, loaded, count, add: addToCart, inc, dec, clear, reconcile, showToast, addedAt } =
-    useCart();
-  const [open, setOpen] = useState(false);
-  const [pop, setPop] = useState(false);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [placing, setPlacing] = useState(false);
+  // cart data and the drawer both live in lib/cart now, so the dish page can
+  // add to the order and open it without coming back here
+  const { loaded, add: addToCart, reconcile, showToast } = useCart();
   const [selectedTag, setSelectedTag] = useState<string>("all");
   // drop slugs that have left the menu, then honour ?add= — the dish page adds
   // in place now, but shared and bookmarked links still land here
@@ -61,49 +55,14 @@ export default function MenuClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, loaded]);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, []);
-
   const itemBySlug = (slug: string) => items.find((b) => b.slug === slug)!;
-  const priceOf = (slug: string) => parseFloat(itemBySlug(slug).price);
 
-  const total = Object.entries(cart).reduce((s, [slug, q]) => s + priceOf(slug) * q, 0);
-
-  // replay the FAB's pop whenever anything lands in the cart, wherever from
-  useEffect(() => {
-    if (!addedAt) return;
-    setPop(false);
-    const id = requestAnimationFrame(() => setPop(true));
-    return () => cancelAnimationFrame(id);
-  }, [addedAt]);
 
   const add = (slug: string) => {
     addToCart(slug);
     showToast(`${itemBySlug(slug).name} added to your order 🥞`);
   };
 
-  const checkout = async () => {
-    if (!count) return showToast("Your order is empty!");
-    if (!name.trim()) return showToast("Add your name so we know whose stack it is!");
-    setPlacing(true);
-    try {
-      const order = await placeOrder({
-        customer_name: name.trim(),
-        phone: phone.trim(),
-        items: Object.entries(cart).map(([slug, quantity]) => ({ slug, quantity })),
-      });
-      clear();
-      setOpen(false);
-      showToast(`Order received — $${order.total}. See you soon, ${name.trim()}! 🎉`);
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : "Something went wrong — please try again.");
-    } finally {
-      setPlacing(false);
-    }
-  };
 
   const visibleTags =
     selectedTag === "all" ? TAG_ORDER : TAG_ORDER.filter((t) => t === selectedTag);
@@ -279,135 +238,6 @@ export default function MenuClient({
         </div>
       </main>
 
-      {/* Cart Button */}
-      {live && (
-        <button
-          className="cart-fab"
-          aria-label="Open cart"
-          onClick={() => setOpen(true)}
-        >
-          <ShoppingCart size={26} strokeWidth={2.2} aria-hidden="true" />
-          <span className={`count${pop ? " pop" : ""}`}>{count}</span>
-        </button>
-      )}
-
-      {/* Backdrop */}
-      <div
-        className={`cart-backdrop${open ? " show" : ""}`}
-        onClick={() => setOpen(false)}
-      />
-
-      {/* Cart Drawer */}
-      <aside
-        className={`cart-drawer${open ? " open" : ""}`}
-        aria-label="Shopping cart"
-      >
-        <div className="cart-head">
-          <h3>Your Order</h3>
-          <button
-            className="cart-close"
-            aria-label="Close cart"
-            onClick={() => setOpen(false)}
-          >
-            ✕
-          </button>
-        </div>
-        <div className="cart-items">
-          {count === 0 ? (
-            <p className="cart-empty">
-              Your order is empty.
-              <br />
-              Go stack something. 🥞
-            </p>
-          ) : (
-            Object.entries(cart).map(([slug, qty]) => {
-              const b = itemBySlug(slug);
-              return (
-                <div className="cart-item" key={slug}>
-                  <Image
-                    src={b.image || b.photo}
-                    alt={b.name}
-                    width={58}
-                    height={58}
-                  />
-                  <div>
-                    <div className="n">{b.name}</div>
-                    <div className="p">
-                      ${parseFloat(b.price)} × {qty} = $
-                      {(priceOf(slug) * qty).toFixed(2)}
-                    </div>
-                  </div>
-                  <div className="qty">
-                    <button
-                      aria-label="Remove one"
-                      onClick={() => dec(slug)}
-                    >
-                      −
-                    </button>
-                    <span>{qty}</span>
-                    <button
-                      aria-label="Add one"
-                      onClick={() => inc(slug)}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-        <div className="cart-foot">
-          <div className="cart-form">
-            <input
-              className="input"
-              placeholder="Your name *"
-              value={name}
-              autoComplete="name"
-              onChange={(e) => setName(e.target.value)}
-            />
-            <input
-              className="input"
-              placeholder="Phone (optional)"
-              value={phone}
-              autoComplete="tel"
-              inputMode="tel"
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
-          <div className="cart-total">
-            <span>Total</span>
-            <b>${total.toFixed(2)}</b>
-          </div>
-          <button
-            className="btn btn-primary"
-            onClick={checkout}
-            disabled={placing}
-          >
-            {placing ? "Placing order…" : "Checkout for Pickup →"}
-          </button>
-          {uberEatsUrl && (
-            <a
-              href={uberEatsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "block",
-                textAlign: "center",
-                marginTop: "0.7rem",
-                fontSize: "0.9rem",
-                fontWeight: 700,
-                color: "#06C167",
-                textDecoration: "underline",
-              }}
-            >
-              Prefer delivery? Order on Uber Eats 🛵
-            </a>
-          )}
-        </div>
-      </aside>
-
-      {/* Toast */}
     </>
   );
 }

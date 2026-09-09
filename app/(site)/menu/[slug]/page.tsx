@@ -3,11 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Sparkles, Star } from "lucide-react";
-import Marquee from "@/components/Marquee";
 import DishGallery from "@/components/DishGallery";
 import QtyAdd from "@/components/QtyAdd";
 import DishMenuButton from "@/components/DishMenuButton";
-import { TAG_LABEL, getMenuWithStatus, getReviews, getSite, lines, money, type ApiMenuItem } from "@/lib/api";
+import CartButton from "@/components/CartButton";
+import { TAG_LABEL, getMenuWithStatus, getReviews, getSite, money, type ApiMenuItem } from "@/lib/api";
 import { jsonLd } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -98,7 +98,11 @@ export default async function DishPage({ params }: Props) {
             {TAG_ICONS[item.tag]} {TAG_LABEL[item.tag]}
           </span>
           <span className="dish-topbar-title">{item.name}</span>
-          <DishMenuButton />
+          {/* right-hand pair: the order, then the menu — mobile app bar only */}
+          <span className="dish-topbar-actions">
+            <CartButton live={site.online_ordering_enabled} className="dish-topbar-cart" />
+            <DishMenuButton />
+          </span>
         </nav>
 
         {/* 1. Large Hero Photo Deep Frame */}
@@ -235,9 +239,6 @@ export default async function DishPage({ params }: Props) {
           </div>
         </div>
       </div>
-
-      {/* 3. Mid-page Running Marquee Ticker */}
-      <Marquee words={lines(site.marquee_words)} />
 
       {/* 4. Retro Statement Band with Stickers */}
       <section className="statement">

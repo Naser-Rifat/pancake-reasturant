@@ -362,6 +362,11 @@ body.has-announce .nav-links {
   align-items: center;
   gap: 0.6rem;
 }
+/* the app header's cart is a mobile/tablet control — desktop has the floating
+   bubble instead, and showing both put two carts on one screen */
+.nav-cart {
+  display: none;
+}
 
 /* Compact Luxury Nav Book Button */
 .nav-book-btn {
@@ -700,33 +705,6 @@ body.has-announce .nav-links {
 @keyframes spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-/* ---------- marquee ---------- */
-.marquee {
-  background: var(--lavender);
-  color: var(--ink);
-  overflow: hidden;
-  padding: 0.85rem 0;
-  position: relative;
-  z-index: 5;
-}
-.marquee-track {
-  display: flex;
-  gap: 2.5rem;
-  white-space: nowrap;
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 0.9rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  animation: scrollX 24s linear infinite;
-  width: max-content;
-}
-@keyframes scrollX {
-  to {
-    transform: translateX(-50%);
   }
 }
 
@@ -3941,11 +3919,6 @@ body::before {
   transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* --- marquee pauses for reading on hover --- */
-.marquee:hover .marquee-track {
-  animation-play-state: paused;
-}
-
 /* --- logo mark gives a little nod on hover --- */
 .logo svg {
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -4132,7 +4105,6 @@ body::before {
   html {
     scroll-behavior: auto;
   }
-  .marquee-track,
   .round-badge svg,
   .pancake-illust {
     animation: none;
@@ -6927,6 +6899,14 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
   }
+  /* the cart takes the same treatment over the hero photo — its default is an
+     ink glyph on a 6%-ink disc, which disappears against a dark stack */
+  body:has(.hero-nav) .nav:not(.past-hero) .nav-cart {
+    background: rgba(26, 17, 9, 0.5);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    color: var(--cream);
+  }
   body:has(.hero-nav) .nav:not(.past-hero) .burger-toggle span {
     background: var(--cream);
     width: 20px;
@@ -6943,7 +6923,8 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
    menu" exactly as it read before; phones hide the label instead. */
 .spec-label,
 .dish-topbar-title,
-.dish-topbar-more {
+.dish-topbar-more,
+.dish-topbar-actions {
   display: none;
 }
 .dish-back-arrow {
@@ -6971,7 +6952,9 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     top: 0;
     z-index: 20;
     display: grid;
-    grid-template-columns: 44px 1fr 44px;
+    /* auto, not a second 44px: the cart button comes and goes with the order,
+       and a fixed track would leave a hole in the bar when it is absent */
+    grid-template-columns: 44px 1fr auto;
     align-items: center;
     min-height: 56px;
     margin: 0 0 0.2rem;
@@ -7008,6 +6991,44 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .dish-page .dish-topbar-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .dish-page .dish-topbar-cart {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(253, 249, 238, 0.85);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .dish-page .dish-topbar-cart .count {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    background: var(--yellow);
+    color: var(--ink);
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+  /* same pop the menu page's FAB plays, so an add reads the same everywhere */
+  .dish-page .dish-topbar-cart .count.pop {
+    animation: pop 0.3s ease;
   }
   .dish-page .dish-topbar-more {
     display: inline-grid;
@@ -7424,7 +7445,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     width: min(24rem, calc(100% - 1.6rem));
-    transform: translate(-50%, calc(100% + 1.6rem));
+    transform: translateX(-50%);
     background: rgba(26, 17, 9, 0.9);
     -webkit-backdrop-filter: blur(18px) saturate(1.2);
     backdrop-filter: blur(18px) saturate(1.2);
@@ -7432,16 +7453,6 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     border-radius: 999px;
     padding: 0.35rem;
     box-shadow: 0 12px 34px rgba(26, 17, 9, 0.4);
-    opacity: 0;
-    pointer-events: none;
-    transition:
-      transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.22s ease;
-  }
-  .tabbar.on {
-    transform: translate(-50%, 0);
-    opacity: 1;
-    pointer-events: auto;
   }
   .tabbar-item {
     display: flex;
@@ -7500,37 +7511,75 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     color: var(--ink);
     background: var(--yellow);
   }
-  /* the WhatsApp bubble and the cart FAB both live in the bottom-right corner
-     the bar now crosses — lift them clear while it is up */
-  body:has(.tabbar.on) .wa-float {
+  /* the WhatsApp bubble sits in the corner the bar now crosses — lift it clear.
+     The cart used to stack here too; it lives in the header now. */
+  body:has(.tabbar) .wa-float {
     bottom: calc(0.7rem + 64px + 12px + env(safe-area-inset-bottom, 0px));
   }
-  body:has(.tabbar.on) .cart-fab {
+  /* the toast landed on the tab bar, covering the very labels you tap next.
+     It only overlapped occasionally while the bar came and went on scroll; the
+     bar is permanent now, so the overlap would be every time. */
+  body:has(.tabbar) .toast {
     bottom: calc(0.7rem + 64px + 12px + env(safe-area-inset-bottom, 0px));
   }
-  body:has(.tabbar.on):has(.cart-fab) .wa-float {
-    bottom: calc(0.7rem + 64px + 12px + 58px + 12px + env(safe-area-inset-bottom, 0px));
+  /* ...and while the drawer is up it would sit on the checkout button instead */
+  body:has(.cart-drawer.open) .toast {
+    bottom: auto;
+    top: calc(1.2rem + env(safe-area-inset-top, 0px));
+    transform: translate(-50%, -150%);
   }
-  /* once the bar is up it IS the navigation — the top pill would be the same
-     links twice. The header element itself stays in the tree because the menu
-     panel lives inside it (and it is position:fixed, so transforming .nav
-     would re-base it and break the drop). */
-  body:has(.tabbar.on):not(:has(.dish-buy)) .nav {
-    pointer-events: none;
+  body:has(.cart-drawer.open) .toast.show {
+    transform: translate(-50%, 0);
   }
-  body:has(.tabbar.on):not(:has(.dish-buy)) .nav-inner {
-    background: transparent;
-    border-color: transparent;
-    box-shadow: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-  body:has(.tabbar.on):not(:has(.dish-buy)) .nav .logo,
-  body:has(.tabbar.on):not(:has(.dish-buy)) .nav .nav-cta {
+  /* The tab bar IS the navigation now, so the top pill stops being a nav and
+     becomes an app header: brand on the left, order on the right, nothing else.
+     Book lives in the tab bar and the burger's panel is the More tab, so both
+     would be the same control twice. */
+  .nav-book-btn,
+  .burger-toggle {
     display: none;
   }
-  body:has(.tabbar.on) .nav-links {
-    pointer-events: auto;
+  .nav-cta {
+    gap: 0;
+  }
+  /* the app header's cart — the standard top-right slot, on every screen that
+     is not the dish page (which carries its own app bar) */
+  .nav-cart {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(33, 26, 20, 0.06);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .nav-cart .count {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    background: var(--yellow);
+    color: var(--ink);
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .nav-cart .count.pop {
+    animation: pop 0.3s ease;
+  }
+  /* the floating bubble is desktop's answer to having no app bar; below 1024
+     the header's cart is the one true cart and two would be two carts */
+  .cart-fab {
+    display: none;
   }
 
   /* the last section needs room to clear the floating bar */

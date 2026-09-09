@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LogoMark from "@/components/LogoMark";
+import CartButton from "@/components/CartButton";
 import { TOGGLE_MENU_EVENT } from "@/components/BottomBar";
 
 const LINKS = [
@@ -15,7 +16,7 @@ const LINKS = [
   { href: "/#contact", label: "Contact" },
 ];
 
-export default function Nav() {
+export default function Nav({ live = true }: { live?: boolean }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -80,6 +81,9 @@ export default function Nav() {
         </ul>
 
         <div className="nav-cta">
+          {/* mobile/tablet only — desktop keeps the floating bubble, having no
+              app bar to hang this off. globals.css picks which one shows. */}
+          <CartButton live={live} className="nav-cart" />
           <Link href="/booking" className="btn btn-primary nav-book-btn">
             <span className="nav-btn-text">Book</span>
             <span className="nav-btn-arrow">↗</span>

@@ -3,7 +3,6 @@ import Image from "next/image";
 import LogoMark from "@/components/LogoMark";
 import CertIcon from "@/components/CertIcon";
 import HeroShowcase from "@/components/HeroShowcase";
-import Marquee from "@/components/Marquee";
 import CampaignSlider from "@/components/CampaignSlider";
 import FavouritesRail from "@/components/FavouritesRail";
 import ReviewForm from "@/components/ReviewForm";
@@ -66,7 +65,6 @@ export default async function Home() {
       </section>
 
       {/* ================= MARQUEE ================= */}
-      {/* <Marquee /> */}
 
       {/* ================= CAMPAIGN BAND ================= */}
       {announcement?.image &&
