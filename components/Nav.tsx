@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LogoMark from "@/components/LogoMark";
+import { TOGGLE_MENU_EVENT } from "@/components/BottomBar";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -36,6 +37,13 @@ export default function Nav() {
   }, [pathname]);
 
   useEffect(() => setOpen(false), [pathname]);
+
+  // the bottom bar's More tab drives this same panel — one menu, two entry points
+  useEffect(() => {
+    const toggle = () => setOpen((o) => !o);
+    window.addEventListener(TOGGLE_MENU_EVENT, toggle);
+    return () => window.removeEventListener(TOGGLE_MENU_EVENT, toggle);
+  }, []);
 
   // hide the public nav on the standalone live-preview route — must stay AFTER
   // the hooks above so the hook count never changes between renders

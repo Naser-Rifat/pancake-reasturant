@@ -233,7 +233,7 @@ export default async function DishPage({ params }: Props) {
             </h2>
 
             {/* Boutique Diner Menu Cards Grid */}
-            <div className="fav-grid">
+            <div className="dish-related-grid">
               {related.map((m) => {
                 const imgSrc = m.photo || m.image;
                 const stageClass = `stage-${m.tag || "sweet"}`;

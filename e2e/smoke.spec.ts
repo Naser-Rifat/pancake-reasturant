@@ -5,23 +5,27 @@ import { expect, test } from "@playwright/test";
 // seeded (seed_demo) and have the staff user below.
 const ADMIN_USER = process.env.E2E_ADMIN_USER ?? "admin";
 const ADMIN_PASS = process.env.E2E_ADMIN_PASS ?? "krush2026";
+// same backend the site renders from (playwright.config loads .env.local)
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
 
 test("home renders hero, featured slider and reviews from the API", async ({ page }) => {
   // staff manage the menu, so counts must follow the live API, not a fixture
-  const menu = await (await page.request.get("http://localhost:8000/api/menu/")).json();
+  const menu = await (await page.request.get(`${API}/menu/`)).json();
   await page.goto("/");
   await expect(page.locator(".hero-card-left h1")).toBeVisible();
-  // "Our Favourites" rail shows the top picks (up to six)
-  await expect(page.locator("#featured .fav-diner-card")).toHaveCount(Math.min(6, menu.length));
+  // "Our Favourites" grid shows the top picks (up to eight)
+  await expect(page.locator("#featured .fav-card")).toHaveCount(Math.min(8, menu.length));
   await expect(page.locator(".rev-card").first()).toBeVisible();
 });
 
 test("menu page lists dishes with live ordering", async ({ page }) => {
-  const menu = await (await page.request.get("http://localhost:8000/api/menu/")).json();
+  const menu = await (await page.request.get(`${API}/menu/`)).json();
   await page.goto("/menu");
   await expect(page.locator(".diner-dish-row")).toHaveCount(menu.length);
   // backend is up in this suite, so ordering must not be paused
-  await expect(page.locator(".ordering-paused")).toHaveCount(0);
+  // the element is .ordering-paused-box — the old selector matched nothing, so
+  // this assertion passed even when ordering was paused
+  await expect(page.locator(".ordering-paused-box")).toHaveCount(0);
   await expect(page.locator(".diner-dish-row .diner-add-btn").first()).toBeVisible();
 });
 

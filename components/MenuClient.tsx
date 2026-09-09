@@ -233,14 +233,17 @@ export default function MenuClient({
                         className="diner-dish-thumb-link"
                         aria-label={`View ${b.name} details`}
                       >
-                        <div className="diner-dish-thumb">
+                        {/* the mobile card floats the art on a tinted ground with a
+                            white keyline, which only reads on a transparent cutout —
+                            a framed photo would get a rectangle drawn round it */}
+                        <div className={`diner-dish-thumb${b.image ? " is-cutout" : ""}`}>
                           {(b.image || b.photo) && (
                             <Image
                               src={b.image || b.photo}
                               alt={`${b.name} pancakes`}
-                              width={160}
-                              height={160}
-                              sizes="80px"
+                              width={320}
+                              height={320}
+                              sizes="(min-width: 1024px) 80px, 45vw"
                               className="diner-dish-img"
                             />
                           )}

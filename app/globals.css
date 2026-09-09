@@ -4217,93 +4217,212 @@ body:has(.cart-fab) .wa-float {
   justify-content: space-between;
   gap: 1.1rem 1.6rem;
 }
-.fav-head {
-  align-items: flex-end;
+.fav-head { align-items: flex-end; }
+.fav-h .title { margin-bottom: 0.4rem; }
+.fav-sub { color: var(--muted); font-weight: 500; }
+.fav-foot { display: flex; justify-content: center; margin-top: 1.4rem; }
+.fav-foot .btn { width: 100%; justify-content: center; }
+@media (min-width: 768px) {
+  .fav-foot { justify-content: flex-end; margin-top: 1.6rem; }
+  .fav-foot .btn { width: auto; }
 }
-.fav-h .title {
-  margin-bottom: 0.4rem;
-}
-.fav-sub {
-  color: var(--muted);
-  font-weight: 500;
-}
-/* category count pills — click to filter the rail */
+
+/* category count pills — click to filter the grid.
+   On phones they wrapped to two rows and ate 170px of the fold before a single
+   dish showed; they now run as one swipeable chip line, the way an app's filter
+   bar behaves. Tablet+ has the width to wrap them back into the head row. */
 .fav-tabs {
   display: flex;
   flex-wrap: nowrap;
+  gap: 0.6rem;
+  flex: 1 1 100%;
+  min-width: 0;
   overflow-x: auto;
-  gap: 0.65rem;
-  padding: 0.2rem 0.2rem 0.5rem;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
   scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
+  /* stays inside the container — the half-visible last chip is the scroll cue */
+  padding: 0.2rem 0;
 }
-.fav-tabs::-webkit-scrollbar {
-  display: none;
-}
-
+.fav-tabs::-webkit-scrollbar { display: none; }
 @media (min-width: 768px) {
   .fav-tabs {
+    flex: 0 1 auto;
     flex-wrap: wrap;
-    overflow-x: visible;
+    overflow: visible;
+    padding: 0;
   }
 }
-
 .fav-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  font-family: var(--font-round), sans-serif;
+  gap: 0.55rem;
+  font-family: var(--font-body);
   font-weight: 800;
-  font-size: 0.8rem;
-  letter-spacing: 0.03em;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--ink);
   background: var(--cream-card);
-  border: 1.5px solid rgba(33, 26, 20, 0.12);
+  border: none;
   border-radius: 999px;
-  padding: 0.45rem 0.55rem 0.45rem 1rem;
+  padding: 0.5rem 0.55rem 0.5rem 1.1rem;
   cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
-  flex-shrink: 0;
+  flex: 0 0 auto;
   white-space: nowrap;
+  scroll-snap-align: start;
+  /* HIG minimum — the pills measured 38px tall */
+  min-height: 44px;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s ease;
 }
-.fav-pill:hover {
-  transform: translateY(-2px);
-  border-color: var(--ink);
+@media (hover: hover) and (pointer: fine) {
+  .fav-pill:hover { transform: scale(1.05); }
 }
 .fav-pill .n {
   display: inline-grid;
   place-items: center;
-  min-width: 24px;
-  height: 24px;
-  padding: 0 6px;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
   background: var(--ink);
   color: var(--cream);
   border-radius: 999px;
   font-size: 0.72rem;
-  font-weight: 700;
 }
-.fav-pill.sweet { background: rgba(245, 158, 11, 0.12); }
-.fav-pill.choc { background: rgba(242, 120, 156, 0.14); }
-.fav-pill.savoury { background: rgba(184, 230, 196, 0.25); }
+.fav-pill.a { background: var(--card-a); }
+.fav-pill.b { background: var(--card-b); }
+.fav-pill.c { background: var(--card-c); }
+.fav-pill.on { background: var(--pink); }
 
-.fav-pill.on {
-  background: var(--yellow-deep);
-  border-color: var(--ink);
-  color: var(--ink);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-  transform: translateY(-2px);
+/* app-style tile grid. The scroll-snap rail showed 1.3 cards on a phone, so
+   five of six dishes were hidden behind a gesture; a grid shows the menu.
+   Two up on phones, three on tablets, four on desktop. */
+.fav-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.3rem;
 }
-.fav-pill.on .n {
-  background: #ffffff;
-  color: var(--ink);
+@media (min-width: 768px) {
+  .fav-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.2rem;
+    margin-top: 1.6rem;
+  }
 }
+@media (min-width: 1024px) {
+  .fav-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.4rem;
+  }
+}
+/* the whole tile is the tap target, and it presses like a native cell.
+   Same treatment as the /menu cards — tinted ground, cutout standing on the
+   floor with a white keyline — so a dish looks like a dish everywhere. The
+   layout stays different on purpose: photo on top and name below keeps the
+   square photo, where the /menu arrangement would cost this 174px tile 40% of
+   its picture. */
+.fav-card {
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in srgb, var(--card-a) 42%, var(--cream-card));
+  border-radius: 26px;
+  padding: 0.5rem 0.5rem 0.85rem;
+  box-shadow: 0 2px 10px rgba(33, 26, 20, 0.07);
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.25s ease;
+}
+.fav-card:nth-child(3n + 2) { background: var(--card-b); }
+.fav-card:nth-child(3n) { background: color-mix(in srgb, var(--pink) 16%, var(--cream-card)); }
+.fav-card:active { transform: scale(0.97); }
+.fav-card .ph {
+  display: block;
+  position: relative;
+  /* transparent: the cutout stands on the tile's own ground, not in a white box */
+  background: none;
+  border-radius: 20px;
+  /* square keeps every row of the grid aligned at any column count */
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+/* No hover flood on these tiles. It was built for the old 282x250 rail card;
+   on a 2-up grid tile it covered the dish photo completely at every width
+   measured (740/900/1440), and on a food menu the photo is the whole point.
+   The description is one tap away on the dish page. Hover now just lifts the
+   tile — the photo zoom below carries the rest. */
+@media (hover: hover) and (pointer: fine) {
+  .fav-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(33, 26, 20, 0.14);
+  }
+}
+
+/* a real photo fills the frame edge-to-edge — and keeps its white box, since a
+   keyline round a rectangle is just a border */
+.fav-card .ph.framed {
+  background: #fff;
+}
+.fav-card .ph.framed img {
+  object-fit: cover;
+  padding: 0;
+  filter: none;
+}
+.fav-card .ph img {
+  object-fit: contain;
+  /* the dish stands on the frame's floor instead of floating in the middle */
+  object-position: bottom;
+  padding: 0.75rem 0.75rem 0;
+  /* four offset shadows stroke the cutout's alpha edge — same trick as /menu */
+  filter:
+    drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
+    drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
+    drop-shadow(0 10px 16px rgba(33, 26, 20, 0.2));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.fav-card:hover .ph img { transform: scale(1.05) rotate(-1.2deg); }
+.fav-card .nm {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: var(--font-round);
+  font-weight: 800;
+  color: var(--ink);
+  font-size: 0.98rem;
+  line-height: 1.25;
+  margin-top: 0.6rem;
+  padding-inline: 0.3rem;
+}
+/* a 320px phone gives the tile ~140px: two lines truncated "Classic Buttermilk
+   St…", which is worse than an uneven row, so narrow screens get a third line */
+@media (max-width: 359px) {
+  .fav-card .nm { -webkit-line-clamp: 3; font-size: 0.92rem; }
+}
+/* auto margin pins the price to the tile floor, so prices line up across a row
+   whether the name above ran one line or two */
+.fav-card .pr {
+  display: block;
+  margin-top: auto;
+  padding: 0.3rem 0.3rem 0;
+  color: var(--ink);
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+@media (min-width: 768px) {
+  .fav-card { padding: 0.6rem 0.6rem 1rem; }
+  .fav-card .ph img { padding: 1.4rem; }
+  .fav-card .nm { font-size: 1.08rem; margin-top: 0.75rem; }
+  .fav-card .pr { font-size: 1rem; }
+}
+
 
 /* ===================================================================
-   BOUTIQUE DINER MENU CARDS (Unified All-in-One Cards)
+   DISH PAGE — "you might also like" cards (kept as-is; the homepage
+   rail above went back to the original scroll-snap design)
    =================================================================== */
-
-.fav-grid {
+.dish-related-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.6rem;
@@ -4311,14 +4430,14 @@ body:has(.cart-fab) .wa-float {
 }
 
 @media (min-width: 640px) {
-  .fav-grid {
+  .dish-related-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.8rem;
   }
 }
 
 @media (min-width: 1024px) {
-  .fav-grid {
+  .dish-related-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 2.2rem;
   }
@@ -4528,54 +4647,6 @@ body:has(.cart-fab) .wa-float {
   transform: translateX(5px);
 }
 
-/* ---------- Featured Rail Footer CTA Button ---------- */
-.fav-foot {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 2.8rem;
-}
-
-.fav-cta-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 0.6rem !important;
-  padding: 0.85rem 2.4rem !important;
-  font-family: var(--font-round), sans-serif !important;
-  font-weight: 800 !important;
-  font-size: 0.95rem !important;
-  letter-spacing: 0.04em !important;
-  text-transform: uppercase !important;
-  border-radius: 999px !important;
-  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35) !important;
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
-}
-
-.fav-cta-btn:hover {
-  transform: translateY(-3px) scale(1.02) !important;
-  box-shadow: 0 14px 32px rgba(245, 158, 11, 0.45) !important;
-}
-
-.fav-foot-arrow {
-  transition: transform 0.22s ease;
-}
-
-.fav-cta-btn:hover .fav-foot-arrow {
-  transform: translateX(4px);
-}
-
-@media (max-width: 640px) {
-  .fav-foot {
-    margin-top: 2rem;
-    width: 100%;
-  }
-  .fav-cta-btn {
-    width: 100% !important;
-    max-width: 22rem !important;
-    justify-content: center !important;
-    padding: 0.9rem 1.6rem !important;
-  }
-}
 
 /* ===================================================================
    MENU PAGE — Boutique Diner Menu Boards (Option 1)
@@ -6704,110 +6775,523 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   }
 }
 
-/* ---- mobile full-fold hero ----
-   Below the desktop reference layout the hero was a floating 567px box with
-   dead cream under the fold. Mobile pass: the photo panel owns the first
-   screen, the headline moves to the display face at display scale, CTAs go
-   full-width, and the scrim lightens up top so the food shows through.
-   Two auto margins split the spare height: photo air above the headline,
-   CTAs pinned to the bottom edge. */
+/* ---- mobile app-shell hero ----
+   The photo runs edge to edge and owns the whole fold; the headline and both
+   CTAs sit on the bottom third, so everything interactive lands in thumb reach
+   instead of the 296px of cream + empty photo that used to open the page.
+   The lead paragraph is desktop-only here: it measured 3.31:1 over the photo
+   (4.5:1 needed) and the copy it carried is mood, not a decision the fold has
+   to serve. Nav chrome floats on the photo — see the block below. */
 @media (max-width: 1023px) {
   body:has(.hero-nav) .hero {
-    padding: calc(var(--nav-h) + 0.6rem) 0 1.2rem;
+    padding: 0;
   }
   body:has(.hero-nav).has-announce .hero {
-    padding-top: calc(var(--nav-h) + 0.6rem + 44px);
+    padding-top: 44px;
   }
+  /* full bleed: the container's 92% width, the cream frame and the 32px radius
+     together cost 114px of fold before the first pixel of food */
   body:has(.hero-nav) .hero .container.hero-cards {
     display: flex;
-    min-height: calc(100svh - var(--nav-h) - 1.8rem);
-    border-radius: 32px;
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+    min-height: 100svh;
+    border-radius: 0;
     overflow: hidden;
   }
   body:has(.hero-nav).has-announce .hero .container.hero-cards {
-    min-height: calc(100svh - var(--nav-h) - 1.8rem - 44px);
+    min-height: calc(100svh - 44px);
   }
-  body:has(.hero-nav) .hero-price {
+  /* the price chip and the dish switcher both sat in the bottom strip the CTAs
+     now own, and neither survived the trip to a phone: the chip was hidden and
+     the thumbs changed the backdrop with no visible result */
+  body:has(.hero-nav) .hero-price,
+  body:has(.hero-nav) .hero-thumbs {
     display: none !important;
   }
   body:has(.hero-nav) .hero-card-left {
     flex: 1;
-    padding: 3.2rem 1.4rem 2rem !important;
+    /* safe-area inset keeps the second pill clear of the home indicator */
+    padding: 0 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px)) !important;
     display: flex !important;
     flex-direction: column !important;
-    align-items: center !important;
-    text-align: center !important;
-    justify-content: space-between !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    justify-content: flex-end !important;
   }
   body:has(.hero-nav) .hero-card-left h1 {
-    margin: auto 0 0 !important;
+    margin: 0 !important;
     font-family: var(--font-display), var(--font-serif), serif;
     font-weight: 400;
-    font-size: clamp(2.4rem, 9.5vw, 3.5rem) !important;
-    line-height: 0.96 !important;
+    font-size: clamp(2.6rem, 11vw, 3.6rem) !important;
+    line-height: 0.94 !important;
     letter-spacing: 0.01em;
-    text-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
   }
   body:has(.hero-nav) .hero-card-left h1 .script {
     font-family: var(--font-script), cursive;
-    font-size: 0.76em;
-    margin-top: 0.2rem;
+    font-size: 0.72em;
+    margin-top: 0.1rem;
     color: var(--yellow) !important;
-    text-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
   }
   body:has(.hero-nav) .hero-card-left p.lead {
-    margin: 0.75rem auto 0 !important;
-    font-size: 0.92rem !important;
-    line-height: 1.45 !important;
-    max-width: 26ch;
-    color: rgba(248, 242, 224, 0.92) !important;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    display: none !important;
   }
   body:has(.hero-nav) .hero-actions {
-    margin-top: auto !important;
-    padding-top: 1.4rem !important;
+    margin-top: 1.5rem !important;
+    padding-top: 0 !important;
     width: 100%;
-    max-width: 22rem;
+    max-width: none;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0.8rem;
+    align-items: stretch;
+    gap: 0.7rem;
   }
-  body:has(.hero-nav) .hero-actions .btn-primary {
+  /* two full-width pills: the ghost CTA used to be a 27px underlined link */
+  body:has(.hero-nav) .hero-actions .btn {
     width: 100%;
     justify-content: center;
-    padding: 0.85rem 1.6rem !important;
-    font-size: 0.92rem !important;
-    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4) !important;
+    min-height: 54px;
+    padding: 0.9rem 1.6rem !important;
+    font-size: 0.95rem !important;
+    border-radius: 999px;
+  }
+  body:has(.hero-nav) .hero-actions .btn-primary {
+    box-shadow: 0 8px 24px rgba(33, 26, 20, 0.35) !important;
+  }
+  /* a tablet is wide enough that a full-bleed pill stops reading as a button */
+  @media (min-width: 600px) {
+    body:has(.hero-nav) .hero-card-left {
+      padding-inline: 2rem !important;
+    }
+    body:has(.hero-nav) .hero-actions {
+      max-width: 24rem;
+    }
   }
   body:has(.hero-nav) .hero-actions .btn-ghost {
-    background: transparent !important;
-    border: none !important;
+    background: rgba(248, 242, 224, 0.1) !important;
+    border: 1.5px solid rgba(248, 242, 224, 0.7) !important;
     color: var(--cream) !important;
-    font-size: 0.82rem !important;
-    font-weight: 700 !important;
-    padding: 0.2rem !important;
-    text-decoration: underline !important;
-    text-underline-offset: 4px !important;
-    opacity: 0.85;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    opacity: 1;
   }
-  body:has(.hero-nav) .hero-thumbs {
-    margin: 0.6rem auto 0 !important;
-    gap: 0.55rem !important;
-  }
-  body:has(.hero-nav) .hero-thumbs button {
-    width: 48px !important;
-    height: 48px !important;
-    border-radius: 14px !important;
-  }
+  /* Bottom-anchored copy needs a bottom-anchored scrim. The old 4-stop ramp
+     dropped to 0.4 alpha at 35% — right where the text sat — and the hero
+     image is CMS-editable, so the floor has to hold for any photo the client
+     uploads, not just the current one. */
   body:has(.hero-nav) .hero-scrim {
     background: linear-gradient(
       180deg,
-      rgba(26, 17, 9, 0.75) 0%,
-      rgba(26, 17, 9, 0.4) 35%,
-      rgba(26, 17, 9, 0.75) 70%,
+      rgba(26, 17, 9, 0.55) 0%,
+      rgba(26, 17, 9, 0.18) 26%,
+      rgba(26, 17, 9, 0.62) 58%,
+      rgba(26, 17, 9, 0.9) 78%,
       rgba(26, 17, 9, 0.94) 100%
     );
+  }
+}
+
+/* ---- mobile: nav chrome floats on the hero photo ----
+   Over the fold the white pill is gone: a reversed logo and one round burger,
+   like the app onboarding pattern. Past the hero the normal pill returns.
+   "Book" leaves the bar on the home fold because the hero already carries it
+   as a full-width CTA — the same action twice in one screen. */
+@media (max-width: 1023px) {
+  body:has(.hero-nav) .nav:not(.past-hero) .nav-inner {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    padding-inline: 0.35rem;
+  }
+  /* thin tan strokes read 1.01:1 on a photo, so the logo goes reversed here.
+     mask+background is the footer's treatment but it needs a bare element —
+     on the <img> the source pixels still paint over the background, so this
+     knocks the artwork itself out to a flat silhouette instead. */
+  body:has(.hero-nav) .nav:not(.past-hero) .nav-brand-logo {
+    filter: brightness(0) invert(1) drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
+    opacity: 0.96;
+    height: 34px;
+  }
+  body:has(.hero-nav) .nav:not(.past-hero) .nav-book-btn {
+    display: none;
+  }
+  body:has(.hero-nav) .nav:not(.past-hero) .burger-toggle {
+    width: 48px;
+    height: 48px;
+    background: rgba(26, 17, 9, 0.5);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+  body:has(.hero-nav) .nav:not(.past-hero) .burger-toggle span {
+    background: var(--cream);
+    width: 20px;
+  }
+}
+
+/* ---- mobile/tablet home favourites: same card as /menu ----
+   One card per row on phones, two on tablets — name and price on top, the dish
+   filling the card and bleeding off its bottom edge. Desktop keeps the four-up
+   square tiles; the wide card is a phone shape and a 1440px screen has room for
+   a proper grid. */
+@media (max-width: 1023px) {
+  .fav-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+  @media (min-width: 640px) {
+    .fav-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+  }
+  .fav-card {
+    position: relative;
+    height: 215px;
+    padding: 0.95rem 1rem 0;
+    border-radius: 24px;
+    overflow: hidden;
+  }
+  /* the markup is photo-then-name; order flips it without touching the JSX,
+     which keeps the desktop tile's source order intact */
+  .fav-card .nm {
+    order: 1;
+    margin-top: 0;
+    padding-inline: 0;
+    font-size: 1.02rem;
+    line-height: 1.22;
+  }
+  .fav-card .pr {
+    order: 2;
+    margin-top: 0.2rem;
+    padding: 0;
+    font-size: 0.95rem;
+  }
+  .fav-card .ph {
+    order: 3;
+    position: absolute;
+    left: 50%;
+    bottom: -18px;
+    transform: translateX(-50%);
+    width: 78%;
+    height: 142px;
+    aspect-ratio: auto;
+    border-radius: 0;
+  }
+  .fav-card .ph img {
+    padding: 0;
+    object-position: bottom;
+  }
+  .fav-card .ph.framed {
+    background: none;
+  }
+  .fav-card .ph.framed img {
+    border-radius: 16px 16px 0 0;
+    object-position: bottom;
+  }
+  /* name and price sit above the art and let taps through to the card link */
+  .fav-card .nm,
+  .fav-card .pr {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+}
+
+/* ---- mobile/tablet menu cards ----
+   The desktop diner row (photo 72px, dot leader, description, three meta chips)
+   put 249px of mostly-text on a phone and showed the food at 8% of the row —
+   on a food menu. Phones and tablets get a card instead: name and price top
+   left, one round add button top right, and the dish itself filling the card
+   and bleeding off the bottom edge. Description and the kcal/protein chips move
+   to the dish page: the menu is where you scan, the dish page is where you
+   decide. Desktop keeps the row — at 8.3 rows a screen it works. */
+@media (max-width: 1023px) {
+  /* the white category panel cost 53px of card width and its header repeated
+     the filter chips directly above it */
+  .menu-cat-board {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    overflow: visible;
+  }
+  .menu-board-header {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0.9rem;
+  }
+  .menu-board-rows {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+  /* the category chips wrapped to two rows and ate 170px before the first dish,
+     the same trap the home grid had */
+  .menu-filter-bar {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    padding: 0.2rem 0;
+    margin-bottom: 1.4rem;
+  }
+  .menu-filter-bar::-webkit-scrollbar {
+    display: none;
+  }
+  .menu-filter-chip {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    white-space: nowrap;
+    min-height: 44px;
+  }
+  @media (min-width: 640px) {
+    /* one card across a tablet stops reading as a card and starts reading as a
+       banner */
+    .menu-board-rows {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+  }
+
+  .diner-dish-row {
+    position: relative;
+    display: block;
+    height: 190px;
+    padding: 0.95rem 1rem 0;
+    border-radius: 24px;
+    border-bottom: none;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--card-a) 42%, var(--cream-card));
+    box-shadow: 0 2px 10px rgba(33, 26, 20, 0.07);
+    transition: transform 0.16s ease;
+  }
+  /* three soft grounds so a long list does not read as one block */
+  .diner-dish-row:nth-child(3n + 2) {
+    background: var(--card-b);
+  }
+  .diner-dish-row:nth-child(3n) {
+    background: color-mix(in srgb, var(--pink) 16%, var(--cream-card));
+  }
+  .diner-dish-row:hover {
+    background: color-mix(in srgb, var(--card-a) 42%, var(--cream-card));
+  }
+  .diner-dish-row:active {
+    transform: scale(0.98);
+  }
+
+  /* the thumb link stretches over the whole card, so the card is the target */
+  .diner-dish-thumb-link {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: block;
+  }
+  .diner-dish-thumb {
+    position: absolute;
+    left: 50%;
+    bottom: -18px;
+    transform: translateX(-50%);
+    width: 78%;
+    height: 142px;
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .diner-dish-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* the dish sits ON the card floor and is cropped by it — centring it left a
+       gap and the card stopped reading as one object */
+    object-position: bottom;
+    border-radius: 16px 16px 0 0;
+  }
+  /* four offset shadows are how you stroke an alpha edge in CSS — no new asset */
+  .diner-dish-thumb.is-cutout .diner-dish-img {
+    object-fit: contain;
+    border-radius: 0;
+    filter:
+      drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
+      drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
+      drop-shadow(0 8px 14px rgba(33, 26, 20, 0.22));
+  }
+
+  .diner-dish-body {
+    position: static;
+  }
+  .diner-dish-top-row {
+    position: relative;
+    z-index: 1;
+    display: block;
+    /* taps fall through to the card link; the name keeps its own anchor */
+    pointer-events: none;
+    padding-right: 3rem;
+  }
+  .diner-dish-name {
+    /* nowrap is what pushed the price pill off the row on a phone */
+    white-space: normal;
+    font-size: 1.02rem;
+    line-height: 1.22;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .diner-dish-name a {
+    pointer-events: auto;
+  }
+  .diner-dot-leader,
+  .diner-dish-desc,
+  .diner-chips-row,
+  .diner-view-link {
+    display: none;
+  }
+  .diner-price-pill {
+    display: block;
+    margin-top: 0.2rem;
+    padding: 0;
+    background: none;
+    border: none;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .diner-dish-footer {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    display: block;
+  }
+  .diner-add-btn {
+    /* was 70x33 — under the 44pt minimum, and the label is redundant next to a + */
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--cream-card);
+    border: 1.5px solid rgba(33, 26, 20, 0.12);
+    box-shadow: 0 3px 10px rgba(33, 26, 20, 0.14);
+  }
+  .diner-add-btn span {
+    display: none;
+  }
+}
+
+/* ---- mobile/tablet bottom tab bar ----
+   Navigation lives in the thumb zone from the hero's end onward. Desktop keeps
+   the top nav; this is hidden from 1024px up. */
+.tabbar {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .tabbar {
+    position: fixed;
+    left: 50%;
+    bottom: calc(0.7rem + env(safe-area-inset-bottom, 0px));
+    z-index: 110;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: min(24rem, calc(100% - 1.6rem));
+    transform: translate(-50%, calc(100% + 1.6rem));
+    background: rgba(26, 17, 9, 0.9);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    backdrop-filter: blur(18px) saturate(1.2);
+    border: 1px solid rgba(248, 242, 224, 0.14);
+    border-radius: 999px;
+    padding: 0.35rem;
+    box-shadow: 0 12px 34px rgba(26, 17, 9, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.22s ease;
+  }
+  .tabbar.on {
+    transform: translate(-50%, 0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .tabbar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    /* HIG minimum, with the label inside the target rather than under it */
+    min-height: 52px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 999px;
+    color: rgba(248, 242, 224, 0.72);
+    font-family: var(--font-round);
+    font-weight: 800;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition:
+      color 0.18s ease,
+      background 0.18s ease,
+      transform 0.14s ease;
+  }
+  .tabbar-item:active {
+    transform: scale(0.94);
+  }
+  .tabbar-item.on {
+    color: var(--ink);
+    background: var(--yellow);
+  }
+  /* the WhatsApp bubble and the cart FAB both live in the bottom-right corner
+     the bar now crosses — lift them clear while it is up */
+  body:has(.tabbar.on) .wa-float {
+    bottom: calc(0.7rem + 64px + 12px + env(safe-area-inset-bottom, 0px));
+  }
+  body:has(.tabbar.on) .cart-fab {
+    bottom: calc(0.7rem + 64px + 12px + env(safe-area-inset-bottom, 0px));
+  }
+  body:has(.tabbar.on):has(.cart-fab) .wa-float {
+    bottom: calc(0.7rem + 64px + 12px + 58px + 12px + env(safe-area-inset-bottom, 0px));
+  }
+  /* once the bar is up it IS the navigation — the top pill would be the same
+     links twice. The header element itself stays in the tree because the menu
+     panel lives inside it (and it is position:fixed, so transforming .nav
+     would re-base it and break the drop). */
+  body:has(.tabbar.on) .nav {
+    pointer-events: none;
+  }
+  body:has(.tabbar.on) .nav-inner {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  body:has(.tabbar.on) .nav .logo,
+  body:has(.tabbar.on) .nav .nav-cta {
+    display: none;
+  }
+  body:has(.tabbar.on) .nav-links {
+    pointer-events: auto;
+  }
+
+  /* the last section needs room to clear the floating bar */
+  body:has(.tabbar) footer {
+    padding-bottom: calc(64px + 1.4rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tabbar {
+    transition: opacity 0.2s ease;
   }
 }
 
@@ -7701,7 +8185,7 @@ footer .btn-secondary:hover {
    reviews/favourites carry it on a parent — every rule lists both.
    ============================================ */
 .reveal .rev-card,
-.reveal .fav-diner-card,
+.reveal .fav-card,
 .gallery-mosaic.reveal > a,
 .cert-strip.reveal > .cert-badge {
   opacity: 0;
@@ -7711,30 +8195,30 @@ footer .btn-secondary:hover {
     transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal.visible .rev-card,
-.reveal.visible .fav-diner-card,
+.reveal.visible .fav-card,
 .gallery-mosaic.reveal.visible > a,
 .cert-strip.reveal.visible > .cert-badge {
   opacity: 1;
   transform: none;
 }
 .reveal.visible .rev-card:nth-child(2),
-.reveal.visible .fav-diner-card:nth-child(2),
+.reveal.visible .fav-card:nth-child(2),
 .gallery-mosaic.reveal.visible > a:nth-child(2),
 .cert-strip.reveal.visible > .cert-badge:nth-child(2) { transition-delay: 0.07s; }
 .reveal.visible .rev-card:nth-child(3),
-.reveal.visible .fav-diner-card:nth-child(3),
+.reveal.visible .fav-card:nth-child(3),
 .gallery-mosaic.reveal.visible > a:nth-child(3),
 .cert-strip.reveal.visible > .cert-badge:nth-child(3) { transition-delay: 0.14s; }
 .reveal.visible .rev-card:nth-child(4),
-.reveal.visible .fav-diner-card:nth-child(4),
+.reveal.visible .fav-card:nth-child(4),
 .gallery-mosaic.reveal.visible > a:nth-child(4),
 .cert-strip.reveal.visible > .cert-badge:nth-child(4) { transition-delay: 0.21s; }
 .reveal.visible .rev-card:nth-child(5),
-.reveal.visible .fav-diner-card:nth-child(5),
+.reveal.visible .fav-card:nth-child(5),
 .gallery-mosaic.reveal.visible > a:nth-child(5),
 .cert-strip.reveal.visible > .cert-badge:nth-child(5) { transition-delay: 0.28s; }
 .reveal.visible .rev-card:nth-child(n + 6),
-.reveal.visible .fav-diner-card:nth-child(n + 6),
+.reveal.visible .fav-card:nth-child(n + 6),
 .gallery-mosaic.reveal.visible > a:nth-child(n + 6),
 .cert-strip.reveal.visible > .cert-badge:nth-child(n + 6) { transition-delay: 0.35s; }
 
@@ -7754,7 +8238,7 @@ body:has(.hero-nav) .hero-bg img { animation: hero-drift 14s ease-out both; }
 /* motion added after the main reduced-motion block needs its own kill switch */
 @media (prefers-reduced-motion: reduce) {
   .reveal .rev-card,
-  .reveal .fav-diner-card,
+  .reveal .fav-card,
   .gallery-mosaic.reveal > a,
   .cert-strip.reveal > .cert-badge {
     opacity: 1;

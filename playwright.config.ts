@@ -4,6 +4,15 @@ import { defineConfig } from "@playwright/test";
 // CI installs and uses Playwright's chromium.
 const isCI = !!process.env.CI;
 
+// the app reads its API from .env.local; the suite has to assert against that
+// same backend or the counts disagree — pointing the page at Railway while the
+// test counted a local Django was failing every count assertion
+try {
+  process.loadEnvFile(".env.local");
+} catch {
+  /* optional file */
+}
+
 export default defineConfig({
   testDir: "./e2e",
   timeout: 45_000,
@@ -11,7 +20,9 @@ export default defineConfig({
   // html report is what the CI failure-artifact step uploads
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
-    baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000",
+    // this is the site under test, which is not the API — they were the same
+    // variable, so overriding one silently moved the other
+    baseURL: process.env.E2E_BASE_URL ?? "http://localhost:3000",
     channel: isCI ? undefined : "chrome",
     viewport: { width: 1280, height: 900 },
   },

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { DM_Serif_Display, Luckiest_Guy, Pacifico, DM_Sans, Baloo_2 } from "next/font/google";
 import "../globals.css";
@@ -7,6 +7,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import ScrollFx from "@/components/ScrollFx";
+import BottomBar from "@/components/BottomBar";
 import { getAnnouncement, getHours, getReviews, getSite } from "@/lib/api";
 import { customThemeStyle } from "@/lib/theme";
 import { jsonLd } from "@/lib/utils";
@@ -41,6 +42,20 @@ export const metadata: Metadata = {
     "The Pancake Club",
   ],
   alternates: { canonical: "/" },
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/icons/icon-192.png",
+    apple: "/icons/apple-touch-icon.png",
+  },
+  // iOS reads these, not the manifest, to launch standalone from the home screen
+  appleWebApp: {
+    capable: true,
+    title: "Pancake Club",
+    statusBarStyle: "default",
+  },
+  // Next emits the standardised mobile-web-app-capable; Safari before 16.4 only
+  // launches standalone off the apple- prefixed one
+  other: { "apple-mobile-web-app-capable": "yes" },
   robots: {
     index: true,
     follow: true,
@@ -59,6 +74,14 @@ export const metadata: Metadata = {
     title: SITE_TITLE,
     description: SITE_DESC,
   },
+};
+
+// viewport-fit=cover is what makes env(safe-area-inset-*) resolve to anything
+// other than 0 — the hero's bottom CTA and the tab bar both budget for it
+export const viewport: Viewport = {
+  themeColor: "#f8f2e0",
+  colorScheme: "light",
+  viewportFit: "cover",
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
@@ -116,6 +139,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
          <WhatsAppFloat phone={site.whatsapp} />
          }
         <ScrollFx />
+        <BottomBar />
       </body>
     </html>
   );

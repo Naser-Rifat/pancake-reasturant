@@ -52,9 +52,11 @@ export default async function Home() {
             heading={site.hero_heading}
             script={site.hero_script}
             lead={site.hero_lead}
+            /* takeaway is pickup-only ordering and outranks booking by volume,
+               so it takes the solid pill and booking the outlined one */
             ctas={[
-              { href: "/booking", label: "Book a Table", variant: "primary" },
-              { href: "/menu", label: "Explore Our Menu", variant: "ghost" },
+              { href: "/menu", label: "Order Takeaway", variant: "primary" },
+              { href: "/booking", label: "Book a Table", variant: "ghost" },
             ]}
             heroImage={site.hero_image}
             heroCutout={site.hero_cutout}
