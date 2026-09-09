@@ -4,6 +4,7 @@ from .models import (
     Announcement,
     Booking,
     Certification,
+    Coupon,
     GalleryPhoto,
     MenuItem,
     OpeningHours,
@@ -47,6 +48,23 @@ class OrderAdmin(admin.ModelAdmin):
 
     def total(self, obj):
         return obj.total
+
+
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    """Django admin is the backup tooling for coupons until the staff panel
+    grows its own page — without this there is no way to create a code on a
+    deployed server at all."""
+
+    list_display = (
+        "code", "discount_label", "is_active", "times_used", "usage_limit",
+        "starts_at", "ends_at",
+    )
+    list_filter = ("is_active", "kind")
+    search_fields = ("code", "description")
+    # a ledger of redemptions, not a setting — editing it by hand would hand
+    # out or destroy uses that no order accounts for
+    readonly_fields = ("times_used", "created_at", "updated_at")
 
 
 @admin.register(Review)

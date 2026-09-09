@@ -15,7 +15,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from .models import Order
+from .models import Coupon, Order
 
 log = logging.getLogger(__name__)
 
@@ -46,10 +46,30 @@ def create_checkout_session(order) -> str:
         for item in order.items.select_related("menu_item")
     ]
 
+    # A coupon is applied as a one-off Stripe coupon rather than by shaving the
+    # line items: splitting $10 across three items never divides into whole
+    # cents, and this way the discount is a line the customer can see on the
+    # payment page and on the receipt.
+    discounts = []
+    if order.discount_amount and order.discount_amount > 0:
+        try:
+            promo = stripe.Coupon.create(
+                amount_off=int(order.discount_amount * 100),
+                currency="aud",
+                duration="once",
+                name=order.coupon_code or "Discount",
+            )
+            discounts = [{"coupon": promo.id}]
+        except stripe.StripeError as exc:
+            # never charge the full price because the discount failed to attach
+            log.error("Stripe coupon create failed for order %s: %s", order.public_id, exc)
+            raise PaymentError(str(exc)) from exc
+
     try:
         session = stripe.checkout.Session.create(
             mode="payment",
             line_items=line_items,
+            discounts=discounts or None,
             currency="aud",
             customer_email=order.email or None,
             metadata={"order_public_id": str(order.public_id)},
@@ -109,14 +129,39 @@ def _mark_paid(session) -> None:
     emails.staff_new_order(order)
 
 
+def release_coupon(order) -> None:
+    """Hand back the redemption an abandoned order was holding.
+
+    apply_coupon reserves on order creation, so a limited code cannot be burned
+    by someone who opens Checkout and walks away. F() keeps the decrement inside
+    the database — two expiries landing together must not both read the same
+    count. The floor guard means a hand-edited counter can never go negative.
+    """
+    from django.db.models import F
+
+    if not order.coupon_id:
+        return
+    Coupon.objects.filter(pk=order.coupon_id, times_used__gt=0).update(
+        times_used=F("times_used") - 1
+    )
+
+
 def _expire_unpaid(session) -> None:
     """Customer walked away from Checkout — quietly retire the order."""
-    updated = Order.objects.filter(
-        stripe_session_id=session["id"],
-        status=Order.Status.PENDING_PAYMENT,
-        payment_status=Order.PaymentStatus.UNPAID,
-    ).update(status=Order.Status.CANCELLED, cancel_reason="Payment was not completed.")
-    if updated:
+    with transaction.atomic():
+        orders = list(
+            Order.objects.select_for_update().filter(
+                stripe_session_id=session["id"],
+                status=Order.Status.PENDING_PAYMENT,
+                payment_status=Order.PaymentStatus.UNPAID,
+            )
+        )
+        for order in orders:
+            release_coupon(order)
+            order.status = Order.Status.CANCELLED
+            order.cancel_reason = "Payment was not completed."
+            order.save(update_fields=["status", "cancel_reason"])
+    if orders:
         log.info("Stripe webhook: expired unpaid session %s", session["id"])
 
 

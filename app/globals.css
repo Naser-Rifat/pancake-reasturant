@@ -1485,6 +1485,115 @@ footer .logo {
   padding: 1.3rem 1.5rem 1.6rem;
   border-top: 2px dashed var(--lavender);
 }
+/* ---------- coupon, in the cart drawer ----------
+   Sits directly above the total, because a discount belongs beside the number
+   it changes. Collapsed until asked for: an open empty field is a prompt to go
+   and look for a code, and the customers who leave to look do not come back. */
+.cart-coupon-toggle {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  margin-bottom: 0.5rem;
+  border: none;
+  background: none;
+  text-align: left;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--berry);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.cart-coupon {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+.cart-coupon .input {
+  flex: 1;
+  min-width: 0;
+  /* codes are stored upper-case; showing them that way means what the customer
+     types matches what the applied chip says back */
+  text-transform: uppercase;
+}
+.cart-coupon-apply {
+  flex: none;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--ink);
+  background: var(--cream-card);
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  color: var(--ink);
+  cursor: pointer;
+}
+.cart-coupon-apply:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+/* the applied state is a chip, not an input: the code is settled, and the only
+   thing left to do with it is take it off */
+.cart-coupon.on {
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.45rem 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1.5px dashed var(--berry);
+  background: color-mix(in srgb, var(--yellow) 22%, var(--cream-card));
+}
+.cart-coupon-code {
+  font-family: var(--font-round);
+  font-weight: 800;
+  font-size: 0.86rem;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+}
+.cart-coupon-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.82rem;
+  color: var(--berry);
+  font-weight: 700;
+}
+.cart-coupon-remove {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(33, 26, 20, 0.08);
+  color: var(--ink);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.cart-coupon-error {
+  margin: -0.2rem 0 0.7rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--pink-deep);
+}
+/* subtotal and the discount line are supporting figures — only the total is
+   set in the big serif, so the number that matters stays the loud one */
+.cart-total.muted,
+.cart-total.off {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--muted);
+}
+.cart-total.off,
+.cart-total.off b {
+  color: var(--berry);
+}
+
 .cart-total {
   display: flex;
   justify-content: space-between;

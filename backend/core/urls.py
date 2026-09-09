@@ -25,6 +25,7 @@ admin_router.register("certifications", admin_api.AdminCertificationViewSet, bas
 admin_router.register("gallery", admin_api.AdminGalleryViewSet, basename="admin-gallery")
 admin_router.register("announcements", admin_api.AdminAnnouncementViewSet, basename="admin-announcement")
 admin_router.register("hours", admin_api.AdminOpeningHoursViewSet, basename="admin-hours")
+admin_router.register("coupons", admin_api.AdminCouponViewSet, basename="admin-coupon")
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -35,6 +36,9 @@ urlpatterns = [
     path("certifications/", public_cache(views.CertificationListView.as_view()), name="certifications"),
     path("home-steps/", public_cache(views.HomeStepListView.as_view()), name="home-steps"),
     path("site/", public_cache(views.SiteSettingsView.as_view()), name="site"),
+    # not cached and not a ViewSet: it prices a specific cart, and it is the
+    # one public endpoint that answers questions about secret strings
+    path("coupons/validate/", views.CouponValidateView.as_view(), name="coupon-validate"),
     path("webhooks/stripe/", payments.stripe_webhook, name="stripe-webhook"),
     path("admin/login/", admin_api.AdminLoginView.as_view(), name="admin-login"),
     path("admin/stats/", admin_api.AdminStatsView.as_view(), name="admin-stats"),

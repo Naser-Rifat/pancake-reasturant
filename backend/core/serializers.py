@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
@@ -6,6 +8,7 @@ from .models import (
     Announcement,
     Booking,
     Certification,
+    Coupon,
     GalleryPhoto,
     HomeStep,
     MenuItem,
@@ -80,23 +83,28 @@ class OrderSerializer(serializers.ModelSerializer):
     contact details here; staff get them via AdminOrderSerializer."""
 
     items = OrderItemSerializer(many=True, read_only=True)
+    subtotal = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
     total = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
 
     class Meta:
         model = Order
         fields = [
             "public_id", "customer_name",
-            "status", "payment_status", "cancel_reason", "items", "total", "created_at",
+            "status", "payment_status", "cancel_reason", "items",
+            "subtotal", "coupon_code", "discount_amount", "total", "created_at",
         ]
         read_only_fields = ["public_id", "status", "payment_status", "cancel_reason", "created_at"]
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):
     items = OrderItemInputSerializer(many=True, allow_empty=False, write_only=True)
+    # the browser sends a CODE and nothing else — every dollar is worked out
+    # here, the same rule the item price snapshot already follows
+    coupon_code = serializers.CharField(required=False, allow_blank=True, max_length=24)
 
     class Meta:
         model = Order
-        fields = ["customer_name", "email", "phone", "notes", "items"]
+        fields = ["customer_name", "email", "phone", "notes", "items", "coupon_code"]
 
     MAX_TOTAL_QUANTITY = 50
 
@@ -128,6 +136,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         items = validated_data.pop("items")
+        code = (validated_data.pop("coupon_code", "") or "").strip().upper()
         order = Order.objects.create(**validated_data)
         OrderItem.objects.bulk_create(
             OrderItem(
@@ -138,11 +147,67 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             )
             for i in items
         )
+        if code:
+            apply_coupon(order, code)
         return order
 
     def to_representation(self, instance):
         return OrderSerializer(instance, context=self.context).data
 
+
+# Stripe will not open a Checkout Session below its minimum charge, so a code
+# worth more than the cart cannot simply zero the order.
+STRIPE_MIN_CHARGE = Decimal("0.50")
+
+
+def price_with_coupon(code, subtotal):
+    """(coupon, discount) for `code` against `subtotal`, or raise ValidationError.
+
+    Shared by the cart's live preview and by order creation, so the number the
+    customer is shown is produced by exactly the code that charges them.
+    """
+    try:
+        coupon = Coupon.objects.get(code=code.strip().upper())
+    except Coupon.DoesNotExist:
+        raise serializers.ValidationError({"coupon_code": "That code isn't valid."})
+
+    reason = coupon.unusable_reason(subtotal)
+    if reason:
+        raise serializers.ValidationError({"coupon_code": reason})
+
+    discount = coupon.discount_for(subtotal)
+    if subtotal - discount < STRIPE_MIN_CHARGE:
+        raise serializers.ValidationError(
+            {"coupon_code": "That code covers your whole order — please call us to arrange it."}
+        )
+    return coupon, discount
+
+
+def apply_coupon(order, code):
+    """Attach the coupon to a fresh order and RESERVE one redemption.
+
+    Reserved, not spent: the order is unpaid at this point. Stripe's
+    checkout.session.expired webhook hands the redemption back (see
+    payments.release_coupon), so an abandoned cart cannot burn a limited code.
+    The row is locked because two carts can hold the last redemption at once.
+    """
+    subtotal = order.subtotal
+    coupon, discount = price_with_coupon(code, subtotal)
+
+    locked = Coupon.objects.select_for_update().get(pk=coupon.pk)
+    # re-check under the lock: the limit may have gone in between
+    if locked.is_exhausted:
+        raise serializers.ValidationError(
+            {"coupon_code": "That code has been fully claimed."}
+        )
+    locked.times_used += 1
+    locked.save(update_fields=["times_used"])
+
+    order.coupon = locked
+    order.coupon_code = locked.code
+    order.discount_amount = discount
+    order.save(update_fields=["coupon", "coupon_code", "discount_amount"])
+    return discount
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:

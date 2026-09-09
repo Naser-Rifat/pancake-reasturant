@@ -170,9 +170,16 @@ export interface ApiSiteSettings {
 
 export interface ApiOrder {
   public_id: string;
+  customer_name: string;
   status: string;
+  payment_status: "unpaid" | "paid" | "refunded";
+  subtotal: string;
+  coupon_code: string;
+  discount_amount: string;
   total: string;
   items: { slug: string; name: string; quantity: number; unit_price: string; line_total: string }[];
+  /** present only in the placeOrder response — where Stripe takes the payment */
+  checkout_url?: string;
 }
 
 export interface ApiBooking {
@@ -352,8 +359,40 @@ export function placeOrder(payload: {
   email?: string;
   notes?: string;
   items: { slug: string; quantity: number }[];
+  /** just the code — the server prices it and is the only thing Stripe trusts */
+  coupon_code?: string;
 }): Promise<ApiOrder> {
   return post("/orders/", payload);
+}
+
+export interface ApiCouponPreview {
+  code: string;
+  label: string;
+  subtotal: string;
+  discount: string;
+  total: string;
+}
+
+/** Price a code against the cart so the drawer can show the discount before
+ *  checkout. The same server helper prices the real order, so this preview
+ *  cannot disagree with what Stripe charges. */
+export function validateCoupon(
+  code: string,
+  items: { slug: string; quantity: number }[]
+): Promise<ApiCouponPreview> {
+  return post("/coupons/validate/", { code, items });
+}
+
+/** Client-side order lookup — the success page polls this until Stripe's
+ * webhook flips payment_status to "paid". */
+export async function getOrder(publicId: string): Promise<ApiOrder | null> {
+  try {
+    const res = await fetchWithTimeout(`${API_URL}/orders/${publicId}/`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return (await res.json()) as ApiOrder;
+  } catch {
+    return null;
+  }
 }
 
 export function submitReview(payload: {

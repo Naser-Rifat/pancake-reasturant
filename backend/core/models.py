@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -101,6 +102,107 @@ class Booking(TimeStampedModel):
         return f"{self.name} — {self.date} {self.time} x{self.party_size}"
 
 
+class Coupon(TimeStampedModel):
+    """A discount code the staff hand out; the customer types it in the cart.
+
+    The customer's browser only ever sends the CODE — every dollar is worked out
+    here, the same rule the order's price snapshot already follows. A coupon is
+    "usable" only if is_active, inside its date window, under its usage limit,
+    and the cart clears min_subtotal.
+    """
+
+    class Kind(models.TextChoices):
+        PERCENT = "percent", "Percent off"
+        FIXED = "fixed", "Fixed amount off"
+
+    # stored upper-case so "weekend20" and "WEEKEND20" are the same coupon
+    code = models.CharField(max_length=24, unique=True)
+    kind = models.CharField(max_length=10, choices=Kind.choices, default=Kind.PERCENT)
+    # percent: 20 = 20% off · fixed: 20 = $20 off
+    # Decimal, not 0.01: a float bound on a DecimalField compares across types
+    # and Django warns about exactly this
+    value = models.DecimalField(
+        max_digits=6, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))]
+    )
+    # a percent coupon with no ceiling turns a $200 catering order into a $40 gift
+    max_discount = models.DecimalField(
+        max_digits=7, decimal_places=2, null=True, blank=True,
+        help_text="Percent coupons only — the most this code can ever take off.",
+    )
+    min_subtotal = models.DecimalField(
+        max_digits=7, decimal_places=2, default=0,
+        help_text="Cart must reach this before the code applies.",
+    )
+    starts_at = models.DateTimeField(null=True, blank=True)
+    ends_at = models.DateTimeField(null=True, blank=True)
+    usage_limit = models.PositiveIntegerField(
+        null=True, blank=True, help_text="Total redemptions allowed. Blank = unlimited.",
+    )
+    # counts reservations, not payments: incremented when an order claims the
+    # code and released again if that order's checkout expires unpaid
+    times_used = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    description = models.CharField(
+        max_length=120, blank=True, help_text="Staff note — never shown to customers.",
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.code} ({self.discount_label})"
+
+    def save(self, *args, **kwargs):
+        self.code = self.code.strip().upper()
+        super().save(*args, **kwargs)
+
+    @property
+    def discount_label(self):
+        # "%g" via float, not Decimal's own :g — Decimal keeps its trailing
+        # zeros, so 20.00 formatted itself as "20.00% off"
+        trimmed = "%g" % self.value
+        if self.kind == self.Kind.PERCENT:
+            return f"{trimmed}% off"
+        return f"${trimmed} off"
+
+    @property
+    def is_exhausted(self):
+        return self.usage_limit is not None and self.times_used >= self.usage_limit
+
+    def unusable_reason(self, subtotal):
+        """None when the code applies, else the sentence to show the customer.
+
+        Deliberately vague about *why* a code is dead — "not valid" tells a
+        guesser nothing, while "expired" confirms the code exists.
+        """
+        now = timezone.now()
+        if not self.is_active:
+            return "That code isn't valid."
+        if self.starts_at and now < self.starts_at:
+            return "That code isn't valid yet."
+        if self.ends_at and now > self.ends_at:
+            return "That code has expired."
+        if self.is_exhausted:
+            return "That code has been fully claimed."
+        if subtotal < self.min_subtotal:
+            return f"Spend ${'%g' % self.min_subtotal} to use this code."
+        return None
+
+    def discount_for(self, subtotal):
+        """Dollars off `subtotal`, rounded to cents, never more than the total."""
+        from decimal import ROUND_HALF_UP
+
+        if self.kind == self.Kind.PERCENT:
+            amount = subtotal * self.value / Decimal("100")
+            if self.max_discount is not None:
+                amount = min(amount, self.max_discount)
+        else:
+            amount = self.value
+        # a $20 code on a $14 stack must not make the order negative
+        amount = min(amount, subtotal)
+        return amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
 class Order(TimeStampedModel):
     class Status(models.TextChoices):
         # awaiting Stripe payment — hidden from the kitchen until paid
@@ -129,13 +231,26 @@ class Order(TimeStampedModel):
     )
     stripe_session_id = models.CharField(max_length=255, blank=True, db_index=True)
     stripe_payment_intent = models.CharField(max_length=255, blank=True)
+    # PROTECT: a coupon that has been redeemed is part of the sales record
+    coupon = models.ForeignKey(
+        "Coupon", null=True, blank=True, related_name="orders", on_delete=models.PROTECT
+    )
+    # snapshots, like unit_price: editing or renaming the coupon later must not
+    # rewrite what this customer was actually charged
+    coupon_code = models.CharField(max_length=24, blank=True)
+    discount_amount = models.DecimalField(max_digits=7, decimal_places=2, default=0)
 
     class Meta:
         ordering = ["-created_at"]
 
     @property
-    def total(self):
+    def subtotal(self):
         return sum((item.unit_price * item.quantity for item in self.items.all()), start=0)
+
+    @property
+    def total(self):
+        # discount_amount is a snapshot and already capped at the subtotal
+        return self.subtotal - self.discount_amount
 
     def __str__(self):
         return f"Order {self.public_id} ({self.get_status_display()})"

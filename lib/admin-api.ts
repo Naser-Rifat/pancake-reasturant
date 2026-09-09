@@ -17,6 +17,7 @@ export interface AdminOrder {
   phone: string;
   notes: string;
   status: "received" | "preparing" | "ready" | "completed" | "cancelled";
+  payment_status: "unpaid" | "paid" | "refunded";
   cancel_reason: string;
   total: string;
   created_at: string;

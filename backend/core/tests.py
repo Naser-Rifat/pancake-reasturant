@@ -1,11 +1,74 @@
+import hashlib
+import hmac
+import json
+import time
 from datetime import timedelta
 from decimal import Decimal
+from unittest.mock import patch
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import Booking, MenuItem, Review
+from .models import Booking, Coupon, MenuItem, Order, Review
+
+# Orders are pay-first: POST /orders/ opens a Stripe Checkout Session and the
+# order stays pending_payment until the webhook confirms the money. Two things
+# follow for these tests.
+#
+# One: nothing here may touch the network. Every order test used to call the
+# real Stripe API, which made the suite slow, offline-hostile, and dependent on
+# a key being present in the environment.
+#
+# Two: an order only becomes the kitchen's business — visible to staff, worth
+# emailing about — after the webhook. So a test that wants a real order has to
+# place it AND pay it.
+
+WEBHOOK_SECRET = "whsec_test_suite"
+
+
+def place_order(client, payload, format="json"):
+    """POST an order with Stripe stubbed out."""
+    with patch("core.payments.create_checkout_session", return_value="https://stripe.test/pay"):
+        return client.post("/api/orders/", payload, format=format)
+
+
+@override_settings(STRIPE_WEBHOOK_SECRET=WEBHOOK_SECRET)
+def pay_order(client, public_id, event="checkout.session.completed"):
+    """Drive the real webhook view, signature and all.
+
+    Signing a payload rather than calling the private handler means these tests
+    also cover the signature check and the URL wiring — the two pieces that,
+    if misconfigured in production, take a customer's money and never tell the
+    kitchen.
+    """
+    order = Order.objects.get(public_id=public_id)
+    order.stripe_session_id = order.stripe_session_id or f"cs_test_{order.pk}"
+    order.save(update_fields=["stripe_session_id"])
+    payload = json.dumps({
+        "id": "evt_test",
+        "object": "event",
+        "type": event,
+        "data": {"object": {
+            "id": order.stripe_session_id,
+            "object": "checkout.session",
+            "payment_status": "paid",
+            "payment_intent": "pi_test",
+            "metadata": {"order_public_id": str(order.public_id)},
+        }},
+    })
+    ts = str(int(time.time()))
+    sig = hmac.new(
+        WEBHOOK_SECRET.encode(), f"{ts}.{payload}".encode(), hashlib.sha256
+    ).hexdigest()
+    res = client.post(
+        "/api/webhooks/stripe/",
+        data=payload,
+        content_type="application/json",
+        HTTP_STRIPE_SIGNATURE=f"t={ts},v1={sig}",
+    )
+    order.refresh_from_db()
+    return res, order
 
 
 def make_item(slug="berry", price="17.00", **kwargs):
@@ -41,8 +104,8 @@ class OrderApiTests(TestCase):
         make_item("choc", price="18.00")
 
     def test_create_order_snapshots_prices_server_side(self):
-        res = self.client.post(
-            "/api/orders/",
+        res = place_order(
+            self.client,
             {
                 "customer_name": "Alex",
                 "items": [
@@ -55,7 +118,10 @@ class OrderApiTests(TestCase):
         self.assertEqual(res.status_code, 201, res.content)
         body = res.json()
         self.assertEqual(Decimal(body["total"]), Decimal("52.00"))
-        self.assertEqual(body["status"], "received")
+        # pay-first: the order waits for Stripe and is not the kitchen's yet
+        self.assertEqual(body["status"], "pending_payment")
+        self.assertEqual(body["payment_status"], "unpaid")
+        self.assertTrue(body["checkout_url"])
         # order is retrievable by public id
         res2 = self.client.get(f"/api/orders/{body['public_id']}/")
         self.assertEqual(res2.status_code, 200)
@@ -63,8 +129,8 @@ class OrderApiTests(TestCase):
     def test_order_placement_sends_confirmation_with_abn(self):
         from django.core import mail
 
-        res = self.client.post(
-            "/api/orders/",
+        res = place_order(
+            self.client,
             {
                 "customer_name": "Alex", "email": "alex@example.com",
                 "items": [{"slug": "berry", "quantity": 1}],
@@ -72,6 +138,10 @@ class OrderApiTests(TestCase):
             format="json",
         )
         self.assertEqual(res.status_code, 201)
+        # nothing is sent yet: an unpaid order is not an order
+        self.assertEqual(len(mail.outbox), 0)
+
+        pay_order(self.client, res.json()["public_id"])
         # one confirmation to the customer, one heads-up to staff
         self.assertEqual(len(mail.outbox), 2)
         customer_mail = next(m for m in mail.outbox if "alex@example.com" in m.to)
@@ -85,32 +155,37 @@ class OrderApiTests(TestCase):
         from django.contrib.auth.models import User
         from django.core import mail
 
-        order = self.client.post(
-            "/api/orders/",
+        order = place_order(
+            self.client,
             {
                 "customer_name": "Alex", "email": "alex@example.com",
                 "items": [{"slug": "berry", "quantity": 1}],
             },
             format="json",
         ).json()
+        # staff never see an unpaid order — pay it the way Stripe would
+        pay_order(self.client, order["public_id"])
         mail.outbox.clear()
         User.objects.create_user("chef", password="pw", is_staff=True)
         token = self.client.post(
             "/api/admin/login/", {"username": "chef", "password": "pw"}, format="json"
         ).json()["token"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
-        res = self.client.patch(
-            f"/api/admin/orders/{order['public_id']}/",
-            {"status": "cancelled", "cancel_reason": "Out of blueberries tonight"},
-            format="json",
-        )
+        # cancelling a paid order refunds it; the refund itself is Stripe's job
+        with patch("core.payments.refund_order") as refund:
+            res = self.client.patch(
+                f"/api/admin/orders/{order['public_id']}/",
+                {"status": "cancelled", "cancel_reason": "Out of blueberries tonight"},
+                format="json",
+            )
         self.assertEqual(res.status_code, 200, res.content)
+        refund.assert_called_once()
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("Out of blueberries tonight", mail.outbox[0].body)
 
     def test_rejects_oversized_orders(self):
-        res = self.client.post(
-            "/api/orders/",
+        res = place_order(
+            self.client,
             {
                 "customer_name": "Alex",
                 "items": [
@@ -121,8 +196,8 @@ class OrderApiTests(TestCase):
             format="json",
         )
         self.assertEqual(res.status_code, 201)  # 40 items: allowed
-        res = self.client.post(
-            "/api/orders/",
+        res = place_order(
+            self.client,
             {
                 "customer_name": "Alex",
                 "items": [
@@ -136,14 +211,14 @@ class OrderApiTests(TestCase):
         self.assertEqual(res.status_code, 400)  # 60 items: rejected
 
     def test_rejects_unknown_or_empty_items(self):
-        res = self.client.post(
-            "/api/orders/",
+        res = place_order(
+            self.client,
             {"customer_name": "Alex", "items": [{"slug": "nope", "quantity": 1}]},
             format="json",
         )
         self.assertEqual(res.status_code, 400)
-        res = self.client.post(
-            "/api/orders/", {"customer_name": "Alex", "items": []}, format="json"
+        res = place_order(
+            self.client, {"customer_name": "Alex", "items": []}, format="json"
         )
         self.assertEqual(res.status_code, 400)
 
@@ -217,11 +292,12 @@ class AdminApiTests(TestCase):
         self.assertEqual(self.client.get("/api/admin/stats/").status_code, 401)
 
     def test_staff_can_advance_order_status(self):
-        order = self.client.post(
-            "/api/orders/",
+        order = place_order(
+            self.client,
             {"customer_name": "Alex", "items": [{"slug": "berry", "quantity": 1}]},
             format="json",
         ).json()
+        pay_order(self.client, order["public_id"])
         token = self.login("boss").json()["token"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
         res = self.client.patch(
@@ -255,15 +331,16 @@ class AdminApiTests(TestCase):
     def test_order_ready_emails_customer_when_email_given(self):
         from django.core import mail
 
-        order = self.client.post(
-            "/api/orders/",
+        order = place_order(
+            self.client,
             {
                 "customer_name": "Alex", "email": "alex@example.com",
                 "items": [{"slug": "berry", "quantity": 1}],
             },
             format="json",
         ).json()
-        mail.outbox.clear()  # drop the placement-confirmation email
+        pay_order(self.client, order["public_id"])
+        mail.outbox.clear()  # drop the payment-confirmation emails
         token = self.login("boss").json()["token"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
         self.client.patch(f"/api/admin/orders/{order['public_id']}/", {"status": "preparing"}, format="json")
@@ -327,10 +404,9 @@ class AdminApiTests(TestCase):
         self.assertEqual(self.client.delete("/api/admin/menu/waffle/").status_code, 204)
         # deleting an item with order history is blocked with a friendly message
         self.client.credentials()
-        self.client.post(
-            "/api/orders/",
+        place_order(
+            self.client,
             {"customer_name": "Alex", "items": [{"slug": "berry", "quantity": 1}]},
-            format="json",
         )
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
         res = self.client.delete("/api/admin/menu/berry/")
@@ -489,3 +565,249 @@ class ReviewApiTests(TestCase):
         self.assertFalse(Review.objects.get().is_approved)
         listing = self.client.get("/api/reviews/").json()
         self.assertEqual(listing["count"], 0)
+
+
+class CouponTests(TestCase):
+    """The coupon path decides what a customer is charged, so every rule that
+    can move a dollar has a test — including the three integrity bugs found in
+    review, which are the ones most likely to come back."""
+
+    def setUp(self):
+        # DRF keeps throttle counters in the cache, which outlives a test case —
+        # without this the suite throttles itself and fails by running order
+        from django.core.cache import cache
+
+        cache.clear()
+        self.client = APIClient()
+        make_item("berry", "17.00")
+        make_item("choc", "18.00")
+
+    def cart(self, berry=1, choc=1):
+        return [{"slug": "berry", "quantity": berry}, {"slug": "choc", "quantity": choc}]
+
+    def validate(self, code, items=None):
+        return self.client.post(
+            "/api/coupons/validate/",
+            {"code": code, "items": items if items is not None else self.cart()},
+            format="json",
+        )
+
+    # ---------- pricing ----------
+
+    def test_percent_and_fixed_are_priced_server_side(self):
+        Coupon.objects.create(code="PC20", kind="percent", value=Decimal("20"))
+        Coupon.objects.create(code="FIVE", kind="fixed", value=Decimal("5"))
+        self.assertEqual(self.validate("PC20").json()["discount"], "7.00")   # 20% of 35
+        self.assertEqual(self.validate("FIVE").json()["discount"], "5.00")
+
+    def test_code_is_case_insensitive(self):
+        Coupon.objects.create(code="PC20", kind="percent", value=Decimal("20"))
+        self.assertEqual(self.validate("pc20").status_code, 200)
+
+    def test_percent_cap_limits_a_large_order(self):
+        """Without max_discount a 20% code hands $40 off a $200 catering order."""
+        Coupon.objects.create(
+            code="CAP", kind="percent", value=Decimal("20"), max_discount=Decimal("6")
+        )
+        self.assertEqual(self.validate("CAP").json()["discount"], "6.00")
+
+    def test_discount_never_exceeds_stripes_minimum_charge(self):
+        """A code worth more than the cart would open a $0 Checkout Session,
+        which Stripe refuses — so the code is turned away with a sentence."""
+        Coupon.objects.create(code="HUGE", kind="fixed", value=Decimal("999"))
+        res = self.validate("HUGE")
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("covers your whole order", res.json()["coupon_code"])
+
+    # ---------- the rules that turn a code away ----------
+
+    def test_rejects_unknown_inactive_expired_early_and_exhausted(self):
+        now = timezone.now()
+        Coupon.objects.create(code="OFF", kind="fixed", value=Decimal("5"), is_active=False)
+        Coupon.objects.create(
+            code="OLD", kind="fixed", value=Decimal("5"), ends_at=now - timedelta(days=1)
+        )
+        Coupon.objects.create(
+            code="SOON", kind="fixed", value=Decimal("5"), starts_at=now + timedelta(days=1)
+        )
+        Coupon.objects.create(
+            code="GONE", kind="fixed", value=Decimal("5"), usage_limit=1, times_used=1
+        )
+        Coupon.objects.create(
+            code="BIG", kind="fixed", value=Decimal("5"), min_subtotal=Decimal("100")
+        )
+        for code, fragment in [
+            ("NOPE", "isn't valid"),
+            ("OFF", "isn't valid"),
+            ("OLD", "expired"),
+            ("SOON", "valid yet"),
+            ("GONE", "fully claimed"),
+            ("BIG", "Spend $100"),
+        ]:
+            res = self.validate(code)
+            self.assertEqual(res.status_code, 400, code)
+            self.assertIn(fragment, res.json()["coupon_code"], code)
+
+    def test_validate_prices_the_cart_itself(self):
+        """The browser sends items, never a subtotal — otherwise a customer
+        could claim a $500 cart and take a percentage of a number they made up."""
+        Coupon.objects.create(code="PC20", kind="percent", value=Decimal("20"))
+        res = self.client.post(
+            "/api/coupons/validate/",
+            {"code": "PC20", "subtotal": "500.00", "items": [{"slug": "berry", "quantity": 1}]},
+            format="json",
+        )
+        self.assertEqual(res.json()["subtotal"], "17.00")
+        self.assertEqual(res.json()["discount"], "3.40")
+
+    # ---------- redemption accounting ----------
+
+    def test_order_snapshots_the_discount_and_reserves_a_redemption(self):
+        coupon = Coupon.objects.create(code="PC20", kind="percent", value=Decimal("20"))
+        res = place_order(
+            self.client,
+            {"customer_name": "Alex", "coupon_code": "pc20", "items": self.cart()},
+        )
+        self.assertEqual(res.status_code, 201, res.content)
+        body = res.json()
+        self.assertEqual(body["subtotal"], "35.00")
+        self.assertEqual(body["discount_amount"], "7.00")
+        self.assertEqual(body["total"], "28.00")
+        self.assertEqual(body["coupon_code"], "PC20")
+        coupon.refresh_from_db()
+        self.assertEqual(coupon.times_used, 1)
+
+    def test_abandoned_checkout_hands_the_redemption_back(self):
+        """Reserved at placement, released when Stripe expires the session —
+        otherwise a walked-away cart quietly burns a limited code."""
+        coupon = Coupon.objects.create(
+            code="LIMIT", kind="fixed", value=Decimal("5"), usage_limit=1
+        )
+        order = place_order(
+            self.client,
+            {"customer_name": "Alex", "coupon_code": "LIMIT", "items": self.cart()},
+        ).json()
+        coupon.refresh_from_db()
+        self.assertEqual(coupon.times_used, 1)
+
+        pay_order(self.client, order["public_id"], event="checkout.session.expired")
+        coupon.refresh_from_db()
+        self.assertEqual(coupon.times_used, 0)
+        self.assertEqual(
+            Order.objects.get(public_id=order["public_id"]).status, "cancelled"
+        )
+
+    def test_paying_keeps_the_redemption(self):
+        coupon = Coupon.objects.create(code="PC20", kind="percent", value=Decimal("20"))
+        order = place_order(
+            self.client,
+            {"customer_name": "Alex", "coupon_code": "PC20", "items": self.cart()},
+        ).json()
+        pay_order(self.client, order["public_id"])
+        coupon.refresh_from_db()
+        self.assertEqual(coupon.times_used, 1)
+
+    def test_staff_cancelling_an_unpaid_order_releases_the_code(self):
+        """Stripe's expiry webhook only matches orders still pending_payment,
+        so a staff cancellation before then would strand the redemption."""
+        from django.contrib.auth.models import User
+
+        coupon = Coupon.objects.create(
+            code="LIMIT", kind="fixed", value=Decimal("5"), usage_limit=1
+        )
+        order = place_order(
+            self.client,
+            {"customer_name": "Alex", "coupon_code": "LIMIT", "items": self.cart()},
+        ).json()
+        obj = Order.objects.get(public_id=order["public_id"])
+        obj.status = "received"  # visible to staff, still unpaid
+        obj.save(update_fields=["status"])
+
+        User.objects.create_user("chef", password="pw", is_staff=True)
+        token = self.client.post(
+            "/api/admin/login/", {"username": "chef", "password": "pw"}, format="json"
+        ).json()["token"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
+        self.client.patch(
+            f"/api/admin/orders/{order['public_id']}/",
+            {"status": "cancelled", "cancel_reason": "sold out"},
+            format="json",
+        )
+        coupon.refresh_from_db()
+        self.assertEqual(coupon.times_used, 0)
+
+    # ---------- the sales record is not editable ----------
+
+    def test_staff_cannot_rewrite_the_money_on_an_order(self):
+        from django.contrib.auth.models import User
+
+        Coupon.objects.create(code="PC20", kind="percent", value=Decimal("20"))
+        order = place_order(
+            self.client,
+            {"customer_name": "Alex", "coupon_code": "PC20", "items": self.cart()},
+        ).json()
+        pay_order(self.client, order["public_id"])
+
+        User.objects.create_user("chef", password="pw", is_staff=True)
+        token = self.client.post(
+            "/api/admin/login/", {"username": "chef", "password": "pw"}, format="json"
+        ).json()["token"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
+        self.client.patch(
+            f"/api/admin/orders/{order['public_id']}/",
+            {"discount_amount": "999.00", "coupon_code": "HACKED", "payment_status": "refunded"},
+            format="json",
+        )
+        obj = Order.objects.get(public_id=order["public_id"])
+        self.assertEqual(obj.discount_amount, Decimal("7.00"))
+        self.assertEqual(obj.coupon_code, "PC20")
+        self.assertEqual(obj.payment_status, "paid")
+
+    def test_redeemed_coupon_cannot_be_deleted_but_unused_can(self):
+        """PROTECT is right — a redeemed code is part of the sales record — but
+        the panel used to get a 500 instead of a sentence it could show."""
+        from django.contrib.auth.models import User
+
+        used = Coupon.objects.create(code="PC20", kind="percent", value=Decimal("20"))
+        spare = Coupon.objects.create(code="SPARE", kind="fixed", value=Decimal("2"))
+        place_order(
+            self.client,
+            {"customer_name": "Alex", "coupon_code": "PC20", "items": self.cart()},
+        )
+        User.objects.create_user("chef", password="pw", is_staff=True)
+        token = self.client.post(
+            "/api/admin/login/", {"username": "chef", "password": "pw"}, format="json"
+        ).json()["token"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
+
+        res = self.client.delete(f"/api/admin/coupons/{used.pk}/")
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("can't be deleted", res.json()[0])
+        self.assertEqual(
+            self.client.delete(f"/api/admin/coupons/{spare.pk}/").status_code, 204
+        )
+
+    def test_admin_rejects_a_percent_over_100_and_a_backwards_date_window(self):
+        from django.contrib.auth.models import User
+
+        User.objects.create_user("chef", password="pw", is_staff=True)
+        token = self.client.post(
+            "/api/admin/login/", {"username": "chef", "password": "pw"}, format="json"
+        ).json()["token"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
+        over = self.client.post(
+            "/api/admin/coupons/",
+            {"code": "TOOMUCH", "kind": "percent", "value": "120"},
+            format="json",
+        )
+        self.assertEqual(over.status_code, 400)
+        now = timezone.now()
+        backwards = self.client.post(
+            "/api/admin/coupons/",
+            {
+                "code": "BACKWARDS", "kind": "fixed", "value": "5",
+                "starts_at": now.isoformat(), "ends_at": (now - timedelta(days=1)).isoformat(),
+            },
+            format="json",
+        )
+        self.assertEqual(backwards.status_code, 400)

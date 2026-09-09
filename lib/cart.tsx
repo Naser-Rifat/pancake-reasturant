@@ -24,6 +24,9 @@ import {
 } from "react";
 
 const CART_KEY = "krush-cart-v2";
+/** Only the code is kept. The dollars are re-priced by the server every time,
+ *  so a stale localStorage entry can never turn into a stale discount. */
+const COUPON_KEY = "krush-coupon-v1";
 /** one line holds at most 9 — matches the stepper and the ?add= URL path */
 export const MAX_QTY = 9;
 
@@ -48,6 +51,9 @@ type CartApi = {
   open: boolean;
   openCart: () => void;
   closeCart: () => void;
+  /** the code the customer typed, or one carried in on a campaign link */
+  couponCode: string;
+  setCouponCode: (code: string) => void;
 };
 
 const CartContext = createContext<CartApi | null>(null);
@@ -58,6 +64,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState("");
   const [addedAt, setAddedAt] = useState(0);
   const [open, setOpen] = useState(false);
+  const [couponCode, setCouponCodeState] = useState("");
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -66,12 +73,51 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch {
       /* corrupted storage — start fresh */
     }
+    // A campaign banner can carry its own code: /menu?coupon=WEEKEND20 arrives
+    // with the discount already applied, so nobody has to remember and retype
+    // it. The URL is tidied straight away — a code in the address bar gets
+    // shared, bookmarked and screenshotted.
+    //
+    // The code is written to storage BEFORE the URL is cleaned, and that order
+    // matters: this effect runs twice under React's development double-invoke,
+    // and on the second pass the query string is already gone. Persisting first
+    // means the second pass finds the code in storage instead of reading an
+    // empty URL and wiping it.
+    let picked = "";
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const fromUrl = (params.get("coupon") || "").trim().toUpperCase();
+      if (fromUrl) {
+        try {
+          localStorage.setItem(COUPON_KEY, fromUrl);
+        } catch {
+          /* private mode — the in-memory state below still carries it */
+        }
+        params.delete("coupon");
+        const qs = params.toString();
+        window.history.replaceState(null, "", window.location.pathname + (qs ? `?${qs}` : ""));
+      }
+      picked = fromUrl;
+    } catch {
+      /* no URL access — nothing to pick up */
+    }
+    try {
+      setCouponCodeState(picked || localStorage.getItem(COUPON_KEY) || "");
+    } catch {
+      setCouponCodeState(picked);
+    }
     setLoaded(true);
   }, []);
 
   useEffect(() => {
     if (loaded) localStorage.setItem(CART_KEY, JSON.stringify(cart));
   }, [cart, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+    if (couponCode) localStorage.setItem(COUPON_KEY, couponCode);
+    else localStorage.removeItem(COUPON_KEY);
+  }, [couponCode, loaded]);
 
   useEffect(
     () => () => {
@@ -114,6 +160,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clear = useCallback(() => setCart({}), []);
 
+  const setCouponCode = useCallback(
+    (code: string) => setCouponCodeState(code.trim().toUpperCase()),
+    []
+  );
+
   const openCart = useCallback(() => setOpen(true), []);
   const closeCart = useCallback(() => setOpen(false), []);
 
@@ -138,6 +189,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       value={{
         cart, loaded, count, add, inc, dec, clear, reconcile,
         toast, showToast, addedAt, open, openCart, closeCart,
+        couponCode, setCouponCode,
       }}
     >
       {children}

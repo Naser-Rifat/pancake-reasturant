@@ -143,6 +143,12 @@ REST_FRAMEWORK = {
         "orders": "200/hour",
         "orders_burst": "15/min",
         "reviews": "5/hour",
+        # A coupon code is a short guessable string, so this endpoint must not
+        # be a free oracle for finding live codes. But the cart re-prices on
+        # every change — add an item, change a quantity, remove one — so the
+        # limit has to leave room for a customer editing their order. 60/hour
+        # is roughly 50 cart edits, and still far too slow to guess a code.
+        "coupons": "60/hour",
         "logins": "20/hour",
     },
     "DEFAULT_RENDERER_CLASSES": (

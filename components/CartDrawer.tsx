@@ -6,12 +6,14 @@
 // order it had just added to. It now mounts once in the site layout and any
 // cart button opens it through the shared provider.
 //
-// Behaviour is unchanged from the version that lived in MenuClient: same
-// fields, same totals, same placeOrder call, same toasts.
+// Checkout hands off to Stripe: placeOrder creates the order unpaid and returns
+// a Checkout URL, and the cart is deliberately NOT cleared here — /order/success
+// clears it once the webhook confirms payment, so a customer who backs out of
+// Stripe comes back with their order intact.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { money, placeOrder, type ApiMenuItem } from "@/lib/api";
+import { money, placeOrder, validateCoupon, type ApiCouponPreview, type ApiMenuItem } from "@/lib/api";
 import { useCart } from "@/lib/cart";
 
 export default function CartDrawer({
@@ -23,10 +25,18 @@ export default function CartDrawer({
   live?: boolean;
   uberEatsUrl?: string;
 }) {
-  const { cart, count, inc, dec, clear, showToast, open, closeCart } = useCart();
+  const { cart, count, inc, dec, showToast, open, closeCart, couponCode, setCouponCode } =
+    useCart();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [placing, setPlacing] = useState(false);
+  // the box starts closed: an empty coupon field in front of every customer
+  // sends the ones without a code off to hunt for one, and they don't come back
+  const [couponOpen, setCouponOpen] = useState(false);
+  const [couponDraft, setCouponDraft] = useState("");
+  const [coupon, setCoupon] = useState<ApiCouponPreview | null>(null);
+  const [couponError, setCouponError] = useState("");
+  const [checkingCoupon, setCheckingCoupon] = useState(false);
 
   // A slug can outlive its menu item between a stale cart and a fresh menu —
   // MenuClient reconciles on the menu page, but the drawer now renders on every
@@ -37,7 +47,61 @@ export default function CartDrawer({
     return item ? [{ slug, qty, item }] : [];
   });
 
-  const total = linesInCart.reduce((s, l) => s + parseFloat(l.item.price) * l.qty, 0);
+  const subtotal = linesInCart.reduce((s, l) => s + parseFloat(l.item.price) * l.qty, 0);
+  const discount = coupon ? parseFloat(coupon.discount) : 0;
+  const total = subtotal - discount;
+
+  const cartLines = Object.entries(cart).map(([slug, quantity]) => ({ slug, quantity }));
+  const cartKey = JSON.stringify(cartLines);
+
+  // Re-price on every cart change, not just on apply: a code with a $30 minimum
+  // must fall away the moment the cart drops below it, and the number beside
+  // "Total" has to be the number Stripe will charge.
+  useEffect(() => {
+    if (!couponCode || !count) {
+      setCoupon(null);
+      setCouponError("");
+      return;
+    }
+    let cancelled = false;
+    setCheckingCoupon(true);
+    validateCoupon(couponCode, JSON.parse(cartKey))
+      .then((preview) => {
+        if (cancelled) return;
+        setCoupon(preview);
+        setCouponError("");
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setCoupon(null);
+        setCouponError(err instanceof Error ? err.message : "That code isn't valid.");
+      })
+      .finally(() => {
+        if (!cancelled) setCheckingCoupon(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [couponCode, cartKey, count]);
+
+  // a code carried in on a campaign link should show itself, not hide behind
+  // "Have a coupon?" as though the customer had done nothing
+  useEffect(() => {
+    if (couponCode) setCouponOpen(true);
+  }, [couponCode]);
+
+  const applyCoupon = () => {
+    const code = couponDraft.trim();
+    if (!code) return;
+    setCouponCode(code);
+    setCouponDraft("");
+  };
+
+  const removeCoupon = () => {
+    setCouponCode("");
+    setCoupon(null);
+    setCouponError("");
+  };
 
   const checkout = async () => {
     if (!count) return showToast("Your order is empty!");
@@ -47,16 +111,22 @@ export default function CartDrawer({
       const order = await placeOrder({
         customer_name: name.trim(),
         phone: phone.trim(),
-        items: Object.entries(cart).map(([slug, quantity]) => ({ slug, quantity })),
+        items: cartLines,
+        // the code only — the server re-prices it and is the sole authority on
+        // what Stripe charges
+        ...(coupon ? { coupon_code: coupon.code } : {}),
       });
-      clear();
-      closeCart();
-      showToast(`Order received — $${order.total}. See you soon, ${name.trim()}! 🎉`);
+      if (!order.checkout_url) {
+        throw new Error("Payments are unavailable right now — please try again or call us.");
+      }
+      // the cart stays in localStorage until /order/success confirms payment, so
+      // cancelling on Stripe brings the customer back with nothing lost
+      window.location.assign(order.checkout_url);
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Something went wrong — please try again.");
-    } finally {
       setPlacing(false);
     }
+    // no finally — the button stays busy through the redirect
   };
 
   return (
@@ -122,12 +192,75 @@ export default function CartDrawer({
                   onChange={(e) => setPhone(e.target.value)}
                 />
               </div>
+              {/* Closed by default. An open, empty coupon field in front of every
+                  customer sends the ones without a code away to look for one. */}
+              {!couponOpen ? (
+                <button
+                  type="button"
+                  className="cart-coupon-toggle"
+                  onClick={() => setCouponOpen(true)}
+                >
+                  Have a coupon?
+                </button>
+              ) : coupon ? (
+                <div className="cart-coupon on">
+                  <span className="cart-coupon-code">{coupon.code}</span>
+                  <span className="cart-coupon-label">{coupon.label}</span>
+                  <button
+                    type="button"
+                    className="cart-coupon-remove"
+                    aria-label={`Remove coupon ${coupon.code}`}
+                    onClick={removeCoupon}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <div className="cart-coupon">
+                  <input
+                    className="input"
+                    placeholder="Coupon code"
+                    aria-label="Coupon code"
+                    autoCapitalize="characters"
+                    autoComplete="off"
+                    value={couponDraft}
+                    onChange={(e) => setCouponDraft(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && applyCoupon()}
+                  />
+                  <button
+                    type="button"
+                    className="cart-coupon-apply"
+                    onClick={applyCoupon}
+                    disabled={checkingCoupon || !couponDraft.trim()}
+                  >
+                    {checkingCoupon ? "…" : "Apply"}
+                  </button>
+                </div>
+              )}
+              {couponError && (
+                <p className="cart-coupon-error" role="status">
+                  {couponError}
+                </p>
+              )}
+
+              {discount > 0 && coupon && (
+                <>
+                  <div className="cart-total muted">
+                    <span>Subtotal</span>
+                    <b>${subtotal.toFixed(2)}</b>
+                  </div>
+                  <div className="cart-total off">
+                    <span>{coupon.code}</span>
+                    <b>&minus;${discount.toFixed(2)}</b>
+                  </div>
+                </>
+              )}
               <div className="cart-total">
                 <span>Total</span>
                 <b>${total.toFixed(2)}</b>
               </div>
               <button className="btn btn-primary" onClick={checkout} disabled={placing}>
-                {placing ? "Placing order…" : "Checkout for Pickup →"}
+                {placing ? "Taking you to payment…" : "Pay & place order →"}
               </button>
             </>
           ) : (

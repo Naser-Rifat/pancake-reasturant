@@ -28,6 +28,7 @@ from .models import (
     Announcement,
     Booking,
     Certification,
+    Coupon,
     HomeStep,
     GalleryPhoto,
     MenuItem,
@@ -68,8 +69,15 @@ class AdminOrderSerializer(OrderSerializer):
     class Meta(OrderSerializer.Meta):
         # staff also see contact details the public serializer withholds
         fields = OrderSerializer.Meta.fields + ["email", "phone", "notes"]
-        # status and cancel_reason become writable for staff
-        read_only_fields = ["public_id", "created_at"]
+        # Staff move an order through the kitchen and write a cancellation
+        # reason. Everything else is the sales record: the money must only ever
+        # be set by the checkout that charged it and by Stripe's webhook — a
+        # PATCH could otherwise rewrite what a customer was charged, or mark an
+        # unpaid order paid.
+        read_only_fields = [
+            "public_id", "created_at", "payment_status",
+            "items", "subtotal", "coupon_code", "discount_amount", "total",
+        ]
 
 
 class AdminBookingSerializer(serializers.ModelSerializer):
@@ -132,6 +140,11 @@ class AdminOrderViewSet(
             return
         refund_error = None
         if order.status == Order.Status.CANCELLED:
+            # An unpaid order cancelled here never reaches Stripe's expiry
+            # webhook (that only matches orders still pending_payment), so the
+            # redemption it reserved would stay claimed forever.
+            if order.payment_status != Order.PaymentStatus.PAID:
+                payments.release_coupon(order)
             try:
                 payments.refund_order(order)  # no-op unless the order was paid
             except Exception as exc:
@@ -304,6 +317,62 @@ class AdminOpeningHoursSerializer(serializers.ModelSerializer):
         model = OpeningHours
         fields = ["id", "label", "opens", "closes", "sort_order"]
 
+
+class AdminCouponSerializer(serializers.ModelSerializer):
+    # read-only mirrors of the model's rules, so the panel can show "12 / 100"
+    # and a live/expired chip without re-implementing the logic in TypeScript
+    discount_label = serializers.CharField(read_only=True)
+    is_exhausted = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = Coupon
+        fields = [
+            "id", "code", "kind", "value", "max_discount", "min_subtotal",
+            "starts_at", "ends_at", "usage_limit", "times_used", "is_active",
+            "description", "discount_label", "is_exhausted", "created_at",
+        ]
+        # times_used is a ledger, not a setting — only redemptions move it
+        read_only_fields = ["id", "times_used", "created_at"]
+
+    def validate_code(self, value):
+        code = value.strip().upper()
+        if not code:
+            raise serializers.ValidationError("Give the code a name customers can type.")
+        clash = Coupon.objects.filter(code=code)
+        if self.instance:
+            clash = clash.exclude(pk=self.instance.pk)
+        if clash.exists():
+            raise serializers.ValidationError("A coupon with that code already exists.")
+        return code
+
+    def validate(self, attrs):
+        kind = attrs.get("kind", getattr(self.instance, "kind", Coupon.Kind.PERCENT))
+        value = attrs.get("value", getattr(self.instance, "value", None))
+        if kind == Coupon.Kind.PERCENT and value is not None and value > 100:
+            raise serializers.ValidationError({"value": "A percent coupon cannot exceed 100%."})
+        starts, ends = attrs.get("starts_at"), attrs.get("ends_at")
+        if starts and ends and ends <= starts:
+            raise serializers.ValidationError({"ends_at": "The end date must be after the start."})
+        return attrs
+
+
+class AdminCouponViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminCouponSerializer
+    queryset = Coupon.objects.all()
+    pagination_class = None
+
+    def perform_destroy(self, instance):
+        """A redeemed coupon is part of the sales record — PROTECT stops the
+        delete, and without this the panel got a 500 instead of a sentence."""
+        used = instance.orders.count()
+        if used:
+            raise serializers.ValidationError(
+                f"{instance.code} has been used on {used} "
+                f"order{'' if used == 1 else 's'}, so it can't be deleted. "
+                "Switch it off instead — it will stop working immediately."
+            )
+        instance.delete()
 
 class AdminHomeStepSerializer(serializers.ModelSerializer):
     class Meta:

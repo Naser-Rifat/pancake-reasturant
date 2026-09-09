@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework import mixins, status as http_status, viewsets
@@ -22,6 +24,7 @@ from .models import (
     SiteSettings,
 )
 from .serializers import (
+    price_with_coupon,
     AnnouncementSerializer,
     BookingSerializer,
     CertificationSerializer,
@@ -127,6 +130,57 @@ class OrderViewSet(
         data["checkout_url"] = checkout_url
         return Response(data, status=http_status.HTTP_201_CREATED)
 
+
+class CouponValidateView(APIView):
+    """Price a coupon against a cart so the drawer can show the discount.
+
+    Throttled hard: a coupon code is a short guessable string, and without a
+    limit this endpoint is a free oracle for finding live codes.
+
+    The cart's line items come in, never a subtotal — the customer's browser
+    does not get to say what the order is worth, here or at checkout. This
+    returns the same number `apply_coupon` will charge, because both call
+    `price_with_coupon`.
+    """
+
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "coupons"
+
+    def post(self, request):
+        code = (request.data.get("code") or "").strip()
+        if not code:
+            raise ValidationError({"coupon_code": "Enter a code."})
+
+        items = request.data.get("items") or []
+        if not isinstance(items, list) or not items:
+            raise ValidationError({"items": "Your order is empty."})
+
+        wanted = {}
+        for entry in items:
+            try:
+                slug = str(entry["slug"])
+                qty = int(entry["quantity"])
+            except (TypeError, KeyError, ValueError):
+                raise ValidationError({"items": "Malformed cart."})
+            if qty < 1:
+                continue
+            wanted[slug] = wanted.get(slug, 0) + qty
+
+        priced = MenuItem.objects.filter(slug__in=wanted, is_available=True)
+        subtotal = sum((m.price * wanted[m.slug] for m in priced), start=Decimal("0"))
+        if subtotal <= 0:
+            raise ValidationError({"items": "Your order is empty."})
+
+        coupon, discount = price_with_coupon(code, subtotal)
+        return Response(
+            {
+                "code": coupon.code,
+                "label": coupon.discount_label,
+                "subtotal": f"{subtotal:.2f}",
+                "discount": f"{discount:.2f}",
+                "total": f"{subtotal - discount:.2f}",
+            }
+        )
 
 @method_decorator(cache_page(30), name="list")
 class ReviewViewSet(

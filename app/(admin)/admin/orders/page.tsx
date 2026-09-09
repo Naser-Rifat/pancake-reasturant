@@ -100,7 +100,12 @@ export default function OrdersPage() {
     if (status === "cancelled") {
       const input = await promptText({
         title: `Cancel ${o.customer_name}’s order?`,
-        description: "The cancellation message below will be emailed to the customer immediately.",
+        // cancelling a paid order triggers a full Stripe refund in admin_api —
+        // staff should know that before they confirm, not after
+        description:
+          o.payment_status === "paid"
+            ? "Their payment will be refunded in full via Stripe, and the cancellation message below will be emailed to the customer immediately."
+            : "The cancellation message below will be emailed to the customer immediately.",
         label: "Reason for Cancellation",
         placeholder: "e.g. We have sold out of the Berry Bliss Stack today — our sincere apologies!",
         initial: cancel_reason || "",
@@ -122,7 +127,9 @@ export default function OrdersPage() {
         variant: "success",
         title:
           status === "cancelled"
-            ? "Order cancelled — customer notified with reason"
+            ? o.payment_status === "paid"
+              ? "Order cancelled & payment refunded — customer notified"
+              : "Order cancelled — customer notified with reason"
             : status === "ready"
             ? `Order for ${o.customer_name} marked ready — customer notified`
             : status === "completed"

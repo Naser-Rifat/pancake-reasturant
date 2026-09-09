@@ -41,6 +41,10 @@ export default function MenuClient({
     if (!loaded) return;
     reconcile(items.map((b) => b.slug));
     const params = new URLSearchParams(window.location.search);
+    if (params.get("payment") === "cancelled") {
+      window.history.replaceState(null, "", "/menu");
+      showToast("Payment cancelled — your order is still in the cart. 🛒");
+    }
     const wanted = params.get("add");
     if (!wanted) return;
     const qty = Math.min(9, Math.max(1, parseInt(params.get("qty") || "1", 10) || 1));

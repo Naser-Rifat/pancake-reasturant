@@ -91,11 +91,31 @@ export function OrderRow({
         </div>
       </td>
 
-      {/* Total Amount */}
+      {/* Total Amount + payment state — the kitchen only sees paid orders, but
+          staff still need to tell a refund from a completed sale at a glance */}
       <td className="py-3.5 px-3 whitespace-nowrap">
-        <span className="text-sm font-semibold text-[#763a12] px-2.5 py-1 rounded-xl bg-white border border-zinc-200">
-          ${o.total}
-        </span>
+        <div className="space-y-1">
+          <span className="text-sm font-semibold text-[#763a12] px-2.5 py-1 rounded-xl bg-white border border-zinc-200">
+            ${o.total}
+          </span>
+          <div>
+            <span
+              className={`inline-flex px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wide ${
+                o.payment_status === "paid"
+                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                  : o.payment_status === "refunded"
+                  ? "bg-sky-50 text-sky-800 border border-sky-200"
+                  : "bg-zinc-50 text-zinc-500 border border-zinc-200"
+              }`}
+            >
+              {o.payment_status === "paid"
+                ? "Paid"
+                : o.payment_status === "refunded"
+                ? "Refunded"
+                : "Unpaid"}
+            </span>
+          </div>
+        </div>
       </td>
 
       {/* Placed At */}
