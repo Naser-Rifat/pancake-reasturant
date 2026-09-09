@@ -183,6 +183,7 @@ export default async function Home() {
             <FavouritesRail
               items={menu.items}
               variant="v1"
+              live={menu.live && site.online_ordering_enabled}
               /* a single element, not a fragment: RSC serialises multi-child
                  fragments into an unkeyed array when crossing to a client component */
               title={

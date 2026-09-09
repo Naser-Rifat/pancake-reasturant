@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { formatTime, getHours, getSite, telHref } from "@/lib/api";
 import BackToTop from "@/components/BackToTop";
 
@@ -58,13 +59,17 @@ export default async function Footer() {
                 rel="noopener noreferrer"
                 className="f-directions-link"
               >
-                Get directions →
+                <MapPin size={15} strokeWidth={2.2} aria-hidden="true" />
+                <span>Get directions</span>
+                <span aria-hidden="true">→</span>
               </a>
               <a href={telHref(site.phone)} className="f-contact-link">
-                {site.phone}
+                <Phone size={15} strokeWidth={2.2} aria-hidden="true" />
+                <span>{site.phone}</span>
               </a>
               <a href={`mailto:${site.email}`} className="f-contact-link">
-                {site.email}
+                <Mail size={15} strokeWidth={2.2} aria-hidden="true" />
+                <span>{site.email}</span>
               </a>
             </address>
           </div>
@@ -86,17 +91,23 @@ export default async function Footer() {
 
           {/* Column 4: Explore */}
           <div className="f-col f-col-explore">
-            <h2 className="f-col-title">Explore</h2>
+            {/* two headings, one shown per breakpoint: on phones the five nav
+                links below are hidden as duplicates of the tab bar's More
+                panel, and "Explore" would then head a list of social links */}
+            <h2 className="f-col-title">
+              <span className="f-title-nav">Explore</span>
+              <span className="f-title-social">Follow</span>
+            </h2>
             <ul className="f-explore-list">
               {LINKS.map(([label, href]) => (
-                <li key={href}>
+                <li key={href} className="f-explore-nav-item">
                   <Link href={href} className="f-explore-link">
                     {label}
                   </Link>
                 </li>
               ))}
               {site.instagram_url && (
-                <li>
+                <li className="f-explore-social-item">
                   <a
                     href={site.instagram_url}
                     target="_blank"
@@ -108,7 +119,7 @@ export default async function Footer() {
                 </li>
               )}
               {site.facebook_url && (
-                <li>
+                <li className="f-explore-social-item">
                   <a
                     href={site.facebook_url}
                     target="_blank"

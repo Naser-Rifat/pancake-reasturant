@@ -1524,8 +1524,13 @@ footer .logo {
   color: var(--cream);
   font-weight: 600;
   font-size: 0.95rem;
-  padding: 0.85rem 1.7rem;
+  padding: 0.8rem 1.5rem;
   border-radius: 999px;
+  /* `left: 50%` with no `right` caps shrink-to-fit at half the viewport — on a
+     390px phone the pill could never exceed 195px, so a six-word message broke
+     into four lines and covered the card you had just added from. max-content
+     lets it size to the text, and the cap below keeps it off both edges. */
+  width: max-content;
   z-index: 300;
   /* Hidden by opacity, not by geometry. The slide-out is translateY(150%) of
      the element's OWN height, and an empty toast is only ~27px tall — 41px,
@@ -1540,7 +1545,7 @@ footer .logo {
     opacity 0.25s ease,
     visibility 0s linear 0.35s;
   box-shadow: 0 16px 40px rgba(33, 26, 20, 0.35);
-  max-width: 92vw;
+  max-width: min(88vw, 22rem);
   text-align: center;
 }
 .toast.show {
@@ -4345,6 +4350,10 @@ body:has(.cart-fab) .wa-float {
 .dc-hit { position: absolute; inset: 0; z-index: 0; }
 
 .dc-photo {
+  /* decorative: it is positioned and later in the DOM than .dc-hit, so it was
+     painting over the card's own link and swallowing every tap that landed on
+     the dish — the largest part of the card did nothing */
+  pointer-events: none;
   position: absolute;
   left: 50%;
   bottom: -18px;
@@ -6131,6 +6140,8 @@ body:has(.wa-float) .footer-bottom {
 }
 
 /* Explore Column */
+/* one of the two footer headings shows per breakpoint — see Footer.tsx */
+.f-title-social { display: none; }
 .f-explore-list {
   display: flex;
   flex-direction: column;
@@ -6262,6 +6273,68 @@ body:has(.wa-float) .footer-bottom {
 /* the wordmark shares the columns' rail — one axis, not two */
 .footer-mark {
   text-align: left;
+}
+
+/* ---------- footer on phones and touch tablets ----------
+   Measured before this block: 1053px tall (1.6 screens) against 437px on
+   desktop, and every link 23-24px — under the 44pt minimum, on the two things
+   people open a restaurant footer to do: call, and get directions. */
+@media (max-width: 1023px), (max-width: 1366px) and (pointer: coarse) {
+  /* desktop lays four columns side by side and can afford the air; stacked,
+     the same padding and gaps were ~300px of the footer's height */
+  .site-footer {
+    padding: 3rem 0 2rem;
+  }
+  .footer-master-grid {
+    gap: 1.5rem;
+  }
+  /* Menu · About · Gallery · Reviews · Find Us is already the tab bar's More
+     panel — in the footer it was the third copy of the same five links. The
+     social links are NOT anywhere else on a phone, so the column stays and
+     only the duplicates go. */
+  .f-explore-nav-item {
+    display: none;
+  }
+  .f-explore-list {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+  .f-explore-link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  /* the rows carry their own height now, so the block's own gap can go */
+  .f-address-block {
+    gap: 0.1rem;
+  }
+  .f-directions-link,
+  .f-contact-link {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 44px;
+    width: 100%;
+  }
+  .f-directions-link svg,
+  .f-contact-link svg {
+    flex: none;
+    opacity: 0.75;
+  }
+  .f-title-nav { display: none; }
+  .f-title-social { display: inline; }
+  /* with no social links configured the column would be a "Follow" heading
+     over an empty list — worse than the duplicate nav it replaced */
+  .f-col-explore:not(:has(.f-explore-social-item)) {
+    display: none;
+  }
+  /* the two CTAs measured 41px — the footer's only buttons, under the minimum */
+  .f-actions .f-cta-btn {
+    min-height: 44px;
+  }
+  .footer-bottom-bar {
+    margin-top: 1.6rem !important;
+  }
 }
 
 /* the price lived only as a badge on the photo, well above the add control */
@@ -7688,6 +7761,7 @@ h2.title .accent,
 /* the photo's heavy dark-card shadow, lightened for the ticket */
 .camp-shot { box-shadow: 0 6px 18px rgba(33, 26, 20, 0.16); }
 
+
 /* ---------- responsive: mobile layout ---------- */
 @media (max-width: 899px) {
   .camp-swiper {
@@ -7839,6 +7913,97 @@ h2.title .accent,
     font-size: clamp(2rem, 3.6vw, 3rem);
   }
 }
+
+/* ---------- campaign deck: swipe mode (phones + touch tablets) ----------
+   The desktop story pins the card and swaps slides as the page scrolls past a
+   tall runway. On a phone that cost 1693px of page to show three promos, the
+   card sat pinned while you scrolled, and the swipe gesture the deck invites
+   did nothing. Here it is a plain horizontal deck: height follows the content,
+   the finger moves it, and the dots sit under it where a thumb can reach. */
+.camp-swipe .camp-swiper {
+  height: auto !important;
+}
+.camp-swipe .camp-swiper-slide {
+  height: auto !important;
+}
+/* the 2.8rem left inset was runway for the dots that used to float on the
+   card's left edge. They sit under the deck now, so the inset was just dead
+   space pushing every line right and leaving the card visibly lopsided. */
+.camp-swipe .camp-slide {
+  padding-left: 1.3rem !important;
+  padding-right: 1.3rem !important;
+}
+/* the corn sketch is 142x225 on a 359px card — at that size it stops reading
+   as a watermark behind the copy and starts reading as an empty right column */
+.camp-swipe .camp-botanical {
+  width: 96px !important;
+  opacity: 0.45;
+}
+.camp-swipe .camp-vintage-stamp {
+  opacity: 0.5;
+}
+/* the dots markup sits before the deck in the JSX so the desktop story can
+   float it over the card's left edge; in a column the same source order would
+   put it above the deck, where a pagination row reads as a header */
+.camp-swipe .camp {
+  display: flex;
+  flex-direction: column;
+}
+.camp-swipe .camp-swiper-pagination {
+  order: 2;
+  position: static !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  transform: none !important;
+  flex-direction: row !important;
+  justify-content: center;
+  align-items: center;
+  /* a pill around the three bars: loose dots on the page's cream read as three
+     stray marks floating under the card rather than one control */
+  gap: 0.1rem !important;
+  /* Swiper's own horizontal-pagination rule sets width:100%, which stretched
+     the pill edge to edge and undid the "one control" read */
+  width: max-content !important;
+  align-self: center;
+  margin: 0.9rem auto 0;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: rgba(33, 26, 20, 0.055);
+}
+/* the bullets were 7px targets on the card's edge — nowhere near tappable.
+   The dot stays small; the button around it is 44px of nothing. */
+.camp-swipe .camp-vbullet {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 999px;
+  background: none !important;
+  /* the 9px dot carried a drop shadow for the dark card it floated over; on a
+     44px transparent target that shadow drew a visible grey disc */
+  box-shadow: none !important;
+  border: none;
+  padding: 0;
+  position: relative;
+}
+/* bars, not dots: three equal segments also say how much of the deck is left,
+   which three identical circles never did */
+.camp-swipe .camp-vbullet::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(33, 26, 20, 0.22);
+  transition: width 0.25s ease, background 0.25s ease;
+}
+.camp-swipe .camp-vbullet.camp-vbullet-active::after {
+  width: 26px;
+  background: var(--berry);
+}
+
 
 /* ============================================
    ABOUT SLIDER — one photo at a time on the left

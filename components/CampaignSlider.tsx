@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -26,12 +26,27 @@ export default function CampaignSlider({
   const swiperRef = useRef<SwiperType | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Phones and tablets swipe; desktop keeps the scroll-driven story. On a
+  // 390px screen the story cost 1693px of page — 1103px of it empty runway
+  // whose only job was to trigger slide changes — while the finger gesture the
+  // deck actually invites did nothing (vertical Swiper had touch disabled).
+  const [isApp, setIsApp] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia(
+      "(max-width: 1023px), (max-width: 1366px) and (pointer: coarse)"
+    );
+    const sync = () => setIsApp(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   const numItems = items?.length || 0;
 
   // Drive Swiper slide transition with outside window scroll
   useEffect(() => {
-    if (numItems <= 1) return;
+    if (isApp || numItems <= 1) return;
 
     const handleScroll = () => {
       if (!trackRef.current || !swiperRef.current) return;
@@ -71,16 +86,17 @@ export default function CampaignSlider({
       window.removeEventListener("scroll", handleScroll);
       if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
     };
-  }, [numItems]);
+  }, [numItems, isApp]);
 
   if (!items || numItems === 0) return null;
 
-  const trackHeight = numItems > 1 ? `${numItems * 85}vh` : "auto";
+  // no runway to scroll through when the deck is swiped
+  const trackHeight = !isApp && numItems > 1 ? `${numItems * 85}vh` : "auto";
 
   return (
     <div
       ref={trackRef}
-      className="camp-scroll-track"
+      className={`camp-scroll-track${isApp ? " camp-swipe" : ""}`}
       style={{ height: trackHeight }}
     >
       <div className="camp-sticky-box">
@@ -95,11 +111,15 @@ export default function CampaignSlider({
             onSwiper={(swiper) => {
               swiperRef.current = swiper;
             }}
-            direction="vertical"
-            // slides are driven by page scroll, autoplay and the dots — Swiper
-            // must never capture touch, or vertical swipes stop page scroll on
-            // phones (vertical swipers set touch-action: pan-x)
-            allowTouchMove={false}
+            // re-mount on mode change: Swiper reads direction at init
+            key={isApp ? "swipe" : "scroll"}
+            direction={isApp ? "horizontal" : "vertical"}
+            // Desktop slides follow page scroll, so Swiper must never capture
+            // touch there — a vertical swiper sets touch-action: pan-x and
+            // would stop the page scrolling on a touch screen. Horizontal has
+            // no such conflict, so the phone gets the gesture it expects.
+            allowTouchMove={isApp}
+            autoHeight={isApp}
             slidesPerView={1}
             spaceBetween={0}
             speed={600}
