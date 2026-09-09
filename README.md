@@ -62,6 +62,26 @@ hero/about copy, contact details, opening hours, timezone. Customer emails
 (order/booking lifecycle) send automatically — console backend in dev, SMTP via
 env in production.
 
+## Maintenance mode
+
+`proxy.ts` can put the whole site behind a branded holding page. It is driven by
+env vars, so switching it on or off is a Vercel setting change + redeploy — the
+same commit ships live and under maintenance, and nothing to merge or revert.
+
+| Var | Effect |
+|---|---|
+| `MAINTENANCE_MODE=1` | Every page (storefront **and** `/admin`) returns the holding page with **HTTP 503 + `Retry-After`**, `Cache-Control: no-store`. Static assets under `/_next` and image/font files still serve. |
+| `MAINTENANCE_BYPASS_SECRET=<random>` | Your way back in. Hit `https://<site>/?preview=<secret>` once; it sets an httpOnly cookie (7 days) and redirects to the clean URL, after which you browse the real site normally. Change the value to revoke every issued cookie. |
+
+To go down: set both vars in Vercel → Settings → Environment Variables
+(Production) → redeploy. To come back up: delete `MAINTENANCE_MODE` → redeploy.
+
+503 is deliberate — a maintenance page served as `200` reads to Google as the
+site's real content and drops the actual pages from the index; 503 says
+"temporary" and rankings survive. The page is a self-contained HTML string
+(`lib/maintenance-page.ts`) with no app or API dependency, so it still renders
+when whatever caused the maintenance is broken.
+
 ## Deploying
 
 Frontend → Vercel; backend + Postgres → Railway/Render. Set the env vars listed
