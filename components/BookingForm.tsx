@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createBooking, type ApiBooking } from "@/lib/api";
+import { validatePhoneNumber } from "@/lib/format";
 
 interface BookingFormProps {
   menuItems?: { slug: string; name: string; price: string }[];
@@ -35,6 +36,15 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (form.phone.trim()) {
+      const phoneValidation = validatePhoneNumber(form.phone);
+      if (!phoneValidation.isValid) {
+        setError(phoneValidation.error || "Please enter a valid phone number.");
+        return;
+      }
+    }
+
     setSubmitting(true);
     try {
       setBooking(

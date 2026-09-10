@@ -1,8 +1,28 @@
+import re
 from decimal import Decimal
 
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
+
+def validate_phone_number(phone: str) -> str:
+    cleaned = (phone or "").strip()
+    if not cleaned:
+        return ""
+    if not re.match(r"^[+]?[\d\s\-().]+$", cleaned):
+        raise serializers.ValidationError("Phone number can only contain digits, spaces, and a leading '+'.")
+    if cleaned.find("+", 1) != -1:
+        raise serializers.ValidationError("Country code '+' must be at the beginning of the number.")
+    digits = re.sub(r"\D", "", cleaned)
+    if len(digits) < 8:
+        raise serializers.ValidationError("Phone number is too short (minimum 8 digits).")
+    if len(digits) > 15:
+        raise serializers.ValidationError("Phone number is too long (maximum 15 digits).")
+    if cleaned.startswith("+") and digits.startswith("0"):
+        raise serializers.ValidationError("Invalid international country code (cannot start with +0).")
+    if len(set(digits)) == 1:
+        raise serializers.ValidationError("Please enter a real phone number.")
+    return cleaned
 
 from .models import (
     Announcement,
@@ -51,6 +71,9 @@ class BookingSerializer(serializers.ModelSerializer):
             "party_size", "preselected_dish", "notes", "status", "created_at",
         ]
         read_only_fields = ["public_id", "status", "created_at"]
+
+    def validate_phone(self, value):
+        return validate_phone_number(value)
 
     def validate_date(self, value):
         if value < timezone.localdate():
@@ -107,6 +130,9 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         fields = ["customer_name", "email", "phone", "notes", "items", "coupon_code"]
 
     MAX_TOTAL_QUANTITY = 50
+
+    def validate_phone(self, value):
+        return validate_phone_number(value)
 
     def validate(self, attrs):
         settings = SiteSettings.load()

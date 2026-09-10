@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { money, placeOrder, validateCoupon, type ApiCouponPreview, type ApiMenuItem } from "@/lib/api";
 import { useCart } from "@/lib/cart";
+import { validatePhoneNumber } from "@/lib/format";
 
 export default function CartDrawer({
   items,
@@ -29,6 +30,7 @@ export default function CartDrawer({
     useCart();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [placing, setPlacing] = useState(false);
   // the box starts closed: an empty coupon field in front of every customer
   // sends the ones without a code off to hunt for one, and they don't come back
@@ -117,9 +119,42 @@ export default function CartDrawer({
     setCouponError("");
   };
 
+  const handlePhoneChange = (val: string) => {
+    // Only allow phone characters: digits, leading +, spaces, hyphens, parens, dots
+    const sanitized = val.replace(/[^\d+\s\-().]/g, "");
+    setPhone(sanitized);
+    if (phoneError) {
+      const res = validatePhoneNumber(sanitized);
+      if (res.isValid) setPhoneError("");
+    }
+  };
+
+  const handlePhoneBlur = () => {
+    if (!phone.trim()) {
+      setPhoneError("");
+      return;
+    }
+    const res = validatePhoneNumber(phone);
+    if (!res.isValid) {
+      setPhoneError(res.error || "Please enter a valid phone number.");
+    } else {
+      setPhoneError("");
+    }
+  };
+
   const checkout = async () => {
     if (!count) return showToast("Your order is empty!");
     if (!name.trim()) return showToast("Add your name so we know whose stack it is!");
+
+    if (phone.trim()) {
+      const phoneValidation = validatePhoneNumber(phone);
+      if (!phoneValidation.isValid) {
+        const msg = phoneValidation.error || "Please enter a valid phone number.";
+        setPhoneError(msg);
+        return showToast(msg);
+      }
+    }
+
     setPlacing(true);
     try {
       const order = await placeOrder({
@@ -197,14 +232,35 @@ export default function CartDrawer({
                   autoComplete="name"
                   onChange={(e) => setName(e.target.value)}
                 />
-                <input
-                  className="input"
-                  placeholder="Phone (optional)"
-                  value={phone}
-                  autoComplete="tel"
-                  inputMode="tel"
-                  onChange={(e) => setPhone(e.target.value)}
-                />
+                <div>
+                  <input
+                    className={`input${phoneError ? " error" : ""}`}
+                    style={phoneError ? { borderColor: "#ef4444", backgroundColor: "#fef2f2" } : undefined}
+                    placeholder="Phone (optional, e.g. 0412 345 678 or +61...)"
+                    value={phone}
+                    autoComplete="tel"
+                    inputMode="tel"
+                    aria-invalid={!!phoneError}
+                    onChange={(e) => handlePhoneChange(e.target.value)}
+                    onBlur={handlePhoneBlur}
+                  />
+                  {phoneError && (
+                    <p
+                      className="cart-phone-error"
+                      role="alert"
+                      style={{
+                        color: "#dc2626",
+                        fontSize: "0.75rem",
+                        marginTop: "0.25rem",
+                        marginBottom: "0.25rem",
+                        fontWeight: 600,
+                        paddingLeft: "0.25rem",
+                      }}
+                    >
+                      {phoneError}
+                    </p>
+                  )}
+                </div>
               </div>
               {/* Closed by default. An open, empty coupon field in front of every
                   customer sends the ones without a code away to look for one. */}
