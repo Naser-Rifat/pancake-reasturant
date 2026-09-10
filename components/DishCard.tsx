@@ -41,10 +41,15 @@ export default function DishCard({
   onAdd?: (slug: string) => void;
 }) {
   const href = `/menu/${item.slug}`;
-  const src = item.image || item.photo;
+  let src = item.image || item.photo;
+  // Savannah Mack's raw Cloudinary upload includes a stray floating cup artifact
+  // and non-standard aspect ratio. Use the clean, isolated cutout asset instead.
+  if (item.slug === "savannah-mack" && (!src || src.includes("lmhxhhzx21ft2vhusuji"))) {
+    src = "/menu/savannah-clean.png";
+  }
   // a cutout stands on the card floor with a white keyline; a real photo is a
   // rectangle and gets cropped instead — the two need different treatment
-  const isCutout = !!item.image;
+  const isCutout = Boolean(item.image || src.startsWith("/menu/"));
 
   return (
     <article className={`dish-card dc-${variant}`}>
