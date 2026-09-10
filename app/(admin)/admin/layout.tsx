@@ -14,6 +14,7 @@ import {
   Settings,
   ShoppingBag,
   Star,
+  TicketPercent,
   UtensilsCrossed,
 } from "lucide-react";
 import LogoMark from "@/components/LogoMark";
@@ -27,6 +28,7 @@ const NAV = [
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
   { href: "/admin/menu", label: "Menu", icon: UtensilsCrossed },
+  { href: "/admin/coupons", label: "Coupons", icon: TicketPercent },
   { href: "/admin/reviews", label: "Reviews", icon: Star },
   { href: "/admin/content", label: "Site content", icon: Images },
   { href: "/admin/settings", label: "Settings", icon: Settings },

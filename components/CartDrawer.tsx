@@ -91,10 +91,24 @@ export default function CartDrawer({
   }, [couponCode]);
 
   const applyCoupon = () => {
-    const code = couponDraft.trim();
+    const code = couponDraft.trim().toUpperCase();
     if (!code) return;
-    setCouponCode(code);
-    setCouponDraft("");
+    setCouponError("");
+    setCheckingCoupon(true);
+    validateCoupon(code, JSON.parse(cartKey))
+      .then((preview) => {
+        setCoupon(preview);
+        setCouponCode(code);
+        setCouponDraft("");
+        setCouponError("");
+      })
+      .catch((err) => {
+        setCoupon(null);
+        setCouponError(err instanceof Error ? err.message : "That code isn't valid.");
+      })
+      .finally(() => {
+        setCheckingCoupon(false);
+      });
   };
 
   const removeCoupon = () => {
@@ -223,6 +237,7 @@ export default function CartDrawer({
                     aria-label="Coupon code"
                     autoCapitalize="characters"
                     autoComplete="off"
+                    style={{ textTransform: "uppercase" }}
                     value={couponDraft}
                     onChange={(e) => setCouponDraft(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && applyCoupon()}

@@ -410,3 +410,40 @@ export const updateHours = (id: number, d: Partial<AdminHours>) =>
   adminFetch<AdminHours>(`/hours/${id}/`, { method: "PATCH", body: JSON.stringify(d) });
 export const deleteHours = (id: number) =>
   adminFetch<void>(`/hours/${id}/`, { method: "DELETE" });
+
+export interface AdminCoupon {
+  id: number;
+  code: string;
+  kind: "percent" | "fixed";
+  value: string;
+  max_discount?: string | null;
+  min_subtotal: string;
+  starts_at?: string | null;
+  ends_at?: string | null;
+  usage_limit?: number | null;
+  times_used: number;
+  is_active: boolean;
+  description?: string;
+  discount_label: string;
+  is_exhausted: boolean;
+  created_at: string;
+}
+
+export const listCoupons = () => adminFetch<AdminCoupon[]>("/coupons/");
+export const createCoupon = (d: {
+  code: string;
+  kind: "percent" | "fixed";
+  value: string | number;
+  min_subtotal?: string | number;
+  max_discount?: string | number | null;
+  usage_limit?: number | null;
+  starts_at?: string | null;
+  ends_at?: string | null;
+  is_active?: boolean;
+  description?: string;
+}) => adminFetch<AdminCoupon>("/coupons/", { method: "POST", body: JSON.stringify(d) });
+export const updateCoupon = (id: number, patch: Partial<AdminCoupon>) =>
+  adminFetch<AdminCoupon>(`/coupons/${id}/`, { method: "PATCH", body: JSON.stringify(patch) });
+export const deleteCoupon = (id: number) =>
+  adminFetch<void>(`/coupons/${id}/`, { method: "DELETE" });
+
