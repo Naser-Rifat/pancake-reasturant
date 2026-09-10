@@ -106,7 +106,7 @@ export default function HeroShowcase({
             Find a stack
           </Link>
           <Link href="/menu" className="hero-order">
-            Order Now
+            Order Takeaway
             <ChevronRight className="arrow-icon" size={14} strokeWidth={2.75} />
           </Link>
         </div>
