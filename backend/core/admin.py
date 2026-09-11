@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import (
     Announcement,
     Booking,
+    Category,
     Certification,
     Coupon,
     GalleryPhoto,
@@ -15,11 +16,20 @@ from .models import (
 )
 
 
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ["icon", "name", "slug", "is_active", "sort_order", "created_at"]
+    list_editable = ["is_active", "sort_order"]
+    list_filter = ["is_active"]
+    search_fields = ["name", "slug", "description"]
+    prepopulated_fields = {"slug": ["name"]}
+
+
 @admin.register(MenuItem)
 class MenuItemAdmin(admin.ModelAdmin):
-    list_display = ["name", "price", "tag", "heat", "is_featured", "is_available", "sort_order"]
+    list_display = ["name", "price", "category", "tag", "heat", "is_featured", "is_available", "sort_order"]
     list_editable = ["is_featured", "is_available", "sort_order"]
-    list_filter = ["tag", "heat", "is_featured", "is_available"]
+    list_filter = ["category", "tag", "heat", "is_featured", "is_available"]
     search_fields = ["name", "description"]
     prepopulated_fields = {"slug": ["name"]}
 

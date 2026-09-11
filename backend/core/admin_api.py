@@ -2,7 +2,7 @@
 # pyrefly: ignore [missing-import]
 from django.contrib.auth import authenticate
 # pyrefly: ignore [missing-import]
-from django.db.models import F, Sum
+from django.db.models import Count, F, Sum
 # pyrefly: ignore [missing-import]
 from django.db.models.deletion import ProtectedError
 # pyrefly: ignore [missing-import]
@@ -10,7 +10,7 @@ from django.http import HttpResponse
 # pyrefly: ignore [missing-import]
 from django.utils import timezone
 # pyrefly: ignore [missing-import]
-from rest_framework import mixins, serializers, viewsets
+from rest_framework import mixins, serializers, status as http_status, viewsets
 # pyrefly: ignore [missing-import]
 from rest_framework.authtoken.models import Token
 # pyrefly: ignore [missing-import]
@@ -27,6 +27,7 @@ from . import emails, payments
 from .models import (
     Announcement,
     Booking,
+    Category,
     Certification,
     Coupon,
     HomeStep,
@@ -39,7 +40,7 @@ from .models import (
     Review,
     SiteSettings,
 )
-from .serializers import OrderSerializer, SiteSettingsSerializer
+from .serializers import CategorySerializer, OrderSerializer, SiteSettingsSerializer
 
 
 # ---------- auth ----------
@@ -97,14 +98,77 @@ class AdminReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "created_at"]
 
 
+class AdminCategorySerializer(serializers.ModelSerializer):
+    dish_count = serializers.IntegerField(read_only=True, default=0)
+    slug = serializers.SlugField(required=False, allow_blank=True)
+
+    class Meta:
+        model = Category
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "icon",
+            "description",
+            "sort_order",
+            "is_active",
+            "dish_count",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "dish_count", "created_at", "updated_at"]
+
+    def validate(self, attrs):
+        from django.utils.text import slugify
+        name = attrs.get("name") or (self.instance.name if self.instance else "")
+        slug = attrs.get("slug")
+        if not slug and name:
+            slug = slugify(name)
+            attrs["slug"] = slug
+        elif slug:
+            attrs["slug"] = slugify(slug)
+
+        final_slug = attrs.get("slug")
+        if not final_slug:
+            raise serializers.ValidationError({"slug": "Slug is required or could not be generated from name."})
+
+        qs = Category.objects.filter(slug=final_slug)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError({"slug": "A category with this slug already exists."})
+        return attrs
+
+
 class AdminMenuItemSerializer(serializers.ModelSerializer):
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+    category_name = serializers.CharField(source="category.name", read_only=True, default="")
+    category_slug = serializers.CharField(source="category.slug", read_only=True, default="")
+    category_icon = serializers.CharField(source="category.icon", read_only=True, default="🥞")
+
     class Meta:
         model = MenuItem
         fields = [
-            "slug", "name", "description", "price", "tag", "heat", "kcal",
+            "slug", "name", "description", "price", "tag", "category",
+            "category_name", "category_slug", "category_icon", "heat", "kcal",
             "protein_g", "prep_time", "image", "photo", "is_featured",
             "is_available", "sort_order",
         ]
+
+    def to_internal_value(self, data):
+        data = data.copy() if hasattr(data, "copy") else dict(data)
+        if "category" in data:
+            val = data.get("category")
+            if isinstance(val, str) and not val.isdigit() and val != "":
+                cat_obj = Category.objects.filter(slug=val).first()
+                data["category"] = cat_obj.pk if cat_obj else None
+            elif val == "" or val is None:
+                data["category"] = None
+        return super().to_internal_value(data)
 
 
 # ---------- viewsets ----------
@@ -241,6 +305,28 @@ class AdminMenuItemViewSet(viewsets.ModelViewSet):
                            "Mark it unavailable instead."},
                 status=400,
             )
+
+
+class AdminCategoryViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminCategorySerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        return Category.objects.annotate(dish_count=Count("menu_items")).order_by("sort_order", "name")
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        dish_count = instance.menu_items.count()
+        if dish_count > 0:
+            return Response(
+                {
+                    "detail": f"Cannot delete '{instance.name}' because {dish_count} dish(es) are assigned to it. "
+                              f"Please reassign or remove the dishes first, or mark this category inactive."
+                },
+                status=http_status.HTTP_400_BAD_REQUEST,
+            )
+        return super().destroy(request, *args, **kwargs)
 
 
 # ---------- background removal (auto-cutout for uploads) ----------

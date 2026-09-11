@@ -1,4 +1,5 @@
 import type { ChangeEvent, Dispatch, FormEvent, RefObject, SetStateAction } from "react";
+import Link from "next/link";
 import { ArrowLeft, ArrowRight, Image as ImageIcon, Plus, Save, UtensilsCrossed, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,7 @@ import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import PhotoBoard from "@/components/admin/PhotoBoard";
+import type { AdminCategory } from "@/lib/admin-api";
 import type { FormState } from "../_lib";
 
 // The dish create/edit form: a 2-step wizard for new dishes (details → photos)
@@ -27,6 +29,7 @@ export function MenuDishEditor({
   setPhotoCounts,
   formRef,
   photosRef,
+  categories = [],
 }: {
   editing: string | null;
   form: FormState;
@@ -43,6 +46,7 @@ export function MenuDishEditor({
   setPhotoCounts: Dispatch<SetStateAction<Record<string, number>>>;
   formRef: RefObject<HTMLDivElement | null>;
   photosRef: RefObject<HTMLDivElement | null>;
+  categories?: AdminCategory[];
 }) {
   return (
     <div ref={formRef} className="scroll-mt-6 bg-white p-6 sm:p-8 rounded-xl border border-[#763a12] shadow-sm space-y-6">
@@ -117,18 +121,45 @@ export function MenuDishEditor({
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="mi-tag" className="text-xs font-semibold text-[#211a14]">
-                  Menu Category Tag
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="mi-tag" className="text-xs font-semibold text-[#211a14]">
+                    Category
+                  </Label>
+                  <Link
+                    href="/admin/categories"
+                    target="_blank"
+                    className="text-[10px] text-amber-800 hover:underline font-semibold"
+                  >
+                    Manage Categories ↗
+                  </Link>
+                </div>
                 <Select
                   id="mi-tag"
                   className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
-                  value={form.tag}
-                  onChange={set("tag")}
+                  value={form.category ? String(form.category) : form.tag}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const matched = categories.find((c) => String(c.id) === val || c.slug === val);
+                    if (matched) {
+                      setForm((prev) => ({ ...prev, category: matched.id, tag: matched.slug }));
+                    } else {
+                      set("tag")(e);
+                    }
+                  }}
                 >
-                  <option value="sweet">Sweet Stack</option>
-                  <option value="savoury">Savoury Brunch</option>
-                  <option value="choc">Choc Loaded</option>
+                  {categories.length > 0 ? (
+                    categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.icon || "🥞"} {c.name} {c.is_active ? "" : "(Hidden)"}
+                      </option>
+                    ))
+                  ) : (
+                    <>
+                      <option value="sweet">🍯 Sweet Stack</option>
+                      <option value="savoury">🥑 Savoury Brunch</option>
+                      <option value="choc">🍫 Choc Loaded</option>
+                    </>
+                  )}
                 </Select>
               </div>
               <div className="space-y-1">

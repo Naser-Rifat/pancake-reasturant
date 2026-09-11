@@ -16,6 +16,7 @@ import {
   Star,
   TicketPercent,
   UtensilsCrossed,
+  Layers,
 } from "lucide-react";
 import LogoMark from "@/components/LogoMark";
 import { ConfirmProvider } from "@/components/ui/confirm";
@@ -28,6 +29,7 @@ const NAV = [
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
   { href: "/admin/menu", label: "Menu", icon: UtensilsCrossed },
+  { href: "/admin/categories", label: "Categories", icon: Layers },
   { href: "/admin/coupons", label: "Coupons", icon: TicketPercent },
   { href: "/admin/reviews", label: "Reviews", icon: Star },
   { href: "/admin/content", label: "Site content", icon: Images },

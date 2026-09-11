@@ -811,3 +811,83 @@ class CouponTests(TestCase):
             format="json",
         )
         self.assertEqual(backwards.status_code, 400)
+
+
+class CategoryTests(TestCase):
+    def setUp(self):
+        from django.contrib.auth.models import User
+        from rest_framework.test import APIClient
+
+        self.client = APIClient()
+        self.staff_user = User.objects.create_user("staff", password="password123", is_staff=True)
+        login_res = self.client.post(
+            "/api/admin/login/", {"username": "staff", "password": "password123"}, format="json"
+        )
+        self.token = login_res.json()["token"]
+
+    def test_public_categories_list_and_dish_count(self):
+        from .models import Category, MenuItem
+
+        cat = Category.objects.create(name="Beverages", slug="beverages", icon="☕", sort_order=10)
+        MenuItem.objects.create(
+            name="Iced Latte",
+            slug="iced-latte",
+            description="Cold and bold",
+            price="6.50",
+            category=cat,
+            is_available=True,
+        )
+
+        res = self.client.get("/api/categories/")
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        bev = next((c for c in data if c["slug"] == "beverages"), None)
+        self.assertIsNotNone(bev)
+        self.assertEqual(bev["dish_count"], 1)
+        self.assertEqual(bev["icon"], "☕")
+
+    def test_admin_category_crud_and_delete_protection(self):
+        from .models import Category, MenuItem
+
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token}")
+
+        # 1. Create category
+        create_res = self.client.post(
+            "/api/admin/categories/",
+            {"name": "Sides & Bites", "slug": "sides", "icon": "🍟", "sort_order": 5},
+            format="json",
+        )
+        self.assertEqual(create_res.status_code, 201)
+        cat_id = create_res.json()["id"]
+
+        # 2. Update category
+        update_res = self.client.patch(
+            f"/api/admin/categories/{cat_id}/",
+            {"name": "Sides & Extra Bites"},
+            format="json",
+        )
+        self.assertEqual(update_res.status_code, 200)
+        self.assertEqual(update_res.json()["name"], "Sides & Extra Bites")
+
+        # 3. Assign a dish to it
+        item = MenuItem.objects.create(
+            name="Crispy Fries",
+            slug="crispy-fries",
+            description="Golden fries",
+            price="8.00",
+            category_id=cat_id,
+        )
+
+        # 4. Attempt to delete -> Should be rejected because dish is attached
+        del_fail = self.client.delete(f"/api/admin/categories/{cat_id}/")
+        self.assertEqual(del_fail.status_code, 400)
+        self.assertIn("dish(es) are assigned", del_fail.json()["detail"])
+
+        # 5. Remove dish attachment and delete
+        item.category = None
+        item.save()
+
+        del_ok = self.client.delete(f"/api/admin/categories/{cat_id}/")
+        self.assertEqual(del_ok.status_code, 204)
+        self.assertFalse(Category.objects.filter(pk=cat_id).exists())
+

@@ -15,6 +15,33 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
+class Category(TimeStampedModel):
+    name = models.CharField(max_length=60, unique=True)
+    slug = models.SlugField(max_length=60, unique=True)
+    icon = models.CharField(
+        max_length=30,
+        blank=True,
+        default="🥞",
+        help_text="Emoji or icon identifier, e.g. 🥞, 🍯, 🥑, 🍫, ☕",
+    )
+    description = models.TextField(blank=True, default="")
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["sort_order", "name"]
+        verbose_name_plural = "Categories"
+
+    def __str__(self):
+        return f"{self.icon} {self.name}".strip() if self.icon else self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.name:
+            from django.utils.text import slugify
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
 class MenuItem(TimeStampedModel):
     class Tag(models.TextChoices):
         SWEET = "sweet", "Sweet"
@@ -30,7 +57,14 @@ class MenuItem(TimeStampedModel):
     name = models.CharField(max_length=120)
     description = models.TextField()
     price = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0)])
-    tag = models.CharField(max_length=12, choices=Tag.choices, default=Tag.SWEET)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="menu_items",
+    )
+    tag = models.CharField(max_length=60, default=Tag.SWEET, blank=True)
     heat = models.CharField(max_length=12, choices=Heat.choices, default=Heat.NONE)
     kcal = models.PositiveIntegerField(null=True, blank=True)
     protein_g = models.PositiveIntegerField(null=True, blank=True)
@@ -52,6 +86,15 @@ class MenuItem(TimeStampedModel):
 
     class Meta:
         ordering = ["sort_order", "name"]
+
+    def save(self, *args, **kwargs):
+        if self.category:
+            self.tag = self.category.slug
+        elif self.tag and not self.category and getattr(self, "_state", None) and self._state.adding:
+            cat = Category.objects.filter(slug=self.tag).first()
+            if cat:
+                self.category = cat
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

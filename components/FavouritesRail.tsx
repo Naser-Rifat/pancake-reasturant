@@ -3,17 +3,12 @@
 // Category count pills + the favourites tile grid, shared by both designs.
 // The pills filter the grid — they look like controls, so they behave like them.
 
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import DishCard from "@/components/DishCard";
 import { useCart } from "@/lib/cart";
 import { TAG_LABEL, type ApiMenuItem } from "@/lib/api";
 
-const TAGS: ApiMenuItem["tag"][] = ["sweet", "savoury", "choc"];
-// Four, not eight: on phones and tablets each favourite now gets a full-width
-// card identical to the /menu page's. At eight the home page showed the entire
-// menu in the same cards as /menu, and "View Full Menu" led nowhere new — four
-// keeps this a teaser and leaves the full list a reason to exist.
 const MAX = 4;
 
 const SKIN = {
@@ -50,7 +45,7 @@ export default function FavouritesRail({
   /** "view full menu" link — inside the subhead when there is one, else under the rail */
   cta?: { href: string; label: string };
 }) {
-  const [tab, setTab] = useState<"all" | ApiMenuItem["tag"]>("all");
+  const [tab, setTab] = useState<string>("all");
   const { add, showToast } = useCart();
   const s = SKIN[variant];
 
@@ -64,10 +59,24 @@ export default function FavouritesRail({
     showToast(`${hit?.name ?? "Item"} added to your order 🥞`);
   };
 
-  const counts = TAGS.map((tag) => ({ tag, count: items.filter((i) => i.tag === tag).length })).filter(
-    (c) => c.count > 0
-  );
-  const shown = (tab === "all" ? items : items.filter((i) => i.tag === tab)).slice(0, MAX);
+  const dynamicCategories = useMemo(() => {
+    const map = new Map<string, { slug: string; label: string; count: number }>();
+    for (const item of items) {
+      const slug = item.category_slug || item.tag;
+      const label = item.category_name || TAG_LABEL[slug] || (slug.charAt(0).toUpperCase() + slug.slice(1));
+      if (!map.has(slug)) {
+        map.set(slug, { slug, label, count: 0 });
+      }
+      map.get(slug)!.count += 1;
+    }
+    return Array.from(map.values());
+  }, [items]);
+
+  const shown = (
+    tab === "all"
+      ? items
+      : items.filter((i) => (i.category_slug || i.tag) === tab)
+  ).slice(0, MAX);
 
   return (
     <>
@@ -82,15 +91,15 @@ export default function FavouritesRail({
           >
             All Stacks <span className="n">{items.length}</span>
           </button>
-          {counts.map((c, i) => (
+          {dynamicCategories.map((c, i) => (
             <button
-              key={c.tag}
+              key={c.slug}
               role="tab"
-              aria-selected={tab === c.tag}
-              className={`${s.pill} ${s.tints[i % s.tints.length]}${tab === c.tag ? " on" : ""}`}
-              onClick={() => setTab(c.tag)}
+              aria-selected={tab === c.slug}
+              className={`${s.pill} ${s.tints[i % s.tints.length]}${tab === c.slug ? " on" : ""}`}
+              onClick={() => setTab(c.slug)}
             >
-              {TAG_LABEL[c.tag]} <span className="n">{c.count}</span>
+              {c.label} <span className="n">{c.count}</span>
             </button>
           ))}
         </div>

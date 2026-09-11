@@ -1,17 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   TAG_LABEL,
   telHref,
   type ApiMenuItem,
   type ApiAnnouncement,
+  type ApiCategory,
 } from "@/lib/api";
 import { useCart } from "@/lib/cart";
 import DishCard from "@/components/DishCard";
-
-const TAG_ORDER = ["sweet", "savoury", "choc"] as const;
 
 const CATEGORY_ICONS: Record<string, string> = {
   sweet: "🍯",
@@ -21,6 +20,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 export default function MenuClient({
   items,
+  categories = [],
   campaigns = [],
   live = true,
   phone: restaurantPhone = "(02) 5550 1234",
@@ -28,6 +28,7 @@ export default function MenuClient({
   uberEatsUrl = "",
 }: {
   items: ApiMenuItem[];
+  categories?: ApiCategory[];
   campaigns?: ApiAnnouncement[];
   live?: boolean;
   phone?: string;
@@ -87,7 +88,7 @@ export default function MenuClient({
     const tagParam = params.get("tag");
     if (tagParam === "deals" || params.get("deal") || params.get("special")) {
       setSelectedTag("deals");
-    } else if (tagParam && TAG_ORDER.includes(tagParam as any)) {
+    } else if (tagParam) {
       setSelectedTag(tagParam);
     }
 
@@ -118,8 +119,41 @@ export default function MenuClient({
     showToast(`${itemBySlug(slug).name} added to your order 🥞`);
   };
 
-  const visibleTags =
-    selectedTag === "all" ? TAG_ORDER : TAG_ORDER.filter((t) => t === selectedTag);
+  const displayCategories = useMemo(() => {
+    const list: { slug: string; name: string; icon: string; sort_order: number }[] = [];
+    const seen = new Set<string>();
+
+    for (const c of categories) {
+      if (!c.is_active) continue;
+      seen.add(c.slug);
+      list.push({
+        slug: c.slug,
+        name: c.name,
+        icon: c.icon || "🥞",
+        sort_order: c.sort_order,
+      });
+    }
+
+    for (const item of items) {
+      const slug = item.category_slug || item.tag;
+      if (slug && !seen.has(slug)) {
+        seen.add(slug);
+        list.push({
+          slug,
+          name: item.category_name || TAG_LABEL[slug] || (slug.charAt(0).toUpperCase() + slug.slice(1)),
+          icon: item.category_icon || CATEGORY_ICONS[slug] || "🥞",
+          sort_order: 99,
+        });
+      }
+    }
+
+    return list.sort((a, b) => a.sort_order - b.sort_order);
+  }, [categories, items]);
+
+  const visibleCategories =
+    selectedTag === "all"
+      ? displayCategories
+      : displayCategories.filter((c) => c.slug === selectedTag);
 
   return (
     <>
@@ -184,18 +218,20 @@ export default function MenuClient({
             </button>
           )}
 
-          {TAG_ORDER.map((tag) => {
-            const countForTag = items.filter((b) => b.tag === tag).length;
+          {displayCategories.map((cat) => {
+            const countForTag = items.filter(
+              (b) => (b.category_slug ? b.category_slug === cat.slug : b.tag === cat.slug)
+            ).length;
             if (countForTag === 0) return null;
             return (
               <button
-                key={tag}
+                key={cat.slug}
                 type="button"
-                className={`menu-filter-chip ${selectedTag === tag ? "active" : ""}`}
-                onClick={() => setSelectedTag(tag)}
+                className={`menu-filter-chip ${selectedTag === cat.slug ? "active" : ""}`}
+                onClick={() => setSelectedTag(cat.slug)}
               >
                 <span>
-                  {CATEGORY_ICONS[tag]} {TAG_LABEL[tag]}
+                  {cat.icon} {cat.name}
                 </span>
                 <small className="filter-count">{countForTag}</small>
               </button>
@@ -269,16 +305,22 @@ export default function MenuClient({
         {/* Regular Segmented Boutique Diner Menu Boards */}
         {selectedTag !== "deals" && (
           <div className="menu-boards-container">
-            {visibleTags.map((tag) => {
-              const group = items.filter((b) => b.tag === tag);
+            {visibleCategories.map((cat) => {
+              const group = items.filter(
+                (b) => (b.category_slug ? b.category_slug === cat.slug : b.tag === cat.slug)
+              );
               if (group.length === 0) return null;
 
               return (
-                <section className="menu-cat-board" key={tag}>
+                <section className="menu-cat-board" key={cat.slug}>
                   <div className="menu-board-header">
                     <div className="board-header-left">
-                      <span className="board-cat-icon">{CATEGORY_ICONS[tag]}</span>
-                      <h2 className="board-cat-title">{TAG_LABEL[tag]} Stacks</h2>
+                      <span className="board-cat-icon">{cat.icon}</span>
+                      <h2 className="board-cat-title">
+                        {cat.name.toLowerCase().includes("stack") || cat.name.toLowerCase().includes("brunch")
+                          ? cat.name
+                          : `${cat.name} Stacks`}
+                      </h2>
                     </div>
                     <span className="board-items-badge">
                       {group.length} {group.length === 1 ? "Dish" : "Dishes"}

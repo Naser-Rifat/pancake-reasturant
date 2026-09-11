@@ -26,9 +26,11 @@ admin_router.register("gallery", admin_api.AdminGalleryViewSet, basename="admin-
 admin_router.register("announcements", admin_api.AdminAnnouncementViewSet, basename="admin-announcement")
 admin_router.register("hours", admin_api.AdminOpeningHoursViewSet, basename="admin-hours")
 admin_router.register("coupons", admin_api.AdminCouponViewSet, basename="admin-coupon")
+admin_router.register("categories", admin_api.AdminCategoryViewSet, basename="admin-category")
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("categories/", public_cache(views.CategoryListView.as_view()), name="categories"),
     path("gallery/", public_cache(views.GalleryPhotoListView.as_view()), name="gallery"),
     path("announcement/", public_cache(views.AnnouncementView.as_view()), name="announcement"),
     path("campaigns/", public_cache(views.CampaignListView.as_view()), name="campaigns"),

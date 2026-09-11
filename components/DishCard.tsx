@@ -24,7 +24,7 @@ import Image from "next/image";
 import { ArrowRight, Plus } from "lucide-react";
 import { TAG_LABEL, money, type ApiMenuItem } from "@/lib/api";
 
-export const TAG_ICONS: Record<ApiMenuItem["tag"], string> = {
+export const TAG_ICONS: Record<string, string> = {
   sweet: "🍯",
   savoury: "🥑",
   choc: "🍫",
@@ -53,6 +53,8 @@ export default function DishCard({
   // a cutout stands on the card floor with a white keyline; a real photo is a
   // rectangle and gets cropped instead — the two need different treatment
   const isCutout = Boolean(item.image || src.startsWith("/menu/"));
+  const catIcon = item.category_icon || item.category?.icon || TAG_ICONS[item.tag] || "🥞";
+  const catLabel = item.category_name || item.category?.name || TAG_LABEL[item.tag] || item.tag;
 
   return (
     <article className={`dish-card dc-${variant}`}>
@@ -74,9 +76,9 @@ export default function DishCard({
 
       <div className="dc-body">
         <div className="dc-head">
-          <span className={`dc-badge tag-${item.tag}`}>
-            <span aria-hidden="true">{TAG_ICONS[item.tag]}</span>
-            <span>{TAG_LABEL[item.tag]}</span>
+          <span className={`dc-badge tag-${item.category_slug || item.tag}`}>
+            <span aria-hidden="true">{catIcon}</span>
+            <span>{catLabel}</span>
           </span>
           <span className="dc-dots" aria-hidden="true" />
           <span className="dc-price">{money(item.price)}</span>

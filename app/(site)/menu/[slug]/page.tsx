@@ -40,10 +40,13 @@ export default async function DishPage({ params }: Props) {
   if (!item) notFound();
 
   // Related dishes for the bottom row
-  const sameTag = items.filter((i) => i.tag === item.tag && i.slug !== item.slug);
-  const otherTags = items.filter((i) => i.tag !== item.tag && i.slug !== item.slug);
+  const catIcon = item.category_icon || item.category?.icon || TAG_ICONS[item.tag] || "🥞";
+  const catLabel = item.category_name || item.category?.name || TAG_LABEL[item.tag] || item.tag;
+  const itemCatKey = item.category_slug || item.tag;
+  const sameTag = items.filter((i) => (i.category_slug || i.tag) === itemCatKey && i.slug !== item.slug);
+  const otherTags = items.filter((i) => (i.category_slug || i.tag) !== itemCatKey && i.slug !== item.slug);
   const related = [...sameTag, ...otherTags].slice(0, 3);
-  const relatedAllSameTag = related.length > 0 && related.every((i) => i.tag === item.tag);
+  const relatedAllSameTag = related.length > 0 && related.every((i) => (i.category_slug || i.tag) === itemCatKey);
 
   const price = parseFloat(item.price);
   const avgRating = reviews.length
@@ -90,7 +93,7 @@ export default async function DishPage({ params }: Props) {
           </Link>
           <span className="dish-crumb-sep" style={{ margin: "0 0.5rem", opacity: 0.4 }}>/</span>
           <span className="dish-crumb-tag" style={{ textTransform: "capitalize", color: "var(--deep)", fontWeight: 700 }}>
-            {TAG_ICONS[item.tag]} {TAG_LABEL[item.tag]}
+            {catIcon} {catLabel}
           </span>
           <span className="dish-topbar-title">{item.name}</span>
           {/* right-hand pair: the order, then the menu — mobile app bar only */}
@@ -131,9 +134,9 @@ export default async function DishPage({ params }: Props) {
           {/* Left Column: Copy & Order Controls */}
           <div className="dprod-copy">
             <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "0.4rem" }}>
-              <span className={`fav-tag-badge tag-${item.tag}`} style={{ fontSize: "0.75rem", padding: "5px 12px" }}>
-                <span>{TAG_ICONS[item.tag]}</span>
-                <span>{TAG_LABEL[item.tag]}</span>
+              <span className={`fav-tag-badge tag-${item.category_slug || item.tag}`} style={{ fontSize: "0.75rem", padding: "5px 12px" }}>
+                <span>{catIcon}</span>
+                <span>{catLabel}</span>
               </span>
               {item.heat === "medium" && (
                 <span style={{ background: "#ffedd5", color: "#9a3412", border: "1px solid #fed7aa", padding: "4px 10px", borderRadius: "999px", fontSize: "0.75rem", fontWeight: 800 }}>
@@ -254,7 +257,7 @@ export default async function DishPage({ params }: Props) {
           <section className="dish-related">
             <h2 className="title inline">
               {relatedAllSameTag ? (
-                <>More <span className="accent">{TAG_LABEL[item.tag]}</span></>
+                <>More <span className="accent">{catLabel}</span></>
               ) : (
                 <>You might also <span className="accent">like</span></>
               )}

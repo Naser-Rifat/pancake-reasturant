@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Image as ImageIcon,
   Pencil,
@@ -15,9 +16,11 @@ import {
   createMenuItem,
   createMenuItemPhoto,
   deleteMenuItem,
+  listCategories,
   listMenu,
   listMenuItemPhotos,
   updateMenuItem,
+  type AdminCategory,
   type AdminMenuItem,
 } from "@/lib/admin-api";
 import { Button } from "@/components/ui/button";
@@ -31,6 +34,7 @@ import { AdminError } from "@/components/ui/admin-error";
 import {
   EMPTY_FORM,
   TAG_INFO,
+  getCategoryBadge,
   slugify,
   type FilterCategory,
   type FormState,
@@ -39,6 +43,7 @@ import { MenuDishEditor } from "./_components/MenuDishEditor";
 
 export default function MenuAdminPage() {
   const [items, setItems] = useState<AdminMenuItem[]>([]);
+  const [categories, setCategories] = useState<AdminCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -81,12 +86,15 @@ export default function MenuAdminPage() {
     setEditing(null);
   };
 
+  const categoriesMap = useMemo(() => new Map(categories.map((c) => [c.slug, c])), [categories]);
+
   const load = useCallback(() => {
     setLoading(true);
     setError("");
-    listMenu()
-      .then(async (list) => {
+    Promise.all([listMenu(), listCategories().catch(() => [])])
+      .then(async ([list, cats]) => {
         setItems(list);
+        setCategories(cats);
         const counts = await Promise.all(
           list.map((i) =>
             listMenuItemPhotos(i.slug)
@@ -114,12 +122,16 @@ export default function MenuAdminPage() {
 
   const openEdit = (item: AdminMenuItem, jumpToPhotos = false) => {
     jumpTo.current = jumpToPhotos ? "photos" : "top";
+    const matchedCat: number | undefined =
+      (typeof item.category === "number" ? item.category : undefined) ??
+      (item.category_slug ? categoriesMap.get(item.category_slug)?.id : undefined);
     const next: FormState = {
       slug: item.slug,
       name: item.name,
       description: item.description,
       price: item.price,
       tag: item.tag,
+      category: matchedCat,
       heat: item.heat,
       kcal: item.kcal?.toString() ?? "",
       protein_g: item.protein_g?.toString() ?? "",
@@ -180,6 +192,7 @@ export default function MenuAdminPage() {
       description: form.description,
       price: form.price,
       tag: form.tag,
+      category: form.category,
       heat: form.heat,
       kcal: numOrNull(form.kcal),
       protein_g: numOrNull(form.protein_g),
@@ -313,11 +326,11 @@ export default function MenuAdminPage() {
 
       // Category filter
       let matchesCat = true;
-      if (categoryFilter === "sweet") matchesCat = item.tag === "sweet";
-      else if (categoryFilter === "savoury") matchesCat = item.tag === "savoury";
-      else if (categoryFilter === "choc") matchesCat = item.tag === "choc";
-      else if (categoryFilter === "featured") matchesCat = item.is_featured;
+      if (categoryFilter === "featured") matchesCat = item.is_featured;
       else if (categoryFilter === "live") matchesCat = item.is_available;
+      else if (categoryFilter !== "all") {
+        matchesCat = item.category_slug === categoryFilter || item.tag === categoryFilter;
+      }
 
       return matchesSearch && matchesCat;
     });
@@ -344,13 +357,23 @@ export default function MenuAdminPage() {
           </p>
         </div>
 
-        <Button
-          onClick={openAdd}
-          className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 px-5 py-2.5 rounded-lg shadow-xs shrink-0 transition-transform"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Add New Dish</span>
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <Link
+            href="/admin/categories"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-zinc-300 bg-white text-xs font-bold text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 transition-colors shadow-2xs"
+          >
+            <Layers className="h-4 w-4 text-amber-800" />
+            <span>Manage Categories</span>
+          </Link>
+
+          <Button
+            onClick={openAdd}
+            className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 px-5 py-2.5 rounded-lg shadow-xs shrink-0 transition-transform"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add New Dish</span>
+          </Button>
+        </div>
       </div>
 
       {/* Quick Metrics Bar */}
@@ -428,6 +451,7 @@ export default function MenuAdminPage() {
           setPhotoCounts={setPhotoCounts}
           formRef={formRef}
           photosRef={photosRef}
+          categories={categories}
         />
       )}
 
@@ -466,9 +490,11 @@ export default function MenuAdminPage() {
         <div className="flex flex-wrap gap-2 pt-1 border-t border-zinc-200">
           {[
             { id: "all", label: "All Dishes", count: totalCount },
-            { id: "sweet", label: "Sweet Stacks", count: sweetCount },
-            { id: "savoury", label: "Savoury Brunch", count: savouryCount },
-            { id: "choc", label: "Choc Loaded", count: chocCount },
+            ...categories.map((c) => ({
+              id: c.slug,
+              label: `${c.icon || "🥞"} ${c.name}`,
+              count: items.filter((i) => i.category_slug === c.slug || i.tag === c.slug).length,
+            })),
             { id: "featured", label: "Featured", count: featuredCount },
             { id: "live", label: "Available Now", count: liveCount },
           ].map((cat) => {
@@ -541,7 +567,7 @@ export default function MenuAdminPage() {
               </thead>
               <tbody className="divide-y divide-zinc-100 text-xs font-medium text-[#211a14]">
                 {filteredItems.map((item) => {
-                  const tagData = TAG_INFO[item.tag] ?? TAG_INFO.sweet;
+                  const tagData = getCategoryBadge(item, categoriesMap);
                   const photoCount = photoCounts[item.slug] ?? 0;
                   return (
                     <tr

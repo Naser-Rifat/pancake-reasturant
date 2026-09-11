@@ -1,5 +1,6 @@
 import type {
   ApiAnnouncement,
+  ApiCategory,
   ApiHomeStep,
   ApiCertification,
   ApiGalleryPhoto,
@@ -11,6 +12,12 @@ import type {
 
 // Snapshot of the seeded backend content. Used when the API is unreachable so
 // the storefront still renders — keep in sync with `backend seed_demo`.
+
+export const FALLBACK_CATEGORIES: ApiCategory[] = [
+  { id: 1, name: "Sweet Stacks", slug: "sweet", icon: "🍯", description: "Fluffy dessert pancakes", sort_order: 1, is_active: true, dish_count: 4 },
+  { id: 2, name: "Savoury Brunch", slug: "savoury", icon: "🥑", description: "Hearty breakfast pancakes", sort_order: 2, is_active: true, dish_count: 2 },
+  { id: 3, name: "Choc Loaded", slug: "choc", icon: "🍫", description: "Rich chocolate indulgences", sort_order: 3, is_active: true, dish_count: 2 },
+];
 
 export const FALLBACK_CAMPAIGNS: ApiAnnouncement[] = [
   {

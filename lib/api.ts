@@ -25,12 +25,27 @@ export async function fetchWithTimeout(
   }
 }
 
+export interface ApiCategory {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string;
+  description?: string;
+  sort_order: number;
+  is_active: boolean;
+  dish_count?: number;
+}
+
 export interface ApiMenuItem {
   slug: string;
   name: string;
   description: string;
   price: string; // decimal string, e.g. "17.00"
-  tag: "sweet" | "savoury" | "choc";
+  tag: string;
+  category?: ApiCategory | null;
+  category_name?: string;
+  category_slug?: string;
+  category_icon?: string;
   heat: "none" | "medium" | "hot";
   kcal: number | null;
   protein_g: number | null;
@@ -193,7 +208,7 @@ export interface ApiBooking {
 
 // ---------- display helpers ----------
 
-export const TAG_LABEL: Record<ApiMenuItem["tag"], string> = {
+export const TAG_LABEL: Record<string, string> = {
   sweet: "Sweet",
   savoury: "Savoury",
   choc: "Choc Loaded",
@@ -252,6 +267,12 @@ export async function getMenu(): Promise<ApiMenuItem[]> {
 export async function getFeaturedMenu(): Promise<ApiMenuItem[]> {
   const { FALLBACK_MENU } = await import("./fallback-data");
   return get("/menu/?featured=1", FALLBACK_MENU.filter((m) => m.is_featured));
+}
+
+export async function getCategories(): Promise<ApiCategory[]> {
+  const { FALLBACK_CATEGORIES } = await import("./fallback-data");
+  const cats = await get<ApiCategory[] | null>("/categories/", null);
+  return cats ?? FALLBACK_CATEGORIES;
 }
 
 export async function getReviews(): Promise<ApiReview[]> {

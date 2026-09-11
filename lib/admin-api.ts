@@ -49,12 +49,29 @@ export interface AdminReview {
   created_at: string;
 }
 
+export interface AdminCategory {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string;
+  description: string;
+  sort_order: number;
+  is_active: boolean;
+  dish_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AdminMenuItem {
   slug: string;
   name: string;
   description: string;
   price: string;
-  tag: "sweet" | "savoury" | "choc";
+  tag: string;
+  category?: number | null;
+  category_name?: string;
+  category_slug?: string;
+  category_icon?: string;
   heat: "none" | "medium" | "hot";
   kcal: number | null;
   protein_g: number | null;
@@ -212,6 +229,8 @@ export const listReviews = () => adminFetch<AdminReview[]>("/reviews/");
 
 export const listMenu = () => adminFetch<AdminMenuItem[]>("/menu/");
 
+export const listCategories = () => adminFetch<AdminCategory[]>("/categories/");
+
 // ---------- writes ----------
 
 export const updateOrder = (publicId: string, patch: Partial<AdminOrder>) =>
@@ -234,6 +253,15 @@ export const createMenuItem = (data: Partial<AdminMenuItem>) =>
 
 export const deleteMenuItem = (slug: string) =>
   adminFetch<void>(`/menu/${slug}/`, { method: "DELETE" });
+
+export const createCategory = (data: Partial<AdminCategory>) =>
+  adminFetch<AdminCategory>("/categories/", { method: "POST", body: JSON.stringify(data) });
+
+export const updateCategory = (id: number, patch: Partial<AdminCategory>) =>
+  adminFetch<AdminCategory>(`/categories/${id}/`, { method: "PATCH", body: JSON.stringify(patch) });
+
+export const deleteCategory = (id: number) =>
+  adminFetch<void>(`/categories/${id}/`, { method: "DELETE" });
 
 export const createAdminBooking = (data: Partial<AdminBooking>) =>
   adminFetch<AdminBooking>("/bookings/", { method: "POST", body: JSON.stringify(data) });

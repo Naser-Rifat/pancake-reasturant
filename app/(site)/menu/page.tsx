@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import MenuClient from "@/components/MenuClient";
-import { getCampaigns, getMenuWithStatus, getSite } from "@/lib/api";
+import { getCampaigns, getCategories, getMenuWithStatus, getSite } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -12,10 +12,11 @@ export const metadata: Metadata = {
 };
 
 export default async function MenuPage() {
-  const [{ items, live }, site, campaigns] = await Promise.all([
+  const [{ items, live }, site, campaigns, categories] = await Promise.all([
     getMenuWithStatus(),
     getSite(),
     getCampaigns(),
+    getCategories(),
   ]);
 
   return (
@@ -32,6 +33,7 @@ export default async function MenuPage() {
 
       <MenuClient
         items={items}
+        categories={categories}
         campaigns={campaigns}
         live={live && site.online_ordering_enabled}
         phone={site.phone}

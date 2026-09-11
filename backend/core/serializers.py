@@ -27,6 +27,7 @@ def validate_phone_number(phone: str) -> str:
 from .models import (
     Announcement,
     Booking,
+    Category,
     Certification,
     Coupon,
     GalleryPhoto,
@@ -41,6 +42,23 @@ from .models import (
 )
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    dish_count = serializers.IntegerField(read_only=True, default=0)
+
+    class Meta:
+        model = Category
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "icon",
+            "description",
+            "sort_order",
+            "is_active",
+            "dish_count",
+        ]
+
+
 class MenuItemPhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItemPhoto
@@ -49,11 +67,16 @@ class MenuItemPhotoSerializer(serializers.ModelSerializer):
 
 class MenuItemSerializer(serializers.ModelSerializer):
     photos = MenuItemPhotoSerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
+    category_name = serializers.CharField(source="category.name", read_only=True, default="")
+    category_slug = serializers.CharField(source="category.slug", read_only=True, default="")
+    category_icon = serializers.CharField(source="category.icon", read_only=True, default="🥞")
 
     class Meta:
         model = MenuItem
         fields = [
-            "slug", "name", "description", "price", "tag", "heat",
+            "slug", "name", "description", "price", "tag", "category",
+            "category_name", "category_slug", "category_icon", "heat",
             "kcal", "protein_g", "prep_time", "image", "photo", "photos",
             "is_featured",
         ]

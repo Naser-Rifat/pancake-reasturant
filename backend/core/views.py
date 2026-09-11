@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.db.models import Count, Q
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework import mixins, status as http_status, viewsets
@@ -14,6 +15,7 @@ from . import payments
 from .models import (
     Announcement,
     Booking,
+    Category,
     Certification,
     HomeStep,
     GalleryPhoto,
@@ -27,6 +29,7 @@ from .serializers import (
     price_with_coupon,
     AnnouncementSerializer,
     BookingSerializer,
+    CategorySerializer,
     CertificationSerializer,
     HomeStepSerializer,
     GalleryPhotoSerializer,
@@ -59,20 +62,34 @@ class ThrottleWritesOnlyMixin:
 @method_decorator(cache_page(30), name="list")
 @method_decorator(cache_page(30), name="retrieve")
 class MenuItemViewSet(viewsets.ReadOnlyModelViewSet):
-    """Public menu. `?featured=1` returns the home-page picks, `?tag=sweet` filters."""
+    """Public menu. `?featured=1` returns the home-page picks, `?category=sweet` or `?tag=sweet` filters."""
 
     serializer_class = MenuItemSerializer
     lookup_field = "slug"
     pagination_class = None
 
     def get_queryset(self):
-        qs = MenuItem.objects.filter(is_available=True)
+        qs = MenuItem.objects.filter(is_available=True).select_related("category").prefetch_related("photos")
         if self.request.query_params.get("featured") in ("1", "true"):
             qs = qs.filter(is_featured=True)
-        tag = self.request.query_params.get("tag")
-        if tag:
-            qs = qs.filter(tag=tag)
+        cat_filter = self.request.query_params.get("category") or self.request.query_params.get("tag")
+        if cat_filter:
+            qs = qs.filter(Q(category__slug=cat_filter) | Q(tag=cat_filter))
         return qs
+
+
+class CategoryListView(ListAPIView):
+    """Public active categories list with available dish counts."""
+
+    serializer_class = CategorySerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        return (
+            Category.objects.filter(is_active=True)
+            .annotate(dish_count=Count("menu_items", filter=Q(menu_items__is_available=True)))
+            .order_by("sort_order", "name")
+        )
 
 
 class BookingViewSet(
