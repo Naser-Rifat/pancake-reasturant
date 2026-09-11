@@ -166,9 +166,8 @@ export default async function DishPage({ params }: Props) {
 
             <p className="dish-desc">{item.description}</p>
 
-            {/* Nutrition & timing. One markup, two shapes: chips on desktop,
-                label-and-value rows on phones (globals.css hides .spec-label
-                above 1023px, so the desktop chip is unchanged). */}
+            {/* Calories, Protein, and Prep time specs (commented out per user request; uncomment to re-enable) */}
+            {/*
             <div className="chips dish-specs">
               {item.prep_time && (
                 <span className="chip">
@@ -189,6 +188,7 @@ export default async function DishPage({ params }: Props) {
                 </span>
               )}
             </div>
+            */}
 
             {site.online_ordering_enabled ? (
               <div className="dish-buy">

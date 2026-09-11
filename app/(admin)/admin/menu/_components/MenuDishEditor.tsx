@@ -177,6 +177,8 @@ export function MenuDishEditor({
                   <option value="hot">Hot &amp; Spicy</option>
                 </Select>
               </div>
+              {/* Prep time input - commented out per user request; uncomment to restore */}
+              {/*
               <div className="space-y-1">
                 <Label htmlFor="mi-prep" className="text-xs font-semibold text-[#211a14]">
                   Estimated Prep Time
@@ -189,10 +191,12 @@ export function MenuDishEditor({
                   onChange={set("prep_time")}
                 />
               </div>
+              */}
             </div>
           </div>
 
-          {/* Nutrition */}
+          {/* Nutrition Details (Calories & Protein) - commented out per user request; uncomment to restore */}
+          {/*
           <div className="pt-4 border-t border-zinc-200 space-y-3">
             <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide flex items-center gap-1.5">
               Nutrition Details (Optional):
@@ -226,6 +230,7 @@ export function MenuDishEditor({
               </div>
             </div>
           </div>
+          */}
         </div>
 
         {/* Step 2: Photos */}

@@ -91,11 +91,14 @@ export default function DishCard({
 
         <p className="dc-desc">{item.description}</p>
 
+        {/* Calories, Protein, and Prep time badges (commented out per user request; uncomment to re-enable) */}
+        {/*
         <div className="dc-chips">
           {item.kcal != null && <span className="dc-chip">🔥 {item.kcal} kcal</span>}
           {item.protein_g != null && <span className="dc-chip">💪 {item.protein_g}g protein</span>}
           {item.prep_time && <span className="dc-chip">⏱ {item.prep_time}</span>}
         </div>
+        */}
       </div>
 
       <div className="dc-actions">
