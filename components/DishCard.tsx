@@ -34,11 +34,14 @@ export default function DishCard({
   item,
   variant = "tile",
   onAdd,
+  dealBadge,
 }: {
   item: ApiMenuItem;
   variant?: "tile" | "row";
   /** omit to hide the add button — ordering paused, or a context that only links */
   onAdd?: (slug: string) => void;
+  /** special offer / promo deal badge */
+  dealBadge?: string;
 }) {
   const href = `/menu/${item.slug}`;
   let src = item.image || item.photo;
@@ -81,6 +84,7 @@ export default function DishCard({
 
         <h3 className="dc-name">
           <Link href={href}>{item.name}</Link>
+          {dealBadge && <span className="dc-deal-pill">{dealBadge}</span>}
         </h3>
 
         <p className="dc-desc">{item.description}</p>

@@ -205,7 +205,10 @@ export default function CampaignSlider({
 
                       <div className="camp-actions-row">
                         {c.link_url && (
-                          <Link href={safeHref(c.link_url)} className="camp-cta">
+                          <Link
+                            href={c.link_url === "/menu" ? "/menu?tag=deals" : safeHref(c.link_url)}
+                            className="camp-cta"
+                          >
                             <span>{c.link_text || "Explore Menu & Deals"}</span>
                             <ArrowRight size={16} strokeWidth={2.5} className="camp-btn-arrow" />
                           </Link>

@@ -6,6 +6,7 @@ import {
   TAG_LABEL,
   telHref,
   type ApiMenuItem,
+  type ApiAnnouncement,
 } from "@/lib/api";
 import { useCart } from "@/lib/cart";
 import DishCard from "@/components/DishCard";
@@ -20,23 +21,59 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 export default function MenuClient({
   items,
+  campaigns = [],
   live = true,
   phone: restaurantPhone = "(02) 5550 1234",
   pauseMessage = "",
   uberEatsUrl = "",
 }: {
   items: ApiMenuItem[];
+  campaigns?: ApiAnnouncement[];
   live?: boolean;
   phone?: string;
   pauseMessage?: string;
   uberEatsUrl?: string;
 }) {
-  // cart data and the drawer both live in lib/cart now, so the dish page can
-  // add to the order and open it without coming back here
-  const { loaded, add: addToCart, reconcile, showToast } = useCart();
+  // cart data and drawer both live in lib/cart now
+  const { loaded, add: addToCart, openCart, reconcile, setCouponCode, showToast } = useCart();
   const [selectedTag, setSelectedTag] = useState<string>("all");
-  // drop slugs that have left the menu, then honour ?add= — the dish page adds
-  // in place now, but shared and bookmarked links still land here
+
+  // Identify dishes associated with active campaigns or house specials
+  const dealItems = items.filter((item) => {
+    if (item.is_featured) return true;
+    return campaigns.some((c) => {
+      const matchSlug = c.card1_dish === item.slug || c.card2_dish === item.slug;
+      const matchText =
+        c.message.toLowerCase().includes(item.slug.toLowerCase()) ||
+        c.message.toLowerCase().includes(item.name.toLowerCase()) ||
+        c.details.toLowerCase().includes(item.name.toLowerCase()) ||
+        (item.slug === "buttermilk" && c.message.toLowerCase().includes("buttermilk"));
+      return matchSlug || matchText;
+    });
+  });
+
+  const getDealBadge = (slug: string) => {
+    const campaign = campaigns.find((c) => {
+      return (
+        c.card1_dish === slug ||
+        c.card2_dish === slug ||
+        c.message.toLowerCase().includes(slug) ||
+        (slug === "buttermilk" && c.message.toLowerCase().includes("buttermilk"))
+      );
+    });
+    if (campaign) {
+      const msg = campaign.message.toLowerCase();
+      if (msg.includes("2-for-1") || msg.includes("2 for 1")) return "🔥 2-for-1 Special";
+      if (msg.includes("20% off") || msg.includes("20%")) return "🔥 20% Off";
+      if (msg.includes("free")) return "🎁 Free Deal";
+      return "🔥 Special Deal";
+    }
+    const item = items.find((i) => i.slug === slug);
+    if (item?.is_featured) return "⭐ House Favourite";
+    return undefined;
+  };
+
+  // Handle URL query parameters (?tag=deals, ?coupon=..., ?add=...)
   useEffect(() => {
     if (!loaded) return;
     reconcile(items.map((b) => b.slug));
@@ -45,12 +82,29 @@ export default function MenuClient({
       window.history.replaceState(null, "", "/menu");
       showToast("Payment cancelled — your order is still in the cart. 🛒");
     }
+
+    // Switch to deals tab if requested
+    const tagParam = params.get("tag");
+    if (tagParam === "deals" || params.get("deal") || params.get("special")) {
+      setSelectedTag("deals");
+    } else if (tagParam && TAG_ORDER.includes(tagParam as any)) {
+      setSelectedTag(tagParam);
+    }
+
+    // Pre-apply coupon code from URL
+    const coupon = params.get("coupon");
+    if (coupon) {
+      setCouponCode(coupon.toUpperCase());
+      showToast(`Coupon "${coupon.toUpperCase()}" applied! 🎉`);
+    }
+
     const wanted = params.get("add");
     if (!wanted) return;
     const qty = Math.min(9, Math.max(1, parseInt(params.get("qty") || "1", 10) || 1));
     const hit = items.find((b) => b.slug === wanted);
     if (hit) {
       addToCart(wanted, qty);
+      openCart();
       window.history.replaceState(null, "", "/menu");
       showToast(`${hit.name} added to your order 🥞`);
     }
@@ -59,12 +113,10 @@ export default function MenuClient({
 
   const itemBySlug = (slug: string) => items.find((b) => b.slug === slug)!;
 
-
   const add = (slug: string) => {
     addToCart(slug);
     showToast(`${itemBySlug(slug).name} added to your order 🥞`);
   };
-
 
   const visibleTags =
     selectedTag === "all" ? TAG_ORDER : TAG_ORDER.filter((t) => t === selectedTag);
@@ -73,10 +125,7 @@ export default function MenuClient({
     <>
       <main className="container menu-page-container">
         {!live && (
-          <div
-            className="ordering-paused-box"
-            role="status"
-          >
+          <div className="ordering-paused-box" role="status">
             <p style={{ margin: 0, fontWeight: 500 }}>
               {pauseMessage || "Online ordering is temporarily paused."} Call us on{" "}
               <a
@@ -123,6 +172,18 @@ export default function MenuClient({
             <span>✨ All Stacks</span>
             <small className="filter-count">{items.length}</small>
           </button>
+
+          {dealItems.length > 0 && (
+            <button
+              type="button"
+              className={`menu-filter-chip chip-deals ${selectedTag === "deals" ? "active" : ""}`}
+              onClick={() => setSelectedTag("deals")}
+            >
+              <span>🔥 Special Deals</span>
+              <small className="filter-count">{dealItems.length}</small>
+            </button>
+          )}
+
           {TAG_ORDER.map((tag) => {
             const countForTag = items.filter((b) => b.tag === tag).length;
             if (countForTag === 0) return null;
@@ -142,38 +203,104 @@ export default function MenuClient({
           })}
         </div>
 
-        {/* Segmented Boutique Diner Menu Boards */}
-        <div className="menu-boards-container">
-          {visibleTags.map((tag) => {
-            const group = items.filter((b) => b.tag === tag);
-            if (group.length === 0) return null;
+        {/* Active Promotional Deals Banner (shown when Deals tab is active) */}
+        {selectedTag === "deals" && (
+          <div className="menu-deals-banner">
+            <div className="deals-banner-header">
+              <span className="deals-kicker">Fresh Off the Griddle</span>
+              <h3>🎉 Weekly Specials & Limited Deals</h3>
+              <p>Special perks & promotions griddled with love — available in-store and online.</p>
+            </div>
 
-            return (
-              <section className="menu-cat-board" key={tag}>
-                <div className="menu-board-header">
-                  <div className="board-header-left">
-                    <span className="board-cat-icon">{CATEGORY_ICONS[tag]}</span>
-                    <h2 className="board-cat-title">{TAG_LABEL[tag]} Stacks</h2>
+            {campaigns.length > 0 && (
+              <div className="deals-cards-grid">
+                {campaigns.map((c) => {
+                  const isBooking = c.link_url?.includes("booking");
+                  return (
+                    <div className="deals-ticket-card" key={c.message}>
+                      <div className="ticket-tag">
+                        {isBooking ? "🍽️ Dine-In Special" : "🥞 Takeaway Offer"}
+                      </div>
+                      <h4>{c.message}</h4>
+                      {c.details && <p className="ticket-details">{c.details}</p>}
+                      {c.link_url && (
+                        <div className="ticket-action">
+                          <Link href={c.link_url} className="ticket-btn">
+                            <span>
+                              {c.link_text || (isBooking ? "Book a Table" : "Explore Deal")}
+                            </span>
+                            <span aria-hidden="true">→</span>
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Dishes on Special */}
+            <section className="menu-cat-board menu-deals-board">
+              <div className="menu-board-header">
+                <div className="board-header-left">
+                  <span className="board-cat-icon">🔥</span>
+                  <h2 className="board-cat-title">Special Offer Stacks</h2>
+                </div>
+                <span className="board-items-badge">
+                  {dealItems.length} {dealItems.length === 1 ? "Dish" : "Dishes"}
+                </span>
+              </div>
+
+              <div className="menu-board-rows">
+                {dealItems.map((b) => (
+                  <DishCard
+                    item={b}
+                    variant="row"
+                    key={b.slug}
+                    onAdd={live ? add : undefined}
+                    dealBadge={getDealBadge(b.slug)}
+                  />
+                ))}
+              </div>
+            </section>
+          </div>
+        )}
+
+        {/* Regular Segmented Boutique Diner Menu Boards */}
+        {selectedTag !== "deals" && (
+          <div className="menu-boards-container">
+            {visibleTags.map((tag) => {
+              const group = items.filter((b) => b.tag === tag);
+              if (group.length === 0) return null;
+
+              return (
+                <section className="menu-cat-board" key={tag}>
+                  <div className="menu-board-header">
+                    <div className="board-header-left">
+                      <span className="board-cat-icon">{CATEGORY_ICONS[tag]}</span>
+                      <h2 className="board-cat-title">{TAG_LABEL[tag]} Stacks</h2>
+                    </div>
+                    <span className="board-items-badge">
+                      {group.length} {group.length === 1 ? "Dish" : "Dishes"}
+                    </span>
                   </div>
-                  <span className="board-items-badge">
-                    {group.length} {group.length === 1 ? "Dish" : "Dishes"}
-                  </span>
-                </div>
 
-                <div className="menu-board-rows">
-                  {group.map((b) => (
-                    <DishCard
-                      item={b}
-                      variant="row"
-                      key={b.slug}
-                      onAdd={live ? add : undefined}
-                    />
-                  ))}
-                </div>
-              </section>
-            );
-          })}
-        </div>
+                  <div className="menu-board-rows">
+                    {group.map((b) => (
+                      <DishCard
+                        item={b}
+                        variant="row"
+                        key={b.slug}
+                        onAdd={live ? add : undefined}
+                        dealBadge={getDealBadge(b.slug)}
+                      />
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+        )}
       </main>
 
     </>

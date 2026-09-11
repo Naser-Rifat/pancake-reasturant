@@ -1,18 +1,22 @@
 import type { Metadata } from "next";
 import MenuClient from "@/components/MenuClient";
-import { getMenuWithStatus, getSite } from "@/lib/api";
+import { getCampaigns, getMenuWithStatus, getSite } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Menu",
+  title: "Menu & Special Deals",
   description:
-    "Six signature pancake stacks — fluffy, fresh, and griddled to order. See the menu and book a table.",
+    "Signature pancake stacks — fluffy, fresh, and griddled to order. Explore our full menu and daily special offers.",
   alternates: { canonical: "/menu" },
 };
 
 export default async function MenuPage() {
-  const [{ items, live }, site] = await Promise.all([getMenuWithStatus(), getSite()]);
+  const [{ items, live }, site, campaigns] = await Promise.all([
+    getMenuWithStatus(),
+    getSite(),
+    getCampaigns(),
+  ]);
 
   return (
     <>
@@ -28,6 +32,7 @@ export default async function MenuPage() {
 
       <MenuClient
         items={items}
+        campaigns={campaigns}
         live={live && site.online_ordering_enabled}
         phone={site.phone}
         pauseMessage={site.online_ordering_disabled_message}

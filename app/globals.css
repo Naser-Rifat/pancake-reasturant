@@ -4836,6 +4836,142 @@ body:has(.cart-fab) .wa-float {
   color: #ffffff;
 }
 
+.menu-filter-chip.chip-deals {
+  background: color-mix(in srgb, var(--yellow) 16%, #ffffff);
+  border-color: rgba(217, 119, 6, 0.35);
+  color: #92400e;
+}
+.menu-filter-chip.chip-deals:hover {
+  background: color-mix(in srgb, var(--yellow) 30%, #ffffff);
+  border-color: #d97706;
+}
+.menu-filter-chip.chip-deals.active {
+  background: #d97706;
+  border-color: #b45309;
+  color: #ffffff;
+}
+
+/* Deal Pill on Dish Name */
+.dc-deal-pill {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--yellow) 22%, #fff);
+  border: 1px solid #f59e0b;
+  color: #92400e;
+  font-family: var(--font-round), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  vertical-align: middle;
+  line-height: 1.2;
+  box-shadow: 0 1px 4px rgba(245, 158, 11, 0.2);
+}
+
+/* Deals Banner on Menu Page */
+.menu-deals-banner {
+  margin-bottom: 2.8rem;
+  animation: fadeIn 0.3s ease;
+}
+.deals-banner-header {
+  text-align: center;
+  margin-bottom: 1.8rem;
+}
+.deals-banner-header .deals-kicker {
+  display: inline-block;
+  font-family: var(--font-script), cursive;
+  font-size: 1.18rem;
+  color: var(--yellow-deep);
+  margin-bottom: 0.2rem;
+}
+.deals-banner-header h3 {
+  font-family: var(--font-round), sans-serif;
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0 0 0.35rem;
+}
+.deals-banner-header p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+.deals-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 2.5rem;
+}
+.deals-ticket-card {
+  position: relative;
+  background: #fff;
+  border: 1.5px dashed rgba(217, 119, 6, 0.45);
+  border-radius: 20px;
+  padding: 1.4rem;
+  box-shadow: 0 4px 14px rgba(33, 26, 20, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.deals-ticket-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(217, 119, 6, 0.15);
+  border-color: #d97706;
+}
+.deals-ticket-card .ticket-tag {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--yellow) 18%, var(--cream-card));
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  font-family: var(--font-round), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #92400e;
+  margin-bottom: 0.6rem;
+}
+.deals-ticket-card h4 {
+  font-family: var(--font-round), sans-serif;
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0 0 0.4rem;
+  line-height: 1.35;
+}
+.deals-ticket-card .ticket-details {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin: 0 0 1rem;
+  flex: 1;
+}
+.deals-ticket-card .ticket-action {
+  margin-top: auto;
+}
+.deals-ticket-card .ticket-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  background: var(--yellow-deep);
+  color: var(--ink);
+  font-family: var(--font-round), sans-serif;
+  font-size: 0.84rem;
+  font-weight: 800;
+  text-decoration: none;
+  border: 1px solid var(--ink);
+  transition: all 0.2s ease;
+}
+.deals-ticket-card .ticket-btn:hover {
+  background: var(--ink);
+  color: #fff;
+  transform: translateX(2px);
+}
+
 /* ---------- Segmented Menu Boards ---------- */
 .menu-boards-container {
   display: grid;
