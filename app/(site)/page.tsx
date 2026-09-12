@@ -53,9 +53,9 @@ export default async function Home() {
             heading={site.hero_heading}
             script={site.hero_script}
             lead={site.hero_lead}
-            /* Book a Table is the primary action on the hero; takeaway ordering is in the top-right bar */
             ctas={[
               { href: "/booking", label: "BOOK A TABLE", variant: "primary" },
+              { href: "/menu", label: "EXPLORE MENU", variant: "ghost" },
             ]}
             heroImage={site.hero_image}
             heroCutout={site.hero_cutout}

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { DM_Serif_Display, Luckiest_Guy, Pacifico, DM_Sans, Baloo_2 } from "next/font/google";
 import "../globals.css";
 import Announce from "@/components/Announce";
+import TopRibbon from "@/components/TopRibbon";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
@@ -140,8 +141,19 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         {/* the cart wraps everything: the drawer mounts once here, every page's
             cart button opens it, and the tab bar reads its count */}
         <CartProvider>
+          <TopRibbon
+            address={site.address}
+            facebookUrl={site.facebook_url}
+            instagramUrl={site.instagram_url}
+            uberEatsUrl={site.uber_eats_url}
+          />
           <Announce data={announcement} />
-          <Nav live={site.online_ordering_enabled} />
+          <Nav
+            live={site.online_ordering_enabled}
+            facebookUrl={site.facebook_url}
+            instagramUrl={site.instagram_url}
+            uberEatsUrl={site.uber_eats_url}
+          />
           {children}
           <Footer />
           {site.whatsapp &&

@@ -16,7 +16,17 @@ const LINKS = [
   { href: "/#contact", label: "Contact" },
 ];
 
-export default function Nav({ live = true }: { live?: boolean }) {
+export default function Nav({
+  live = true,
+  facebookUrl,
+  instagramUrl,
+  uberEatsUrl,
+}: {
+  live?: boolean;
+  facebookUrl?: string;
+  instagramUrl?: string;
+  uberEatsUrl?: string;
+}) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -78,6 +88,52 @@ export default function Nav({ live = true }: { live?: boolean }) {
               </Link>
             </li>
           ))}
+
+          {/* Mobile Drawer Social & Uber Eats Delivery Section */}
+          {(uberEatsUrl || facebookUrl || instagramUrl) && (
+            <li className="nav-drawer-extras">
+              {uberEatsUrl && (
+                <a
+                  href={uberEatsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="nav-drawer-uber-btn"
+                >
+                  <span>🛵 Order on Uber Eats</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              )}
+              {(facebookUrl || instagramUrl) && (
+                <div className="nav-drawer-socials">
+                  <span className="drawer-socials-label">Follow Us</span>
+                  <div className="drawer-socials-btns">
+                    {facebookUrl && (
+                      <a
+                        href={facebookUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="drawer-social-link"
+                        aria-label="Follow on Facebook"
+                      >
+                        Facebook ↗
+                      </a>
+                    )}
+                    {instagramUrl && (
+                      <a
+                        href={instagramUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="drawer-social-link"
+                        aria-label="Follow on Instagram"
+                      >
+                        Instagram ↗
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+            </li>
+          )}
         </ul>
 
         <div className="nav-cta">

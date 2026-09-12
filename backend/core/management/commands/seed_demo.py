@@ -151,6 +151,9 @@ class Command(BaseCommand):
         site.email = "hello@thepancakeclub.com.au"
         site.map_embed = "https://www.google.com/maps?q=18%20Pakington%20Street%2C%20Geelong%20West%20VIC%20Australia&output=embed"
         site.transit_badges = "3 min walk from Town hall\n2hr Street Parking\nStep free access"
+        site.instagram_url = "https://www.instagram.com"
+        site.facebook_url = "https://www.facebook.com"
+        site.uber_eats_url = "https://www.ubereats.com"
         site.timezone = "Australia/Melbourne"
         site.save()
 
