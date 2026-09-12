@@ -14,6 +14,7 @@ import {
   getCampaigns,
   lines,
   formatTime,
+  getCategories,
   getCertifications,
   getGallery,
   getHours,
@@ -27,7 +28,7 @@ import { safeEmbedUrl, safeHref } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [announcement, campaigns, menu, gallery, reviews, hours, certs, site] =
+  const [announcement, campaigns, menu, gallery, reviews, hours, certs, site, categories] =
     await Promise.all([
       getAnnouncement(),
       getCampaigns(),
@@ -37,6 +38,7 @@ export default async function Home() {
       getHours(),
       getCertifications(),
       getSite(),
+      getCategories(),
     ]);
 
   // slider heading is one editable string; the last word carries the accent colour
@@ -53,7 +55,7 @@ export default async function Home() {
             lead={site.hero_lead}
             /* Book a Table is the primary action on the hero; takeaway ordering is in the top-right bar */
             ctas={[
-              { href: "/booking", label: "Book a Table", variant: "primary" },
+              { href: "/booking", label: "BOOK A TABLE", variant: "primary" },
             ]}
             heroImage={site.hero_image}
             heroCutout={site.hero_cutout}
@@ -121,11 +123,11 @@ export default async function Home() {
 
                   {/* Middle: Headline, Kicker & CTA Button */}
                   <div className="promo-main">
-                    <span className="promo-kicker">{site?.promo_kicker || "✨ TODAY'S FEATURED SPECIAL"}</span>
+                    <span className="promo-kicker">{site?.promo_kicker || "TODAY'S FEATURED SPECIAL"}</span>
                     <h2 className="promo-head">{announcement.message}</h2>
                     {announcement.link_url && (
                       <Link href={safeHref(announcement.link_url, "/menu")} className="promo-cta-btn">
-                        <span>{announcement.link_text || "Explore Menu & Deals"}</span>
+                        <span>{announcement.link_text || "EXPLORE THE MENU"}</span>
                         <span className="promo-arrow">→</span>
                       </Link>
                     )}
@@ -180,6 +182,7 @@ export default async function Home() {
           <div className="reveal">
             <FavouritesRail
               items={menu.items}
+              categories={categories}
               variant="v1"
               live={menu.live && site.online_ordering_enabled}
               /* a single element, not a fragment: RSC serialises multi-child
@@ -188,12 +191,12 @@ export default async function Home() {
                 <div>
                   <p className="kicker">Crowd Favourites</p>
                   <h2 className="title">
-                    Our <span className="accent">Favourites</span>
+                    Pick your <span className="accent">favorites</span>
                   </h2>
-                  <p className="fav-sub">Top picks straight off our menu.</p>
+                  <p className="fav-sub">Top pick straight from our menu</p>
                 </div>
               }
-              cta={{ href: "/menu", label: "View Full Menu" }}
+              cta={{ href: "/menu", label: "VIEW FULL MENU" }}
             />
           </div>
         </div>
@@ -214,11 +217,12 @@ export default async function Home() {
               items={campaigns}
               title={
                 <div className="reveal" style={{ textAlign: "center" }}>
-                  <p className="kicker">{site?.offers_kicker || "On Right Now"}</p>
+                  <p className="kicker">{site?.offers_kicker || "On right now"}</p>
                   <h2 className="title">
                     {offersTitleWords.slice(0, -1).join(" ")}{" "}
                     <span className="accent">{offersTitleWords[offersTitleWords.length - 1]}</span>
                   </h2>
+                  <p className="fav-sub" style={{ marginTop: "0.4rem" }}>Fresh off the griddle</p>
                 </div>
               }
             />
@@ -255,7 +259,7 @@ export default async function Home() {
             {gallery.slice(0, 6).map((p, i) => {
               const tapes = ["tape-left", "tape-right", "tape-center", "tape-left", "tape-pin", "tape-right"];
               const tape = tapes[i % tapes.length];
-              const stamps = ["🥞 100% Fluffy", "✨ Sydney Vibe", "☕ Fresh Brew", "🍓 Berry Sweet", "💛 Café Mood", "🍯 Golden Maple"];
+              const stamps = ["🥞 100% Fluffy", "✨ Geelong Vibe", "☕ Fresh Brew", "🍓 Berry Sweet", "💛 Café Mood", "🍯 Golden Maple"];
               const stamp = stamps[i % stamps.length];
               const isHero = i === 0;
 
@@ -297,7 +301,7 @@ export default async function Home() {
                   {isHero && p.caption && (
                     <div className="mosaic-hero-chin">
                       <p className="mosaic-hero-caption">{p.caption}</p>
-                      <span className="mosaic-hero-tag">📍 Sydney, NSW</span>
+                      <span className="mosaic-hero-tag">📍 Geelong, Victoria</span>
                     </div>
                   )}
                 </Link>
@@ -323,9 +327,8 @@ export default async function Home() {
         />
         <div className="container">
           <div className="reveal" style={{ textAlign: "center" }}>
-            
             <h2 className="title">
-              What Our <span className="accent">Guests Say</span>
+              What our <span className="accent">guests say</span>
             </h2>
           </div>
           <ReviewsCarousel reviews={reviews} />
@@ -349,12 +352,12 @@ export default async function Home() {
         />
         <div className="container">
           <div className="reveal" style={{ textAlign: "center", marginBottom: "2.8rem" }}>
-            <p className="kicker">Come On Over</p>
+            <p className="kicker">Come on over</p>
             <h2 className="title inline">
               Hours &amp; <span className="accent">Location</span>
             </h2>
             <p className="section-lead" style={{ margin: "0.5rem auto 0", maxWidth: "540px" }}>
-              Drop by for breakfast, lazy brunch, or an afternoon pancake fix in the heart of Sydney.
+              Drop by for brunch or an afternoon pancake fix in the heart of Geelong
             </p>
           </div>
 
@@ -377,7 +380,7 @@ export default async function Home() {
               </ul>
 
               <div className="diner-find-box">
-                <h4 className="find-title">📍 Find Us in Sydney</h4>
+                <h4 className="find-title">📍 Find us in Geelong, Victoria</h4>
                 <div className="contact-lines">
                   <span className="contact-item">
                     <strong>Address:</strong> {site.address}
@@ -405,7 +408,7 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* Sydney Map Card */}
+            {/* Geelong Map Card */}
             <div className="map-card diner-map-card">
               <div className="map-frame">
                 <iframe
@@ -417,7 +420,7 @@ export default async function Home() {
               </div>
               <div className="map-action-bar">
                 <div className="map-location-info">
-                  <span className="map-spot-name">The Pancake Club Sydney</span>
+                  <span className="map-spot-name">Pancake Club Geelong</span>
                   <span className="map-spot-addr">{site.address}</span>
                 </div>
                 <a
@@ -426,7 +429,7 @@ export default async function Home() {
                   rel="noopener noreferrer"
                   className="btn btn-primary map-directions-btn"
                 >
-                  Get Directions ↗
+                  GET DIRECTIONS ↗
                 </a>
               </div>
             </div>
@@ -441,7 +444,7 @@ export default async function Home() {
           <div className="container">
             <div style={{ textAlign: "center" }}>
               <p className="kicker">FEEL GOOD ABOUT EVERY BITE</p>
-              <h3 className="cert-section-heading">Certified &amp; Award-Winning Quality</h3>
+              <h3 className="cert-section-heading">Certified &amp; award winning quality</h3>
             </div>
             <div className="cert-strip reveal">
               {certs.map((c) => (
@@ -485,7 +488,7 @@ export default async function Home() {
           style={{ bottom: "2rem", right: "6%", transform: "rotate(180deg)" }}
         />
         <div className="container reveal">
-          <p className="cta-kicker">READY FOR A FEAST?</p>
+          <p className="cta-kicker">READY FOR A GOOD TIME</p>
           <h2>
             {site.cta_heading} <span className="accent">{site.cta_script}</span>
           </h2>
@@ -494,7 +497,7 @@ export default async function Home() {
             href={safeHref(site.cta_button_url, "/booking")}
             className="btn btn-primary cta-action-btn"
           >
-            <span>🥞 {site.cta_button_label || "Book a Table Now"}</span>
+            <span>🥞 {site.cta_button_label || "BOOK A TABLE"}</span>
           </Link>
         </div>
       </section>

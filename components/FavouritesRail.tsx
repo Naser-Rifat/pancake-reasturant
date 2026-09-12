@@ -7,7 +7,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import DishCard from "@/components/DishCard";
 import { useCart } from "@/lib/cart";
-import { TAG_LABEL, type ApiMenuItem } from "@/lib/api";
+import { TAG_LABEL, type ApiCategory, type ApiMenuItem } from "@/lib/api";
 
 const MAX = 4;
 
@@ -26,6 +26,7 @@ const SKIN = {
 
 export default function FavouritesRail({
   items,
+  categories = [],
   variant = "v1",
   live = false,
   title,
@@ -33,6 +34,7 @@ export default function FavouritesRail({
   cta,
 }: {
   items: ApiMenuItem[];
+  categories?: ApiCategory[];
   variant?: keyof typeof SKIN;
   /** ordering open? false hides the add button, same as /menu does */
   live?: boolean;
@@ -60,6 +62,16 @@ export default function FavouritesRail({
   };
 
   const dynamicCategories = useMemo(() => {
+    if (categories && categories.length > 0) {
+      return categories
+        .filter((c) => c.is_active)
+        .map((c) => ({
+          slug: c.slug,
+          label: `${c.icon ? c.icon + " " : ""}${c.name}`,
+          count: items.filter((i) => (i.category_slug ? i.category_slug === c.slug : i.tag === c.slug)).length,
+        }))
+        .filter((c) => c.count > 0);
+    }
     const map = new Map<string, { slug: string; label: string; count: number }>();
     for (const item of items) {
       const slug = item.category_slug || item.tag;
@@ -70,7 +82,7 @@ export default function FavouritesRail({
       map.get(slug)!.count += 1;
     }
     return Array.from(map.values());
-  }, [items]);
+  }, [categories, items]);
 
   const shown = (
     tab === "all"

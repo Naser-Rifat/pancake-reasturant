@@ -219,7 +219,7 @@ export default function CampaignSlider({
                       <div className="camp-vintage-stamp" aria-hidden="true">
                         <span>FLUFFY</span>
                         <b>SPECIAL</b>
-                        <small>SYDNEY</small>
+                        <small>GEELONG</small>
                       </div>
 
                       <span className="camp-botanical" aria-hidden="true" />

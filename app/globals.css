@@ -4979,6 +4979,7 @@ body:has(.cart-fab) .wa-float {
 }
 
 .menu-cat-board {
+  scroll-margin-top: 5.5rem;
   background: #ffffff;
   border-radius: 26px;
   border: 1.5px solid rgba(118, 58, 18, 0.12);

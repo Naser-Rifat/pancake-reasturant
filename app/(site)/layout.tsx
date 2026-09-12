@@ -25,9 +25,9 @@ const display = Luckiest_Guy({ weight: "400", subsets: ["latin"], variable: "--f
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-const SITE_TITLE = "The Pancake Club — Pancakes & Stacks, Sydney";
+const SITE_TITLE = "The Pancake Club — Pancakes & Stacks, Geelong";
 const SITE_DESC =
-  "Fluffy homemade pancakes in Sydney. View the menu, book a table online, and see why locals love The Pancake Club. Real maple, fresh berries, zero guilt.";
+  "Fluffy homemade pancakes in Geelong. View the menu, book a table online, and see why locals love The Pancake Club. Real maple, fresh berries, zero guilt.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -38,10 +38,10 @@ export const metadata: Metadata = {
   description: SITE_DESC,
   applicationName: "The Pancake Club",
   keywords: [
-    "pancakes Sydney",
-    "breakfast Sydney",
-    "pancake restaurant",
-    "book a table Sydney",
+    "pancakes Geelong",
+    "breakfast Geelong",
+    "pancake restaurant Geelong",
+    "book a table Geelong",
     "The Pancake Club",
   ],
   alternates: { canonical: "/" },
@@ -116,8 +116,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     address: {
       "@type": "PostalAddress",
       streetAddress: site.address,
-      addressLocality: "Sydney",
-      addressRegion: "NSW",
+      addressLocality: "Geelong West",
+      addressRegion: "VIC",
       addressCountry: "AU",
     },
     hasMenu: `${SITE_URL}/menu`,

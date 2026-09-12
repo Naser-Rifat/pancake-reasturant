@@ -10,7 +10,7 @@ export default function manifest(): MetadataRoute.Manifest {
     // home screens truncate at ~12 characters
     short_name: "Pancake Club",
     description:
-      "Fluffy homemade pancakes in Sydney. Order takeaway for pickup or book a table.",
+      "Fluffy homemade pancakes in Geelong. Order takeaway for pickup or book a table.",
     start_url: "/",
     scope: "/",
     display: "standalone",

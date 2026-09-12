@@ -150,10 +150,41 @@ export default function MenuClient({
     return list.sort((a, b) => a.sort_order - b.sort_order);
   }, [categories, items]);
 
+  const handleCategorySelect = (slug: string) => {
+    setSelectedTag(slug);
+    if (slug === "deals") {
+      const banner = document.querySelector(".menu-deals-banner") || document.querySelector(".menu-filter-bar");
+      if (banner) {
+        const yOffset = -90;
+        const y = banner.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+      return;
+    }
+    if (slug === "all") {
+      const firstBoard = document.querySelector(".menu-cat-board") || document.querySelector(".menu-filter-bar");
+      if (firstBoard) {
+        const yOffset = -90;
+        const y = firstBoard.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+      return;
+    }
+    // Specific category: auto scroll down smoothly to that category board
+    setTimeout(() => {
+      const target = document.getElementById(`category-${slug}`);
+      if (target) {
+        const yOffset = -90;
+        const y = target.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+    }, 40);
+  };
+
   const visibleCategories =
-    selectedTag === "all"
-      ? displayCategories
-      : displayCategories.filter((c) => c.slug === selectedTag);
+    selectedTag === "deals"
+      ? []
+      : displayCategories;
 
   return (
     <>
@@ -201,7 +232,7 @@ export default function MenuClient({
           <button
             type="button"
             className={`menu-filter-chip ${selectedTag === "all" ? "active" : ""}`}
-            onClick={() => setSelectedTag("all")}
+            onClick={() => handleCategorySelect("all")}
           >
             <span>✨ All Stacks</span>
             <small className="filter-count">{items.length}</small>
@@ -211,7 +242,7 @@ export default function MenuClient({
             <button
               type="button"
               className={`menu-filter-chip chip-deals ${selectedTag === "deals" ? "active" : ""}`}
-              onClick={() => setSelectedTag("deals")}
+              onClick={() => handleCategorySelect("deals")}
             >
               <span>🔥 Special Deals</span>
               <small className="filter-count">{dealItems.length}</small>
@@ -228,7 +259,7 @@ export default function MenuClient({
                 key={cat.slug}
                 type="button"
                 className={`menu-filter-chip ${selectedTag === cat.slug ? "active" : ""}`}
-                onClick={() => setSelectedTag(cat.slug)}
+                onClick={() => handleCategorySelect(cat.slug)}
               >
                 <span>
                   {cat.icon} {cat.name}
@@ -312,15 +343,11 @@ export default function MenuClient({
               if (group.length === 0) return null;
 
               return (
-                <section className="menu-cat-board" key={cat.slug}>
+                <section className="menu-cat-board" id={`category-${cat.slug}`} key={cat.slug}>
                   <div className="menu-board-header">
                     <div className="board-header-left">
                       <span className="board-cat-icon">{cat.icon}</span>
-                      <h2 className="board-cat-title">
-                        {cat.name.toLowerCase().includes("stack") || cat.name.toLowerCase().includes("brunch")
-                          ? cat.name
-                          : `${cat.name} Stacks`}
-                      </h2>
+                      <h2 className="board-cat-title">{cat.name}</h2>
                     </div>
                     <span className="board-items-badge">
                       {group.length} {group.length === 1 ? "Dish" : "Dishes"}

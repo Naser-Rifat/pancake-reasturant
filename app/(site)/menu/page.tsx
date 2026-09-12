@@ -24,10 +24,10 @@ export default async function MenuPage() {
       <section className="menu-hero">
         <div className="container">
           <h1>
-            {site.menu_hero_heading || "Stacks On"}{" "}
-            <span className="accent">{site.menu_hero_script || "Stacks."}</span>
+            {site.menu_hero_heading || "Pick your"}{" "}
+            <span className="accent">{site.menu_hero_script || "Favourites"}</span>
           </h1>
-          <p>{site.menu_hero_lead || "Signature pancake stacks. Griddled to order. Zero regrets."}</p>
+          <p>{site.menu_hero_lead || "Freshly made and served with love"}</p>
         </div>
       </section>
 

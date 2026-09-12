@@ -8,7 +8,7 @@ const DINER_TAGS = [
   { text: "Verified Diner", icon: "🥞" },
   { text: "Brunch Regular", icon: "☕" },
   { text: "Sweet Tooth", icon: "🍓" },
-  { text: "Sydney Local", icon: "✨" },
+  { text: "Geelong Local", icon: "✨" },
   { text: "Weekend Feast", icon: "💛" },
 ];
 
@@ -92,7 +92,7 @@ export default function ReviewsCarousel({ reviews }: { reviews: ApiReview[] }) {
                 <span className="avatar">{r.avatar || "🥞"}</span>
                 <div className="who-info">
                   <span className="who-name">{r.name}</span>
-                  {r.suburb && <span className="who-suburb">📍 {r.suburb}, Sydney</span>}
+                  {r.suburb && <span className="who-suburb">📍 {r.suburb}, Geelong</span>}
                 </div>
               </div>
             </article>
