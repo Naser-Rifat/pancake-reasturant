@@ -16,6 +16,7 @@ export function Pagination({
   serverHasMore,
   loading = false,
   onPageChange,
+  className = "",
 }: {
   page: number;
   pageSize: number;
@@ -23,6 +24,7 @@ export function Pagination({
   serverHasMore: boolean;
   loading?: boolean;
   onPageChange: (page: number) => void;
+  className?: string;
 }) {
   const knownPages = Math.max(1, Math.ceil(totalLoaded / pageSize));
   if (knownPages <= 1 && !serverHasMore) return null;
@@ -37,7 +39,7 @@ export function Pagination({
   return (
     <nav
       aria-label="Pagination"
-      className="p-4 flex flex-wrap items-center justify-center gap-1.5 border-t border-zinc-200 bg-white"
+      className={`p-4 flex flex-wrap items-center justify-center gap-1.5 border-t border-zinc-200 bg-white ${className}`}
     >
       <Button
         variant="outline"
