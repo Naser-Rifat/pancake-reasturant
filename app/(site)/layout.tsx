@@ -162,7 +162,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
            <WhatsAppFloat phone={site.whatsapp} />
            }
           <ScrollFx />
-          <BottomBar />
+          <BottomBar whatsapp={site.whatsapp} />
           {/* desktop's cart — mobile/tablet use the app header's, which sits
               in Nav. globals.css shows exactly one of them per breakpoint. */}
           <CartButton live={site.online_ordering_enabled} className="cart-fab" size={26} />

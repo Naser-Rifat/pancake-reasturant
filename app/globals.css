@@ -8043,7 +8043,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.38rem;
     width: auto;
     max-width: calc(100% - 1.8rem);
     transform: translateX(-50%) translateY(140%);
@@ -8137,10 +8137,20 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     color: var(--ink);
     border-color: #1e130b;
   }
-  /* the WhatsApp bubble sits in the corner the bar now crosses — lift it clear.
-     The cart used to stack here too; it lives in the header now. */
-  body:has(.tabbar) .wa-float {
-    bottom: calc(0.7rem + 64px + 12px + env(safe-area-inset-bottom, 0px));
+  /* 💬 WhatsApp Chat Tab in Bottom Bar */
+  .tabbar-chat {
+    color: #25d366;
+    text-decoration: none;
+  }
+  .tabbar-chat:hover,
+  .tabbar-chat:active {
+    background: rgba(37, 211, 102, 0.12);
+    border-color: rgba(37, 211, 102, 0.35);
+    color: #128c7e;
+  }
+  /* Mobile & Tablet: WhatsApp lives inside the bottom tab bar — suppress floating bubble to keep food views clean */
+  .wa-float {
+    display: none !important;
   }
   /* The toast landed on the tab bar, covering the very labels you tap next —
      the bar is permanent now, so that would happen every time.
