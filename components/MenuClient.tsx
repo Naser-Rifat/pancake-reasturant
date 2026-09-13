@@ -152,21 +152,31 @@ export default function MenuClient({
 
   const handleCategorySelect = (slug: string) => {
     setSelectedTag(slug);
+
+    const getNavOffset = () => {
+      const nav = document.querySelector(".nav");
+      const ribbon = document.querySelector(".top-ribbon");
+      const navBottom = nav
+        ? nav.getBoundingClientRect().bottom
+        : ribbon
+        ? ribbon.getBoundingClientRect().bottom + 60
+        : 120;
+      return -(navBottom + 16);
+    };
+
     if (slug === "deals") {
       const banner = document.querySelector(".menu-deals-banner") || document.querySelector(".menu-filter-bar");
       if (banner) {
-        const yOffset = -90;
-        const y = banner.getBoundingClientRect().top + window.pageYOffset + yOffset;
-        window.scrollTo({ top: y, behavior: "smooth" });
+        const y = banner.getBoundingClientRect().top + window.pageYOffset + getNavOffset();
+        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
       }
       return;
     }
     if (slug === "all") {
       const firstBoard = document.querySelector(".menu-cat-board") || document.querySelector(".menu-filter-bar");
       if (firstBoard) {
-        const yOffset = -90;
-        const y = firstBoard.getBoundingClientRect().top + window.pageYOffset + yOffset;
-        window.scrollTo({ top: y, behavior: "smooth" });
+        const y = firstBoard.getBoundingClientRect().top + window.pageYOffset + getNavOffset();
+        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
       }
       return;
     }
@@ -174,9 +184,8 @@ export default function MenuClient({
     setTimeout(() => {
       const target = document.getElementById(`category-${slug}`);
       if (target) {
-        const yOffset = -90;
-        const y = target.getBoundingClientRect().top + window.pageYOffset + yOffset;
-        window.scrollTo({ top: y, behavior: "smooth" });
+        const y = target.getBoundingClientRect().top + window.pageYOffset + getNavOffset();
+        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
       }
     }, 40);
   };

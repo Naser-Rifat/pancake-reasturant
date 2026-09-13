@@ -153,6 +153,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             facebookUrl={site.facebook_url}
             instagramUrl={site.instagram_url}
             uberEatsUrl={site.uber_eats_url}
+            whatsapp={site.whatsapp}
+            address={site.address}
           />
           {children}
           <Footer />

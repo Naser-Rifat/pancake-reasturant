@@ -4,9 +4,27 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import LogoMark from "@/components/LogoMark";
+import { X, ArrowRight, ExternalLink } from "lucide-react";
 import CartButton from "@/components/CartButton";
 import { TOGGLE_MENU_EVENT } from "@/components/BottomBar";
+
+function FacebookIcon({ size = 15 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" aria-hidden="true">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+    </svg>
+  );
+}
+
+function InstagramIcon({ size = 15 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+  );
+}
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -21,16 +39,21 @@ export default function Nav({
   facebookUrl,
   instagramUrl,
   uberEatsUrl,
+  whatsapp,
+  address = "18 Pakington Street, Geelong West",
 }: {
   live?: boolean;
   facebookUrl?: string;
   instagramUrl?: string;
   uberEatsUrl?: string;
+  whatsapp?: string;
+  address?: string;
 }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [pastHero, setPastHero] = useState(false);
+
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
@@ -47,112 +70,251 @@ export default function Nav({
     return () => window.removeEventListener("scroll", onScroll);
   }, [pathname]);
 
+  // Close drawer on route change
   useEffect(() => setOpen(false), [pathname]);
 
-  // the bottom bar's More tab drives this same panel — one menu, two entry points
+  // Lock body scroll when mobile drawer is open to prevent background leaks
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+      document.body.classList.add("nav-drawer-active");
+    } else {
+      document.body.style.overflow = "";
+      document.body.classList.remove("nav-drawer-active");
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.classList.remove("nav-drawer-active");
+    };
+  }, [open]);
+
+  // The bottom bar's More tab drives this same panel
   useEffect(() => {
     const toggle = () => setOpen((o) => !o);
     window.addEventListener(TOGGLE_MENU_EVENT, toggle);
     return () => window.removeEventListener(TOGGLE_MENU_EVENT, toggle);
   }, []);
 
-  // hide the public nav on the standalone live-preview route — must stay AFTER
-  // the hooks above so the hook count never changes between renders
   if (pathname === "/preview" || pathname?.startsWith("/preview")) {
     return null;
   }
 
+  const cleanAddress = address.replace(/,\s*Australia$/i, "").trim();
+  const whatsappDigits = whatsapp ? whatsapp.replace(/\D/g, "") : "";
+
   return (
-    <header className={`nav${scrolled ? " scrolled" : ""}${pastHero ? " past-hero" : ""}`}>
-      <div className="container nav-inner">
-        <Link href="/" className="logo" aria-label="The Pancake Club — home">
-          <Image
-            src="/logo.png"
-            alt="The Pancake Club"
-            width={132}
-            height={56}
-            priority
-            className="nav-brand-logo"
-          />
-        </Link>
+    <>
+      <header className={`nav${scrolled ? " scrolled" : ""}${pastHero ? " past-hero" : ""}`}>
+        <div className="container nav-inner">
+          <Link href="/" className="logo" aria-label="The Pancake Club — home">
+            <Image
+              src="/logo.png"
+              alt="The Pancake Club"
+              width={132}
+              height={56}
+              priority
+              className="nav-brand-logo"
+            />
+          </Link>
 
-        <ul className={`nav-links${open ? " open" : ""}`}>
-          {LINKS.map((l) => (
-            <li key={l.href}>
-              <Link
-                href={l.href}
-                className={pathname === l.href ? "active" : undefined}
-                onClick={() => setOpen(false)}
-              >
-                {l.label}
-              </Link>
-            </li>
-          ))}
+          {/* Desktop Inline Nav Links */}
+          <ul className="nav-links nav-links-desktop">
+            {LINKS.map((l) => (
+              <li key={l.href}>
+                <Link
+                  href={l.href}
+                  className={pathname === l.href ? "active" : undefined}
+                >
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
 
-          {/* Mobile Drawer Social & Uber Eats Delivery Section */}
-          {(uberEatsUrl || facebookUrl || instagramUrl) && (
-            <li className="nav-drawer-extras">
+          <div className="nav-cta">
+            <CartButton live={live} className="nav-cart" />
+            <Link href="/booking" className="btn btn-primary nav-book-btn">
+              <span className="nav-btn-text">Book</span>
+              <span className="nav-btn-arrow">↗</span>
+            </Link>
+            <button
+              className={`burger-toggle${open ? " open" : ""}`}
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
+              onClick={() => setOpen(!open)}
+            >
+              {open ? (
+                <X size={20} strokeWidth={2.4} aria-hidden="true" />
+              ) : (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="4" y1="7" x2="20" y2="7" />
+                  <line x1="4" y1="12" x2="20" y2="12" />
+                  <line x1="4" y1="17" x2="20" y2="17" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile & Tablet Full-Screen Luxury Menu Drawer */}
+      <div
+        className={`mobile-nav-overlay${open ? " open" : ""}`}
+        aria-hidden={!open}
+      >
+        {/* Dimmed backdrop click target */}
+        <div
+          className="mobile-nav-backdrop"
+          onClick={() => setOpen(false)}
+          aria-hidden="true"
+        />
+
+        {/* Sliding luxury sheet */}
+        <div
+          className="mobile-nav-sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Main Navigation"
+        >
+          {/* Drawer Header with Brand & Dedicated X Close Button */}
+          <div className="mobile-nav-header">
+            <Link href="/" className="mobile-nav-logo" onClick={() => setOpen(false)}>
+              <Image
+                src="/logo.png"
+                alt="The Pancake Club"
+                width={124}
+                height={52}
+                priority
+                className="nav-brand-logo"
+              />
+            </Link>
+            <button
+              type="button"
+              className="mobile-nav-close-btn"
+              aria-label="Close menu"
+              onClick={() => setOpen(false)}
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Drawer Content Body */}
+          <div className="mobile-nav-content">
+            {/* Primary Navigation Links */}
+            <ul className="mobile-nav-links-list">
+              {LINKS.map((l) => {
+                const isActive = pathname === l.href;
+                return (
+                  <li key={l.href}>
+                    <Link
+                      href={l.href}
+                      className={`mobile-nav-item${isActive ? " active" : ""}`}
+                      onClick={() => setOpen(false)}
+                    >
+                      <span className="mobile-nav-item-label">{l.label}</span>
+                      <ArrowRight size={17} className="mobile-nav-item-arrow" aria-hidden="true" />
+                    </Link>
+                  </li>
+                );
+              })}
+              <li>
+                <Link
+                  href="/booking"
+                  className="mobile-nav-item mobile-nav-item-book"
+                  onClick={() => setOpen(false)}
+                >
+                  <span className="mobile-nav-item-label">Book a Table</span>
+                  <span className="mobile-nav-book-badge">Reserve ↗</span>
+                </Link>
+              </li>
+            </ul>
+
+            {/* Action CTAs: Uber Eats Delivery & WhatsApp Support */}
+            <div className="mobile-nav-cta-stack">
               {uberEatsUrl && (
                 <a
                   href={uberEatsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="nav-drawer-uber-btn"
+                  className="mobile-drawer-uber-pill"
                 >
-                  <span>🛵 Order on Uber Eats</span>
-                  <span aria-hidden="true">↗</span>
+                  <span className="m-uber-icon" aria-hidden="true">🛵</span>
+                  <span className="m-uber-text">Order on Uber Eats</span>
+                  <ExternalLink size={14} className="m-uber-arrow" aria-hidden="true" />
                 </a>
               )}
-              {(facebookUrl || instagramUrl) && (
-                <div className="nav-drawer-socials">
-                  <span className="drawer-socials-label">Follow Us</span>
-                  <div className="drawer-socials-btns">
-                    {facebookUrl && (
-                      <a
-                        href={facebookUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="drawer-social-link"
-                        aria-label="Follow on Facebook"
-                      >
-                        Facebook ↗
-                      </a>
-                    )}
-                    {instagramUrl && (
-                      <a
-                        href={instagramUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="drawer-social-link"
-                        aria-label="Follow on Instagram"
-                      >
-                        Instagram ↗
-                      </a>
-                    )}
-                  </div>
-                </div>
+              {whatsappDigits && (
+                <a
+                  href={`https://wa.me/${whatsappDigits}?text=${encodeURIComponent("Hi The Pancake Club! I'd like to make an enquiry.")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mobile-drawer-wa-pill"
+                >
+                  <span className="m-wa-icon" aria-hidden="true">💬</span>
+                  <span className="m-wa-text">Chat on WhatsApp</span>
+                  <ExternalLink size={14} className="m-wa-arrow" aria-hidden="true" />
+                </a>
               )}
-            </li>
-          )}
-        </ul>
+            </div>
 
-        <div className="nav-cta">
-          {/* mobile/tablet only — desktop keeps the floating bubble, having no
-              app bar to hang this off. globals.css picks which one shows. */}
-          <CartButton live={live} className="nav-cart" />
-          <Link href="/booking" className="btn btn-primary nav-book-btn">
-            <span className="nav-btn-text">Book</span>
-            <span className="nav-btn-arrow">↗</span>
-          </Link>
-          <button
-            className={`burger-toggle${open ? " open" : ""}`}
-            aria-label="Toggle menu"
-            onClick={() => setOpen(!open)}
-          >
-            <span></span><span></span><span></span>
-          </button>
+            {/* Social Follow Channels */}
+            {(facebookUrl || instagramUrl) && (
+              <div className="mobile-nav-socials-box">
+                <span className="mobile-nav-socials-heading">Follow Us</span>
+                <div className="mobile-nav-socials-grid">
+                  {facebookUrl && (
+                    <a
+                      href={facebookUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mobile-nav-social-btn"
+                      aria-label="Follow The Pancake Club on Facebook"
+                    >
+                      <FacebookIcon size={15} />
+                      <span>Facebook</span>
+                      <span className="m-ext-arrow" aria-hidden="true">↗</span>
+                    </a>
+                  )}
+                  {instagramUrl && (
+                    <a
+                      href={instagramUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mobile-nav-social-btn"
+                      aria-label="Follow The Pancake Club on Instagram"
+                    >
+                      <InstagramIcon size={15} />
+                      <span>Instagram</span>
+                      <span className="m-ext-arrow" aria-hidden="true">↗</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Store Location & Hours Footer */}
+            <div className="mobile-nav-store-footer">
+              <p className="mobile-nav-store-addr">
+                📍 {cleanAddress}
+              </p>
+              <p className="mobile-nav-store-time">
+                Open Daily · 11:00 AM – 9:00 PM
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-    </header>
+    </>
   );
 }
+

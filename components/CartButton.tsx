@@ -34,19 +34,23 @@ export default function CartButton({
     return () => cancelAnimationFrame(id);
   }, [addedAt]);
 
-  if (!live || count === 0) return null;
+  // Desktop FAB only shows when items exist; header cart is always visible
+  if (!live) return null;
+  if (className.includes("cart-fab") && count === 0) return null;
 
   return (
     <button
       type="button"
       className={className}
-      aria-label={`Your order — ${count} item${count === 1 ? "" : "s"}`}
+      aria-label={count > 0 ? `Your order — ${count} item${count === 1 ? "" : "s"}` : "Your order — empty"}
       onClick={openCart}
     >
       <ShoppingCart size={size} strokeWidth={2.2} aria-hidden="true" />
-      <span className={`count${pop ? " pop" : ""}`} aria-hidden="true">
-        {count}
-      </span>
+      {count > 0 && (
+        <span className={`count${pop ? " pop" : ""}`} aria-hidden="true">
+          {count}
+        </span>
+      )}
     </button>
   );
 }

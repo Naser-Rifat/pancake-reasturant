@@ -1,15 +1,13 @@
 "use client";
 
-// Mobile/tablet bottom tab bar — the navigation, full stop.
-//
-// It used to reveal itself only once you had scrolled past the hero, which is
-// the one thing an app's tab bar never does: you land, and the app's shape is
-// already there. It is up from the first paint now, and the top pill is a thin
-// app header (logo + cart) rather than a second copy of these links.
-//
+// Mobile/tablet bottom tab bar.
+// On the homepage, navigation lives on the hero itself (Book a Table & Explore Menu).
+// This bar takes over smoothly once you scroll past the hero fold, so navigation
+// lives in the thumb zone without duplicating the hero action buttons.
+// On subpages (menu, booking, gallery), it is visible from first paint.
 // Desktop never sees it — globals.css hides it from 1024px up.
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CalendarDays, House, Menu as MenuIcon, UtensilsCrossed } from "lucide-react";
@@ -20,18 +18,45 @@ const TABS = [
   { href: "/booking", label: "Book", Icon: CalendarDays },
 ];
 
-/** Nav owns the menu panel; the More tab reuses it rather than shipping a
- *  second list that would drift out of sync with the burger's. */
 export const TOGGLE_MENU_EVENT = "pancakeclub:toggle-menu";
 
 export default function BottomBar() {
   const pathname = usePathname();
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    // Pages without a hero (menu, booking, gallery, etc.) show the bar immediately
+    const hero = document.querySelector(".hero");
+    if (!hero) {
+      setShown(true);
+      return;
+    }
+
+    // On homepage, reveal only once scrolled past hero fold to prevent button clash
+    const onScroll = () => {
+      const h = (hero as HTMLElement).offsetHeight || window.innerHeight;
+      const y = window.scrollY;
+      setShown((was) => (was ? y > h * 0.35 : y > h * 0.65));
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [pathname]);
 
   // the standalone live-preview route renders without site chrome, same as Nav
   if (pathname === "/preview" || pathname?.startsWith("/preview")) return null;
 
   return (
-    <nav className="tabbar" aria-label="Primary">
+    <nav
+      className={`tabbar${shown ? " on" : ""}`}
+      aria-label="Primary"
+      aria-hidden={!shown}
+    >
       {TABS.map(({ href, label, Icon }) => {
         const active = href === "/" ? pathname === "/" : pathname?.startsWith(href);
         return (
@@ -40,11 +65,12 @@ export default function BottomBar() {
             href={href}
             className={`tabbar-item${active ? " on" : ""}`}
             aria-current={active ? "page" : undefined}
+            tabIndex={shown ? undefined : -1}
           >
             <span className="tabbar-icon">
-              <Icon size={21} strokeWidth={2.2} aria-hidden="true" />
+              <Icon size={20} strokeWidth={2.2} aria-hidden="true" />
             </span>
-            <span>{label}</span>
+            <span className="tabbar-label">{label}</span>
           </Link>
         );
       })}
@@ -52,10 +78,14 @@ export default function BottomBar() {
         type="button"
         className="tabbar-item"
         onClick={() => window.dispatchEvent(new Event(TOGGLE_MENU_EVENT))}
+        tabIndex={shown ? undefined : -1}
       >
-        <MenuIcon size={21} strokeWidth={2.2} aria-hidden="true" />
-        <span>More</span>
+        <span className="tabbar-icon">
+          <MenuIcon size={20} strokeWidth={2.2} aria-hidden="true" />
+        </span>
+        <span className="tabbar-label">More</span>
       </button>
     </nav>
   );
 }
+

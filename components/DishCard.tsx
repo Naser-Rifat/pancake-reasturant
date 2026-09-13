@@ -30,6 +30,33 @@ export const TAG_ICONS: Record<string, string> = {
   choc: "🍫",
 };
 
+/**
+ * Custom vector icon matching the reference design:
+ * A boutique shopping bag outline with a centered plus sign.
+ */
+function BagPlusIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      width="19"
+      height="19"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+      <path d="M3 6h18" />
+      <path d="M16 10a4 4 0 0 1-8 0" />
+      <line x1="12" y1="12.5" x2="12" y2="16.5" strokeWidth="2.2" />
+      <line x1="10" y1="14.5" x2="14" y2="14.5" strokeWidth="2.2" />
+    </svg>
+  );
+}
+
 export default function DishCard({
   item,
   variant = "tile",
@@ -50,55 +77,71 @@ export default function DishCard({
   if (item.slug === "savannah-mack" && (!src || src.includes("lmhxhhzx21ft2vhusuji"))) {
     src = "/menu/savannah-clean.png";
   }
-  // a cutout stands on the card floor with a white keyline; a real photo is a
-  // rectangle and gets cropped instead — the two need different treatment
+  // Ensure every menu card has a gorgeous, high-definition transparent cutout
+  // matching the artisan bakery reference design
+  if (!item.image && (!src || !src.startsWith("/menu/"))) {
+    const cat = item.category_slug || item.tag || "";
+    if (cat.includes("choc")) src = "/menu/choc.png";
+    else if (cat.includes("savoury")) src = "/menu/brekkie.png";
+    else if (cat.includes("berry") || item.slug.includes("berry")) src = "/menu/berry.png";
+    else if (cat.includes("banana") || item.slug.includes("banana")) src = "/menu/banana.png";
+    else if (cat.includes("lemon") || item.slug.includes("lemon")) src = "/menu/lemon.png";
+    else src = "/menu/buttermilk.png";
+  }
+  // a cutout stands on the card floor with a white keyline
   const isCutout = Boolean(item.image || src.startsWith("/menu/"));
   const catIcon = item.category_icon || item.category?.icon || TAG_ICONS[item.tag] || "🥞";
   const catLabel = item.category_name || item.category?.name || TAG_LABEL[item.tag] || item.tag;
+
+  const isRow = variant === "row";
 
   return (
     <article className={`dish-card dc-${variant}`}>
       {/* the whole card is the target; the name keeps its own anchor for AT */}
       <Link href={href} className="dc-hit" aria-label={`View ${item.name} details`} />
 
-      <div className="dc-photo">
-        {src && (
-          <Image
-            src={src}
-            alt={`${item.name} pancakes`}
-            width={320}
-            height={320}
-            sizes="(min-width: 1024px) 25vw, 45vw"
-            className={`dc-img${isCutout ? " is-cutout" : ""}`}
-          />
-        )}
-      </div>
-
       <div className="dc-body">
-        <div className="dc-head">
+        {dealBadge && (
+          <div className="dc-badge-row">
+            <span className="dc-badge dc-badge-featured">{dealBadge}</span>
+          </div>
+        )}
+
+        <div className={`dc-head${isRow ? " dc-head-row" : ""}`}>
           <span className={`dc-badge tag-${item.category_slug || item.tag}`}>
             <span aria-hidden="true">{catIcon}</span>
             <span>{catLabel}</span>
           </span>
           <span className="dc-dots" aria-hidden="true" />
-          <span className="dc-price">{money(item.price)}</span>
+          <span className="dc-price dc-price-head">{money(item.price)}</span>
         </div>
 
         <h3 className="dc-name">
           <Link href={href}>{item.name}</Link>
-          {dealBadge && <span className="dc-deal-pill">{dealBadge}</span>}
+          {dealBadge && <span className="dc-deal-pill dc-deal-pill-desktop">{dealBadge}</span>}
         </h3>
 
-        <p className="dc-desc">{item.description}</p>
+        {/* Sub-price only rendered for the mobile row variant */}
+        {isRow && (
+          <span className="dc-price dc-price-sub">{money(item.price)}</span>
+        )}
 
-        {/* Calories, Protein, and Prep time badges (commented out per user request; uncomment to re-enable) */}
-        {/*
-        <div className="dc-chips">
-          {item.kcal != null && <span className="dc-chip">🔥 {item.kcal} kcal</span>}
-          {item.protein_g != null && <span className="dc-chip">💪 {item.protein_g}g protein</span>}
-          {item.prep_time && <span className="dc-chip">⏱ {item.prep_time}</span>}
+        {item.description && <p className="dc-desc">{item.description}</p>}
+      </div>
+
+      <div className="dc-media">
+        <div className="dc-photo">
+          {src && (
+            <Image
+              src={src}
+              alt={`${item.name} pancakes`}
+              width={420}
+              height={420}
+              sizes="(min-width: 1024px) 25vw, 380px"
+              className={`dc-img${isCutout ? " is-cutout" : ""}`}
+            />
+          )}
         </div>
-        */}
       </div>
 
       <div className="dc-actions">
@@ -107,17 +150,38 @@ export default function DishCard({
           <ArrowRight size={13} />
         </Link>
         {onAdd && (
-          <button
-            type="button"
-            className="dc-add"
-            onClick={() => onAdd(item.slug)}
-            aria-label={`Add ${item.name} to order`}
-          >
-            <Plus size={14} strokeWidth={2.75} />
-            <span>Add</span>
-          </button>
+          <>
+            <button
+              type="button"
+              className="dc-add dc-add-desktop"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onAdd(item.slug);
+              }}
+              aria-label={`Add ${item.name} to order`}
+            >
+              <Plus size={14} strokeWidth={2.75} />
+              <span>Add</span>
+            </button>
+            {isRow && (
+              <button
+                type="button"
+                className="dc-add dc-add-bag"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onAdd(item.slug);
+                }}
+                aria-label={`Add ${item.name} to order`}
+              >
+                <BagPlusIcon />
+              </button>
+            )}
+          </>
         )}
       </div>
     </article>
   );
 }
+
