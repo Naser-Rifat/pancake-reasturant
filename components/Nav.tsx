@@ -56,9 +56,14 @@ export default function Nav({
   const [hasBottomBar, setHasBottomBar] = useState(false);
 
   useEffect(() => {
+    let lastY = typeof window !== "undefined" ? window.scrollY : 0;
+    let stopTimer: ReturnType<typeof setTimeout> | null = null;
+
     const onScroll = () => {
       const y = window.scrollY;
+      const delta = y - lastY;
       setScrolled(y > 30);
+
       const hero = document.querySelector(".hero");
       if (hero) {
         setPastHero(y > 220);
@@ -67,11 +72,44 @@ export default function Nav({
         setPastHero(true);
         setHasBottomBar(true);
       }
+
+      // Do not auto-hide if mobile drawer or cart drawer is open
+      if (open || (typeof document !== "undefined" && document.querySelector(".cart-drawer.open"))) {
+        document.body.classList.remove("chrome-hidden");
+        lastY = y;
+        return;
+      }
+
+      // Near the top of the viewport, chrome should always remain visible
+      if (y <= 30) {
+        document.body.classList.remove("chrome-hidden");
+      } else if (delta > 8) {
+        // Scrolling DOWN -> hide chrome for full-screen immersive reading
+        document.body.classList.add("chrome-hidden");
+      } else if (delta < -6) {
+        // Scrolling UP -> reveal chrome immediately
+        document.body.classList.remove("chrome-hidden");
+      }
+
+      // Scrolling STOPPED debounce timer (smoothly re-reveal bars after 320ms pause)
+      if (stopTimer) clearTimeout(stopTimer);
+      stopTimer = setTimeout(() => {
+        document.body.classList.remove("chrome-hidden");
+      }, 320);
+
+      lastY = y;
     };
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [pathname]);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (stopTimer) clearTimeout(stopTimer);
+      if (typeof document !== "undefined") {
+        document.body.classList.remove("chrome-hidden");
+      }
+    };
+  }, [pathname, open]);
 
   // Close drawer on route change
   useEffect(() => setOpen(false), [pathname]);
