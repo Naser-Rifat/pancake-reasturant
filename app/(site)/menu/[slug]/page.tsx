@@ -83,81 +83,58 @@ export default async function DishPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />
 
       <div className="container">
-        {/* Breadcrumb Navigation */}
-        {/* Breadcrumb on desktop; on phones globals.css turns this into the
-            app bar — back arrow, the dish name centred, and a menu button */}
+        {/* Breadcrumb Navigation / Mobile Top App Bar */}
         <nav className="dish-crumb" aria-label="Breadcrumb">
           <Link href="/menu" className="dish-back">
             <span className="dish-back-arrow" aria-hidden="true">←</span>
             <span className="dish-back-label">Back to the menu</span>
           </Link>
-          <span className="dish-crumb-sep" style={{ margin: "0 0.5rem", opacity: 0.4 }}>/</span>
-          <span className="dish-crumb-tag" style={{ textTransform: "capitalize", color: "var(--deep)", fontWeight: 700 }}>
+          <span className="dish-crumb-sep" style={{ margin: "0 0.55rem", opacity: 0.45 }}>/</span>
+          <span className="dish-crumb-tag">
             {catIcon} {catLabel}
           </span>
-          <span className="dish-topbar-title">{item.name}</span>
-          {/* right-hand pair: the order, then the menu — mobile app bar only */}
+          <span className="dish-topbar-title">Pancake Details</span>
+          {/* right-hand pair: cart button, then quick menu */}
           <span className="dish-topbar-actions">
             <CartButton live={site.online_ordering_enabled} className="dish-topbar-cart" />
             <DishMenuButton />
           </span>
         </nav>
 
-        {/* 1. Large Hero Photo Deep Frame */}
-        <div className="hf" style={{ border: "2px solid rgba(255,255,255,0.08)", boxShadow: "0 20px 40px rgba(33,26,20,0.14)" }}>
-          <div className="hf-photo dish">
-            {heroImage && (
-              <Image
-                src={heroImage}
-                alt={`${item.name} pancakes`}
-                fill
-                priority
-                sizes="(min-width: 1024px) 1180px, 100vw"
-                className={item.photo ? undefined : "as-cutout"}
-              />
-            )}
-            {/* Spinning Rotating Circular Price Badge */}
-            <span className="price-spin" aria-hidden="true">
-              <svg viewBox="0 0 120 120">
-                <defs>
-                  <path id="dishring" d="M 60,60 m -44,0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0" />
-                </defs>
-                <text><textPath href="#dishring">fresh daily • est. 1999 •</textPath></text>
-              </svg>
-              <span className="num">${price}</span>
-            </span>
-          </div>
-        </div>
-
-        {/* 2. Product Details Block: Copy on Left, Multiple Image Slider Rail on Right */}
+        {/* Product Details: Left Gallery, Right Details (on mobile stacked food-first) */}
         <div className="dprod">
-          {/* Left Column: Copy & Order Controls */}
+          {/* Visual Showcase (Hero Floating Image / Cutout with sticker stroke + Counter) */}
+          <div className="dprod-art">
+            <DishGallery
+              name={item.name}
+              images={galleryImages.length > 0 ? galleryImages : [{ id: "main", src: heroImage, alt: item.name }]}
+            />
+          </div>
+
+          {/* Copy & Order Controls */}
           <div className="dprod-copy">
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "0.4rem" }}>
-              <span className={`fav-tag-badge tag-${item.category_slug || item.tag}`} style={{ fontSize: "0.75rem", padding: "5px 12px" }}>
+            {/* 3 Boutique Soft Pastel Pill Badges (matches artisan reference) */}
+            <div className="dish-pill-tags">
+              <span className="dish-pill-tag tag-rose">
                 <span>{catIcon}</span>
                 <span>{catLabel}</span>
               </span>
-              {item.heat === "medium" && (
-                <span style={{ background: "#ffedd5", color: "#9a3412", border: "1px solid #fed7aa", padding: "4px 10px", borderRadius: "999px", fontSize: "0.75rem", fontWeight: 800 }}>
-                  🌶️ Medium
-                </span>
-              )}
-              {item.heat === "hot" && (
-                <span style={{ background: "#ffe4e6", color: "#9f1239", border: "1px solid #fecdd3", padding: "4px 10px", borderRadius: "999px", fontSize: "0.75rem", fontWeight: 800 }}>
-                  🔥 Spicy
-                </span>
-              )}
+              <span className="dish-pill-tag tag-peach">
+                <span>{item.is_featured ? "✨ House Favourite" : "🔥 Freshly Griddled"}</span>
+              </span>
+              <span className="dish-pill-tag tag-sky">
+                <span>{item.tag === "savory" ? "🍳 Farm Fresh Eggs" : "🍯 Pure Maple Syrup"}</span>
+              </span>
             </div>
 
-            <h1>{item.name}</h1>
+            <h1 className="dish-title">{item.name}</h1>
 
             {avgRating != null && (
               <p className="dish-stars">
                 <span className="stars" aria-hidden="true" style={{ color: "var(--yellow-deep, #f59e0b)" }}>
                   {"★".repeat(Math.round(avgRating))}{"☆".repeat(5 - Math.round(avgRating))}
                 </span>{" "}
-                {avgRating} for The Pancake Club ·{" "}
+                <span className="rating-score">{avgRating}</span> ·{" "}
                 <Link href="/#reviews">
                   {reviews.length} guest review{reviews.length === 1 ? "" : "s"}
                 </Link>
@@ -166,79 +143,77 @@ export default async function DishPage({ params }: Props) {
 
             <p className="dish-desc">{item.description}</p>
 
-            {/* Calories, Protein, and Prep time specs (commented out per user request; uncomment to re-enable) */}
+            {/* 2 Boutique Specification Cards (commented out per user request; uncomment to re-enable) */}
             {/*
-            <div className="chips dish-specs">
-              {item.prep_time && (
-                <span className="chip">
-                  <span className="spec-label">Prep time</span>
-                  <span className="spec-value">⏱ {item.prep_time}</span>
+            <div className="dish-spec-cards">
+              <div className="dish-spec-card">
+                <span className="spec-label">Kitchen Prep</span>
+                <span className="spec-value">{item.prep_time || "10 - 12 Mins"}</span>
+              </div>
+              <div className="dish-spec-card">
+                <span className="spec-label">Stack Size</span>
+                <span className="spec-value">
+                  {item.tag === "beverage" ? "1 Fresh Brew" : item.tag === "sides" ? "Generous Portion" : "3 Fluffy Pancakes"}
                 </span>
-              )}
-              {item.kcal != null && (
-                <span className="chip">
-                  <span className="spec-label">Energy</span>
-                  <span className="spec-value">🔥 {item.kcal} kcal</span>
-                </span>
-              )}
-              {item.protein_g != null && (
-                <span className="chip">
-                  <span className="spec-label">Protein</span>
-                  <span className="spec-value">💪 {item.protein_g}g protein</span>
-                </span>
-              )}
+              </div>
             </div>
             */}
 
-            {site.online_ordering_enabled ? (
-              <div className="dish-buy">
-                <p className="dish-price">
-                  {money(item.price)} <span>per stack</span>
-                </p>
-                <QtyAdd slug={item.slug} name={item.name} />
-              </div>
-            ) : (
-              <div className="dish-paused-cta" style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap", margin: "1rem 0" }}>
-                <Link href="/booking" className="btn btn-primary">
-                  Book a Table 🥞
-                </Link>
-                {site.uber_eats_url && (
-                  <a
-                    href={site.uber_eats_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-secondary"
-                    style={{ background: "#06C167", color: "#fff", borderColor: "#06C167" }}
-                  >
-                    Order on Uber Eats 🛵
-                  </a>
-                )}
-              </div>
-            )}
+            {/* Desktop Inline Buy Section (hidden on mobile where sticky bottom dock is active) */}
+            <div className="dish-desktop-buy">
+              {site.online_ordering_enabled ? (
+                <div className="dish-buy-inline">
+                  <p className="dish-price">
+                    {money(item.price)} <span>per stack</span>
+                  </p>
+                  <QtyAdd slug={item.slug} name={item.name} />
+                </div>
+              ) : (
+                <div className="dish-paused-cta">
+                  <Link href="/booking" className="btn btn-primary">
+                    Book a Table 🥞
+                  </Link>
+                  {site.uber_eats_url && (
+                    <a
+                      href={site.uber_eats_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-secondary"
+                      style={{ background: "#06C167", color: "#fff", borderColor: "#06C167" }}
+                    >
+                      Order on Uber Eats 🛵
+                    </a>
+                  )}
+                </div>
+              )}
 
-            {!site.online_ordering_enabled && (
-              <p className="dish-price">
-                {money(item.price)} <span>per stack</span>
+              <p className="dish-note">
+                Pickup from {site.address.split(",")[0]} — griddled when you order, never before.{" "}
+                <Link href="/booking">Or book a table →</Link>
               </p>
-            )}
-
-            <p className="dish-note">
-              Pickup from {site.address.split(",")[0]} — griddled when you order, never before.{" "}
-              <Link href="/booking">Or book a table →</Link>
-            </p>
-          </div>
-
-          {/* Right Column: Multiple Images Slider Rail / Gallery */}
-          <div className="dprod-art">
-            <DishGallery
-              name={item.name}
-              images={galleryImages.length > 0 ? galleryImages : [{ id: "main", src: heroImage, alt: item.name }]}
-            />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 4. Retro Statement Band with Stickers */}
+      {/* Sticky Bottom Action Dock for Mobile & Tablet (matches Image 2 reference) */}
+      <div className="dish-sticky-dock">
+        <div className="dock-price-wrap">
+          <span className="dock-price">${price % 1 === 0 ? price : price.toFixed(2)}</span>
+          <span className="dock-price-sub">per stack</span>
+        </div>
+        <div className="dock-action-wrap">
+          {site.online_ordering_enabled ? (
+            <QtyAdd slug={item.slug} name={item.name} />
+          ) : (
+            <Link href="/booking" className="btn btn-primary btn-dock-add">
+              Book a Table 🥞
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {/* 4. Retro Statement Band with Stickers (displayed on desktop, hidden on mobile via CSS) */}
       <section className="statement">
         <div className="container statement-in">
           <span className="st-pill" style={{ top: "14%", left: "6%", transform: "rotate(-8deg)" }}>Pancakes</span>

@@ -5,6 +5,7 @@
 // adds straight into the shared cart and stays put.
 
 import { useState } from "react";
+import { ShoppingBag } from "lucide-react";
 import { MAX_QTY, useCart } from "@/lib/cart";
 
 export default function QtyAdd({ slug, name }: { slug: string; name: string }) {
@@ -20,13 +21,14 @@ export default function QtyAdd({ slug, name }: { slug: string; name: string }) {
       </div>
       <button
         type="button"
-        className="btn btn-primary"
+        className="btn btn-primary btn-dock-add"
         onClick={() => {
           add(slug, qty);
           showToast(`${name} added to your order 🥞`);
         }}
       >
-        Add to Order
+        <ShoppingBag size={18} aria-hidden="true" />
+        <span>Add to Cart</span>
       </button>
     </div>
   );
