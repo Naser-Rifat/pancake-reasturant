@@ -30,6 +30,7 @@ import { useConfirm } from "@/components/ui/confirm";
 import { useToast } from "@/components/ui/toast";
 import { TableSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
+import { Pagination } from "@/components/admin/Pagination";
 
 import {
   EMPTY_FORM,
@@ -48,6 +49,9 @@ export default function MenuAdminPage() {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<FilterCategory>("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(8);
+  const tableRef = useRef<HTMLDivElement>(null);
   // null = form closed, "" = adding new, slug = editing that item
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
@@ -336,6 +340,26 @@ export default function MenuAdminPage() {
     });
   }, [items, searchQuery, categoryFilter]);
 
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, categoryFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / pageSize));
+
+  // Keep page within valid bounds if items count shrinks
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
+
+  // Paginated slice for current page
+  const paginatedItems = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredItems.slice(start, start + pageSize);
+  }, [filteredItems, page, pageSize]);
+
   // Statistics
   const totalCount = items.length;
   const liveCount = items.filter((i) => i.is_available).length;
@@ -482,7 +506,14 @@ export default function MenuAdminPage() {
 
           {/* Results Summary */}
           <div className="text-xs font-bold text-zinc-500 shrink-0">
-            Showing <strong>{filteredItems.length}</strong> of {totalCount} items
+            Showing{" "}
+            <strong className="text-[#763a12]">
+              {filteredItems.length === 0
+                ? 0
+                : `${(page - 1) * pageSize + 1}–${Math.min(filteredItems.length, page * pageSize)}`}
+            </strong>{" "}
+            of <strong>{filteredItems.length}</strong> dishes
+            {filteredItems.length !== totalCount && ` (filtered from ${totalCount})`}
           </div>
         </div>
 
@@ -527,7 +558,7 @@ export default function MenuAdminPage() {
       {/* ========================================================================= */}
       {/* MENU ITEMS TABLE                                                          */}
       {/* ========================================================================= */}
-      <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+      <div ref={tableRef} className="scroll-mt-6 bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-6">
             <TableSkeleton rows={6} cols={7} />
@@ -566,7 +597,7 @@ export default function MenuAdminPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100 text-xs font-medium text-[#211a14]">
-                {filteredItems.map((item) => {
+                {paginatedItems.map((item) => {
                   const tagData = getCategoryBadge(item, categoriesMap);
                   const photoCount = photoCounts[item.slug] ?? 0;
                   return (
@@ -698,6 +729,45 @@ export default function MenuAdminPage() {
                 })}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Numbered Pagination & Rows-Per-Page Controls */}
+        {!loading && filteredItems.length > 0 && (
+          <div className="border-t border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-xs text-zinc-600">
+              <span className="font-medium text-zinc-500">Rows per page:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPage(1);
+                }}
+                aria-label="Dishes per page"
+                className="h-8 rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20 cursor-pointer"
+              >
+                <option value={8}>8 dishes</option>
+                <option value={12}>12 dishes</option>
+                <option value={20}>20 dishes</option>
+                <option value={50}>50 dishes</option>
+              </select>
+              <span className="text-zinc-300">|</span>
+              <span className="text-zinc-500 font-medium">
+                {filteredItems.length} total {filteredItems.length === 1 ? "dish" : "dishes"}
+              </span>
+            </div>
+
+            <Pagination
+              page={page}
+              pageSize={pageSize}
+              totalLoaded={filteredItems.length}
+              serverHasMore={false}
+              className="border-t-0 p-0"
+              onPageChange={(p) => {
+                setPage(p);
+                tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            />
           </div>
         )}
       </div>
