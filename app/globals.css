@@ -7048,8 +7048,8 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   }
   body:has(.hero-nav) .hero-card-left {
     flex: 1;
-    /* Ensure hero buttons sit comfortably above the fixed bottom tabbar with optical breathing room */
-    padding: 0 1.25rem calc(5.8rem + env(safe-area-inset-bottom, 0px)) !important;
+    /* Hero buttons sit at the very bottom of the mobile viewport with standard thumb-zone safe gap */
+    padding: 0 1.25rem calc(1.35rem + env(safe-area-inset-bottom, 0px)) !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -7113,7 +7113,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   @media (min-width: 600px) {
     body:has(.hero-nav) .hero-card-left {
       padding-inline: 2rem !important;
-      padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)) !important;
+      padding-bottom: calc(2.2rem + env(safe-area-inset-bottom, 0px)) !important;
     }
     body:has(.hero-nav) .hero-actions,
     body:has(.hero-nav):has(.wa-float) .hero-actions {
@@ -7154,7 +7154,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   }
   /* WhatsApp float button: elevates cleanly above action buttons on mobile over hero */
   body:has(.hero-nav) .wa-float {
-    bottom: calc(9.8rem + env(safe-area-inset-bottom, 0px)) !important;
+    bottom: calc(8.6rem + env(safe-area-inset-bottom, 0px)) !important;
     width: 50px !important;
     height: 50px !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(37, 211, 102, 0.35) !important;
@@ -8151,6 +8151,14 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   }
   .burger-toggle:active {
     transform: scale(0.94);
+  }
+  /* When bottom navigation bar is active, hide header's redundant burger toggle */
+  body:has(.tabbar.on) .burger-toggle,
+  body:has(.tabbar.on) .nav:not(.past-hero) .burger-toggle {
+    display: none !important;
+  }
+  body:has(.tabbar.on) .wa-float {
+    bottom: calc(0.7rem + 64px + 12px + env(safe-area-inset-bottom, 0px)) !important;
   }
   .nav-cta {
     display: flex;

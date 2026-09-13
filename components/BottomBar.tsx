@@ -32,11 +32,10 @@ export default function BottomBar() {
       return;
     }
 
-    // On homepage, reveal only once scrolled past hero fold to prevent button clash
+    // On homepage, reveal as soon as scrolling starts (y > 40px) and hide at top (y <= 20px)
     const onScroll = () => {
-      const h = (hero as HTMLElement).offsetHeight || window.innerHeight;
       const y = window.scrollY;
-      setShown((was) => (was ? y > h * 0.35 : y > h * 0.65));
+      setShown((was) => (was ? y > 20 : y > 40));
     };
 
     onScroll();

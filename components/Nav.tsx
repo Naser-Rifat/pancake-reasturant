@@ -53,6 +53,7 @@ export default function Nav({
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [pastHero, setPastHero] = useState(false);
+  const [hasBottomBar, setHasBottomBar] = useState(false);
 
   useEffect(() => {
     const onScroll = () => {
@@ -61,8 +62,10 @@ export default function Nav({
       const hero = document.querySelector(".hero");
       if (hero) {
         setPastHero(y > 220);
+        setHasBottomBar((was) => (was ? y > 20 : y > 40));
       } else {
         setPastHero(true);
+        setHasBottomBar(true);
       }
     };
     onScroll();
@@ -137,32 +140,34 @@ export default function Nav({
               <span className="nav-btn-text">Book</span>
               <span className="nav-btn-arrow">↗</span>
             </Link>
-            <button
-              className={`burger-toggle${open ? " open" : ""}`}
-              aria-label={open ? "Close menu" : "Open menu"}
-              aria-expanded={open}
-              onClick={() => setOpen(!open)}
-            >
-              {open ? (
-                <X size={20} strokeWidth={2.4} aria-hidden="true" />
-              ) : (
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <line x1="4" y1="7" x2="20" y2="7" />
-                  <line x1="4" y1="12" x2="20" y2="12" />
-                  <line x1="4" y1="17" x2="20" y2="17" />
-                </svg>
-              )}
-            </button>
+            {!hasBottomBar && (
+              <button
+                className={`burger-toggle${open ? " open" : ""}`}
+                aria-label={open ? "Close menu" : "Open menu"}
+                aria-expanded={open}
+                onClick={() => setOpen(!open)}
+              >
+                {open ? (
+                  <X size={20} strokeWidth={2.4} aria-hidden="true" />
+                ) : (
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <line x1="4" y1="7" x2="20" y2="7" />
+                    <line x1="4" y1="12" x2="20" y2="12" />
+                    <line x1="4" y1="17" x2="20" y2="17" />
+                  </svg>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </header>
