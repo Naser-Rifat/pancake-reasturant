@@ -41,7 +41,8 @@ urlpatterns = [
     # not cached and not a ViewSet: it prices a specific cart, and it is the
     # one public endpoint that answers questions about secret strings
     path("coupons/validate/", views.CouponValidateView.as_view(), name="coupon-validate"),
-    path("webhooks/stripe/", payments.stripe_webhook, name="stripe-webhook"),
+    # TODO: STRIPE PAYMENT SERVICE - UNCOMMENT WHEN RE-ENABLING STRIPE:
+    # path("webhooks/stripe/", payments.stripe_webhook, name="stripe-webhook"),
     path("admin/login/", admin_api.AdminLoginView.as_view(), name="admin-login"),
     path("admin/stats/", admin_api.AdminStatsView.as_view(), name="admin-stats"),
     path("admin/site/", admin_api.AdminSiteSettingsView.as_view(), name="admin-site"),

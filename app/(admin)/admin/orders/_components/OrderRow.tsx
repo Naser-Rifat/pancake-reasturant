@@ -105,14 +105,14 @@ export function OrderRow({
                   ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
                   : o.payment_status === "refunded"
                   ? "bg-sky-50 text-sky-800 border border-sky-200"
-                  : "bg-zinc-50 text-zinc-500 border border-zinc-200"
+                  : "bg-amber-50 text-amber-900 border border-amber-200"
               }`}
             >
               {o.payment_status === "paid"
                 ? "Paid"
                 : o.payment_status === "refunded"
                 ? "Refunded"
-                : "Unpaid"}
+                : "Pay at Counter"}
             </span>
           </div>
         </div>

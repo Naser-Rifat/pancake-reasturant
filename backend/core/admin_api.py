@@ -209,10 +209,13 @@ class AdminOrderViewSet(
             # redemption it reserved would stay claimed forever.
             if order.payment_status != Order.PaymentStatus.PAID:
                 payments.release_coupon(order)
-            try:
-                payments.refund_order(order)  # no-op unless the order was paid
-            except Exception as exc:
-                refund_error = exc
+            # ------------------------------------------------------------------
+            # TODO: STRIPE PAYMENT SERVICE - UNCOMMENT WHEN RE-ENABLING STRIPE:
+            # try:
+            #     payments.refund_order(order)  # no-op unless the order was paid
+            # except Exception as exc:
+            #     refund_error = exc
+            # ------------------------------------------------------------------
         emails.order_status_changed(order)
         if refund_error is not None:
             # order stays cancelled and the customer was emailed; staff must

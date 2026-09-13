@@ -376,11 +376,10 @@ async function post<T>(path: string, payload: unknown): Promise<T> {
 
 export function placeOrder(payload: {
   customer_name: string;
-  phone?: string;
+  phone: string;
   email?: string;
   notes?: string;
   items: { slug: string; quantity: number }[];
-  /** just the code — the server prices it and is the only thing Stripe trusts */
   coupon_code?: string;
 }): Promise<ApiOrder> {
   return post("/orders/", payload);

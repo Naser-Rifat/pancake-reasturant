@@ -94,6 +94,11 @@ export default function DishGallery({ images, name }: { images: DishImage[]; nam
           </div>
         ) : (
           <div className="dish-hero-photo-frame" key={currentImg.id}>
+            <div
+              className="dish-hero-photo-ambient"
+              style={{ backgroundImage: `url(${currentImg.src})` }}
+              aria-hidden="true"
+            />
             <Image
               src={currentImg.src}
               alt={currentImg.alt || name}

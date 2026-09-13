@@ -143,6 +143,24 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):
+    customer_name = serializers.CharField(
+        required=True,
+        allow_blank=False,
+        max_length=120,
+        error_messages={
+            "required": "Please enter your name.",
+            "blank": "Please enter your name.",
+        },
+    )
+    phone = serializers.CharField(
+        required=True,
+        allow_blank=False,
+        max_length=30,
+        error_messages={
+            "required": "Please enter your phone number.",
+            "blank": "Please enter your phone number.",
+        },
+    )
     items = OrderItemInputSerializer(many=True, allow_empty=False, write_only=True)
     # the browser sends a CODE and nothing else — every dollar is worked out
     # here, the same rule the item price snapshot already follows
@@ -154,8 +172,19 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
     MAX_TOTAL_QUANTITY = 50
 
+    def validate_customer_name(self, value):
+        name = (value or "").strip()
+        if not name:
+            raise serializers.ValidationError("Please enter your name.")
+        if len(name) < 2:
+            raise serializers.ValidationError("Name must be at least 2 characters.")
+        return name
+
     def validate_phone(self, value):
-        return validate_phone_number(value)
+        cleaned = (value or "").strip()
+        if not cleaned:
+            raise serializers.ValidationError("Please enter your phone number.")
+        return validate_phone_number(cleaned)
 
     def validate(self, attrs):
         settings = SiteSettings.load()

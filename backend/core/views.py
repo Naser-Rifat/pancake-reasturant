@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.db.models import Count, Q
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -10,7 +11,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from . import payments
+from . import emails, payments
 
 from .models import (
     Announcement,
@@ -128,23 +129,42 @@ class OrderViewSet(
         return OrderCreateSerializer if self.action == "create" else OrderSerializer
 
     def create(self, request, *args, **kwargs):
-        """Create the order unpaid, hand back a Stripe Checkout URL.
+        """Create the order.
 
-        No emails here — the kitchen only hears about the order when the
-        Stripe webhook confirms payment (see payments._mark_paid).
+        ========================================================================
+        NOTE: STRIPE PAYMENT SERVICE IS TEMPORARILY COMMENTED OUT.
+        Direct orders are currently active (Pay at counter / cash on pickup).
+        The order is saved directly as status=RECEIVED and payment_status=UNPAID,
+        and customer / staff emails are sent immediately.
+        ========================================================================
         """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        order = serializer.save(status=Order.Status.PENDING_PAYMENT)
-        try:
-            checkout_url = payments.create_checkout_session(order)
-        except payments.PaymentError:
-            order.delete()  # never leave a dangling order the customer can't pay for
-            raise ValidationError(
-                "Payments are unavailable right now — please try again in a minute or call us."
-            )
+
+        # Direct Order (Pay at counter / Cash on pickup)
+        order = serializer.save(
+            status=Order.Status.RECEIVED,
+            payment_status=Order.PaymentStatus.UNPAID,
+        )
+
+        # Send confirmation & kitchen alert emails immediately
+        emails.order_status_changed(order)
+        emails.staff_new_order(order)
+
+        # ----------------------------------------------------------------------
+        # TODO: UNCOMMENT WHEN RE-ENABLING STRIPE PAYMENTS:
+        # order = serializer.save(status=Order.Status.PENDING_PAYMENT)
+        # try:
+        #     checkout_url = payments.create_checkout_session(order)
+        # except payments.PaymentError:
+        #     order.delete()  # never leave a dangling order the customer can't pay for
+        #     raise ValidationError(
+        #         "Payments are unavailable right now — please try again in a minute or call us."
+        #     )
+        # ----------------------------------------------------------------------
+
         data = OrderSerializer(order).data
-        data["checkout_url"] = checkout_url
+        data["checkout_url"] = f"{settings.FRONTEND_URL}/order/success?order={order.public_id}"
         return Response(data, status=http_status.HTTP_201_CREATED)
 
 

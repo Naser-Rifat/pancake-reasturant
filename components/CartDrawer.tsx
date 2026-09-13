@@ -26,9 +26,10 @@ export default function CartDrawer({
   live?: boolean;
   uberEatsUrl?: string;
 }) {
-  const { cart, count, inc, dec, showToast, open, closeCart, couponCode, setCouponCode } =
+  const { cart, count, inc, dec, clear, showToast, open, closeCart, couponCode, setCouponCode } =
     useCart();
   const [name, setName] = useState("");
+  const [nameError, setNameError] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [placing, setPlacing] = useState(false);
@@ -119,6 +120,23 @@ export default function CartDrawer({
     setCouponError("");
   };
 
+  const handleNameChange = (val: string) => {
+    setName(val);
+    if (nameError && val.trim().length >= 2) {
+      setNameError("");
+    }
+  };
+
+  const handleNameBlur = () => {
+    if (!name.trim()) {
+      setNameError("Please enter your name.");
+    } else if (name.trim().length < 2) {
+      setNameError("Name must be at least 2 characters.");
+    } else {
+      setNameError("");
+    }
+  };
+
   const handlePhoneChange = (val: string) => {
     // Only allow phone characters: digits, leading +, spaces, hyphens, parens, dots
     const sanitized = val.replace(/[^\d+\s\-().]/g, "");
@@ -131,7 +149,7 @@ export default function CartDrawer({
 
   const handlePhoneBlur = () => {
     if (!phone.trim()) {
-      setPhoneError("");
+      setPhoneError("Phone number is required so we can notify you.");
       return;
     }
     const res = validatePhoneNumber(phone);
@@ -144,15 +162,27 @@ export default function CartDrawer({
 
   const checkout = async () => {
     if (!count) return showToast("Your order is empty!");
-    if (!name.trim()) return showToast("Add your name so we know whose stack it is!");
 
-    if (phone.trim()) {
-      const phoneValidation = validatePhoneNumber(phone);
-      if (!phoneValidation.isValid) {
-        const msg = phoneValidation.error || "Please enter a valid phone number.";
-        setPhoneError(msg);
-        return showToast(msg);
-      }
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setNameError("Please enter your name.");
+      return showToast("Please enter your name!");
+    }
+    if (trimmedName.length < 2) {
+      setNameError("Name must be at least 2 characters.");
+      return showToast("Name must be at least 2 characters!");
+    }
+
+    const trimmedPhone = phone.trim();
+    if (!trimmedPhone) {
+      setPhoneError("Phone number is required so we can notify you.");
+      return showToast("Please enter your phone number!");
+    }
+    const phoneValidation = validatePhoneNumber(trimmedPhone);
+    if (!phoneValidation.isValid) {
+      const msg = phoneValidation.error || "Please enter a valid phone number.";
+      setPhoneError(msg);
+      return showToast(msg);
     }
 
     setPlacing(true);
@@ -161,16 +191,24 @@ export default function CartDrawer({
         customer_name: name.trim(),
         phone: phone.trim(),
         items: cartLines,
-        // the code only — the server re-prices it and is the sole authority on
-        // what Stripe charges
         ...(coupon ? { coupon_code: coupon.code } : {}),
       });
-      if (!order.checkout_url) {
-        throw new Error("Payments are unavailable right now — please try again or call us.");
-      }
-      // the cart stays in localStorage until /order/success confirms payment, so
-      // cancelling on Stripe brings the customer back with nothing lost
-      window.location.assign(order.checkout_url);
+
+      // Clear cart immediately upon direct order placement
+      clear();
+      setCouponCode("");
+
+      // -----------------------------------------------------------------------
+      // TODO: STRIPE PAYMENT SERVICE - UNCOMMENT WHEN RE-ENABLING STRIPE:
+      // if (!order.checkout_url) {
+      //   throw new Error("Payments are unavailable right now — please try again or call us.");
+      // }
+      // window.location.assign(order.checkout_url);
+      // -----------------------------------------------------------------------
+
+      // Direct redirect to order success page
+      const destination = order.checkout_url || `/order/success?order=${order.public_id}`;
+      window.location.assign(destination);
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Something went wrong — please try again.");
       setPlacing(false);
@@ -225,18 +263,39 @@ export default function CartDrawer({
           {live ? (
             <>
               <div className="cart-form">
-                <input
-                  className="input"
-                  placeholder="Your name *"
-                  value={name}
-                  autoComplete="name"
-                  onChange={(e) => setName(e.target.value)}
-                />
+                <div>
+                  <input
+                    className={`input${nameError ? " error" : ""}`}
+                    style={nameError ? { borderColor: "#ef4444", backgroundColor: "#fef2f2" } : undefined}
+                    placeholder="Your name *"
+                    value={name}
+                    autoComplete="name"
+                    aria-invalid={!!nameError}
+                    onChange={(e) => handleNameChange(e.target.value)}
+                    onBlur={handleNameBlur}
+                  />
+                  {nameError && (
+                    <p
+                      className="cart-name-error"
+                      role="alert"
+                      style={{
+                        color: "#dc2626",
+                        fontSize: "0.75rem",
+                        marginTop: "0.25rem",
+                        marginBottom: "0.25rem",
+                        fontWeight: 600,
+                        paddingLeft: "0.25rem",
+                      }}
+                    >
+                      {nameError}
+                    </p>
+                  )}
+                </div>
                 <div>
                   <input
                     className={`input${phoneError ? " error" : ""}`}
                     style={phoneError ? { borderColor: "#ef4444", backgroundColor: "#fef2f2" } : undefined}
-                    placeholder="Phone (optional, e.g. 0412 345 678 or +61...)"
+                    placeholder="Phone number * (e.g. 0412 345 678)"
                     value={phone}
                     autoComplete="tel"
                     inputMode="tel"
@@ -331,7 +390,7 @@ export default function CartDrawer({
                 <b>${total.toFixed(2)}</b>
               </div>
               <button className="btn btn-primary" onClick={checkout} disabled={placing}>
-                {placing ? "Taking you to payment…" : "Pay & place order →"}
+                {placing ? "Placing your order…" : "Place order (Pay at counter) →"}
               </button>
             </>
           ) : (
