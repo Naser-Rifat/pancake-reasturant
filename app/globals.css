@@ -7434,7 +7434,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   filter: blur(24px);
   pointer-events: none;
 }
-.dish-hero-img-wrap {
+.dish-hero-cutout-wrap {
   position: absolute;
   inset: 0;
   display: flex;
@@ -7451,13 +7451,29 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     drop-shadow(0 14px 28px rgba(33, 26, 20, 0.18)) !important;
   transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.dish-hero-photo {
-  object-fit: cover !important;
-  border-radius: 24px !important;
-  box-shadow: 0 16px 36px rgba(33, 26, 20, 0.12) !important;
-}
 .dish-hero-stage:active .dish-hero-cutout {
   transform: scale(0.98);
+}
+
+/* Framed Boutique Artisan Photograph (for real-life shots) */
+.dish-hero-photo-frame {
+  position: relative;
+  width: calc(100% - 24px);
+  height: calc(100% - 16px);
+  margin: auto;
+  border-radius: 26px;
+  overflow: hidden;
+  border: 2.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 14px 34px rgba(33, 26, 20, 0.16);
+  background: var(--cream-card);
+}
+.dish-hero-photo-img {
+  object-fit: cover !important;
+  object-position: center !important;
+  transition: transform 0.3s ease;
+}
+.dish-hero-stage:active .dish-hero-photo-img {
+  transform: scale(1.02);
 }
 
 /* Floating Frosted Pill Badge Counter: "1 / 3" (Matches Image 2 reference) */

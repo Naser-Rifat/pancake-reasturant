@@ -80,20 +80,30 @@ export default function DishGallery({ images, name }: { images: DishImage[]; nam
         aria-label={`View full resolution photos of ${name}`}
         onKeyDown={(e) => e.key === "Enter" && setLightbox(activeIndex)}
       >
-        {/* Soft Ambient Halo */}
-        <div className="dish-hero-halo" aria-hidden="true" />
-
-        {/* Hero Image */}
-        <div className="dish-hero-img-wrap" key={currentImg.id}>
-          <Image
-            src={currentImg.src}
-            alt={currentImg.alt || name}
-            fill
-            priority
-            sizes="(min-width: 1024px) 50vw, 92vw"
-            className={currentImg.cutout ? "dish-hero-cutout" : "dish-hero-photo"}
-          />
-        </div>
+        {/* Hero Image Presentation */}
+        {currentImg.cutout ? (
+          <div className="dish-hero-cutout-wrap" key={currentImg.id}>
+            <Image
+              src={currentImg.src}
+              alt={currentImg.alt || name}
+              fill
+              priority
+              sizes="(min-width: 1024px) 50vw, 92vw"
+              className="dish-hero-cutout"
+            />
+          </div>
+        ) : (
+          <div className="dish-hero-photo-frame" key={currentImg.id}>
+            <Image
+              src={currentImg.src}
+              alt={currentImg.alt || name}
+              fill
+              priority
+              sizes="(min-width: 1024px) 50vw, 92vw"
+              className="dish-hero-photo-img"
+            />
+          </div>
+        )}
 
         {/* Floating Frosted Pill Badge Counter (matches Reference Image 2: "1 / 3") */}
         {validImages.length > 1 && (
