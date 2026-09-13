@@ -10,9 +10,21 @@ export default function DishGallery({ images, name }: { images: DishImage[]; nam
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
 
-  // Touch swipe state
+  // Touch swipe state for hero stage
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
+
+  // Thumbs ref for horizontal sliding
+  const thumbsRef = useRef<HTMLDivElement | null>(null);
+
+  // Auto-scroll the active thumbnail into center view smoothly
+  useEffect(() => {
+    if (!thumbsRef.current) return;
+    const activeThumb = thumbsRef.current.querySelector<HTMLElement>(".dish-thumb.is-active");
+    if (activeThumb) {
+      activeThumb.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  }, [activeIndex]);
 
   useEffect(() => {
     if (lightbox === null) return;
@@ -72,9 +84,8 @@ export default function DishGallery({ images, name }: { images: DishImage[]; nam
         <div className="dish-hero-halo" aria-hidden="true" />
 
         {/* Hero Image */}
-        <div className="dish-hero-img-wrap">
+        <div className="dish-hero-img-wrap" key={currentImg.id}>
           <Image
-            key={currentImg.id}
             src={currentImg.src}
             alt={currentImg.alt || name}
             fill
@@ -122,9 +133,14 @@ export default function DishGallery({ images, name }: { images: DishImage[]; nam
         )}
       </div>
 
-      {/* Thumbnail Bar for multi-photo dishes */}
+      {/* Thumbnail Bar for multi-photo dishes with smooth sliding */}
       {validImages.length > 1 && (
-        <div className="dish-hero-thumbs" role="tablist" aria-label="Photo angles">
+        <div
+          className="dish-hero-thumbs"
+          ref={thumbsRef}
+          role="tablist"
+          aria-label="Photo angles"
+        >
           {validImages.map((img, i) => (
             <button
               key={img.id}

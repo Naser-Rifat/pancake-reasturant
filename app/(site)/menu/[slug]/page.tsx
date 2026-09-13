@@ -129,6 +129,8 @@ export default async function DishPage({ params }: Props) {
 
             <h1 className="dish-title">{item.name}</h1>
 
+            {/* Guest star rating (commented out per user request; uncomment to re-enable) */}
+            {/*
             {avgRating != null && (
               <p className="dish-stars">
                 <span className="stars" aria-hidden="true" style={{ color: "var(--yellow-deep, #f59e0b)" }}>
@@ -140,6 +142,7 @@ export default async function DishPage({ params }: Props) {
                 </Link>
               </p>
             )}
+            */}
 
             <p className="dish-desc">{item.description}</p>
 

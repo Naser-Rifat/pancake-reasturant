@@ -7515,29 +7515,50 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   cursor: not-allowed;
 }
 
-/* Thumbnails Strip */
+/* Thumbnails Strip: Smooth Horizontal Slide & Scroll */
 .dish-hero-thumbs {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 10px;
-  margin-top: 14px;
+  margin: 14px auto 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 6px 12px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+}
+.dish-hero-thumbs::-webkit-scrollbar {
+  display: none;
+}
+@media (min-width: 640px) {
+  .dish-hero-thumbs {
+    justify-content: center;
+  }
 }
 .dish-thumb {
   position: relative;
-  width: 60px;
-  height: 60px;
+  flex: 0 0 62px !important;
+  min-width: 62px !important;
+  width: 62px !important;
+  height: 62px !important;
+  flex-shrink: 0 !important;
+  scroll-snap-align: center;
   border-radius: 16px;
-  border: 2px solid transparent;
-  background: rgba(253, 249, 238, 0.8);
+  border: 2.5px solid transparent;
+  background: rgba(253, 249, 238, 0.85);
   padding: 3px;
   cursor: pointer;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 .dish-thumb.is-active {
   border-color: var(--ink);
   background: #ffffff;
-  transform: translateY(-2px);
+  transform: scale(1.05);
+  box-shadow: 0 4px 14px rgba(33, 26, 20, 0.12);
 }
 .dish-thumb-box {
   position: relative;
