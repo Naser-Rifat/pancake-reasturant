@@ -200,7 +200,7 @@ export default function CartDrawer({
           ) : (
             linesInCart.map(({ slug, qty, item }) => (
               <div className="cart-item" key={slug}>
-                <Image src={item.image || item.photo} alt={item.name} width={58} height={58} />
+                <Image src={item.photo || item.image || "/menu/buttermilk.png"} alt={item.name} width={58} height={58} />
                 <div>
                   <div className="n">{item.name}</div>
                   <div className="p">

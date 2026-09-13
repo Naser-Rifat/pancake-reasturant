@@ -77,3 +77,327 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .toast-in, .toast-out { animation-duration: 0.01s; }
 }
+
+/* =========================================================================
+   Live Storefront Preview Card (Scoped to .preview-phone-card)
+   Renders the exact public customer card inside the admin menu editor.
+   ========================================================================= */
+.preview-phone-card .dish-card {
+  position: relative !important;
+  display: block !important;
+  height: 248px !important;
+  min-height: 248px !important;
+  width: 100% !important;
+  max-width: 360px !important;
+  border-radius: 28px !important;
+  padding: 1.25rem 1.25rem 0 !important;
+  overflow: hidden !important;
+  border: 1.5px solid rgba(118, 58, 18, 0.12) !important;
+  box-shadow: 0 8px 24px rgba(33, 26, 20, 0.07) !important;
+  background: linear-gradient(150deg, #fdf8f0 0%, #faefe0 60%, #f6e6d0 100%) !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+}
+
+.preview-phone-card .dish-card .dc-hit {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+.preview-phone-card .dish-card .dc-body {
+  position: relative !important;
+  z-index: 5 !important;
+  max-width: calc(100% - 60px) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.preview-phone-card .dish-card .dc-badge-row {
+  margin-bottom: 0.25rem !important;
+  display: block !important;
+}
+
+.preview-phone-card .dish-card .dc-badge-featured {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.2rem !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  padding: 2px 7px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #92400e !important;
+  border: 1px solid rgba(245, 158, 11, 0.45) !important;
+  box-shadow: 0 1px 4px rgba(245, 158, 11, 0.15) !important;
+}
+
+.preview-phone-card .dish-card .dc-head {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  min-height: 28px !important;
+  margin-bottom: 0.32rem !important;
+}
+
+.preview-phone-card .dish-card .dc-head .dc-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.28rem !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  padding: 3px 8px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(118, 58, 18, 0.12) !important;
+  color: #211a14 !important;
+  white-space: nowrap !important;
+}
+
+.preview-phone-card .dish-card .dc-dots {
+  display: none !important;
+}
+
+.preview-phone-card .dish-card .dc-head .dc-price {
+  font-family: system-ui, -apple-system, sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 1.05rem !important;
+  color: #5c4b3f !important;
+  margin-left: auto !important;
+  white-space: nowrap !important;
+}
+
+.preview-phone-card .dish-card .dc-name {
+  font-family: system-ui, -apple-system, sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 1.18rem !important;
+  line-height: 1.2 !important;
+  color: #211a14 !important;
+  margin: 0 0 0.18rem !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  letter-spacing: -0.01em !important;
+}
+
+.preview-phone-card .dish-card .dc-deal-pill {
+  display: none !important;
+}
+
+.preview-phone-card .dish-card .dc-desc,
+.preview-phone-card .dish-card .dc-foot,
+.preview-phone-card .dish-card .dc-details,
+.preview-phone-card .dish-card .dc-price-sub {
+  display: none !important;
+}
+
+.preview-phone-card .dish-card .dc-actions {
+  position: absolute !important;
+  top: 1.25rem !important;
+  right: 1.25rem !important;
+  z-index: 6 !important;
+  display: block !important;
+}
+
+.preview-phone-card .dish-card .dc-add {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(118, 58, 18, 0.1) !important;
+  box-shadow: 0 3px 10px rgba(33, 26, 20, 0.06) !important;
+  color: #3a281c !important;
+  padding: 0 !important;
+}
+.preview-phone-card .dish-card .dc-add span,
+.preview-desktop-card .dish-card .dc-add span {
+  display: none !important;
+}
+
+.preview-phone-card .dish-card .dc-media {
+  position: absolute !important;
+  inset: auto 0 -6px 0 !important;
+  width: 100% !important;
+  height: 142px !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+.preview-phone-card .dish-card .dc-photo {
+  position: static !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+}
+
+.preview-phone-card .dish-card .dc-img {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.preview-phone-card .dish-card .dc-img:not(.is-cutout) {
+  width: 90% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  border-radius: 18px 18px 0 0 !important;
+  transform: none !important;
+  box-shadow: 0 -3px 14px rgba(33, 26, 20, 0.12) !important;
+}
+
+.preview-phone-card .dish-card .dc-img.is-cutout {
+  object-fit: contain !important;
+  transform: scale(1.15) !important;
+  transform-origin: center bottom !important;
+  filter:
+    drop-shadow(0 -2px 0 #ffffff)
+    drop-shadow(0 2px 0 #ffffff)
+    drop-shadow(-2px 0 0 #ffffff)
+    drop-shadow(2px 0 0 #ffffff)
+    drop-shadow(0 0 3px #ffffff)
+    drop-shadow(0 14px 24px rgba(33, 26, 20, 0.16)) !important;
+}
+
+/* Desktop Tile Preview */
+.preview-desktop-card .dish-card {
+  position: relative !important;
+  display: block !important;
+  height: 330px !important;
+  min-height: 330px !important;
+  width: 100% !important;
+  max-width: 295px !important;
+  border-radius: 26px !important;
+  padding: 1.15rem 1.25rem 0 !important;
+  overflow: hidden !important;
+  border: 1.5px solid rgba(118, 58, 18, 0.12) !important;
+  box-shadow: 0 10px 24px rgba(33, 26, 20, 0.08) !important;
+  background: linear-gradient(150deg, #fdf8f0 0%, #faefe0 60%, #f6e6d0 100%) !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+}
+.preview-desktop-card .dish-card .dc-body {
+  position: relative !important;
+  z-index: 5 !important;
+  padding-right: 3.5rem !important;
+}
+.preview-desktop-card .dish-card .dc-head {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  min-height: 32px !important;
+  margin-bottom: 0.35rem !important;
+}
+.preview-desktop-card .dish-card .dc-head .dc-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.28rem !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 0.63rem !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  padding: 4px 10px !important;
+  border-radius: 999px !important;
+  border: 1px dashed rgba(33, 26, 20, 0.22) !important;
+  background: rgba(253, 249, 238, 0.8) !important;
+  color: #211a14 !important;
+}
+.preview-desktop-card .dish-card .dc-head .dc-badge-featured {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #92400e !important;
+  border: 1px solid rgba(245, 158, 11, 0.45) !important;
+  box-shadow: 0 1px 4px rgba(245, 158, 11, 0.15) !important;
+}
+.preview-desktop-card .dish-card .dc-head .dc-price {
+  font-family: system-ui, -apple-system, sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1.05rem !important;
+  color: #211a14 !important;
+  margin-left: auto !important;
+}
+.preview-desktop-card .dish-card .dc-name {
+  font-family: system-ui, -apple-system, sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1.05rem !important;
+  line-height: 1.25 !important;
+  color: #211a14 !important;
+  margin: 0 0 0.35rem !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  max-width: 88% !important;
+}
+.preview-desktop-card .dish-card .dc-desc,
+.preview-desktop-card .dish-card .dc-foot,
+.preview-desktop-card .dish-card .dc-details,
+.preview-desktop-card .dish-card .dc-deal-pill,
+.preview-desktop-card .dish-card .dc-badge-row,
+.preview-desktop-card .dish-card .dc-price-sub {
+  display: none !important;
+}
+.preview-desktop-card .dish-card .dc-actions {
+  position: absolute !important;
+  top: 1.15rem !important;
+  right: 1.25rem !important;
+  z-index: 6 !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 44px !important;
+}
+.preview-desktop-card .dish-card .dc-add {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1.5px solid rgba(33, 26, 20, 0.12) !important;
+  box-shadow: 0 3px 10px rgba(33, 26, 20, 0.08) !important;
+  color: #211a14 !important;
+  padding: 0 !important;
+}
+.preview-desktop-card .dish-card .dc-photo {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: -8px !important;
+  transform: translateX(-50%) !important;
+  width: 88% !important;
+  height: 175px !important;
+  pointer-events: none !important;
+}
+.preview-desktop-card .dish-card .dc-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: bottom !important;
+  border-radius: 16px 16px 0 0 !important;
+}
+.preview-desktop-card .dish-card .dc-img.is-cutout {
+  object-fit: contain !important;
+  border-radius: 0 !important;
+  filter: drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(0 8px 14px rgba(33, 26, 20, 0.22)) !important;
+}

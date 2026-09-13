@@ -71,25 +71,18 @@ export default function DishCard({
   dealBadge?: string;
 }) {
   const href = `/menu/${item.slug}`;
-  let src = item.image || item.photo;
-  // Savannah Mack's raw Cloudinary upload includes a stray floating cup artifact
-  // and non-standard aspect ratio. Use the clean, isolated cutout asset instead.
-  if (item.slug === "savannah-mack" && (!src || src.includes("lmhxhhzx21ft2vhusuji"))) {
-    src = "/menu/savannah-clean.png";
-  }
-  // Ensure every menu card has a gorgeous, high-definition transparent cutout
-  // matching the artisan bakery reference design
-  if (!item.image && (!src || !src.startsWith("/menu/"))) {
-    const cat = item.category_slug || item.tag || "";
-    if (cat.includes("choc")) src = "/menu/choc.png";
-    else if (cat.includes("savoury")) src = "/menu/brekkie.png";
-    else if (cat.includes("berry") || item.slug.includes("berry")) src = "/menu/berry.png";
-    else if (cat.includes("banana") || item.slug.includes("banana")) src = "/menu/banana.png";
-    else if (cat.includes("lemon") || item.slug.includes("lemon")) src = "/menu/lemon.png";
-    else src = "/menu/buttermilk.png";
-  }
-  // a cutout stands on the card floor with a white keyline
-  const isCutout = Boolean(item.image || src.startsWith("/menu/"));
+  // The image chosen by the admin:
+  // 1. item.photo is the Main photo designated by the admin in the catalog editor
+  // 2. item.image is the cutout image set by the admin
+  // 3. Fallback placeholder only if neither was provided
+  const src = item.photo || item.image || "/menu/buttermilk.png";
+
+  // A transparent cutout is used if the admin chose a cutout asset or when only a cutout exists
+  const isCutout = Boolean(
+    (!item.photo && Boolean(item.image)) ||
+    src.includes("cutout") ||
+    (src.startsWith("/menu/") && !src.includes("photo"))
+  );
   const catIcon = item.category_icon || item.category?.icon || TAG_ICONS[item.tag] || "🥞";
   const catLabel = item.category_name || item.category?.name || TAG_LABEL[item.tag] || item.tag;
 
@@ -101,24 +94,27 @@ export default function DishCard({
       <Link href={href} className="dc-hit" aria-label={`View ${item.name} details`} />
 
       <div className="dc-body">
-        {dealBadge && (
+        {isRow && dealBadge && (
           <div className="dc-badge-row">
             <span className="dc-badge dc-badge-featured">{dealBadge}</span>
           </div>
         )}
 
         <div className={`dc-head${isRow ? " dc-head-row" : ""}`}>
-          <span className={`dc-badge tag-${item.category_slug || item.tag}`}>
-            <span aria-hidden="true">{catIcon}</span>
-            <span>{catLabel}</span>
-          </span>
+          {dealBadge && !isRow ? (
+            <span className="dc-badge dc-badge-featured">{dealBadge}</span>
+          ) : (
+            <span className={`dc-badge tag-${item.category_slug || item.tag}`}>
+              <span aria-hidden="true">{catIcon}</span>
+              <span>{catLabel}</span>
+            </span>
+          )}
           <span className="dc-dots" aria-hidden="true" />
           <span className="dc-price dc-price-head">{money(item.price)}</span>
         </div>
 
         <h3 className="dc-name">
           <Link href={href}>{item.name}</Link>
-          {dealBadge && <span className="dc-deal-pill dc-deal-pill-desktop">{dealBadge}</span>}
         </h3>
 
         {/* Sub-price only rendered for the mobile row variant */}

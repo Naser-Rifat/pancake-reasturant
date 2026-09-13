@@ -4632,9 +4632,9 @@ body:has(.cart-fab) .wa-float {
     height: 44px;
   }
   .dish-card.dc-tile .dc-photo {
-    width: 84%;
-    height: 202px;
-    bottom: -12px;
+    width: 86%;
+    height: 180px;
+    bottom: -8px;
   }
   .dish-card.dc-tile .dc-name {
     font-size: 1.1rem;
@@ -7567,7 +7567,8 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
      bold title + price header, circular bag button, and hero cutout food
      with crisp white sticker outline anchored at bottom.
      =================================================================== */
-  .dish-card.dc-row {
+  .dish-card.dc-row,
+  .dish-card.dc-tile {
     position: relative !important;
     display: block !important;
     height: 248px !important;
@@ -7581,31 +7582,38 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
       0 1px 3px rgba(33, 26, 20, 0.02);
     transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease;
   }
-  .dish-card.dc-row:active {
+  .dish-card.dc-row:active,
+  .dish-card.dc-tile:active {
     transform: scale(0.985);
   }
 
   /* Card background variations: delicate warm pastry tints matching brand palette */
   .dish-card.dc-row,
-  .dish-card.dc-row:nth-child(4n + 1) {
+  .dish-card.dc-tile,
+  .dish-card.dc-row:nth-child(4n + 1),
+  .dish-card.dc-tile:nth-child(4n + 1) {
     background: linear-gradient(150deg, #fdf8f0 0%, #faefe0 60%, #f6e6d0 100%) !important;
     border-color: rgba(190, 140, 80, 0.16);
   }
-  .dish-card.dc-row:nth-child(4n + 2) {
+  .dish-card.dc-row:nth-child(4n + 2),
+  .dish-card.dc-tile:nth-child(4n + 2) {
     background: linear-gradient(150deg, #fdf3ee 0%, #fce9df 60%, #f9ded2 100%) !important;
     border-color: rgba(200, 100, 70, 0.14);
   }
-  .dish-card.dc-row:nth-child(4n + 3) {
+  .dish-card.dc-row:nth-child(4n + 3),
+  .dish-card.dc-tile:nth-child(4n + 3) {
     background: linear-gradient(150deg, #f0f4f9 0%, #e5eef6 60%, #dae7f2 100%) !important;
     border-color: rgba(100, 140, 180, 0.15);
   }
-  .dish-card.dc-row:nth-child(4n + 4) {
+  .dish-card.dc-row:nth-child(4n + 4),
+  .dish-card.dc-tile:nth-child(4n + 4) {
     background: linear-gradient(150deg, #f4f8f1 0%, #e8efe3 60%, #dbe7d4 100%) !important;
     border-color: rgba(100, 150, 90, 0.14);
   }
 
   /* Top Left Info Group */
-  .dish-card.dc-row .dc-body {
+  .dish-card.dc-row .dc-body,
+  .dish-card.dc-tile .dc-body {
     position: relative;
     z-index: 5;
     max-width: calc(100% - 60px);
@@ -7613,11 +7621,13 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     padding: 0 !important;
   }
 
-  .dish-card.dc-row .dc-badge-row {
+  .dish-card.dc-row .dc-badge-row,
+  .dish-card.dc-tile .dc-badge-row {
     margin-bottom: 0.25rem;
     display: block;
   }
-  .dish-card.dc-row .dc-badge-featured {
+  .dish-card.dc-row .dc-badge-featured,
+  .dish-card.dc-tile .dc-badge-featured {
     display: inline-flex;
     align-items: center;
     gap: 0.2rem;
@@ -7634,14 +7644,43 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     box-shadow: 0 1px 4px rgba(245, 158, 11, 0.15);
   }
 
-  /* Hide legacy dc-head and row-head on mobile sticker cards to eliminate duplicate tags and duplicate prices */
+  /* Hide legacy dc-head on mobile sticker cards in /menu to eliminate duplicate tags and duplicate prices */
   .dish-card.dc-row .dc-head,
   .dish-card.dc-row .dc-head-row,
   .dish-card.dc-row .dc-head-legacy {
     display: none !important;
   }
 
-  .dish-card.dc-row .dc-name {
+  /* On home tile cards, dc-head neatly presents the category pill and price at the top */
+  .dish-card.dc-tile .dc-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 28px;
+    margin-bottom: 0.32rem;
+  }
+  .dish-card.dc-tile .dc-head .dc-badge {
+    font-family: var(--font-round), sans-serif;
+    font-weight: 800;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(118, 58, 18, 0.12);
+    color: var(--ink);
+  }
+  .dish-card.dc-tile .dc-head .dc-price {
+    font-family: var(--font-round), sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #5c4b3f;
+    margin-left: auto;
+  }
+
+  .dish-card.dc-row .dc-name,
+  .dish-card.dc-tile .dc-name {
     font-family: var(--font-round), sans-serif;
     font-weight: 700;
     font-size: 1.18rem;
@@ -7664,22 +7703,26 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     margin: 0;
   }
 
-  .dish-card.dc-row .dc-desc {
+  .dish-card.dc-row .dc-desc,
+  .dish-card.dc-tile .dc-desc {
     display: none !important;
   }
-  .dish-card.dc-row .dc-foot {
+  .dish-card.dc-row .dc-foot,
+  .dish-card.dc-tile .dc-foot {
     display: none !important;
   }
 
-  /* Top Right Action (Circular Shopping Bag Plus Button) */
-  .dish-card.dc-row .dc-actions {
+  /* Top Right Action Button */
+  .dish-card.dc-row .dc-actions,
+  .dish-card.dc-tile .dc-actions {
     position: absolute;
     top: 1.25rem;
     right: 1.25rem;
     z-index: 6;
     display: block !important;
   }
-  .dish-card.dc-row .dc-details {
+  .dish-card.dc-row .dc-details,
+  .dish-card.dc-tile .dc-details {
     display: none !important;
   }
   .dish-card.dc-row .dc-add-desktop {
@@ -7705,9 +7748,30 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     background: rgba(255, 255, 255, 0.95);
     color: var(--yellow-deep);
   }
+  .dish-card.dc-tile .dc-add-desktop {
+    display: inline-grid !important;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.78);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(118, 58, 18, 0.1);
+    box-shadow: 0 3px 10px rgba(33, 26, 20, 0.06);
+    color: #3a281c;
+    place-items: center;
+    cursor: pointer;
+    transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.18s ease;
+  }
+  .dish-card.dc-tile .dc-add-desktop:active {
+    transform: scale(0.88);
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--yellow-deep);
+  }
 
-  /* Center & Bottom: Hero Food Cutout with White Sticker Outline */
-  .dish-card.dc-row .dc-media {
+  /* Center & Bottom: Hero Food Cutout with White Sticker Outline or Framed Photo */
+  .dish-card.dc-row .dc-media,
+  .dish-card.dc-tile .dc-media {
     position: absolute;
     inset: auto 0 -6px 0;
     width: 100%;
@@ -7719,7 +7783,8 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     justify-content: center;
     overflow: hidden;
   }
-  .dish-card.dc-row .dc-photo {
+  .dish-card.dc-row .dc-photo,
+  .dish-card.dc-tile .dc-photo {
     position: static !important;
     left: auto !important;
     right: auto !important;
@@ -7738,7 +7803,8 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     border-radius: 0 !important;
     overflow: hidden;
   }
-  .dish-card.dc-row .dc-img {
+  .dish-card.dc-row .dc-img,
+  .dish-card.dc-tile .dc-img {
     position: relative;
     width: 100%;
     height: 100%;
@@ -7749,7 +7815,8 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   /* The signature white sticker keyline effect from the reference */
-  .dish-card.dc-row .dc-img.is-cutout {
+  .dish-card.dc-row .dc-img.is-cutout,
+  .dish-card.dc-tile .dc-img.is-cutout {
     filter:
       drop-shadow(0 -2px 0 #ffffff)
       drop-shadow(0 2px 0 #ffffff)
@@ -7757,6 +7824,120 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
       drop-shadow(2px 0 0 #ffffff)
       drop-shadow(0 0 3px #ffffff)
       drop-shadow(0 14px 24px rgba(33, 26, 20, 0.16));
+  }
+  /* Original framed photography uploaded by admin */
+  .dish-card.dc-row .dc-img:not(.is-cutout),
+  .dish-card.dc-tile .dc-img:not(.is-cutout) {
+    width: 90%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 18px 18px 0 0;
+    transform: none;
+    box-shadow: 0 -3px 14px rgba(33, 26, 20, 0.12);
+  }
+
+  /* Admin live preview container */
+  .preview-phone-card .dish-card {
+    position: relative !important;
+    display: block !important;
+    height: 248px !important;
+    min-height: 248px !important;
+    border-radius: 28px !important;
+    padding: 1.25rem 1.25rem 0 !important;
+    overflow: hidden !important;
+    border: 1.5px solid rgba(118, 58, 18, 0.12) !important;
+    box-shadow: 0 8px 24px rgba(33, 26, 20, 0.07) !important;
+    background: linear-gradient(150deg, #fdf8f0 0%, #faefe0 60%, #f6e6d0 100%) !important;
+  }
+  .preview-phone-card .dish-card .dc-body {
+    position: relative !important;
+    z-index: 5 !important;
+    max-width: calc(100% - 60px) !important;
+    padding: 0 !important;
+  }
+  .preview-phone-card .dish-card .dc-head {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    min-height: 28px !important;
+    margin-bottom: 0.32rem !important;
+  }
+  .preview-phone-card .dish-card .dc-name {
+    font-family: var(--font-round), sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.18rem !important;
+    line-height: 1.2 !important;
+    color: var(--ink) !important;
+    margin: 0 0 0.18rem !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+  .preview-phone-card .dish-card .dc-desc,
+  .preview-phone-card .dish-card .dc-foot,
+  .preview-phone-card .dish-card .dc-details {
+    display: none !important;
+  }
+  .preview-phone-card .dish-card .dc-actions {
+    position: absolute !important;
+    top: 1.25rem !important;
+    right: 1.25rem !important;
+    z-index: 6 !important;
+    display: block !important;
+  }
+  .preview-phone-card .dish-card .dc-media {
+    position: absolute !important;
+    inset: auto 0 -6px 0 !important;
+    width: 100% !important;
+    height: 142px !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+  }
+  .preview-phone-card .dish-card .dc-photo {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+  }
+  .preview-phone-card .dish-card .dc-img {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .preview-phone-card .dish-card .dc-img:not(.is-cutout) {
+    width: 90% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    border-radius: 18px 18px 0 0 !important;
+    transform: none !important;
+    box-shadow: 0 -3px 14px rgba(33, 26, 20, 0.12) !important;
+  }
+  .preview-phone-card .dish-card .dc-img.is-cutout {
+    object-fit: contain !important;
+    transform: scale(1.15) !important;
+    transform-origin: center bottom !important;
+    filter:
+      drop-shadow(0 -2px 0 #ffffff)
+      drop-shadow(0 2px 0 #ffffff)
+      drop-shadow(-2px 0 0 #ffffff)
+      drop-shadow(2px 0 0 #ffffff)
+      drop-shadow(0 0 3px #ffffff)
+      drop-shadow(0 14px 24px rgba(33, 26, 20, 0.16)) !important;
   }
 
   /* the category chips wrapped to two rows and ate 170px before the first dish,

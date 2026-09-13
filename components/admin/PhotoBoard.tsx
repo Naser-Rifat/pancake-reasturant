@@ -189,20 +189,27 @@ export default function PhotoBoard({
                 </div>
                 <div className="absolute left-1 top-1 flex flex-wrap gap-1">
                   {isMain && (
-                    <span className="rounded bg-zinc-900 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white">Main</span>
+                    <span className="rounded bg-zinc-900 px-1.5 py-0.5 text-[10px] font-bold uppercase text-white shadow-xs flex items-center gap-1">
+                      <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" /> Active on Site
+                    </span>
                   )}
                   {isCut && (
-                    <span className="rounded bg-emerald-600 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white">Cutout</span>
+                    <span className="rounded bg-emerald-700 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white shadow-xs">
+                      Cutout
+                    </span>
                   )}
                 </div>
                 <div className="grid grid-cols-3 divide-x border-t text-[11px]">
                   <button
                     type="button"
-                    className="flex items-center justify-center gap-1 py-1.5 font-medium hover:bg-muted disabled:opacity-40"
+                    className={`flex items-center justify-center gap-1 py-1.5 font-medium transition-colors ${
+                      isMain ? "bg-zinc-900 text-white font-bold" : "hover:bg-muted"
+                    }`}
                     onClick={() => onSetMain(isMain ? "" : t.url)}
-                    title={isMain ? "Unset main image" : "Use as the main image"}
+                    title={isMain ? "Active on public menu — click to unset" : "Click to display this image on the public site"}
                   >
-                    <Star className={`h-3 w-3 ${isMain ? "fill-current" : ""}`} /> Main
+                    <Star className={`h-3 w-3 ${isMain ? "fill-amber-400 text-amber-400" : ""}`} />
+                    <span>{isMain ? "Active" : "Show on Site"}</span>
                   </button>
                   <button
                     type="button"

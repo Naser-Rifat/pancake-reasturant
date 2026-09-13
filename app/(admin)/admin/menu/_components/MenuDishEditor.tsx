@@ -8,6 +8,7 @@ import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import PhotoBoard from "@/components/admin/PhotoBoard";
+import { DishPreviewAndGuide } from "./DishPreviewAndGuide";
 import type { AdminCategory } from "@/lib/admin-api";
 import type { FormState } from "../_lib";
 
@@ -233,18 +234,26 @@ export function MenuDishEditor({
           */}
         </div>
 
-        {/* Step 2: Photos */}
+        {/* Step 2: Photos & Storefront Preview */}
         <div className={`space-y-5 ${!editing && step !== 2 ? "hidden" : ""}`}>
-          <div className="space-y-2">
+          {/* Real-time Customer Storefront Preview Card & Exact Sizing Guide */}
+          <DishPreviewAndGuide
+            form={form}
+            categories={categories}
+            onSetPhoto={(url) => setForm((f) => ({ ...f, photo: url }))}
+            onSetImage={(url) => setForm((f) => ({ ...f, image: url }))}
+          />
+
+          <div className="space-y-2 pt-1">
             <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide flex items-center gap-1.5">
               <ImageIcon className="h-3.5 w-3.5" /> High-Resolution Photo Gallery &amp; Cutout:
             </span>
             <p className="text-xs text-zinc-500">
-              Upload food shots below. Mark one as <strong>Main</strong> for card thumbnails and hero display. <strong>Cutout</strong> is the optional transparent PNG for special promo tiles.
+              Upload food shots below. Click <strong>Show on Site</strong> on the image you want customers to see on the public menu and homepage cards.
             </p>
           </div>
 
-          <div ref={photosRef} className="p-4 rounded-lg border border-zinc-200 bg-white">
+          <div ref={photosRef} className="p-4 rounded-lg border border-zinc-200 bg-white space-y-4">
             <PhotoBoard
               slug={editing ?? ""}
               name={form.name || "this dish"}
@@ -256,6 +265,49 @@ export function MenuDishEditor({
               pending={pendingPhotos}
               onPendingChange={setPendingPhotos}
             />
+
+            {/* Active Storefront Image Indicator */}
+            {(form.photo || form.image) && (
+              <div className="p-3.5 rounded-xl border border-amber-300/80 bg-amber-50/70 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-amber-300 bg-white shadow-xs shrink-0">
+                    <img
+                      src={form.photo || form.image}
+                      alt="Active storefront preview"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                      <span>⭐ Active on Public Storefront:</span>
+                      <span className="font-semibold px-2 py-0.5 rounded-md bg-amber-200/70 text-amber-900 text-[10px] uppercase">
+                        {form.photo && form.photo !== form.image
+                          ? "Original Photo"
+                          : "Transparent Cutout"}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-amber-900/80 mt-0.5">
+                      Customers will see this exact image on the homepage and menu cards.
+                    </p>
+                  </div>
+                </div>
+
+                {form.photo && form.image && form.photo !== form.image && (
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="h-7 px-2.5 text-[11px] font-bold border-amber-400 bg-white hover:bg-amber-100 text-amber-950 rounded-lg"
+                      onClick={() => setForm((f) => ({ ...f, photo: f.image }))}
+                      title="Switch public cards to use the cutout sticker instead"
+                    >
+                      ✂️ Switch to Cutout
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
