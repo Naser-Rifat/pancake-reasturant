@@ -80,6 +80,7 @@ export default function DishCard({
   // A transparent cutout is used if the admin chose a cutout asset or when only a cutout exists
   const isCutout = Boolean(
     (!item.photo && Boolean(item.image)) ||
+    (item.photo && item.image && item.photo === item.image) ||
     src.includes("cutout") ||
     (src.startsWith("/menu/") && !src.includes("photo"))
   );

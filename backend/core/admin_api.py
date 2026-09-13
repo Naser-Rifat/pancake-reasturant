@@ -285,6 +285,14 @@ class AdminMenuItemPhotoViewSet(
         qs = MenuItemPhoto.objects.all()
         slug = self.request.query_params.get("menu_item")
         if slug:
+            item = MenuItem.objects.filter(slug=slug).first()
+            if item and item.photo and not MenuItemPhoto.objects.filter(menu_item=item, image=item.photo).exists():
+                MenuItemPhoto.objects.create(
+                    menu_item=item,
+                    image=item.photo,
+                    alt=f"{item.name} original photo",
+                    sort_order=0,
+                )
             qs = qs.filter(menu_item__slug=slug)
         return qs
 
@@ -344,8 +352,8 @@ class AdminRemoveBgView(APIView):
         upload = request.FILES.get("file")
         if upload is None:
             return Response({"detail": "Attach an image as 'file'."}, status=400)
-        if upload.size > 12 * 1024 * 1024:
-            return Response({"detail": "Image too large (max 12 MB)."}, status=400)
+        if upload.size > 5 * 1024 * 1024:
+            return Response({"detail": "Image too large (max 5 MB)."}, status=400)
 
         from io import BytesIO
 

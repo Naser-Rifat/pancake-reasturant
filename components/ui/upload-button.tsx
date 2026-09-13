@@ -6,6 +6,13 @@ import { Button } from "@/components/ui/button";
 import { API_URL } from "@/lib/api";
 import { getToken } from "@/lib/admin-api";
 import { cloudinaryReady, uploadToCloudinary } from "@/lib/cloudinary";
+import { useToast } from "@/components/ui/toast";
+import {
+  MAX_IMAGE_SIZE_BYTES,
+  MAX_IMAGE_SIZE_MB,
+  validateDishImageFile,
+  type ImageValidationResult,
+} from "@/lib/image-validation";
 
 /**
  * Uploads an image straight to Cloudinary (unsigned preset, plain REST — no SDK)
@@ -20,18 +27,22 @@ export function UploadButton({
   cutout = false,
   label = "Upload",
   multiple = false,
+  validate,
 }: {
-  onUploaded?: (url: string) => void;
+  onUploaded?: (url: string, check?: ImageValidationResult) => void | Promise<void>;
   /** dual mode: one pick returns BOTH the original photo and its cutout */
-  onPair?: (urls: { photo: string; cutout: string }) => void;
+  onPair?: (urls: { photo: string; cutout: string }) => void | Promise<void>;
   cutout?: boolean;
   label?: string;
   /** let staff pick several files in one go — onUploaded fires per file */
   multiple?: boolean;
+  /** custom pre-flight validation callback */
+  validate?: (file: File) => Promise<ImageValidationResult>;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [stage, setStage] = useState<"" | "cutting" | "uploading">("");
   const [error, setError] = useState("");
+  const { toast } = useToast();
 
   if (!cloudinaryReady) return null;
 
@@ -50,25 +61,44 @@ export function UploadButton({
 
   const upload = async (file: File) => {
     setError("");
+    setStage("uploading");
+
     try {
+      // If custom validation was passed, run it; otherwise run default dish validator
+      const validator = validate ?? validateDishImageFile;
+      const check = await validator(file);
+      if (!check.valid) {
+        const errMsg = check.error || "Image validation failed";
+        setError(errMsg);
+        toast({ variant: "error", title: "❌ Upload Blocked by Validation", description: errMsg });
+        return;
+      }
+      if (check.warning) {
+        toast({ variant: "info", title: "Aspect ratio note", description: check.warning });
+      }
+
       if (onPair) {
-        setStage("uploading");
         const photo = await uploadToCloudinary(file);
         setStage("cutting");
         const cut = await removeBg(file);
         setStage("uploading");
-        onPair({ photo, cutout: await uploadToCloudinary(cut) });
+        await onPair({ photo, cutout: await uploadToCloudinary(cut) });
         return;
       }
       let payload: File = file;
       if (cutout) {
         setStage("cutting");
         payload = await removeBg(file);
+        setStage("uploading");
       }
-      setStage("uploading");
-      onUploaded?.(await uploadToCloudinary(payload));
+      const uploadedUrl = await uploadToCloudinary(payload);
+      if (onUploaded) {
+        await onUploaded(uploadedUrl, check);
+      }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Upload failed");
+      const errMsg = e instanceof Error ? e.message : "Upload failed";
+      setError(errMsg);
+      toast({ variant: "error", title: "Upload failed", description: errMsg });
     } finally {
       setStage("");
       if (fileRef.current) fileRef.current.value = "";
@@ -76,7 +106,7 @@ export function UploadButton({
   };
 
   return (
-    <span className="inline-flex items-center gap-2">
+    <span className="inline-flex flex-wrap items-center gap-2">
       <input
         ref={fileRef}
         type="file"
@@ -96,9 +126,14 @@ export function UploadButton({
         onClick={() => fileRef.current?.click()}
       >
         <Upload />
-        {stage === "cutting" ? "Removing background…" : stage === "uploading" ? "Uploading…" : label}
+        {stage === "cutting" ? "Removing background…" : stage === "uploading" ? "Validating & Uploading…" : label}
       </Button>
-      {error && <span className="text-xs font-medium text-destructive">{error}</span>}
+      {error && (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-red-50 text-red-700 border border-red-200">
+          <span>⚠️</span>
+          <span>{error}</span>
+        </span>
+      )}
     </span>
   );
 }

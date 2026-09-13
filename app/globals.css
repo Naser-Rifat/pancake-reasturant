@@ -7831,14 +7831,16 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     width: 90%;
     height: 100%;
     object-fit: cover;
-    object-position: center;
+    object-position: center 38%;
     border-radius: 18px 18px 0 0;
     transform: none;
     box-shadow: 0 -3px 14px rgba(33, 26, 20, 0.12);
   }
 
-  /* Admin live preview container */
-  .preview-phone-card .dish-card {
+  /* Admin live preview containers: phone, tablet, desktop */
+  .preview-phone-card .dish-card,
+  .preview-tablet-card .dish-card,
+  .preview-desktop-card .dish-card {
     position: relative !important;
     display: block !important;
     height: 248px !important;
@@ -7850,20 +7852,26 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     box-shadow: 0 8px 24px rgba(33, 26, 20, 0.07) !important;
     background: linear-gradient(150deg, #fdf8f0 0%, #faefe0 60%, #f6e6d0 100%) !important;
   }
-  .preview-phone-card .dish-card .dc-body {
+  .preview-phone-card .dish-card .dc-body,
+  .preview-tablet-card .dish-card .dc-body,
+  .preview-desktop-card .dish-card .dc-body {
     position: relative !important;
     z-index: 5 !important;
     max-width: calc(100% - 60px) !important;
     padding: 0 !important;
   }
-  .preview-phone-card .dish-card .dc-head {
+  .preview-phone-card .dish-card .dc-head,
+  .preview-tablet-card .dish-card .dc-head,
+  .preview-desktop-card .dish-card .dc-head {
     display: flex !important;
     align-items: center !important;
     gap: 0.5rem !important;
     min-height: 28px !important;
     margin-bottom: 0.32rem !important;
   }
-  .preview-phone-card .dish-card .dc-name {
+  .preview-phone-card .dish-card .dc-name,
+  .preview-tablet-card .dish-card .dc-name,
+  .preview-desktop-card .dish-card .dc-name {
     font-family: var(--font-round), sans-serif !important;
     font-weight: 700 !important;
     font-size: 1.18rem !important;
@@ -7876,18 +7884,28 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     overflow: hidden !important;
   }
   .preview-phone-card .dish-card .dc-desc,
+  .preview-tablet-card .dish-card .dc-desc,
+  .preview-desktop-card .dish-card .dc-desc,
   .preview-phone-card .dish-card .dc-foot,
-  .preview-phone-card .dish-card .dc-details {
+  .preview-tablet-card .dish-card .dc-foot,
+  .preview-desktop-card .dish-card .dc-foot,
+  .preview-phone-card .dish-card .dc-details,
+  .preview-tablet-card .dish-card .dc-details,
+  .preview-desktop-card .dish-card .dc-details {
     display: none !important;
   }
-  .preview-phone-card .dish-card .dc-actions {
+  .preview-phone-card .dish-card .dc-actions,
+  .preview-tablet-card .dish-card .dc-actions,
+  .preview-desktop-card .dish-card .dc-actions {
     position: absolute !important;
     top: 1.25rem !important;
     right: 1.25rem !important;
     z-index: 6 !important;
     display: block !important;
   }
-  .preview-phone-card .dish-card .dc-media {
+  .preview-phone-card .dish-card .dc-media,
+  .preview-tablet-card .dish-card .dc-media,
+  .preview-desktop-card .dish-card .dc-media {
     position: absolute !important;
     inset: auto 0 -6px 0 !important;
     width: 100% !important;
@@ -7899,7 +7917,9 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     justify-content: center !important;
     overflow: hidden !important;
   }
-  .preview-phone-card .dish-card .dc-photo {
+  .preview-phone-card .dish-card .dc-photo,
+  .preview-tablet-card .dish-card .dc-photo,
+  .preview-desktop-card .dish-card .dc-photo {
     position: static !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -7913,21 +7933,27 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     border-radius: 0 !important;
     overflow: hidden !important;
   }
-  .preview-phone-card .dish-card .dc-img {
+  .preview-phone-card .dish-card .dc-img,
+  .preview-tablet-card .dish-card .dc-img,
+  .preview-desktop-card .dish-card .dc-img {
     position: relative !important;
     width: 100% !important;
     height: 100% !important;
   }
-  .preview-phone-card .dish-card .dc-img:not(.is-cutout) {
+  .preview-phone-card .dish-card .dc-img:not(.is-cutout),
+  .preview-tablet-card .dish-card .dc-img:not(.is-cutout),
+  .preview-desktop-card .dish-card .dc-img:not(.is-cutout) {
     width: 90% !important;
     height: 100% !important;
     object-fit: cover !important;
-    object-position: center !important;
+    object-position: center 38% !important;
     border-radius: 18px 18px 0 0 !important;
     transform: none !important;
     box-shadow: 0 -3px 14px rgba(33, 26, 20, 0.12) !important;
   }
-  .preview-phone-card .dish-card .dc-img.is-cutout {
+  .preview-phone-card .dish-card .dc-img.is-cutout,
+  .preview-tablet-card .dish-card .dc-img.is-cutout,
+  .preview-desktop-card .dish-card .dc-img.is-cutout {
     object-fit: contain !important;
     transform: scale(1.15) !important;
     transform-origin: center bottom !important;
