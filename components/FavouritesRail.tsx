@@ -117,13 +117,11 @@ export default function FavouritesRail({
                 className={`${s.pill} fav-bento-tile${isSelected ? " on" : ""}`}
                 onClick={() => setTab(c.slug)}
               >
-                <div className="fav-bento-top">
-                  <span className="fav-bento-icon" aria-hidden="true">
-                    {c.icon}
-                  </span>
-                  <span className="fav-bento-count">{c.count}</span>
-                </div>
+                <span className="fav-bento-icon" aria-hidden="true">
+                  {c.icon}
+                </span>
                 <span className="fav-bento-name">{c.name}</span>
+                <span className="fav-bento-count">{c.count}</span>
               </button>
             );
           })}

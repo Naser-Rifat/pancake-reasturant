@@ -4663,8 +4663,24 @@ body:has(.cart-fab) .wa-float {
     gap: 1.5rem;
   }
 }
-.fav-h .title { margin-bottom: 0.4rem; }
-.fav-sub { color: var(--muted); font-weight: 500; }
+.fav-h .title { 
+  margin-bottom: 1.35rem !important; 
+}
+.fav-h .title .accent {
+  display: inline-block !important;
+  font-family: var(--font-script), cursive !important;
+  padding-bottom: 0.4rem !important;
+  line-height: 1.25 !important;
+  transform: rotate(-2deg) !important;
+  margin-top: 0.2rem !important;
+}
+.fav-sub { 
+  color: var(--muted) !important; 
+  font-weight: 500 !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  margin: 0 0 0.5rem 0 !important;
+}
 .fav-foot { display: flex; justify-content: center; margin-top: 1.4rem; }
 .fav-foot .btn { width: 100%; justify-content: center; }
 @media (min-width: 768px) {
@@ -4673,123 +4689,120 @@ body:has(.cart-fab) .wa-float {
 }
 
 /* ===================================================================
-   BENTO APP-STYLE CATEGORY GRID (No horizontal slider/scroll)
+   SLIM & AESTHETIC CATEGORY PILL CHIPS
    =================================================================== */
 .fav-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.55rem;
-  width: 100%;
-  overflow: visible;
-  padding: 0.2rem 0;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.65rem !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0.35rem 0 !important;
+  margin-top: 0.5rem !important;
+  overflow: visible !important;
 }
-@media (min-width: 640px) {
+@media (max-width: 767px) {
   .fav-tabs {
-    grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
-    gap: 0.65rem;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-snap-type: x mandatory !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    padding: 0.3rem 0.2rem 0.65rem !important;
   }
-}
-@media (min-width: 1024px) {
-  .fav-tabs {
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    gap: 0.75rem;
+  .fav-tabs::-webkit-scrollbar {
+    display: none !important;
   }
 }
 
 .fav-bento-tile {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  align-items: stretch !important;
-  background: rgba(255, 255, 255, 0.85) !important;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1.5px solid rgba(118, 58, 18, 0.1) !important;
-  border-radius: 6px !important;
-  padding: 0.55rem 0.6rem !important;
-  min-height: 64px !important;
-  height: auto !important;
-  white-space: normal !important;
-  text-align: left !important;
-  box-shadow: 0 2px 5px rgba(33, 26, 20, 0.03);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.18s ease, border-color 0.18s ease, box-shadow 0.2s ease !important;
-  cursor: pointer;
-  position: relative;
-  user-select: none;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.55rem !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1.5px solid rgba(118, 58, 18, 0.13) !important;
+  border-radius: 999px !important;
+  padding: 0.42rem 1.15rem !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2px 8px rgba(33, 26, 20, 0.04) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  flex-shrink: 0 !important;
+  scroll-snap-align: start !important;
 }
 @media (hover: hover) and (pointer: fine) {
   .fav-bento-tile:hover {
     transform: translateY(-2px) !important;
     background: #ffffff !important;
-    border-color: rgba(224, 134, 0, 0.4) !important;
-    box-shadow: 0 6px 16px rgba(33, 26, 20, 0.08) !important;
+    border-color: rgba(239, 191, 56, 0.65) !important;
+    box-shadow: 0 6px 18px rgba(239, 191, 56, 0.22) !important;
   }
   .fav-bento-tile:hover .fav-bento-icon {
-    transform: scale(1.15);
+    transform: scale(1.15) !important;
   }
 }
 .fav-bento-tile:active {
   transform: scale(0.97) !important;
 }
-
-.fav-bento-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
 .fav-bento-icon {
-  font-size: 1.25rem;
-  line-height: 1;
-  display: inline-block;
-  transition: transform 0.2s ease;
-}
-.fav-bento-count {
-  font-family: var(--font-body);
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: var(--muted);
-  background: rgba(33, 26, 20, 0.06);
-  padding: 1px 6px;
-  border-radius: 999px;
-  min-width: 18px;
-  text-align: center;
-  line-height: 1.4;
-  letter-spacing: 0;
-  transition: all 0.18s ease;
+  font-size: 1.12rem !important;
+  line-height: 1 !important;
+  display: inline-block !important;
+  transition: transform 0.2s ease !important;
 }
 .fav-bento-name {
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.01em;
-  text-transform: capitalize;
-  color: var(--ink);
-  line-height: 1.18;
-  margin-top: 0.35rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  word-break: break-word;
-  transition: color 0.18s ease;
+  font-family: var(--font-round), sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+  color: var(--ink) !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  transition: color 0.18s ease !important;
+}
+.fav-bento-count {
+  font-family: var(--font-round), sans-serif !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  color: var(--muted) !important;
+  background: rgba(33, 26, 20, 0.07) !important;
+  padding: 2px 7px !important;
+  border-radius: 999px !important;
+  min-width: 20px !important;
+  text-align: center !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0 !important;
+  transition: all 0.18s ease !important;
 }
 
 /* Selected State */
 .fav-bento-tile.on {
-  background: var(--ink) !important;
-  border-color: var(--ink) !important;
+  background: var(--ink, #211a14) !important;
+  border-color: var(--ink, #211a14) !important;
   box-shadow: 0 6px 18px rgba(33, 26, 20, 0.22) !important;
+  transform: scale(1.02) !important;
 }
 .fav-bento-tile.on .fav-bento-name {
   color: #ffffff !important;
 }
 .fav-bento-tile.on .fav-bento-count {
-  background: var(--pink) !important;
-  color: #ffffff !important;
+  background: var(--yellow, #efbf38) !important;
+  color: #211a14 !important;
+  font-weight: 900 !important;
 }
 .fav-bento-tile.on .fav-bento-icon {
-  transform: scale(1.15);
+  transform: scale(1.15) !important;
 }
 
 /* app-style tile grid. The scroll-snap rail showed 1.3 cards on a phone, so
