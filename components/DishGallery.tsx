@@ -90,6 +90,7 @@ export default function DishGallery({
           priority
           sizes="(min-width: 1024px) 680px, 100vw"
           className={currentImg.cutout ? "as-cutout" : "as-photo"}
+          unoptimized={currentImg.src.startsWith("/")}
         />
 
         {/* Signature Rotating Circular Price Badge */}
@@ -172,6 +173,7 @@ export default function DishGallery({
                   fill
                   sizes="64px"
                   className={img.cutout ? "cut" : ""}
+                  unoptimized={img.src.startsWith("/")}
                 />
               </span>
             </button>
@@ -195,6 +197,7 @@ export default function DishGallery({
                   height={880}
                   sizes="92vw"
                   priority={idx === lightbox}
+                  unoptimized={img.src.startsWith("/")}
                 />
                 {img.alt && <figcaption>{img.alt}</figcaption>}
               </figure>

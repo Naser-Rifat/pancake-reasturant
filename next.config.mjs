@@ -6,6 +6,7 @@ const nextConfig = {
     globalNotFound: true,
   },
   images: {
+    contentDispositionType: "inline",
     // Restrict image optimization to the hosts actually used (Cloudinary for
     // admin uploads, Unsplash for stock/seed images) so the /_next/image
     // endpoint can't be abused as an open proxy for arbitrary hosts.

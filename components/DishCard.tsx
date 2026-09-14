@@ -136,6 +136,7 @@ export default function DishCard({
               height={420}
               sizes="(min-width: 1024px) 25vw, 380px"
               className={`dc-img${isCutout ? " is-cutout" : ""}`}
+              unoptimized={src.startsWith("/")}
             />
           )}
         </div>

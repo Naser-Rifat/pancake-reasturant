@@ -1801,6 +1801,7 @@ body:has(.top-ribbon).has-announce .page-hero {
 }
 .dprod-art {
   position: relative;
+  width: 100%;
 }
 /* panel rail: the last panel is sliced by the section edge, so "more views"
    is shown rather than announced */
@@ -7377,14 +7378,18 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   .dish-page .dprod {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: 1.2rem;
     padding: 0.4rem 0 2rem;
   }
   .dish-page .dprod-art {
     order: 1;
+    width: 100%;
+    align-self: stretch;
   }
   .dish-page .dprod-copy {
     order: 2;
+    width: 100%;
     display: flex;
     flex-direction: column;
   }
@@ -7396,7 +7401,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
 
   /* Safe padding for mobile bottom tab bar */
   .dish-page {
-    padding-bottom: calc(var(--tabbar-h, 60px) + 2.5rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--tabbar-h, 60px) + 3.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
