@@ -7894,9 +7894,11 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   .dish-card.dc-row,
   .dish-card.dc-tile {
     position: relative !important;
-    display: block !important;
-    height: 248px !important;
-    min-height: 248px;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    min-height: 274px !important;
+    height: auto !important;
     border-radius: 28px !important;
     padding: 1.25rem 1.25rem 0 !important;
     overflow: hidden !important;
@@ -7940,9 +7942,10 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   .dish-card.dc-tile .dc-body {
     position: relative;
     z-index: 5;
-    max-width: calc(100% - 60px);
+    max-width: calc(100% - 56px);
     pointer-events: auto;
     padding: 0 !important;
+    margin-bottom: 0.65rem;
   }
 
   .dish-card.dc-row .dc-badge-row,
@@ -8096,10 +8099,11 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   /* Center & Bottom: Hero Food Cutout with White Sticker Outline or Framed Photo */
   .dish-card.dc-row .dc-media,
   .dish-card.dc-tile .dc-media {
-    position: absolute;
-    inset: auto 0 -6px 0;
-    width: 100%;
-    height: 142px;
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: 144px;
+    margin-top: auto;
     z-index: 2;
     pointer-events: none;
     display: flex;
@@ -8152,13 +8156,13 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   /* Original framed photography uploaded by admin */
   .dish-card.dc-row .dc-img:not(.is-cutout),
   .dish-card.dc-tile .dc-img:not(.is-cutout) {
-    width: 90%;
+    width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 38%;
-    border-radius: 18px 18px 0 0;
+    object-position: center center;
+    border-radius: 20px 20px 0 0;
     transform: none;
-    box-shadow: 0 -3px 14px rgba(33, 26, 20, 0.12);
+    box-shadow: 0 -3px 14px rgba(33, 26, 20, 0.1);
   }
 
   /* Admin live preview containers: phone, tablet, desktop */
@@ -8166,9 +8170,11 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   .preview-tablet-card .dish-card,
   .preview-desktop-card .dish-card {
     position: relative !important;
-    display: block !important;
-    height: 248px !important;
-    min-height: 248px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    min-height: 274px !important;
+    height: auto !important;
     border-radius: 28px !important;
     padding: 1.25rem 1.25rem 0 !important;
     overflow: hidden !important;
@@ -8181,8 +8187,9 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   .preview-desktop-card .dish-card .dc-body {
     position: relative !important;
     z-index: 5 !important;
-    max-width: calc(100% - 60px) !important;
+    max-width: calc(100% - 56px) !important;
     padding: 0 !important;
+    margin-bottom: 0.65rem !important;
   }
   .preview-phone-card .dish-card .dc-head,
   .preview-tablet-card .dish-card .dc-head,
@@ -8230,10 +8237,11 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   .preview-phone-card .dish-card .dc-media,
   .preview-tablet-card .dish-card .dc-media,
   .preview-desktop-card .dish-card .dc-media {
-    position: absolute !important;
-    inset: auto 0 -6px 0 !important;
+    position: relative !important;
+    inset: auto !important;
     width: 100% !important;
-    height: 142px !important;
+    height: 144px !important;
+    margin-top: auto !important;
     z-index: 2 !important;
     pointer-events: none !important;
     display: flex !important;
@@ -8267,13 +8275,13 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   .preview-phone-card .dish-card .dc-img:not(.is-cutout),
   .preview-tablet-card .dish-card .dc-img:not(.is-cutout),
   .preview-desktop-card .dish-card .dc-img:not(.is-cutout) {
-    width: 90% !important;
+    width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
-    object-position: center 38% !important;
-    border-radius: 18px 18px 0 0 !important;
+    object-position: center center !important;
+    border-radius: 20px 20px 0 0 !important;
     transform: none !important;
-    box-shadow: 0 -3px 14px rgba(33, 26, 20, 0.12) !important;
+    box-shadow: 0 -3px 14px rgba(33, 26, 20, 0.1) !important;
   }
   .preview-phone-card .dish-card .dc-img.is-cutout,
   .preview-tablet-card .dish-card .dc-img.is-cutout,
