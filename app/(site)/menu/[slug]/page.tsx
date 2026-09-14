@@ -70,12 +70,52 @@ export default async function DishPage({ params }: Props) {
   };
 
   // Build the complete multiple images list for the gallery slider rail
-  const heroImage = item.photo || item.image;
-  const galleryImages = [
-    ...(item.image ? [{ id: "cutout", src: item.image, alt: `${item.name} cutout`, cutout: true }] : []),
-    ...(item.photo ? [{ id: "photo-main", src: item.photo, alt: `${item.name} real photo` }] : []),
-    ...(item.photos ?? []).map((p) => ({ id: String(p.id), src: p.image, alt: p.alt || `${item.name} angle` })),
+  // UX Rule & Industry Standard:
+  // 1. If real food photo(s) are uploaded, display the real food photos in the dish gallery.
+  // 2. Never mix an old/mismatched transparent cutout sticker into the real photo slider.
+  // 3. Deduplicate by URL so a photo marked as 'main' is never rendered twice.
+  // 4. If the admin explicitly chose the cutout (or no real photos exist), display the cutout.
+  const isCutoutChosen = Boolean(
+    item.image && (!item.photo || item.photo === item.image)
+  );
+
+  const realPhotos = [
+    ...(item.photo && item.photo !== item.image
+      ? [{ id: "photo-main", src: item.photo, alt: `${item.name} photo` }]
+      : []),
+    ...(item.photos ?? []).map((p) => ({
+      id: String(p.id),
+      src: p.image,
+      alt: p.alt || `${item.name} angle`,
+    })),
   ];
+
+  // Deduplicate real photos by URL
+  const seenUrls = new Set<string>();
+  const uniqueRealPhotos = realPhotos.filter((img) => {
+    if (!img.src || seenUrls.has(img.src)) return false;
+    seenUrls.add(img.src);
+    return true;
+  });
+
+  let galleryImages: { id: string; src: string; alt: string; cutout?: boolean }[] = [];
+
+  if (isCutoutChosen || uniqueRealPhotos.length === 0) {
+    if (item.image) {
+      galleryImages = [{ id: "cutout", src: item.image, alt: `${item.name} cutout`, cutout: true }];
+    } else if (uniqueRealPhotos.length > 0) {
+      galleryImages = uniqueRealPhotos;
+    }
+  } else {
+    // Real photos exist and take center stage
+    galleryImages = uniqueRealPhotos;
+  }
+
+  // Fallback if still empty
+  if (galleryImages.length === 0) {
+    const fallbackSrc = item.photo || item.image || "/menu/buttermilk.png";
+    galleryImages = [{ id: "fallback", src: fallbackSrc, alt: item.name, cutout: !item.photo }];
+  }
 
   return (
     <main className="dish-page">
@@ -105,7 +145,7 @@ export default async function DishPage({ params }: Props) {
           <div className="dprod-art">
             <DishGallery
               name={item.name}
-              images={galleryImages.length > 0 ? galleryImages : [{ id: "main", src: heroImage, alt: item.name }]}
+              images={galleryImages}
               price={price}
             />
           </div>
