@@ -7440,7 +7440,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     color: #1a1109 !important;
     font-family: var(--font-serif), Georgia, serif !important;
     font-weight: 400 !important;
-    font-size: clamp(1.65rem, 5.8vw, 2.25rem) !important;
+    font-size: clamp(1.75rem, 6.2vw, 2.35rem) !important;
     line-height: 1.05 !important;
     letter-spacing: -0.015em !important;
     text-transform: none !important;
@@ -7451,33 +7451,23 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     color: #1a1109 !important;
     display: inline !important;
   }
-  body:has(.hero-nav) .hero-card-left h1 .head-line:first-child::after {
-    content: " ";
-  }
   body:has(.hero-nav) .hero-card-left h1 .script {
     font-family: var(--font-script), cursive !important;
-    font-size: 0.92em !important;
-    margin-top: 0.05rem !important;
+    font-size: 0.94em !important;
+    margin-top: 0.08rem !important;
     display: block !important;
     color: #b85d19 !important; /* rich warm caramel/terracotta accent */
     text-shadow: none !important;
     text-align: center !important;
   }
   body:has(.hero-nav) .hero-card-left h1 .head-chip {
-    display: inline-block !important;
-    vertical-align: middle !important;
-    margin-left: 0.3rem !important;
-    width: clamp(22px, 5.5vw, 28px) !important;
-    height: clamp(22px, 5.5vw, 28px) !important;
-    border-radius: 50% !important;
-    overflow: hidden !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.14) !important;
+    display: none !important; /* hide cluttered chip on mobile for pure editorial typography */
   }
 
-  /* Lead Description Copy (Centered) */
+  /* Lead Description Copy (Centered, never truncated mid-sentence) */
   body:has(.hero-nav) .hero-card-left p.lead {
     display: -webkit-box !important;
-    -webkit-line-clamp: 2 !important;
+    -webkit-line-clamp: 3 !important;
     -webkit-box-orient: vertical !important;
     overflow: hidden !important;
     margin: 0 !important;
@@ -7485,28 +7475,28 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     text-align: center !important;
     color: #5c4c42 !important;
     font-size: clamp(0.78rem, 2.7vw, 0.86rem) !important;
-    line-height: 1.36 !important;
+    line-height: 1.38 !important;
     font-weight: 450 !important;
-    max-width: 36ch !important;
+    max-width: 44ch !important;
   }
 
   /* Action Buttons */
   body:has(.hero-nav) .hero-actions {
-    margin-top: 0.2rem !important;
+    margin-top: 0.25rem !important;
     padding-top: 0 !important;
     width: 100% !important;
     max-width: 22rem !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: clamp(0.35rem, 1vh, 0.55rem) !important;
+    gap: 0.45rem !important;
   }
   body:has(.hero-nav) .hero-actions .btn {
     width: 100% !important;
     justify-content: center !important;
-    min-height: clamp(38px, 5.2vh, 44px) !important;
-    padding: 0.55rem 1.2rem !important;
-    font-size: clamp(0.82rem, 2.8vw, 0.88rem) !important;
+    min-height: 42px !important;
+    padding: 0.6rem 1.2rem !important;
+    font-size: 0.88rem !important;
     border-radius: 999px !important;
     font-weight: 800 !important;
     letter-spacing: 0.03em !important;
@@ -7520,19 +7510,19 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     background: linear-gradient(180deg, #f7cb46 0%, #e8a71f 100%) !important;
     color: #1a1109 !important;
     border: 1px solid rgba(26, 17, 9, 0.08) !important;
-    box-shadow: 0 4px 14px rgba(232, 167, 31, 0.36), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 4px 14px rgba(232, 167, 31, 0.38), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
   }
   body:has(.hero-nav) .hero-actions .btn-ghost {
     background: #ffffff !important;
-    border: 1.5px solid rgba(26, 17, 9, 0.16) !important;
+    border: 1.5px solid rgba(26, 17, 9, 0.2) !important;
     color: #1a1109 !important;
     font-weight: 800 !important;
-    box-shadow: 0 2px 6px rgba(26, 17, 9, 0.04) !important;
+    box-shadow: 0 2px 8px rgba(26, 17, 9, 0.05) !important;
     text-shadow: none !important;
   }
   body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     background: #fdfaf3 !important;
-    border-color: rgba(26, 17, 9, 0.32) !important;
+    border-color: rgba(26, 17, 9, 0.36) !important;
   }
 
   /* Tablet layout (≥600px) */
@@ -7579,21 +7569,22 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     padding-inline: 0.35rem;
   }
   body:has(.hero-nav) .nav:not(.past-hero) .logo {
-    background: transparent !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    display: inline-flex;
-    align-items: center;
+    background: rgba(254, 250, 240, 0.94) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    backdrop-filter: blur(14px) !important;
+    border: 1.5px solid rgba(118, 58, 18, 0.12) !important;
+    box-shadow: 0 4px 16px rgba(26, 17, 9, 0.18) !important;
+    border-radius: 999px !important;
+    padding: 0.3rem 0.85rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    height: 42px !important;
   }
-  /* Original colorful logo on transparent ground with subtle shadow for crisp readability */
   body:has(.hero-nav) .nav:not(.past-hero) .nav-brand-logo {
-    filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45));
+    filter: none !important;
     opacity: 1;
-    height: 34px;
-    width: auto;
+    height: 24px !important;
+    width: auto !important;
   }
   body:has(.hero-nav) .nav:not(.past-hero) .nav-book-btn {
     display: none;
@@ -7634,6 +7625,9 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   }
   body:has(.hero-nav) .nav:not(.past-hero) .nav-cart:active {
     transform: scale(0.93);
+  }
+  nextjs-portal {
+    display: none !important;
   }
 }
 

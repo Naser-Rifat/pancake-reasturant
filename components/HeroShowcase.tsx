@@ -116,7 +116,7 @@ export default function HeroShowcase({
         <h1>
           {headingWords.length >= 2 ? (
             <>
-              <span className="head-line">{headingWords[0]}</span>
+              <span className="head-line">{headingWords[0]}</span>{" "}
               <span className="head-line">
                 {headingWords.slice(1).join(" ")}
                 {chip && (
