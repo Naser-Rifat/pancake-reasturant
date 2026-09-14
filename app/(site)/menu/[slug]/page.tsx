@@ -6,7 +6,6 @@ import { ArrowLeft, Star } from "lucide-react";
 import DishGallery from "@/components/DishGallery";
 import DishCard, { TAG_ICONS } from "@/components/DishCard";
 import QtyAdd from "@/components/QtyAdd";
-import DishMenuButton from "@/components/DishMenuButton";
 import CartButton from "@/components/CartButton";
 import { TAG_LABEL, getMenuWithStatus, getReviews, getSite, money, type ApiMenuItem } from "@/lib/api";
 import { jsonLd } from "@/lib/utils";
@@ -93,11 +92,10 @@ export default async function DishPage({ params }: Props) {
           <span className="dish-crumb-tag">
             {catIcon} {catLabel}
           </span>
-          <span className="dish-topbar-title">Pancake Details</span>
-          {/* right-hand pair: cart button, then quick menu */}
+          <span className="dish-topbar-title">{item.name}</span>
+          {/* right-hand: cart button */}
           <span className="dish-topbar-actions">
             <CartButton live={site.online_ordering_enabled} className="dish-topbar-cart" />
-            <DishMenuButton />
           </span>
         </nav>
 
