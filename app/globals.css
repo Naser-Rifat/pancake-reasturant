@@ -5933,32 +5933,34 @@ body:has(.cart-fab) .wa-float {
 }
 
 @media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
-  /* ---- brand lockup: Frosted Glass Capsule Pill (Image 2) ---- */
+  /* ---- brand lockup: Clean transparent logo (No bubble pill) ---- */
   body:has(.hero-nav) .hero-logo.hero-logo-pill,
   .hero-logo.hero-logo-pill {
-    background: rgba(254, 250, 240, 0.94) !important;
-    -webkit-backdrop-filter: blur(14px) !important;
-    backdrop-filter: blur(14px) !important;
-    border: 1.5px solid rgba(118, 58, 18, 0.12) !important;
-    box-shadow: 0 4px 16px rgba(26, 17, 9, 0.18) !important;
-    border-radius: 999px !important;
-    padding: 0.35rem 1.25rem !important;
+    background: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
     display: inline-flex !important;
     align-items: center !important;
-    height: 48px !important;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
+    height: auto !important;
+    transition: transform 0.2s ease, opacity 0.2s ease !important;
   }
   body:has(.hero-nav) .hero-logo.hero-logo-pill:hover,
   .hero-logo.hero-logo-pill:hover {
-    transform: translateY(-2px) scale(1.02) !important;
-    box-shadow: 0 8px 24px rgba(26, 17, 9, 0.24) !important;
-    background: rgba(255, 252, 245, 0.98) !important;
+    transform: scale(1.03) !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    opacity: 0.95 !important;
   }
   .hero-brand-logo {
-    height: 28px !important;
+    height: 38px !important;
     width: auto !important;
     object-fit: contain !important;
     display: block !important;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7)) !important;
   }
   body:has(.hero-nav) .hero-nav {
     min-height: 48px;
@@ -7349,64 +7351,72 @@ body:has(.hero-nav) .hero-find {
 
 @media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
   body:has(.hero-nav) .hero {
-    padding: 14px 0 0 !important;
+    padding: 36px 0 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
   }
-  body:has(.hero-nav).has-announce .hero {
-    padding-top: calc(14px + 44px) !important;
+  body:has(.hero-nav):has(.top-ribbon) .hero {
+    padding-top: 36px !important;
   }
-  /* The Container: Top Visual Stage + Flush Warm Cream Welcome Section */
+  body:has(.hero-nav):has(.top-ribbon).has-announce .hero {
+    padding-top: calc(36px + 40px) !important;
+  }
+  /* The Container: 100% Full-Width Edge-to-Edge Stage (Zero lateral gaps) */
   body:has(.hero-nav) .hero .container.hero-cards {
     display: flex !important;
     flex-direction: column !important;
-    width: auto !important;
-    max-width: 1340px !important;
-    margin-inline: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
-    border-radius: 8px !important;
-    overflow: hidden !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
     background: #faf6ed !important;
-    border: 1.5px solid rgba(118, 58, 18, 0.1) !important;
-    box-shadow: 0 16px 44px rgba(26, 17, 9, 0.1) !important;
+    border: none !important;
+    box-shadow: none !important;
     position: relative !important;
   }
 
-  /* Top Visual Stage: Full-width cinematic pancake stage with centered food art */
+  /* Top Visual Stage: Full-width cinematic pancake stage proportioned to keep CTAs above fold */
   body:has(.hero-nav) .hero-bg {
     position: relative !important;
     inset: auto !important;
     width: 100% !important;
-    height: 520px !important;
-    min-height: 520px !important;
-    max-height: 520px !important;
+    height: clamp(340px, 42vh, 400px) !important;
+    min-height: clamp(340px, 42vh, 400px) !important;
+    max-height: clamp(340px, 42vh, 400px) !important;
     overflow: hidden !important;
     background: radial-gradient(circle at center 50%, #2f3d2a 0%, #152013 65%, #0d150c 100%) !important;
   }
   body:has(.hero-nav) .hero-bg img {
     object-fit: cover !important;
-    object-position: center 44% !important;
+    object-position: center 46% !important;
   }
   body:has(.hero-nav) .hero-scrim {
     position: absolute !important;
     inset: 0 !important;
     background: linear-gradient(
       180deg,
-      rgba(13, 21, 12, 0.65) 0%,
-      rgba(13, 21, 12, 0.1) 32%,
-      rgba(13, 21, 12, 0.12) 68%,
-      rgba(13, 21, 12, 0.6) 100%
+      rgba(10, 15, 10, 0.86) 0%,
+      rgba(10, 15, 10, 0.4) 30%,
+      rgba(10, 15, 10, 0.05) 55%,
+      rgba(10, 15, 10, 0.42) 85%,
+      rgba(10, 15, 10, 0.72) 100%
     ) !important;
     pointer-events: none !important;
   }
 
-  /* Top Navigation Bar: Spans across the top of the visual stage */
+  /* Top Navigation Bar: Spans cleanly across top of visual stage without bubble capsules */
   body:has(.hero-nav) .hero-nav {
     position: absolute !important;
-    top: 1.4rem !important;
-    left: 2rem !important;
-    right: 2rem !important;
-    z-index: 10 !important;
+    top: 1.25rem !important;
+    left: 3rem !important;
+    right: 3rem !important;
+    z-index: 15 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
@@ -7417,68 +7427,81 @@ body:has(.hero-nav) .hero-find {
     pointer-events: auto !important;
   }
 
-  /* Frosted capsule for brand logo */
+  /* Clean Brand Logo without pill bubble */
   body:has(.hero-nav) .hero-logo-pill {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: rgba(253, 249, 238, 0.88) !important;
-    backdrop-filter: blur(18px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
-    padding: 0.45rem 1.15rem !important;
-    border-radius: 999px !important;
-    box-shadow: 0 8px 24px rgba(18, 12, 8, 0.14) !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.65) !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    transition: transform 0.2s ease, opacity 0.2s ease !important;
   }
   body:has(.hero-nav) .hero-logo-pill:hover {
-    transform: translateY(-1px) scale(1.02) !important;
-    box-shadow: 0 10px 28px rgba(18, 12, 8, 0.18) !important;
+    transform: scale(1.03) !important;
+    opacity: 0.95 !important;
+  }
+  body:has(.hero-nav) .hero-brand-logo {
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7)) !important;
+    width: 130px !important;
+    height: auto !important;
   }
 
-  /* Center: Frosted Glass Capsule Pill for Navigation Links */
+  /* Center: Image 2 Style - Clean Uppercase White Navigation Links */
   body:has(.hero-nav) .hero-nav-links {
     display: flex !important;
     align-items: center !important;
-    gap: 0.35rem !important;
+    gap: 2.8rem !important;
     margin: 0 auto !important;
-    padding: 0.35rem 0.5rem !important;
+    padding: 0 !important;
     list-style: none !important;
-    background: rgba(253, 249, 238, 0.88) !important;
-    backdrop-filter: blur(20px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.65) !important;
-    border-radius: 999px !important;
-    box-shadow:
-      0 10px 30px rgba(18, 12, 8, 0.15),
-      0 1px 3px rgba(0, 0, 0, 0.06) !important;
-    transition: box-shadow 0.2s ease !important;
-  }
-  body:has(.hero-nav) .hero-nav-links:hover {
-    box-shadow:
-      0 14px 36px rgba(18, 12, 8, 0.2),
-      0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
   }
   body:has(.hero-nav) .hero-nav-links a {
-    color: #211a14 !important;
+    color: #ffffff !important;
     font-weight: 800 !important;
-    font-size: 0.8rem !important;
-    letter-spacing: 0.08em !important;
+    font-size: 0.88rem !important;
+    letter-spacing: 0.14em !important;
     text-transform: uppercase !important;
     text-decoration: none !important;
-    padding: 0.45rem 1.05rem !important;
-    border-radius: 999px !important;
-    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    display: inline-block !important;
+    padding: 0.4rem 0.2rem !important;
+    border-radius: 0 !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7), 0 2px 12px rgba(0, 0, 0, 0.5) !important;
+    transition: color 0.18s ease, text-shadow 0.18s ease !important;
+    position: relative !important;
+  }
+  body:has(.hero-nav) .hero-nav-links a::after {
+    content: "" !important;
+    position: absolute !important;
+    bottom: -2px !important;
+    left: 0 !important;
+    width: 0 !important;
+    height: 2px !important;
+    background: var(--yellow, #efbf38) !important;
+    transition: width 0.2s ease !important;
+    border-radius: 2px !important;
   }
   body:has(.hero-nav) .hero-nav-links a:hover {
-    color: #211a14 !important;
-    background: var(--yellow, #efbf38) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(239, 191, 56, 0.4) !important;
+    color: var(--yellow, #efbf38) !important;
+    background: transparent !important;
+    transform: none !important;
+    box-shadow: none !important;
+    text-shadow: 0 0 12px rgba(239, 191, 56, 0.6) !important;
+  }
+  body:has(.hero-nav) .hero-nav-links a:hover::after {
+    width: 100% !important;
   }
 
-  /* Topbar actions (Find a stack + Order button) */
+  /* Topbar actions (Order Takeaway CTA) */
   body:has(.hero-nav) .hero-topbar {
     position: static !important;
     display: flex !important;
@@ -7487,29 +7510,7 @@ body:has(.hero-nav) .hero-find {
     inset: auto !important;
   }
   body:has(.hero-nav) .hero-find {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 0.45rem !important;
-    color: #211a14 !important;
-    font-size: 0.8rem !important;
-    font-weight: 800 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.06em !important;
-    text-decoration: none !important;
-    background: rgba(253, 249, 238, 0.88) !important;
-    backdrop-filter: blur(18px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
-    padding: 0.6rem 1.15rem !important;
-    border-radius: 999px !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.65) !important;
-    box-shadow: 0 8px 24px rgba(18, 12, 8, 0.12) !important;
-    transition: all 0.2s ease !important;
-  }
-  body:has(.hero-nav) .hero-find:hover {
-    background: #ffffff !important;
-    color: var(--yellow-deep, #e08600) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 10px 28px rgba(18, 12, 8, 0.16) !important;
+    display: none !important;
   }
   body:has(.hero-nav) .hero-order {
     display: inline-flex !important;
@@ -7519,25 +7520,25 @@ body:has(.hero-nav) .hero-find {
     color: #211a14 !important;
     font-size: 0.82rem !important;
     font-weight: 800 !important;
-    letter-spacing: 0.06em !important;
+    letter-spacing: 0.08em !important;
     text-transform: uppercase !important;
     padding: 0.65rem 1.45rem !important;
     border-radius: 999px !important;
     text-decoration: none !important;
-    box-shadow: 0 6px 20px rgba(239, 191, 56, 0.45) !important;
+    box-shadow: 0 4px 16px rgba(239, 191, 56, 0.45) !important;
     transition: all 0.2s ease !important;
   }
   body:has(.hero-nav) .hero-order:hover {
     background: var(--yellow-deep, #e08600) !important;
     transform: translateY(-1px) scale(1.02) !important;
-    box-shadow: 0 8px 24px rgba(224, 134, 0, 0.5) !important;
+    box-shadow: 0 6px 20px rgba(224, 134, 0, 0.5) !important;
   }
 
-  /* Stage Dish Thumbnails (floating on the visual stage bottom right) */
+  /* Stage Dish Thumbnails (floating on visual stage bottom right) */
   body:has(.hero-nav) .hero-stage-thumbs {
     position: absolute !important;
-    bottom: 1.5rem !important;
-    right: 2rem !important;
+    bottom: 1.25rem !important;
+    right: 2.5rem !important;
     z-index: 5 !important;
     display: flex !important;
     align-items: center !important;
@@ -7567,13 +7568,13 @@ body:has(.hero-nav) .hero-find {
     transform: scale(1.08) !important;
   }
 
-  /* Bottom Editorial Section: Flush Warm Cream Welcome Card */
+  /* Bottom Editorial Section: Proportionally balanced so buttons are 100% visible above the fold */
   body:has(.hero-nav) .hero-card-left {
     position: relative !important;
     width: 100% !important;
     height: auto !important;
     background: #faf6ed !important;
-    padding: 4.5rem 2.5rem 5rem !important;
+    padding: 1.8rem 2rem 2.2rem !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -7582,9 +7583,9 @@ body:has(.hero-nav) .hero-find {
   }
   body:has(.hero-nav) .hero-card-left h1 {
     font-family: var(--font-serif), Georgia, serif !important;
-    font-size: clamp(3.2rem, 5.2vw, 4.6rem) !important;
+    font-size: clamp(2.4rem, 3.4vw, 3.2rem) !important;
     font-weight: 800 !important;
-    line-height: 1.05 !important;
+    line-height: 1.1 !important;
     color: #211a14 !important;
     text-transform: none !important;
     letter-spacing: -0.02em !important;
@@ -7608,10 +7609,10 @@ body:has(.hero-nav) .hero-find {
   body:has(.hero-nav) .hero-card-left p.lead {
     color: #4a3b32 !important;
     font-family: var(--font-body), sans-serif !important;
-    font-size: clamp(1.05rem, 1.35vw, 1.22rem) !important;
-    line-height: 1.72 !important;
-    max-width: 65ch !important;
-    margin: 1.6rem auto 0 !important;
+    font-size: clamp(0.98rem, 1.2vw, 1.12rem) !important;
+    line-height: 1.55 !important;
+    max-width: 62ch !important;
+    margin: 0.65rem auto 0 !important;
     text-shadow: none !important;
     text-align: center !important;
   }
@@ -7620,8 +7621,8 @@ body:has(.hero-nav) .hero-find {
     flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 1.25rem !important;
-    margin-top: 2.4rem !important;
+    gap: 1.1rem !important;
+    margin-top: 1.25rem !important;
     padding-top: 0 !important;
     width: 100% !important;
   }
@@ -7629,17 +7630,17 @@ body:has(.hero-nav) .hero-find {
     background: var(--yellow) !important;
     color: #211a14 !important;
     font-weight: 800 !important;
-    font-size: 0.88rem !important;
+    font-size: 0.85rem !important;
     letter-spacing: 0.08em !important;
-    padding: 1rem 2.6rem !important;
+    padding: 0.85rem 2.2rem !important;
     border-radius: 999px !important;
-    box-shadow: 0 4px 18px rgba(239, 191, 56, 0.4) !important;
+    box-shadow: 0 4px 16px rgba(239, 191, 56, 0.4) !important;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
   body:has(.hero-nav) .hero-actions .btn-primary:hover {
     background: var(--yellow-deep) !important;
     transform: translateY(-2px) scale(1.02) !important;
-    box-shadow: 0 8px 26px rgba(224, 134, 0, 0.45) !important;
+    box-shadow: 0 8px 24px rgba(224, 134, 0, 0.45) !important;
   }
   body:has(.hero-nav) .hero-actions .btn-ghost {
     display: inline-flex !important;
@@ -7647,9 +7648,9 @@ body:has(.hero-nav) .hero-find {
     color: #211a14 !important;
     border: 1.5px solid rgba(118, 58, 18, 0.2) !important;
     font-weight: 800 !important;
-    font-size: 0.88rem !important;
+    font-size: 0.85rem !important;
     letter-spacing: 0.08em !important;
-    padding: 1rem 2.6rem !important;
+    padding: 0.85rem 2.2rem !important;
     border-radius: 999px !important;
     box-shadow: 0 2px 8px rgba(33, 26, 20, 0.06) !important;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
