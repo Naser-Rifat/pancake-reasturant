@@ -7370,14 +7370,14 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     min-height: calc(100svh - 44px) !important;
   }
 
-  /* Top 3/5 Visual Stage (~56% viewport) */
+  /* Top 3/5 Visual Stage (Exact 60% of viewport) */
   body:has(.hero-nav) .hero-bg {
     position: relative !important;
     inset: auto !important;
     width: 100% !important;
-    height: 56svh !important;
-    min-height: 360px !important;
-    max-height: 520px !important;
+    height: 59svh !important;
+    min-height: 380px !important;
+    max-height: 560px !important;
     flex-shrink: 0 !important;
     z-index: 1 !important;
     overflow: hidden !important;
@@ -7401,22 +7401,23 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     pointer-events: none !important;
   }
 
-  /* Bottom 2/5 Content Card (~44% viewport) */
+  /* Bottom 2/5 Content Card (Sharp architectural division, 40% of viewport) */
   body:has(.hero-nav) .hero-card-left {
     position: relative !important;
     flex: 1 1 auto !important;
     width: 100% !important;
     background: #faf6ed !important;
-    border-radius: 28px 28px 0 0 !important;
-    margin-top: -24px !important;
+    border-radius: 0 !important;
+    margin-top: 0 !important;
     z-index: 5 !important;
     padding: 1.6rem 1.4rem calc(1.5rem + env(safe-area-inset-bottom, 0px)) !important;
     display: flex !important;
     flex-direction: column !important;
-    align-items: flex-start !important;
-    text-align: left !important;
+    align-items: center !important;
+    text-align: center !important;
     justify-content: space-between !important;
-    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.12) !important;
+    box-shadow: none !important;
+    border-top: 1px solid rgba(26, 17, 9, 0.08) !important;
   }
   body:has(.hero-nav) .hero-card-right {
     display: none !important;
@@ -7426,7 +7427,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     display: none !important;
   }
 
-  /* Headline on Warm Cream */
+  /* Headline on Warm Cream (Centered) */
   body:has(.hero-nav) .hero-card-left h1 {
     margin: 0 !important;
     color: #1a1109 !important;
@@ -7437,6 +7438,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     letter-spacing: -0.01em !important;
     text-transform: none !important;
     text-shadow: none !important;
+    text-align: center !important;
   }
   body:has(.hero-nav) .hero-card-left h1 .head-line {
     color: #1a1109 !important;
@@ -7452,6 +7454,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     display: block !important;
     color: #b85d19 !important; /* rich warm caramel/terracotta accent */
     text-shadow: none !important;
+    text-align: center !important;
   }
   body:has(.hero-nav) .hero-card-left h1 .head-chip {
     display: inline-block !important;
@@ -7464,7 +7467,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14) !important;
   }
 
-  /* Lead Description Copy */
+  /* Lead Description Copy (Centered) */
   body:has(.hero-nav) .hero-card-left p.lead {
     display: -webkit-box !important;
     -webkit-line-clamp: 3 !important;
@@ -7472,11 +7475,13 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     overflow: hidden !important;
     margin-top: 0.7rem !important;
     margin-bottom: 0 !important;
+    margin-inline: auto !important;
+    text-align: center !important;
     color: #4a3b32 !important;
     font-size: clamp(0.88rem, 3.4vw, 0.95rem) !important;
     line-height: 1.48 !important;
     font-weight: 450 !important;
-    max-width: 44ch !important;
+    max-width: 38ch !important;
   }
 
   /* Action Buttons */
@@ -7487,7 +7492,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     max-width: 100% !important;
     display: flex !important;
     flex-direction: column !important;
-    align-items: stretch !important;
+    align-items: center !important;
     gap: 0.65rem !important;
   }
   body:has(.hero-nav) .hero-actions .btn {
