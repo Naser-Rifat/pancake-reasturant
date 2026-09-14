@@ -7403,14 +7403,18 @@ body:has(.hero-nav) .hero-find {
   /* Top Navigation Bar: Spans across the top of the visual stage */
   body:has(.hero-nav) .hero-nav {
     position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    top: 1.4rem !important;
+    left: 2rem !important;
+    right: 2rem !important;
     z-index: 10 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 1.4rem 2.5rem !important;
+    padding: 0 !important;
+    pointer-events: none !important;
+  }
+  body:has(.hero-nav) .hero-nav > * {
+    pointer-events: auto !important;
   }
 
   /* Frosted capsule for brand logo */
@@ -7418,41 +7422,60 @@ body:has(.hero-nav) .hero-find {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: rgba(255, 255, 255, 0.94) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    padding: 0.45rem 1.1rem !important;
+    background: rgba(253, 249, 238, 0.88) !important;
+    backdrop-filter: blur(18px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+    padding: 0.45rem 1.15rem !important;
     border-radius: 999px !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.5) !important;
-    transition: transform 0.2s ease !important;
+    box-shadow: 0 8px 24px rgba(18, 12, 8, 0.14) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.65) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
   }
   body:has(.hero-nav) .hero-logo-pill:hover {
-    transform: scale(1.03) !important;
+    transform: translateY(-1px) scale(1.02) !important;
+    box-shadow: 0 10px 28px rgba(18, 12, 8, 0.18) !important;
   }
 
-  /* Clean nav links across visual stage */
+  /* Center: Frosted Glass Capsule Pill for Navigation Links */
   body:has(.hero-nav) .hero-nav-links {
     display: flex !important;
     align-items: center !important;
-    gap: 2.2rem !important;
+    gap: 0.35rem !important;
     margin: 0 auto !important;
-    padding: 0 !important;
+    padding: 0.35rem 0.5rem !important;
     list-style: none !important;
-    font-weight: 800 !important;
-    font-size: 0.82rem !important;
-    letter-spacing: 0.1em !important;
-    text-transform: uppercase !important;
+    background: rgba(253, 249, 238, 0.88) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.65) !important;
+    border-radius: 999px !important;
+    box-shadow:
+      0 10px 30px rgba(18, 12, 8, 0.15),
+      0 1px 3px rgba(0, 0, 0, 0.06) !important;
+    transition: box-shadow 0.2s ease !important;
+  }
+  body:has(.hero-nav) .hero-nav-links:hover {
+    box-shadow:
+      0 14px 36px rgba(18, 12, 8, 0.2),
+      0 2px 6px rgba(0, 0, 0, 0.08) !important;
   }
   body:has(.hero-nav) .hero-nav-links a {
-    color: #ffffff !important;
+    color: #211a14 !important;
+    font-weight: 800 !important;
+    font-size: 0.8rem !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
     text-decoration: none !important;
-    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4) !important;
-    transition: color 0.18s ease, text-shadow 0.18s ease !important;
+    padding: 0.45rem 1.05rem !important;
+    border-radius: 999px !important;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    display: inline-block !important;
   }
   body:has(.hero-nav) .hero-nav-links a:hover {
-    color: var(--yellow) !important;
-    text-shadow: 0 2px 12px rgba(239, 191, 56, 0.5) !important;
+    color: #211a14 !important;
+    background: var(--yellow, #efbf38) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(239, 191, 56, 0.4) !important;
   }
 
   /* Topbar actions (Find a stack + Order button) */
@@ -7460,45 +7483,54 @@ body:has(.hero-nav) .hero-find {
     position: static !important;
     display: flex !important;
     align-items: center !important;
-    gap: 1.2rem !important;
+    gap: 0.8rem !important;
     inset: auto !important;
   }
   body:has(.hero-nav) .hero-find {
     display: inline-flex !important;
     align-items: center !important;
     gap: 0.45rem !important;
-    color: #ffffff !important;
-    font-size: 0.82rem !important;
-    font-weight: 700 !important;
+    color: #211a14 !important;
+    font-size: 0.8rem !important;
+    font-weight: 800 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.06em !important;
     text-decoration: none !important;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4) !important;
-    transition: color 0.18s ease !important;
+    background: rgba(253, 249, 238, 0.88) !important;
+    backdrop-filter: blur(18px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+    padding: 0.6rem 1.15rem !important;
+    border-radius: 999px !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.65) !important;
+    box-shadow: 0 8px 24px rgba(18, 12, 8, 0.12) !important;
+    transition: all 0.2s ease !important;
   }
   body:has(.hero-nav) .hero-find:hover {
-    color: var(--yellow) !important;
+    background: #ffffff !important;
+    color: var(--yellow-deep, #e08600) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 10px 28px rgba(18, 12, 8, 0.16) !important;
   }
   body:has(.hero-nav) .hero-order {
     display: inline-flex !important;
     align-items: center !important;
-    gap: 0.35rem !important;
-    background: var(--yellow) !important;
+    gap: 0.4rem !important;
+    background: var(--yellow, #efbf38) !important;
     color: #211a14 !important;
     font-size: 0.82rem !important;
     font-weight: 800 !important;
     letter-spacing: 0.06em !important;
     text-transform: uppercase !important;
-    padding: 0.65rem 1.4rem !important;
+    padding: 0.65rem 1.45rem !important;
     border-radius: 999px !important;
     text-decoration: none !important;
-    box-shadow: 0 4px 14px rgba(239, 191, 56, 0.35) !important;
+    box-shadow: 0 6px 20px rgba(239, 191, 56, 0.45) !important;
     transition: all 0.2s ease !important;
   }
   body:has(.hero-nav) .hero-order:hover {
-    background: var(--yellow-deep) !important;
+    background: var(--yellow-deep, #e08600) !important;
     transform: translateY(-1px) scale(1.02) !important;
-    box-shadow: 0 6px 18px rgba(224, 134, 0, 0.45) !important;
+    box-shadow: 0 8px 24px rgba(224, 134, 0, 0.5) !important;
   }
 
   /* Stage Dish Thumbnails (floating on the visual stage bottom right) */

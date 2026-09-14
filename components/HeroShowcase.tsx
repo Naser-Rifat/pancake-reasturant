@@ -8,9 +8,7 @@ import type { ApiMenuItem } from "@/lib/api";
 import { ChevronRight } from "lucide-react";
 
 const NAV = [
-  { href: "/", label: "Home" },
-  { href: "/booking", label: "Book a Table" },
-  { href: "/menu", label: "Our Menu" },
+  { href: "/menu", label: "Menu" },
   { href: "/gallery", label: "Gallery" },
   { href: "/#reviews", label: "Reviews" },
   { href: "/#contact", label: "Contact" },
