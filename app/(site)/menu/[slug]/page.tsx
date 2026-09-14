@@ -108,64 +108,33 @@ export default async function DishPage({ params }: Props) {
             <DishGallery
               name={item.name}
               images={galleryImages.length > 0 ? galleryImages : [{ id: "main", src: heroImage, alt: item.name }]}
+              price={price}
             />
           </div>
 
           {/* Copy & Order Controls */}
           <div className="dprod-copy">
-            {/* 3 Boutique Soft Pastel Pill Badges (matches artisan reference) */}
+            {/* Category & House Favourite Badges */}
             <div className="dish-pill-tags">
-              <span className="dish-pill-tag tag-rose">
+              <span className={`dish-pill-tag tag-${item.category_slug || item.tag}`}>
                 <span>{catIcon}</span>
                 <span>{catLabel}</span>
               </span>
-              <span className="dish-pill-tag tag-peach">
-                <span>{item.is_featured ? "✨ House Favourite" : "🔥 Freshly Griddled"}</span>
-              </span>
-              <span className="dish-pill-tag tag-sky">
-                <span>{item.tag === "savory" ? "🍳 Farm Fresh Eggs" : "🍯 Pure Maple Syrup"}</span>
-              </span>
+              {item.is_featured && (
+                <span className="dish-pill-tag tag-featured">
+                  ✨ House Favourite
+                </span>
+              )}
             </div>
 
             <h1 className="dish-title">{item.name}</h1>
 
-            {/* Guest star rating (commented out per user request; uncomment to re-enable) */}
-            {/*
-            {avgRating != null && (
-              <p className="dish-stars">
-                <span className="stars" aria-hidden="true" style={{ color: "var(--yellow-deep, #f59e0b)" }}>
-                  {"★".repeat(Math.round(avgRating))}{"☆".repeat(5 - Math.round(avgRating))}
-                </span>{" "}
-                <span className="rating-score">{avgRating}</span> ·{" "}
-                <Link href="/#reviews">
-                  {reviews.length} guest review{reviews.length === 1 ? "" : "s"}
-                </Link>
-              </p>
-            )}
-            */}
-
             <p className="dish-desc">{item.description}</p>
 
-            {/* 2 Boutique Specification Cards (commented out per user request; uncomment to re-enable) */}
-            {/*
-            <div className="dish-spec-cards">
-              <div className="dish-spec-card">
-                <span className="spec-label">Kitchen Prep</span>
-                <span className="spec-value">{item.prep_time || "10 - 12 Mins"}</span>
-              </div>
-              <div className="dish-spec-card">
-                <span className="spec-label">Stack Size</span>
-                <span className="spec-value">
-                  {item.tag === "beverage" ? "1 Fresh Brew" : item.tag === "sides" ? "Generous Portion" : "3 Fluffy Pancakes"}
-                </span>
-              </div>
-            </div>
-            */}
-
-            {/* Desktop Inline Buy Section (hidden on mobile where sticky bottom dock is active) */}
-            <div className="dish-desktop-buy">
+            {/* Inline Purchase Section (visible and responsive across mobile, tablet, and desktop) */}
+            <div className="dish-buy-section">
               {site.online_ordering_enabled ? (
-                <div className="dish-buy-inline">
+                <div className="dish-buy">
                   <p className="dish-price">
                     {money(item.price)} <span>per stack</span>
                   </p>
@@ -196,23 +165,6 @@ export default async function DishPage({ params }: Props) {
               </p>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Sticky Bottom Action Dock for Mobile & Tablet (matches Image 2 reference) */}
-      <div className="dish-sticky-dock">
-        <div className="dock-price-wrap">
-          <span className="dock-price">${price % 1 === 0 ? price : price.toFixed(2)}</span>
-          <span className="dock-price-sub">per stack</span>
-        </div>
-        <div className="dock-action-wrap">
-          {site.online_ordering_enabled ? (
-            <QtyAdd slug={item.slug} name={item.name} />
-          ) : (
-            <Link href="/booking" className="btn btn-primary btn-dock-add">
-              Book a Table 🥞
-            </Link>
-          )}
         </div>
       </div>
 

@@ -6,16 +6,30 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export type DishImage = { id: string; src: string; alt: string; cutout?: boolean };
 
-export default function DishGallery({ images, name }: { images: DishImage[]; name: string }) {
+export default function DishGallery({
+  images,
+  name,
+  price,
+}: {
+  images: DishImage[];
+  name: string;
+  price?: number | string;
+}) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
 
   // Touch swipe state for hero stage
   const touchStartX = useRef<number | null>(null);
-  const touchEndX = useRef<number | null>(null);
 
   // Thumbs ref for horizontal sliding
   const thumbsRef = useRef<HTMLDivElement | null>(null);
+
+  // Filter valid images or provide fallback
+  const validImages = images.filter((i) => Boolean(i.src));
+  const displayImages =
+    validImages.length > 0
+      ? validImages
+      : [{ id: "fallback", src: "/menu/buttermilk.png", alt: name, cutout: true }];
 
   // Auto-scroll the active thumbnail into center view smoothly
   useEffect(() => {
@@ -37,88 +51,73 @@ export default function DishGallery({ images, name }: { images: DishImage[]; nam
     };
   }, [lightbox]);
 
-  // Clean empty src images
-  const validImages = images.filter((i) => i.src);
-  if (validImages.length === 0) return null;
-
-  const currentImg = validImages[activeIndex] || validImages[0];
+  const currentImg = displayImages[activeIndex] || displayImages[0];
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    touchEndX.current = null;
     touchStartX.current = e.targetTouches[0].clientX;
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.targetTouches[0].clientX;
-  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    const minSwipeDistance = 40;
 
-  const handleTouchEnd = () => {
-    if (!touchStartX.current || !touchEndX.current) return;
-    const diff = touchStartX.current - touchEndX.current;
-    const minSwipeDistance = 45;
-
-    if (diff > minSwipeDistance && activeIndex < validImages.length - 1) {
-      // Swiped left -> next
+    if (diff > minSwipeDistance && activeIndex < displayImages.length - 1) {
       setActiveIndex((prev) => prev + 1);
     } else if (diff < -minSwipeDistance && activeIndex > 0) {
-      // Swiped right -> prev
       setActiveIndex((prev) => prev - 1);
     }
+    touchStartX.current = null;
   };
 
   return (
     <div className="dish-hero-container">
-      {/* Floating Hero Stage: unboxed cutout directly on warm ground */}
+      {/* Authentic Retro Diner Hero Frame with Signature Rotating Price Badge */}
       <div
-        className="dish-hero-stage"
+        className="hf-photo dish"
         onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         onClick={() => setLightbox(activeIndex)}
         role="button"
         tabIndex={0}
-        aria-label={`View full resolution photos of ${name}`}
+        aria-label={`View photo of ${name}`}
         onKeyDown={(e) => e.key === "Enter" && setLightbox(activeIndex)}
       >
-        {/* Hero Image Presentation */}
-        {currentImg.cutout ? (
-          <div className="dish-hero-cutout-wrap" key={currentImg.id}>
-            <Image
-              src={currentImg.src}
-              alt={currentImg.alt || name}
-              fill
-              priority
-              sizes="(min-width: 1024px) 50vw, 92vw"
-              className="dish-hero-cutout"
-            />
-          </div>
-        ) : (
-          <div className="dish-hero-photo-frame" key={currentImg.id}>
-            <div
-              className="dish-hero-photo-ambient"
-              style={{ backgroundImage: `url(${currentImg.src})` }}
-              aria-hidden="true"
-            />
-            <Image
-              src={currentImg.src}
-              alt={currentImg.alt || name}
-              fill
-              priority
-              sizes="(min-width: 1024px) 50vw, 92vw"
-              className="dish-hero-photo-img"
-            />
-          </div>
+        <Image
+          src={currentImg.src}
+          alt={currentImg.alt || name}
+          fill
+          priority
+          sizes="(min-width: 1024px) 680px, 100vw"
+          className={currentImg.cutout ? "as-cutout" : "as-photo"}
+        />
+
+        {/* Signature Rotating Circular Price Badge */}
+        {price != null && (
+          <span className="price-spin" aria-hidden="true">
+            <svg viewBox="0 0 120 120">
+              <defs>
+                <path id="dishring" d="M 60,60 m -44,0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0" />
+              </defs>
+              <text>
+                <textPath href="#dishring">fresh daily • est. 1999 •</textPath>
+              </text>
+            </svg>
+            <span className="num">
+              ${typeof price === "number" ? (price % 1 === 0 ? price : price.toFixed(2)) : price}
+            </span>
+          </span>
         )}
 
-        {/* Floating Frosted Pill Badge Counter (matches Reference Image 2: "1 / 3") */}
-        {validImages.length > 1 && (
-          <div className="dish-hero-counter" aria-label={`Photo ${activeIndex + 1} of ${validImages.length}`}>
-            <span>{activeIndex + 1} / {validImages.length}</span>
+        {/* Photo Counter Pill if multiple photos */}
+        {displayImages.length > 1 && (
+          <div className="dish-hero-counter" aria-label={`Photo ${activeIndex + 1} of ${displayImages.length}`}>
+            <span>{activeIndex + 1} / {displayImages.length}</span>
           </div>
         )}
 
         {/* Navigation Chevrons for desktop/tablet */}
-        {validImages.length > 1 && (
+        {displayImages.length > 1 && (
           <>
             <button
               type="button"
@@ -135,10 +134,10 @@ export default function DishGallery({ images, name }: { images: DishImage[]; nam
             <button
               type="button"
               className="dish-hero-arrow next"
-              disabled={activeIndex === validImages.length - 1}
+              disabled={activeIndex === displayImages.length - 1}
               onClick={(e) => {
                 e.stopPropagation();
-                setActiveIndex((i) => Math.min(validImages.length - 1, i + 1));
+                setActiveIndex((i) => Math.min(displayImages.length - 1, i + 1));
               }}
               aria-label="Next photo"
             >
@@ -149,14 +148,14 @@ export default function DishGallery({ images, name }: { images: DishImage[]; nam
       </div>
 
       {/* Thumbnail Bar for multi-photo dishes with smooth sliding */}
-      {validImages.length > 1 && (
+      {displayImages.length > 1 && (
         <div
           className="dish-hero-thumbs"
           ref={thumbsRef}
           role="tablist"
           aria-label="Photo angles"
         >
-          {validImages.map((img, i) => (
+          {displayImages.map((img, i) => (
             <button
               key={img.id}
               type="button"
@@ -187,7 +186,7 @@ export default function DishGallery({ images, name }: { images: DishImage[]; nam
             ✕
           </button>
           <div className="plbx-track">
-            {validImages.map((img, idx) => (
+            {displayImages.map((img, idx) => (
               <figure key={img.id} className={idx === lightbox ? "active-photo" : ""}>
                 <Image
                   src={img.src}

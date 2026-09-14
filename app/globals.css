@@ -7266,13 +7266,8 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   body:has(.top-ribbon).has-announce .dish-page {
     padding-top: calc(var(--announce-h, 44px) + var(--ribbon-h, 34px));
   }
-  /* the site nav pill steps aside: this page gets a clean top app bar */
-  body:has(.dish-sticky-dock) .nav,
+  /* the site top nav pill steps aside on mobile: this page gets a clean top app bar */
   body:has(.dish-page) .nav {
-    display: none !important;
-  }
-  body:has(.dish-sticky-dock) .tabbar,
-  body:has(.dish-page) .tabbar {
     display: none !important;
   }
 
@@ -7399,9 +7394,9 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     display: none !important;
   }
 
-  /* Safe padding for bottom dock */
+  /* Safe padding for mobile bottom tab bar */
   .dish-page {
-    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--tabbar-h, 60px) + 2.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -7412,10 +7407,16 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   position: relative;
   width: 100%;
 }
-.dish-hero-stage {
+.dish-hero-container .hf-photo.dish {
   position: relative;
   width: 100%;
-  height: clamp(340px, 86vw, 440px);
+  height: clamp(320px, 80vw, 440px);
+  min-height: 280px;
+  border-radius: 28px;
+  background: var(--cream-card);
+  border: 1.5px solid rgba(118, 58, 18, 0.08);
+  box-shadow: 0 10px 30px rgba(33, 26, 20, 0.08);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7423,83 +7424,54 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
-  overflow: visible;
 }
-.dish-hero-halo {
-  position: absolute;
-  width: 78%;
-  height: 78%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(254, 240, 199, 0.6) 0%, rgba(254, 240, 199, 0) 70%);
-  filter: blur(24px);
-  pointer-events: none;
-}
-.dish-hero-cutout-wrap {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-/* Unboxed cutout floating with crisp white sticker outline and ambient shadow */
-.dish-hero-cutout {
-  object-fit: contain !important;
-  object-position: center bottom !important;
-  filter:
-    drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
-    drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
-    drop-shadow(0 14px 28px rgba(33, 26, 20, 0.18)) !important;
-  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.dish-hero-stage:active .dish-hero-cutout {
-  transform: scale(0.98);
-}
-
-/* Framed Boutique Artisan Photograph (for real-life shots) */
-.dish-hero-photo-frame {
-  position: relative;
-  width: calc(100% - 16px);
-  height: calc(100% - 12px);
-  margin: auto;
-  border-radius: 26px;
-  overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 0 12px 30px rgba(33, 26, 20, 0.12);
-  background: var(--cream-card);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Ambient blurred background for non-matching aspect ratios */
-.dish-hero-photo-ambient {
-  position: absolute;
-  inset: -16px;
-  background-size: cover;
-  background-position: center;
-  filter: blur(24px) saturate(1.3) brightness(0.96);
-  opacity: 0.32;
-  transform: scale(1.08);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Foreground photograph: 100% visible, never stretched, never cropped! */
-.dish-hero-photo-img {
+.dish-hero-container .hf-photo.dish .as-cutout {
   object-fit: contain !important;
   object-position: center !important;
-  z-index: 1;
-  transition: transform 0.3s ease;
-  filter: drop-shadow(0 6px 18px rgba(33, 26, 20, 0.10));
+  padding: 1.8rem;
+  filter: drop-shadow(0 14px 24px rgba(33, 26, 20, 0.16));
+  transition: transform 0.25s ease;
 }
-.dish-hero-stage:active .dish-hero-photo-img {
-  transform: scale(0.98);
+.dish-hero-container .hf-photo.dish .as-photo {
+  object-fit: cover !important;
+  object-position: center !important;
+  transition: transform 0.25s ease;
+}
+.dish-hero-container .hf-photo.dish:active img {
+  transform: scale(0.985);
+}
+.dish-hero-container .hf-photo .price-spin {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 10;
+}
+@media (max-width: 480px) {
+  .dish-hero-container .hf-photo.dish {
+    height: 310px;
+    min-height: 260px;
+  }
+  .dish-hero-container .hf-photo.dish .as-cutout {
+    padding: 1.2rem;
+  }
+  .dish-hero-container .hf-photo .price-spin {
+    right: 12px;
+    bottom: 12px;
+    transform: scale(0.86);
+    transform-origin: bottom right;
+  }
+}
+@media (min-width: 1024px) {
+  .dish-hero-container .hf-photo.dish {
+    height: 480px;
+    border-radius: 28px;
+  }
 }
 
-/* Floating Frosted Pill Badge Counter: "1 / 3" (Matches Image 2 reference) */
+/* Floating Frosted Pill Badge Counter: "1 / 3" */
 .dish-hero-counter {
   position: absolute;
-  bottom: 8px;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -7508,7 +7480,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   justify-content: center;
   padding: 5px 16px;
   border-radius: 999px;
-  background: rgba(33, 26, 20, 0.62);
+  background: rgba(33, 26, 20, 0.65);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: #ffffff;
@@ -7630,17 +7602,30 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   font-size: 0.8rem;
   font-weight: 700;
   line-height: 1.2;
+  background: rgba(253, 249, 238, 0.95);
+  color: var(--ink);
+  border: 1px solid rgba(118, 58, 18, 0.12);
 }
+.dish-pill-tag.tag-featured {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+.dish-pill-tag.tag-sweet-favourites,
 .dish-pill-tag.tag-rose {
   background: #ffe4e6;
   color: #9f1239;
   border: 1px solid #fecdd3;
 }
+.dish-pill-tag.tag-savory,
 .dish-pill-tag.tag-peach {
   background: #ffedd5;
   color: #9a3412;
   border: 1px solid #fed7aa;
 }
+.dish-pill-tag.tag-beverage,
+.dish-pill-tag.tag-drinks,
+.dish-pill-tag.tag-coffee,
 .dish-pill-tag.tag-sky {
   background: #e0f2fe;
   color: #0369a1;
@@ -7707,156 +7692,141 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
 }
 
 /* ===================================================================
-   Sticky Bottom Action Dock (Matches Image 2 reference)
+   Dish Page Purchase Controls & Layout (.dish-buy-section)
+   Authentic retro diner styling, unbreakable on any screen size.
    =================================================================== */
-.dish-sticky-dock {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 120;
+.dish-buy-section {
+  margin: 1.5rem 0 1.2rem;
+}
+.dish-buy {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.85rem 1.25rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
-  background: color-mix(in srgb, var(--card-a) 34%, var(--cream-card));
-  box-shadow: 0 -12px 28px -6px rgba(33, 26, 20, 0.08);
-  border-top: 1.5px solid rgba(118, 58, 18, 0.08);
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  padding: 1.25rem 1.5rem;
+  background: var(--cream-card);
+  border-radius: 24px;
+  border: 1.5px solid rgba(118, 58, 18, 0.08);
+  box-shadow: 0 8px 24px rgba(33, 26, 20, 0.04);
+  margin-bottom: 0.9rem;
 }
-.dock-price-wrap {
-  display: flex;
-  flex-direction: column;
-  line-height: 1;
-}
-.dock-price {
+.dish-buy .dish-price {
   font-family: var(--font-serif);
-  font-size: 1.95rem;
+  font-size: 2.15rem;
   font-weight: 900;
   color: var(--ink);
   line-height: 1;
-  letter-spacing: -0.02em;
-}
-.dock-price-sub {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: #78716c;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 4px;
-}
-.dock-action-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.dock-action-wrap .qty-add {
   margin: 0;
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
 }
-.dish-sticky-dock .qty {
+.dish-buy .dish-price span {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 5px;
+}
+.dish-buy .qty-add {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  flex-wrap: nowrap;
+}
+.dish-buy .qty {
   display: inline-flex;
   align-items: center;
   background: #ffffff;
-  border: 1.5px solid rgba(118, 58, 18, 0.12);
+  border: 1.5px solid rgba(118, 58, 18, 0.14);
   border-radius: 999px;
-  padding: 2px 4px;
-  height: 42px;
+  padding: 2px 6px;
+  height: 44px;
+  flex-shrink: 0;
 }
-.dish-sticky-dock .qty button {
-  width: 30px;
-  height: 30px;
+.dish-buy .qty button {
+  width: 32px;
+  height: 32px;
   border: none;
   background: none;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--ink);
   display: grid;
   place-items: center;
   cursor: pointer;
   border-radius: 50%;
+  transition: background 0.15s ease;
 }
-.dish-sticky-dock .qty button:active {
+.dish-buy .qty button:hover:not(:disabled) {
   background: rgba(0, 0, 0, 0.06);
 }
-.dish-sticky-dock .qty span {
-  min-width: 22px;
+.dish-buy .qty button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.dish-buy .qty span {
+  min-width: 24px;
   text-align: center;
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   color: var(--ink);
 }
-.btn-dock-add {
+.dish-buy .btn-dock-add {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 8px !important;
   border-radius: 999px !important;
-  padding: 0.8rem 1.45rem !important;
+  padding: 0.78rem 1.6rem !important;
   font-weight: 800 !important;
   font-size: 0.95rem !important;
-  text-transform: none !important;
-  font-family: inherit !important;
-  letter-spacing: 0.01em !important;
   background: var(--ink) !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 16px rgba(33, 26, 20, 0.22) !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
-  white-space: nowrap !important;
+  box-shadow: 0 4px 16px rgba(33, 26, 20, 0.2) !important;
   border: none !important;
+  white-space: nowrap !important;
   cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
 }
-.btn-dock-add:active {
+.dish-buy .btn-dock-add:active {
   transform: scale(0.97) !important;
+}
+
+@media (max-width: 480px) {
+  .dish-buy {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1.15rem;
+  }
+  .dish-buy .dish-price {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .dish-buy .qty-add {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .dish-buy .btn-dock-add {
+    flex: 1 1 auto;
+  }
 }
 
 /* ===================================================================
    Desktop Layout (min-width: 1024px)
    =================================================================== */
-.dish-desktop-buy {
-  display: none;
-}
 @media (min-width: 1024px) {
-  .dish-sticky-dock {
-    display: none !important;
-  }
-  .dish-desktop-buy {
-    display: block;
-    margin-top: 1.6rem;
-    padding-top: 1.6rem;
-    border-top: 1.5px solid rgba(118, 58, 18, 0.09);
-  }
-  .dish-buy-inline {
-    display: flex;
-    align-items: center;
-    gap: 1.8rem;
-    margin-bottom: 1rem;
-  }
-  .dish-buy-inline .dish-price {
-    font-size: 2.1rem;
-    font-weight: 900;
-    margin: 0;
-    line-height: 1;
-  }
-  .dish-buy-inline .dish-price span {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--muted);
-  }
   .dish-page .dprod {
     display: grid;
     grid-template-columns: 1.12fr 1fr;
     gap: 3.5rem;
     align-items: start;
     padding: 2.5rem 0 4rem;
-  }
-  .dish-hero-stage {
-    height: 480px;
-    border-radius: 28px;
-    background: rgba(253, 249, 238, 0.6);
-    border: 1.5px solid rgba(118, 58, 18, 0.08);
   }
   .dish-page .statement {
     display: block !important;
