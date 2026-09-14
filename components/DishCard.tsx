@@ -95,14 +95,8 @@ export default function DishCard({
       <Link href={href} className="dc-hit" aria-label={`View ${item.name} details`} />
 
       <div className="dc-body">
-        {isRow && dealBadge && (
-          <div className="dc-badge-row">
-            <span className="dc-badge dc-badge-featured">{dealBadge}</span>
-          </div>
-        )}
-
         <div className={`dc-head${isRow ? " dc-head-row" : ""}`}>
-          {dealBadge && !isRow ? (
+          {dealBadge ? (
             <span className="dc-badge dc-badge-featured">{dealBadge}</span>
           ) : (
             <span className={`dc-badge tag-${item.category_slug || item.tag}`}>
@@ -117,11 +111,6 @@ export default function DishCard({
         <h3 className="dc-name">
           <Link href={href}>{item.name}</Link>
         </h3>
-
-        {/* Sub-price only rendered for the mobile row variant */}
-        {isRow && (
-          <span className="dc-price dc-price-sub">{money(item.price)}</span>
-        )}
 
         {item.description && <p className="dc-desc">{item.description}</p>}
       </div>

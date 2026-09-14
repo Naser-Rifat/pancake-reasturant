@@ -8235,22 +8235,25 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     box-shadow: 0 1px 4px rgba(245, 158, 11, 0.15);
   }
 
-  /* Hide legacy dc-head on mobile sticker cards in /menu to eliminate duplicate tags and duplicate prices */
+  /* On mobile sticker cards (.dc-row and .dc-tile), dc-head neatly presents the category/deal pill on the left and price on the right next to cart */
   .dish-card.dc-row .dc-head,
   .dish-card.dc-row .dc-head-row,
-  .dish-card.dc-row .dc-head-legacy {
-    display: none !important;
-  }
-
-  /* On home tile cards, dc-head neatly presents the category pill and price at the top */
   .dish-card.dc-tile .dc-head {
-    display: flex;
+    display: flex !important;
     align-items: center;
     gap: 0.5rem;
     min-height: 28px;
     margin-bottom: 0.32rem;
   }
+  .dish-card.dc-row .dc-head .dc-dots,
+  .dish-card.dc-tile .dc-head .dc-dots {
+    display: none !important;
+  }
+  .dish-card.dc-row .dc-head .dc-badge,
   .dish-card.dc-tile .dc-head .dc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     font-family: var(--font-round), sans-serif;
     font-weight: 800;
     font-size: 0.62rem;
@@ -8262,7 +8265,17 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     border: 1px solid rgba(118, 58, 18, 0.12);
     color: var(--ink);
   }
-  .dish-card.dc-tile .dc-head .dc-price {
+  .dish-card.dc-row .dc-head .dc-badge-featured,
+  .dish-card.dc-tile .dc-head .dc-badge-featured {
+    color: #92400e;
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    box-shadow: 0 1px 4px rgba(245, 158, 11, 0.15);
+  }
+  .dish-card.dc-row .dc-head .dc-price,
+  .dish-card.dc-row .dc-head .dc-price-head,
+  .dish-card.dc-tile .dc-head .dc-price,
+  .dish-card.dc-tile .dc-head .dc-price-head {
+    display: inline-block !important;
     font-family: var(--font-round), sans-serif;
     font-weight: 700;
     font-size: 1.05rem;
@@ -8286,12 +8299,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   }
 
   .dish-card.dc-row .dc-price-sub {
-    display: block;
-    font-family: var(--font-round), sans-serif;
-    font-weight: 700;
-    font-size: 1.05rem;
-    color: #5c4b3f;
-    margin: 0;
+    display: none !important;
   }
 
   .dish-card.dc-row .dc-desc,
