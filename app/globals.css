@@ -38,8 +38,8 @@
   --card-a: #f5de7a; /* menu-card soft surface rotation */
   --card-b: #f2eeec;
   --card-c: #efbf38;
-  --radius: 34px;
-  --radius-xl: 36px; /* big section rounding — grows on tablet+ */
+  --radius: 14px; /* sharp luxury card radius */
+  --radius-xl: 18px; /* sharp section radius */
   --frame: 8px; /* lavender page frame — grows on tablet+ */
   --nav-h: 104px;
   --ribbon-h: 36px;
@@ -4834,7 +4834,7 @@ body:has(.cart-fab) .wa-float {
   overflow: hidden;
   height: 215px;
   padding: 0.95rem 1rem 0;
-  border-radius: 24px;
+  border-radius: 14px;
   background: color-mix(in srgb, var(--card-a) 42%, var(--cream-card));
   box-shadow: 0 2px 10px rgba(33, 26, 20, 0.07);
   transition: transform 0.16s ease, box-shadow 0.25s ease;
@@ -4996,7 +4996,7 @@ body:has(.cart-fab) .wa-float {
   .dish-card.dc-tile {
     height: 318px;
     padding: 1.15rem 1.25rem 0;
-    border-radius: 26px;
+    border-radius: 16px;
   }
   .dish-card.dc-tile .dc-body {
     padding-right: 3.8rem;
@@ -5507,16 +5507,38 @@ body:has(.cart-fab) .wa-float {
   }
   .hero-nav ul {
     display: flex;
-    gap: 1.6rem;
+    align-items: center;
+    gap: 0.35rem;
     list-style: none;
+    background: rgba(254, 250, 240, 0.92);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(118, 58, 18, 0.12);
+    border-radius: 999px;
+    padding: 0.3rem 0.6rem;
+    box-shadow: 0 4px 16px rgba(26, 17, 9, 0.14);
+    margin: 0;
+  }
+  .hero-nav ul li {
+    margin: 0;
+  }
+  .hero-nav ul a {
+    font-family: var(--font-body);
     font-weight: 800;
     font-size: 0.78rem;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
+    color: var(--ink) !important;
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    transition: all 0.2s ease;
+    display: inline-block;
+    text-decoration: none !important;
   }
-  .hero-nav a:hover {
-    text-decoration: underline;
-    text-underline-offset: 5px;
+  .hero-nav ul a:hover {
+    background: rgba(118, 58, 18, 0.08);
+    color: var(--pink-deep) !important;
+    text-decoration: none !important;
   }
 
   .hero-topbar {
@@ -5542,19 +5564,22 @@ body:has(.cart-fab) .wa-float {
     color: var(--ink);
   }
   .hero-order {
-    background: var(--cream-card);
+    background: var(--yellow) !important;
+    color: var(--ink) !important;
+    border: 1.5px solid rgba(118, 58, 18, 0.14);
     border-radius: 999px;
-    padding: 0.6rem 1.3rem;
+    padding: 0.65rem 1.4rem;
     font-weight: 800;
-    font-size: 0.76rem;
-    letter-spacing: 0.06em;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: var(--ink);
-    box-shadow: 0 6px 16px rgba(33, 26, 20, 0.18);
-    transition: transform 0.2s ease;
+    box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
   }
   .hero-order:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px) scale(1.02);
+    background: var(--yellow-deep) !important;
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.45);
   }
 }
 
@@ -5580,7 +5605,7 @@ body:has(.cart-fab) .wa-float {
   }
   body:has(.hero-nav) .hero-card-left,
   body:has(.hero-nav) .hero-card-right {
-    border-radius: 34px;
+    border-radius: 18px;
   }
   body:has(.hero-nav) .hero-card-right {
     height: auto;
@@ -5908,46 +5933,35 @@ body:has(.cart-fab) .wa-float {
 }
 
 @media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
-  /* ---- brand lockup: mark in a white disc + wordmark, as in the reference ----
-     replaces the cream chip; the disc gives the mark its own light ground so
-     nothing has to sit on the gold at low contrast. */
-  body:has(.hero-nav) .hero-logo {
-    background: none;
-    box-shadow: none;
-    padding: 0;
-    margin-left: 0;
-    gap: 0.7rem;
+  /* ---- brand lockup: Frosted Glass Capsule Pill (Image 2) ---- */
+  body:has(.hero-nav) .hero-logo.hero-logo-pill,
+  .hero-logo.hero-logo-pill {
+    background: rgba(254, 250, 240, 0.94) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    backdrop-filter: blur(14px) !important;
+    border: 1.5px solid rgba(118, 58, 18, 0.12) !important;
+    box-shadow: 0 4px 16px rgba(26, 17, 9, 0.18) !important;
+    border-radius: 999px !important;
+    padding: 0.35rem 1.25rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    height: 48px !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
   }
-  body:has(.hero-nav) .hero-logo:hover {
-    background: none;
+  body:has(.hero-nav) .hero-logo.hero-logo-pill:hover,
+  .hero-logo.hero-logo-pill:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 8px 24px rgba(26, 17, 9, 0.24) !important;
+    background: rgba(255, 252, 245, 0.98) !important;
   }
-  .hero-logo-disc {
-    width: 46px;
-    height: 46px;
-    flex: none;
-    border-radius: 50%;
-    background: #fff;
-    display: grid;
-    place-items: center;
-    box-shadow: 0 2px 10px rgba(33, 26, 20, 0.08);
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  body:has(.hero-nav) .hero-logo:hover .hero-logo-disc {
-    transform: rotate(-8deg) translateY(-2px);
-  }
-  .hero-logo-name {
-    font-family: var(--font-round);
-    font-weight: 800;
-    font-size: 1.15rem;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    /* the reference sets this in white; on our gold that is ~1.9:1, so the
-       wordmark keeps the ink colour instead */
-    color: var(--ink);
-    white-space: nowrap;
+  .hero-brand-logo {
+    height: 28px !important;
+    width: auto !important;
+    object-fit: contain !important;
+    display: block !important;
   }
   body:has(.hero-nav) .hero-nav {
-    min-height: 46px;
+    min-height: 48px;
   }
 }
 
@@ -6345,7 +6359,7 @@ body:has(.cart-fab) .wa-float {
     align-items: stretch;
     gap: 0.75rem;
     padding: 1.15rem 1.1rem;
-    border-radius: 30px;
+    border-radius: 18px;
     border-width: 2px;
     text-align: left;
   }
@@ -7262,7 +7276,7 @@ body:has(.wa-float) .footer-bottom {
 body:has(.hero-nav) .hero .container.hero-cards {
   position: relative;
   overflow: hidden;
-  border-radius: 32px;
+  border-radius: 18px;
 }
 body:has(.hero-nav) .hero-bg {
   position: absolute;
@@ -7376,17 +7390,28 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
 }
 
 @media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
-  /* the hero headline takes the reference's chunky hand-cut caps; the script
-     word stays Pacifico so the handmade signature isn't lost to one heavy block */
+  /* Editorial DM Serif Display title case + fluid cursive signature */
   body:has(.hero-nav) .hero-card-left h1 {
-    font-family: var(--font-display), var(--font-serif), serif;
-    font-weight: 400;
-    line-height: 0.95;
-    letter-spacing: 0.005em;
+    font-family: var(--font-serif), Georgia, serif !important;
+    font-weight: 700 !important;
+    font-size: clamp(3.4rem, 5.8vw, 5.6rem) !important;
+    line-height: 0.98 !important;
+    letter-spacing: -0.025em !important;
+    text-transform: none !important;
+    color: #ffffff !important;
+    text-shadow: 0 3px 18px rgba(26, 17, 9, 0.45) !important;
+  }
+  body:has(.hero-nav) .hero-card-left h1 .head-line {
+    display: inline !important;
   }
   body:has(.hero-nav) .hero-card-left h1 .script {
-    font-family: var(--font-script), cursive;
-    font-size: 0.82em;
+    display: block !important;
+    font-family: var(--font-script), cursive !important;
+    font-weight: 400 !important;
+    font-size: 0.76em !important;
+    color: var(--yellow) !important;
+    margin-top: 0.12em !important;
+    text-shadow: 0 3px 20px rgba(26, 17, 9, 0.5) !important;
   }
 }
 

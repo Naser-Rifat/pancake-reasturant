@@ -76,11 +76,15 @@ export default function HeroShowcase({
 
       {/* Full-width hero top navigation bar spanning the hero container */}
       <nav className="hero-nav" aria-label="Main">
-        <Link href="/" className="hero-logo" aria-label="The Pancake Club — home">
-          <span className="hero-logo-disc" aria-hidden="true">
-            <LogoMark size={19} />
-          </span>
-          <span className="hero-logo-name">The Pancake Club</span>
+        <Link href="/" className="hero-logo hero-logo-pill" aria-label="The Pancake Club — home">
+          <Image
+            src="/logo.png"
+            alt="The Pancake Club"
+            width={140}
+            height={56}
+            priority
+            className="hero-brand-logo"
+          />
         </Link>
         <ul className="hero-nav-links">
           {NAV.map((l) => (
@@ -117,24 +121,10 @@ export default function HeroShowcase({
           {headingWords.length >= 2 ? (
             <>
               <span className="head-line">{headingWords[0]}</span>{" "}
-              <span className="head-line">
-                {headingWords.slice(1).join(" ")}
-                {chip && (
-                  <span className="head-chip" aria-hidden="true">
-                    <Image src={chip} alt="" width={120} height={120} sizes="64px" />
-                  </span>
-                )}
-              </span>
+              <span className="head-line">{headingWords.slice(1).join(" ")}</span>
             </>
           ) : (
-            <>
-              {heading}
-              {chip && (
-                <span className="head-chip" aria-hidden="true">
-                  <Image src={chip} alt="" width={120} height={120} sizes="64px" />
-                </span>
-              )}
-            </>
+            <>{heading}</>
           )}
           <span className="script">{script}</span>
         </h1>
