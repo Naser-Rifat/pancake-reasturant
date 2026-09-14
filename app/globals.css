@@ -7341,81 +7341,160 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
    The lead paragraph is desktop-only here: it measured 3.31:1 over the photo
    (4.5:1 needed) and the copy it carried is mood, not a decision the fold has
    to serve. Nav chrome floats on the photo — see the block below. */
+/* ---- mobile 3/5 visual + 2/5 editorial card hero ----
+   Top ~3/5 (approx 56svh) dedicated to unobstructed pancake food visual.
+   Bottom ~2/5 (approx 44svh) is an elevated warm cream card with 100% WCAG
+   contrast typography, rich editorial lead copy, and thumb-zone action buttons.
+   Top chrome (logo, cart, burger) floats gracefully over the visual stage. */
 @media (max-width: 1023px), (max-width: 1366px) and (pointer: coarse) {
   body:has(.hero-nav) .hero {
-    padding: 0;
+    padding: 0 !important;
+    background: #faf6ed !important;
   }
   body:has(.hero-nav).has-announce .hero {
-    padding-top: 44px;
+    padding-top: 44px !important;
   }
-  /* full bleed: the container's 92% width, the cream frame and the 32px radius
-     together cost 114px of fold before the first pixel of food */
   body:has(.hero-nav) .hero .container.hero-cards {
-    display: flex;
-    width: 100%;
-    max-width: none;
-    margin-inline: 0;
-    min-height: 100svh;
-    border-radius: 0;
-    overflow: hidden;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin-inline: 0 !important;
+    min-height: 100svh !important;
+    border-radius: 0 !important;
+    background: #faf6ed !important;
+    position: relative !important;
+    overflow: visible !important;
   }
   body:has(.hero-nav).has-announce .hero .container.hero-cards {
-    min-height: calc(100svh - 44px);
+    min-height: calc(100svh - 44px) !important;
   }
-  /* the price chip and the dish switcher both sat in the bottom strip the CTAs
-     now own, and neither survived the trip to a phone: the chip was hidden and
-     the thumbs changed the backdrop with no visible result */
-  body:has(.hero-nav) .hero-price,
-  body:has(.hero-nav) .hero-thumbs {
-    display: none !important;
+
+  /* Top 3/5 Visual Stage (~56% viewport) */
+  body:has(.hero-nav) .hero-bg {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: 56svh !important;
+    min-height: 360px !important;
+    max-height: 520px !important;
+    flex-shrink: 0 !important;
+    z-index: 1 !important;
+    overflow: hidden !important;
+    background: #1a1109 !important;
   }
+  body:has(.hero-nav) .hero-bg img {
+    object-fit: cover !important;
+    object-position: center 48% !important;
+  }
+  /* Delicate top vignette so logo, cart & burger stay crystal clear without darkening the food */
+  body:has(.hero-nav) .hero-scrim {
+    position: absolute !important;
+    inset: 0 !important;
+    background: linear-gradient(
+      180deg,
+      rgba(15, 10, 6, 0.52) 0%,
+      rgba(15, 10, 6, 0.16) 26%,
+      rgba(15, 10, 6, 0) 52%,
+      rgba(15, 10, 6, 0.22) 100%
+    ) !important;
+    pointer-events: none !important;
+  }
+
+  /* Bottom 2/5 Content Card (~44% viewport) */
   body:has(.hero-nav) .hero-card-left {
-    flex: 1;
-    /* Hero buttons sit at the very bottom of the mobile viewport with standard thumb-zone safe gap */
-    padding: 0 1.25rem calc(1.35rem + env(safe-area-inset-bottom, 0px)) !important;
+    position: relative !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    background: #faf6ed !important;
+    border-radius: 28px 28px 0 0 !important;
+    margin-top: -24px !important;
+    z-index: 5 !important;
+    padding: 1.6rem 1.4rem calc(1.5rem + env(safe-area-inset-bottom, 0px)) !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
     text-align: left !important;
-    justify-content: flex-end !important;
+    justify-content: space-between !important;
+    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.12) !important;
   }
-  body:has(.hero-nav) .hero-card-left h1 {
-    margin: 0 !important;
-    font-family: var(--font-display), var(--font-serif), serif;
-    font-weight: 400;
-    font-size: clamp(2.4rem, 10.5vw, 3.4rem) !important;
-    line-height: 0.92 !important;
-    letter-spacing: 0.02em;
-    text-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
-  }
-  body:has(.hero-nav) .hero-card-left h1 .script {
-    font-family: var(--font-script), cursive;
-    font-size: 0.78em;
-    margin-top: 0.2rem;
-    display: block;
-    color: #f7cb46 !important;
-    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
-  }
-  body:has(.hero-nav) .hero-card-left p.lead {
+  body:has(.hero-nav) .hero-card-right {
     display: none !important;
   }
-  body:has(.hero-nav) .hero-actions,
-  body:has(.hero-nav):has(.wa-float) .hero-actions {
-    margin-top: 1.25rem !important;
+  body:has(.hero-nav) .hero-price,
+  body:has(.hero-nav) .hero-thumbs {
+    display: none !important;
+  }
+
+  /* Headline on Warm Cream */
+  body:has(.hero-nav) .hero-card-left h1 {
+    margin: 0 !important;
+    color: #1a1109 !important;
+    font-family: var(--font-serif), Georgia, serif !important;
+    font-weight: 400 !important;
+    font-size: clamp(2.3rem, 8.5vw, 2.9rem) !important;
+    line-height: 1.02 !important;
+    letter-spacing: -0.01em !important;
+    text-transform: none !important;
+    text-shadow: none !important;
+  }
+  body:has(.hero-nav) .hero-card-left h1 .head-line {
+    color: #1a1109 !important;
+    display: inline !important;
+  }
+  body:has(.hero-nav) .hero-card-left h1 .head-line:first-child::after {
+    content: " ";
+  }
+  body:has(.hero-nav) .hero-card-left h1 .script {
+    font-family: var(--font-script), cursive !important;
+    font-size: 0.95em !important;
+    margin-top: 0.15rem !important;
+    display: block !important;
+    color: #b85d19 !important; /* rich warm caramel/terracotta accent */
+    text-shadow: none !important;
+  }
+  body:has(.hero-nav) .hero-card-left h1 .head-chip {
+    display: inline-block !important;
+    vertical-align: middle !important;
+    margin-left: 0.35rem !important;
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14) !important;
+  }
+
+  /* Lead Description Copy */
+  body:has(.hero-nav) .hero-card-left p.lead {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    margin-top: 0.7rem !important;
+    margin-bottom: 0 !important;
+    color: #4a3b32 !important;
+    font-size: clamp(0.88rem, 3.4vw, 0.95rem) !important;
+    line-height: 1.48 !important;
+    font-weight: 450 !important;
+    max-width: 44ch !important;
+  }
+
+  /* Action Buttons */
+  body:has(.hero-nav) .hero-actions {
+    margin-top: 1.15rem !important;
     padding-top: 0 !important;
-    width: 100%;
-    max-width: 24rem;
+    width: 100% !important;
+    max-width: 100% !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: stretch !important;
-    gap: 0.75rem !important;
-    padding-right: 0 !important;
+    gap: 0.65rem !important;
   }
   body:has(.hero-nav) .hero-actions .btn {
     width: 100% !important;
     justify-content: center !important;
-    min-height: 50px !important;
-    padding: 0.85rem 1.4rem !important;
+    min-height: 48px !important;
+    padding: 0.8rem 1.4rem !important;
     font-size: 0.92rem !important;
     border-radius: 999px !important;
     font-weight: 800 !important;
@@ -7424,67 +7503,85 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.16s ease !important;
   }
   body:has(.hero-nav) .hero-actions .btn:active {
-    transform: scale(0.97) !important;
+    transform: scale(0.98) !important;
   }
   body:has(.hero-nav) .hero-actions .btn-primary {
     background: linear-gradient(180deg, #f7cb46 0%, #e8a71f 100%) !important;
     color: #1a1109 !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
-    box-shadow: 0 6px 20px rgba(232, 167, 31, 0.42), 0 2px 6px rgba(0, 0, 0, 0.2) !important;
-  }
-  /* Tablet layout: roomy vertical buttons */
-  @media (min-width: 600px) {
-    body:has(.hero-nav) .hero-card-left {
-      padding-inline: 2rem !important;
-      padding-bottom: calc(2.2rem + env(safe-area-inset-bottom, 0px)) !important;
-    }
-    body:has(.hero-nav) .hero-actions,
-    body:has(.hero-nav):has(.wa-float) .hero-actions {
-      max-width: 24rem;
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 0.75rem !important;
-      padding-right: 0 !important;
-    }
-    body:has(.hero-nav) .hero-actions .btn {
-      width: 100% !important;
-      min-height: 52px !important;
-      font-size: 0.95rem !important;
-    }
+    border: 1px solid rgba(26, 17, 9, 0.08) !important;
+    box-shadow: 0 4px 16px rgba(232, 167, 31, 0.38), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
   }
   body:has(.hero-nav) .hero-actions .btn-ghost {
-    background: rgba(254, 250, 240, 0.18) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(1.2) !important;
-    backdrop-filter: blur(16px) saturate(1.2) !important;
-    border: 1.5px solid rgba(254, 250, 240, 0.85) !important;
-    color: #fffdf7 !important;
+    background: #ffffff !important;
+    border: 1.5px solid rgba(26, 17, 9, 0.16) !important;
+    color: #1a1109 !important;
     font-weight: 800 !important;
-    text-decoration: none !important;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28) !important;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 2px 6px rgba(26, 17, 9, 0.04) !important;
+    text-shadow: none !important;
   }
-  /* Apple-style smooth multi-stop cubic scrim gradient */
-  body:has(.hero-nav) .hero-scrim {
-    background: linear-gradient(
-      180deg,
-      rgba(15, 10, 6, 0.5) 0%,
-      rgba(15, 10, 6, 0.12) 22%,
-      rgba(15, 10, 6, 0.28) 48%,
-      rgba(15, 10, 6, 0.72) 72%,
-      rgba(15, 10, 6, 0.92) 90%,
-      rgba(15, 10, 6, 0.97) 100%
-    );
+  body:has(.hero-nav) .hero-actions .btn-ghost:hover {
+    background: #fdfaf3 !important;
+    border-color: rgba(26, 17, 9, 0.32) !important;
   }
-  /* WhatsApp float button: elevates cleanly above action buttons on mobile over hero */
+
+  /* Tablet layout (≥600px) */
+  @media (min-width: 600px) {
+    body:has(.hero-nav) .hero-card-left {
+      padding: 2.2rem 2.4rem calc(2rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
+    body:has(.hero-nav) .hero-actions {
+      flex-direction: row !important;
+      max-width: 30rem !important;
+      gap: 0.85rem !important;
+    }
+    body:has(.hero-nav) .hero-actions .btn {
+      width: auto !important;
+      flex: 1 1 0 !important;
+      min-height: 50px !important;
+      padding: 0.85rem 1.4rem !important;
+    }
+  }
+
+  /* Short mobile viewports (e.g. iPhone SE / height ≤ 720px) */
+  @media (max-height: 720px) {
+    body:has(.hero-nav) .hero-bg {
+      height: 48svh !important;
+      min-height: 270px !important;
+    }
+    body:has(.hero-nav) .hero-card-left {
+      padding: 1.15rem 1.2rem calc(0.9rem + env(safe-area-inset-bottom, 0px)) !important;
+      margin-top: -20px !important;
+    }
+    body:has(.hero-nav) .hero-card-left h1 {
+      font-size: 1.9rem !important;
+    }
+    body:has(.hero-nav) .hero-card-left p.lead {
+      -webkit-line-clamp: 2 !important;
+      margin-top: 0.35rem !important;
+      font-size: 0.84rem !important;
+      line-height: 1.4 !important;
+    }
+    body:has(.hero-nav) .hero-actions {
+      margin-top: 0.7rem !important;
+      gap: 0.45rem !important;
+    }
+    body:has(.hero-nav) .hero-actions .btn {
+      min-height: 42px !important;
+      padding: 0.55rem 1.2rem !important;
+      font-size: 0.85rem !important;
+    }
+  }
+
+  /* WhatsApp Floating Button */
   body:has(.hero-nav) .wa-float {
-    bottom: calc(8.6rem + env(safe-area-inset-bottom, 0px)) !important;
-    width: 50px !important;
-    height: 50px !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(37, 211, 102, 0.35) !important;
+    bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px)) !important;
+    width: 48px !important;
+    height: 48px !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(37, 211, 102, 0.3) !important;
   }
   body:has(.hero-nav) .wa-float svg {
-    width: 26px !important;
-    height: 26px !important;
+    width: 24px !important;
+    height: 24px !important;
   }
 }
 
