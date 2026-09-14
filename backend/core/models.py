@@ -564,6 +564,12 @@ class SiteSettings(models.Model):
         default="Online ordering is temporarily paused. Please visit us or call to place an order.",
         help_text="Notice shown to guests when online ordering is paused",
     )
+    order_prep_time = models.CharField(
+        max_length=60,
+        blank=True,
+        default="15–20 mins",
+        help_text="Estimated preparation and pickup time displayed to customers in cart and checkout",
+    )
     timezone = models.CharField(max_length=50, default="Australia/Sydney")
 
     THEME_CHOICES = [

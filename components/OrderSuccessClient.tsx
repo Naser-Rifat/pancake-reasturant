@@ -11,6 +11,23 @@ import { useCart } from "@/lib/cart";
 
 type Phase = "checking" | "confirmed" | "paid" | "slow" | "missing";
 
+function formatOrderTimes(createdAt?: string) {
+  const baseDate = createdAt ? new Date(createdAt) : new Date();
+  const date = isNaN(baseDate.getTime()) ? new Date() : baseDate;
+  
+  const placedTime = date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const pickupStart = new Date(date.getTime() + 15 * 60 * 1000);
+  const pickupEnd = new Date(date.getTime() + 20 * 60 * 1000);
+  
+  const startStr = pickupStart.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const endStr = pickupEnd.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  
+  return {
+    placedTime,
+    targetPickupTime: `${startStr} – ${endStr}`,
+  };
+}
+
 export default function OrderSuccessClient({ publicId }: { publicId: string }) {
   // Clear cart and coupon when order is confirmed
   const { clear, setCouponCode } = useCart();
@@ -41,6 +58,8 @@ export default function OrderSuccessClient({ publicId }: { publicId: string }) {
       cancelled = true;
     };
   }, [publicId, clear, setCouponCode]);
+
+  const times = formatOrderTimes(order?.created_at);
 
   return (
     <>
@@ -73,11 +92,61 @@ export default function OrderSuccessClient({ publicId }: { publicId: string }) {
         </div>
       </section>
 
-      <main className="container" style={{ maxWidth: 560, paddingBlock: "2.5rem" }}>
+      <main className="container" style={{ maxWidth: 580, paddingBlock: "2rem" }}>
         {order && (
-          <div style={{ marginBottom: "2rem" }}>
-            <h2 style={{ marginBottom: "0.75rem" }}>
-              {order.customer_name ? `${order.customer_name}'s order` : "Your order"}
+          <div style={{ marginBottom: "2.5rem" }}>
+            {/* Apple-Style Live ETA Hero Card */}
+            <div className="order-eta-card">
+              <div className="order-eta-badge">
+                <span className="order-pulse-dot" />
+                <span>🍳 Griddling Fresh in the Kitchen</span>
+              </div>
+
+              <div className="order-eta-hero">
+                <div className="order-eta-label">Estimated Ready for Pickup</div>
+                <div className="order-eta-time">{times.targetPickupTime}</div>
+                <div className="order-eta-meta">
+                  Order placed at <b>{times.placedTime}</b> · Standard prep: 15–20 mins
+                </div>
+              </div>
+
+              {/* 3-Stage Visual Stepper */}
+              <div className="order-stepper">
+                <div className="step completed">
+                  <div className="step-dot">✓</div>
+                  <div className="step-label">Placed</div>
+                </div>
+                <div className="step-line active" />
+                <div className="step active">
+                  <div className="step-dot">
+                    <span className="step-pulse" />
+                    🥞
+                  </div>
+                  <div className="step-label">Baking</div>
+                </div>
+                <div className="step-line" />
+                <div className="step upcoming">
+                  <div className="step-dot">🛍️</div>
+                  <div className="step-label">Pickup</div>
+                </div>
+              </div>
+
+              {/* Pickup Counter Callout */}
+              <div className="order-pickup-instruction">
+                <div className="order-pickup-row">
+                  <span className="loc-icon">📍</span>
+                  <div>
+                    <div className="order-pickup-title">Collect & Pay at Counter</div>
+                    <div className="order-pickup-sub">
+                      Quote name <b>{order.customer_name || "Guest"}</b> or Order <b>#{order.public_id.slice(-6).toUpperCase()}</b>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h2 style={{ fontSize: "1.25rem", margin: "2rem 0 1rem" }}>
+              Order Receipt
             </h2>
             <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
               {order.items.map((it) => (

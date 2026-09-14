@@ -362,6 +362,7 @@ export interface AdminSiteSettings {
   uber_eats_url: string;
   online_ordering_enabled: boolean;
   online_ordering_disabled_message: string;
+  order_prep_time?: string;
   timezone: string;
   theme: string;
   custom_primary: string;

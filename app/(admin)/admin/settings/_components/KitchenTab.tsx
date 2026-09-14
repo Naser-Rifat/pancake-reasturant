@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
-import { AlertCircle, Mail, Send } from "lucide-react";
+import { AlertCircle, Clock, Mail, Send } from "lucide-react";
 import { SaveButton } from "@/components/admin/SaveButton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -131,6 +131,102 @@ export function KitchenTab({
             </SaveButton>
           </div>
         )}
+      </div>
+
+      {/* Kitchen Preparation & Pickup Lead Time Card */}
+      <div className="bg-white p-6 sm:p-7 rounded-xl border border-zinc-200 shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200">
+          <div className="flex items-center gap-2.5">
+            <Clock className="h-5 w-5 text-amber-600" />
+            <div>
+              <h3 className="text-base font-semibold text-[#211a14]">
+                Kitchen Preparation & Pickup Time
+              </h3>
+              <p className="text-xs text-zinc-500">
+                Shown to customers in the Cart Drawer before ordering and on the Order Confirmation page.
+              </p>
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 self-start sm:self-auto">
+            ⏱️ {site.order_prep_time || "15–20 mins"}
+          </span>
+        </div>
+
+        {/* Quick Presets */}
+        <div className="space-y-2">
+          <label className="text-xs font-semibold uppercase tracking-wider text-zinc-600">
+            Quick Traffic Presets
+          </label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            {[
+              { label: "⚡ Fast", value: "10–15 mins", sub: "Quiet / Low Traffic" },
+              { label: "🥞 Standard", value: "15–20 mins", sub: "Normal Service" },
+              { label: "🔥 Busy", value: "20–30 mins", sub: "Peak Lunch / Evening" },
+              { label: "🚨 Rush Hour", value: "30–45 mins", sub: "Heavy Weekend Rush" },
+            ].map((preset) => {
+              const active = (site.order_prep_time || "15–20 mins") === preset.value;
+              return (
+                <button
+                  key={preset.value}
+                  type="button"
+                  onClick={() => {
+                    setSite((s) => (s ? { ...s, order_prep_time: preset.value } : s));
+                    run(
+                      async () => {
+                        await updateSiteSettings({ order_prep_time: preset.value });
+                      },
+                      "PrepTimePreset",
+                      {
+                        title: `Wait time set to ${preset.value}`,
+                        description: `Customers will now see "${preset.value}" estimated pickup time.`,
+                      }
+                    );
+                  }}
+                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                    active
+                      ? "border-amber-500 bg-amber-50/80 ring-2 ring-amber-400/40 shadow-xs"
+                      : "border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50/60"
+                  }`}
+                >
+                  <div className="text-xs font-bold text-zinc-900">{preset.label}</div>
+                  <div className="text-sm font-extrabold text-amber-900 mt-0.5">{preset.value}</div>
+                  <div className="text-[11px] text-zinc-500 mt-0.5">{preset.sub}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Custom Input */}
+        <div className="pt-2 border-t border-zinc-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="flex-1">
+            <input
+              type="text"
+              className="w-full h-10 px-3.5 text-xs font-medium text-zinc-900 bg-zinc-50 border border-zinc-300 rounded-xl focus:bg-white focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200 transition-all"
+              placeholder="Or enter custom time (e.g. 20–25 mins)"
+              value={site.order_prep_time || ""}
+              onChange={(e) =>
+                setSite((s) => (s ? { ...s, order_prep_time: e.target.value } : s))
+              }
+            />
+          </div>
+          <SaveButton
+            loading={busy === "PrepTimeCustom"}
+            onClick={() =>
+              run(
+                async () => {
+                  await updateSiteSettings({
+                    order_prep_time: site.order_prep_time || "15–20 mins",
+                  });
+                },
+                "PrepTimeCustom",
+                { title: "Prep time updated", description: `Set to "${site.order_prep_time || "15–20 mins"}"` }
+              )
+            }
+          >
+            Save Custom Time
+          </SaveButton>
+        </div>
       </div>
 
       {/* Email Diagnostics Card */}

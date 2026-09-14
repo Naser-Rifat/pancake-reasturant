@@ -177,6 +177,7 @@ export interface ApiSiteSettings {
   uber_eats_url: string;
   online_ordering_enabled: boolean;
   online_ordering_disabled_message: string;
+  order_prep_time?: string;
   timezone: string;
   theme: string;
   custom_primary: string;
@@ -193,6 +194,7 @@ export interface ApiOrder {
   discount_amount: string;
   total: string;
   items: { slug: string; name: string; quantity: number; unit_price: string; line_total: string }[];
+  created_at?: string;
   /** present only in the placeOrder response — where Stripe takes the payment */
   checkout_url?: string;
 }

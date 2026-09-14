@@ -342,5 +342,6 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             "map_embed", "transit_badges", "show_transit_badges",
             "instagram_url", "facebook_url", "uber_eats_url",
             "online_ordering_enabled", "online_ordering_disabled_message",
+            "order_prep_time",
             "timezone", "theme", "custom_primary", "custom_accent",
         ]

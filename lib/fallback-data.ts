@@ -152,6 +152,7 @@ export const FALLBACK_SITE: ApiSiteSettings = {
   uber_eats_url: "https://www.ubereats.com",
   online_ordering_enabled: true,
   online_ordering_disabled_message: "Online ordering is temporarily paused. Please visit us or call to place an order.",
+  order_prep_time: "15–20 mins",
   timezone: "Australia/Melbourne",
   theme: "maple",
   custom_primary: "#efbf38",

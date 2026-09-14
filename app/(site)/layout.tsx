@@ -170,6 +170,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             items={menu.items}
             live={site.online_ordering_enabled}
             uberEatsUrl={site.uber_eats_url}
+            orderPrepTime={site.order_prep_time || "15–20 mins"}
           />
         </CartProvider>
       </body>

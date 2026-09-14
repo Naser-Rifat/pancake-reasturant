@@ -13,6 +13,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { Clock } from "lucide-react";
 import { money, placeOrder, validateCoupon, type ApiCouponPreview, type ApiMenuItem } from "@/lib/api";
 import { useCart } from "@/lib/cart";
 import { validatePhoneNumber } from "@/lib/format";
@@ -21,10 +22,12 @@ export default function CartDrawer({
   items,
   live = true,
   uberEatsUrl = "",
+  orderPrepTime = "15–20 mins",
 }: {
   items: ApiMenuItem[];
   live?: boolean;
   uberEatsUrl?: string;
+  orderPrepTime?: string;
 }) {
   const { cart, count, inc, dec, clear, showToast, open, closeCart, couponCode, setCouponCode } =
     useCart();
@@ -40,6 +43,21 @@ export default function CartDrawer({
   const [coupon, setCoupon] = useState<ApiCouponPreview | null>(null);
   const [couponError, setCouponError] = useState("");
   const [checkingCoupon, setCheckingCoupon] = useState(false);
+  const [targetClock, setTargetClock] = useState("");
+
+  useEffect(() => {
+    const updateTime = () => {
+      const matches = orderPrepTime.match(/\d+/g);
+      const minutesToAdd = matches ? parseInt(matches[matches.length - 1], 10) : 20;
+      const target = new Date(Date.now() + minutesToAdd * 60 * 1000);
+      setTargetClock(
+        target.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+      );
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 30000);
+    return () => clearInterval(interval);
+  }, [orderPrepTime]);
 
   // A slug can outlive its menu item between a stale cart and a fresh menu —
   // MenuClient reconciles on the menu page, but the drawer now renders on every
@@ -389,6 +407,26 @@ export default function CartDrawer({
                 <span>Total</span>
                 <b>${total.toFixed(2)}</b>
               </div>
+
+              {/* Apple-Style Estimated Pickup Clarity Pill */}
+              <div className="cart-eta-pill">
+                <div className="cart-eta-main">
+                  <div className="cart-eta-icon-wrap" aria-hidden="true">
+                    <Clock size={16} className="cart-eta-icon" />
+                  </div>
+                  <div className="cart-eta-text">
+                    <div className="cart-eta-title">
+                      <span>Estimated Pickup:</span>
+                      <b>{orderPrepTime}</b>
+                      {targetClock && <span className="cart-eta-clock">(~{targetClock})</span>}
+                    </div>
+                    <div className="cart-eta-sub">
+                      🥞 Griddled fresh to order · Collect warm at counter
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <button className="btn btn-primary" onClick={checkout} disabled={placing}>
                 {placing ? "Placing your order…" : "Place order (Pay at counter) →"}
               </button>
