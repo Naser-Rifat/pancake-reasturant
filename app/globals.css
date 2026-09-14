@@ -7350,19 +7350,29 @@ body:has(.hero-nav) .hero-find {
 }
 
 @media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
+  /* Hero occupies exactly 100vh fold (campaign section hidden until scroll) */
   body:has(.hero-nav) .hero {
     padding: 36px 0 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    background: #faf6ed !important;
   }
   body:has(.hero-nav):has(.top-ribbon) .hero {
     padding-top: 36px !important;
+    height: 100vh !important;
   }
   body:has(.hero-nav):has(.top-ribbon).has-announce .hero {
     padding-top: calc(36px + 40px) !important;
+    height: 100vh !important;
   }
-  /* The Container: 100% Full-Width Edge-to-Edge Stage (Zero lateral gaps) */
+
+  /* The Container: 100% Full-Width Edge-to-Edge Stage (Zero lateral gaps, exactly 100% height) */
   body:has(.hero-nav) .hero .container.hero-cards {
     display: flex !important;
     flex-direction: column !important;
@@ -7370,42 +7380,43 @@ body:has(.hero-nav) .hero-find {
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
     border-radius: 0 !important;
-    overflow: visible !important;
+    overflow: hidden !important;
     background: #faf6ed !important;
     border: none !important;
     box-shadow: none !important;
     position: relative !important;
   }
 
-  /* Top Visual Stage: Full-width cinematic pancake stage proportioned to keep CTAs above fold */
+  /* Top 3/5ths Visual Stage: Exactly 60% of viewport height (image ta screen er 5 bag er 3 bag) */
   body:has(.hero-nav) .hero-bg {
     position: relative !important;
     inset: auto !important;
     width: 100% !important;
-    height: clamp(340px, 42vh, 400px) !important;
-    min-height: clamp(340px, 42vh, 400px) !important;
-    max-height: clamp(340px, 42vh, 400px) !important;
+    height: 60% !important;
+    flex: 0 0 60% !important;
+    min-height: 60% !important;
+    max-height: 60% !important;
     overflow: hidden !important;
     background: radial-gradient(circle at center 50%, #2f3d2a 0%, #152013 65%, #0d150c 100%) !important;
   }
   body:has(.hero-nav) .hero-bg img {
     object-fit: cover !important;
-    object-position: center 46% !important;
+    object-position: center 50% !important;
   }
   body:has(.hero-nav) .hero-scrim {
     position: absolute !important;
     inset: 0 !important;
     background: linear-gradient(
       180deg,
-      rgba(10, 15, 10, 0.86) 0%,
-      rgba(10, 15, 10, 0.4) 30%,
-      rgba(10, 15, 10, 0.05) 55%,
-      rgba(10, 15, 10, 0.42) 85%,
-      rgba(10, 15, 10, 0.72) 100%
+      rgba(10, 15, 10, 0.88) 0%,
+      rgba(10, 15, 10, 0.42) 35%,
+      rgba(10, 15, 10, 0.05) 60%,
+      rgba(10, 15, 10, 0.35) 85%,
+      rgba(10, 15, 10, 0.65) 100%
     ) !important;
     pointer-events: none !important;
   }
@@ -7413,9 +7424,9 @@ body:has(.hero-nav) .hero-find {
   /* Top Navigation Bar: Spans cleanly across top of visual stage without bubble capsules */
   body:has(.hero-nav) .hero-nav {
     position: absolute !important;
-    top: 1.25rem !important;
-    left: 3rem !important;
-    right: 3rem !important;
+    top: 1.5rem !important;
+    left: 3.5rem !important;
+    right: 3.5rem !important;
     z-index: 15 !important;
     display: flex !important;
     align-items: center !important;
@@ -7447,7 +7458,7 @@ body:has(.hero-nav) .hero-find {
   }
   body:has(.hero-nav) .hero-brand-logo {
     filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7)) !important;
-    width: 130px !important;
+    width: 135px !important;
     height: auto !important;
   }
 
@@ -7455,7 +7466,7 @@ body:has(.hero-nav) .hero-find {
   body:has(.hero-nav) .hero-nav-links {
     display: flex !important;
     align-items: center !important;
-    gap: 2.8rem !important;
+    gap: 3rem !important;
     margin: 0 auto !important;
     padding: 0 !important;
     list-style: none !important;
@@ -7568,24 +7579,29 @@ body:has(.hero-nav) .hero-find {
     transform: scale(1.08) !important;
   }
 
-  /* Bottom Editorial Section: Proportionally balanced so buttons are 100% visible above the fold */
+  /* Bottom 2/5ths Editorial Section: Exactly 40% of hero height, perfectly centered */
   body:has(.hero-nav) .hero-card-left {
     position: relative !important;
     width: 100% !important;
-    height: auto !important;
+    height: 40% !important;
+    flex: 0 0 40% !important;
+    min-height: 40% !important;
+    max-height: 40% !important;
     background: #faf6ed !important;
-    padding: 1.8rem 2rem 2.2rem !important;
+    padding: 1rem 2rem !important;
+    box-sizing: border-box !important;
     display: flex !important;
     flex-direction: column !important;
+    justify-content: center !important;
     align-items: center !important;
     text-align: center !important;
-    overflow: visible !important;
+    overflow: hidden !important;
   }
   body:has(.hero-nav) .hero-card-left h1 {
     font-family: var(--font-serif), Georgia, serif !important;
-    font-size: clamp(2.4rem, 3.4vw, 3.2rem) !important;
+    font-size: clamp(2.1rem, 2.8vw, 2.9rem) !important;
     font-weight: 800 !important;
-    line-height: 1.1 !important;
+    line-height: 1.12 !important;
     color: #211a14 !important;
     text-transform: none !important;
     letter-spacing: -0.02em !important;
@@ -7609,10 +7625,10 @@ body:has(.hero-nav) .hero-find {
   body:has(.hero-nav) .hero-card-left p.lead {
     color: #4a3b32 !important;
     font-family: var(--font-body), sans-serif !important;
-    font-size: clamp(0.98rem, 1.2vw, 1.12rem) !important;
-    line-height: 1.55 !important;
-    max-width: 62ch !important;
-    margin: 0.65rem auto 0 !important;
+    font-size: clamp(0.92rem, 1.1vw, 1.05rem) !important;
+    line-height: 1.5 !important;
+    max-width: 58ch !important;
+    margin: 0.5rem auto 0 !important;
     text-shadow: none !important;
     text-align: center !important;
   }
@@ -7622,7 +7638,7 @@ body:has(.hero-nav) .hero-find {
     align-items: center !important;
     justify-content: center !important;
     gap: 1.1rem !important;
-    margin-top: 1.25rem !important;
+    margin-top: 1rem !important;
     padding-top: 0 !important;
     width: 100% !important;
   }
@@ -7630,9 +7646,9 @@ body:has(.hero-nav) .hero-find {
     background: var(--yellow) !important;
     color: #211a14 !important;
     font-weight: 800 !important;
-    font-size: 0.85rem !important;
+    font-size: 0.82rem !important;
     letter-spacing: 0.08em !important;
-    padding: 0.85rem 2.2rem !important;
+    padding: 0.8rem 2.2rem !important;
     border-radius: 999px !important;
     box-shadow: 0 4px 16px rgba(239, 191, 56, 0.4) !important;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -7648,9 +7664,9 @@ body:has(.hero-nav) .hero-find {
     color: #211a14 !important;
     border: 1.5px solid rgba(118, 58, 18, 0.2) !important;
     font-weight: 800 !important;
-    font-size: 0.85rem !important;
+    font-size: 0.82rem !important;
     letter-spacing: 0.08em !important;
-    padding: 0.85rem 2.2rem !important;
+    padding: 0.8rem 2.2rem !important;
     border-radius: 999px !important;
     box-shadow: 0 2px 8px rgba(33, 26, 20, 0.06) !important;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
