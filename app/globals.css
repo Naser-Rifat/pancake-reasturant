@@ -38,8 +38,8 @@
   --card-a: #f5de7a; /* menu-card soft surface rotation */
   --card-b: #f2eeec;
   --card-c: #efbf38;
-  --radius: 14px; /* sharp luxury card radius */
-  --radius-xl: 18px; /* sharp section radius */
+  --radius: 6px; /* sharp tailored card radius */
+  --radius-xl: 8px; /* sharp section radius */
   --frame: 8px; /* lavender page frame — grows on tablet+ */
   --nav-h: 104px;
   --ribbon-h: 36px;
@@ -4705,7 +4705,7 @@ body:has(.cart-fab) .wa-float {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1.5px solid rgba(118, 58, 18, 0.1) !important;
-  border-radius: 14px !important;
+  border-radius: 6px !important;
   padding: 0.55rem 0.6rem !important;
   min-height: 64px !important;
   height: auto !important;
@@ -4834,7 +4834,7 @@ body:has(.cart-fab) .wa-float {
   overflow: hidden;
   height: 215px;
   padding: 0.95rem 1rem 0;
-  border-radius: 14px;
+  border-radius: 6px;
   background: color-mix(in srgb, var(--card-a) 42%, var(--cream-card));
   box-shadow: 0 2px 10px rgba(33, 26, 20, 0.07);
   transition: transform 0.16s ease, box-shadow 0.25s ease;
@@ -4873,7 +4873,7 @@ body:has(.cart-fab) .wa-float {
   /* the dish sits ON the card floor and is cropped by it — centred left a gap
      and the card stopped reading as one object */
   object-position: bottom;
-  border-radius: 16px 16px 0 0;
+  border-radius: 4px 4px 0 0;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 /* four offset shadows are how you stroke an alpha edge in CSS — no new asset */
@@ -4996,7 +4996,7 @@ body:has(.cart-fab) .wa-float {
   .dish-card.dc-tile {
     height: 318px;
     padding: 1.15rem 1.25rem 0;
-    border-radius: 16px;
+    border-radius: 6px;
   }
   .dish-card.dc-tile .dc-body {
     padding-right: 3.8rem;
@@ -5059,11 +5059,11 @@ body:has(.cart-fab) .wa-float {
     transform: none;
     width: 84px;
     height: 84px;
-    border-radius: 16px;
+    border-radius: 4px;
     overflow: hidden;
     background: #fff;
   }
-  .dish-card.dc-row .dc-img { border-radius: 16px; }
+  .dish-card.dc-row .dc-img { border-radius: 4px; }
   .dish-card.dc-row .dc-img.is-cutout { filter: none; }
   /* name, leader and price share one line the way a printed menu sets them.
      .dc-head is display:contents so its children join this grid directly —
@@ -6359,7 +6359,7 @@ body:has(.cart-fab) .wa-float {
     align-items: stretch;
     gap: 0.75rem;
     padding: 1.15rem 1.1rem;
-    border-radius: 18px;
+    border-radius: 6px;
     border-width: 2px;
     text-align: left;
   }
@@ -7186,7 +7186,7 @@ body:has(.wa-float) .footer-bottom {
 }
 .pickup-step-card {
   background: var(--surface, #ffffff);
-  border-radius: 30px;
+  border-radius: 6px;
   padding: 2rem 1.6rem 1.8rem;
   border: 2px solid rgba(33, 26, 20, 0.08);
   box-shadow:
@@ -7348,70 +7348,288 @@ body:has(.hero-nav) .hero-find {
 }
 
 @media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
+  body:has(.hero-nav) .hero {
+    padding: 14px 0 0 !important;
+  }
+  body:has(.hero-nav).has-announce .hero {
+    padding-top: calc(14px + 44px) !important;
+  }
+  /* The Container: Top Visual Stage + Flush Warm Cream Welcome Section */
   body:has(.hero-nav) .hero .container.hero-cards {
-    display: block;
+    display: flex !important;
+    flex-direction: column !important;
+    width: auto !important;
+    max-width: 1340px !important;
+    margin-inline: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    background: #faf6ed !important;
+    border: 1.5px solid rgba(118, 58, 18, 0.1) !important;
+    box-shadow: 0 16px 44px rgba(26, 17, 9, 0.1) !important;
+    position: relative !important;
   }
-  /* on desktop the copy holds the left half and the scrim leans that way, so
-     the food stays clear on the right */
+
+  /* Top Visual Stage: Full-width cinematic pancake stage with centered food art */
+  body:has(.hero-nav) .hero-bg {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: 520px !important;
+    min-height: 520px !important;
+    max-height: 520px !important;
+    overflow: hidden !important;
+    background: radial-gradient(circle at center 50%, #2f3d2a 0%, #152013 65%, #0d150c 100%) !important;
+  }
+  body:has(.hero-nav) .hero-bg img {
+    object-fit: cover !important;
+    object-position: center 44% !important;
+  }
   body:has(.hero-nav) .hero-scrim {
+    position: absolute !important;
+    inset: 0 !important;
     background: linear-gradient(
-      100deg,
-      rgba(26, 17, 9, 0.9) 0%,
-      rgba(26, 17, 9, 0.82) 34%,
-      rgba(26, 17, 9, 0.45) 58%,
-      rgba(26, 17, 9, 0.18) 100%
-    );
+      180deg,
+      rgba(13, 21, 12, 0.65) 0%,
+      rgba(13, 21, 12, 0.1) 32%,
+      rgba(13, 21, 12, 0.12) 68%,
+      rgba(13, 21, 12, 0.6) 100%
+    ) !important;
+    pointer-events: none !important;
   }
-  body:has(.hero-nav) .hero-card-left {
-    width: 56%;
-    height: 100%;
+
+  /* Top Navigation Bar: Spans across the top of the visual stage */
+  body:has(.hero-nav) .hero-nav {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 10 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 1.4rem 2.5rem !important;
   }
+
+  /* Frosted capsule for brand logo */
+  body:has(.hero-nav) .hero-logo-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    padding: 0.45rem 1.1rem !important;
+    border-radius: 999px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.5) !important;
+    transition: transform 0.2s ease !important;
+  }
+  body:has(.hero-nav) .hero-logo-pill:hover {
+    transform: scale(1.03) !important;
+  }
+
+  /* Clean nav links across visual stage */
+  body:has(.hero-nav) .hero-nav-links {
+    display: flex !important;
+    align-items: center !important;
+    gap: 2.2rem !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    list-style: none !important;
+    font-weight: 800 !important;
+    font-size: 0.82rem !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+  }
+  body:has(.hero-nav) .hero-nav-links a {
+    color: #ffffff !important;
+    text-decoration: none !important;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4) !important;
+    transition: color 0.18s ease, text-shadow 0.18s ease !important;
+  }
+  body:has(.hero-nav) .hero-nav-links a:hover {
+    color: var(--yellow) !important;
+    text-shadow: 0 2px 12px rgba(239, 191, 56, 0.5) !important;
+  }
+
+  /* Topbar actions (Find a stack + Order button) */
   body:has(.hero-nav) .hero-topbar {
-    left: auto;
-    right: 3.4rem;
-    width: auto;
+    position: static !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 1.2rem !important;
+    inset: auto !important;
   }
-  body:has(.hero-nav) .hero-price {
-    left: auto;
-    right: 3.4rem;
-    bottom: 3.4rem;
+  body:has(.hero-nav) .hero-find {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    color: #ffffff !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    text-decoration: none !important;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4) !important;
+    transition: color 0.18s ease !important;
   }
-}
+  body:has(.hero-nav) .hero-find:hover {
+    color: var(--yellow) !important;
+  }
+  body:has(.hero-nav) .hero-order {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    background: var(--yellow) !important;
+    color: #211a14 !important;
+    font-size: 0.82rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    padding: 0.65rem 1.4rem !important;
+    border-radius: 999px !important;
+    text-decoration: none !important;
+    box-shadow: 0 4px 14px rgba(239, 191, 56, 0.35) !important;
+    transition: all 0.2s ease !important;
+  }
+  body:has(.hero-nav) .hero-order:hover {
+    background: var(--yellow-deep) !important;
+    transform: translateY(-1px) scale(1.02) !important;
+    box-shadow: 0 6px 18px rgba(224, 134, 0, 0.45) !important;
+  }
 
-/* the ghost CTA kept its ink outline, which on the dark scrim was barely there */
-body:has(.hero-nav) .hero-actions .btn-ghost {
-  border-color: rgba(248, 242, 224, 0.55);
-  color: var(--cream);
-}
-body:has(.hero-nav) .hero-actions .btn-ghost:hover {
-  background: var(--cream);
-  color: var(--ink);
-  border-color: var(--cream);
-}
+  /* Stage Dish Thumbnails (floating on the visual stage bottom right) */
+  body:has(.hero-nav) .hero-stage-thumbs {
+    position: absolute !important;
+    bottom: 1.5rem !important;
+    right: 2rem !important;
+    z-index: 5 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
+    background: rgba(13, 21, 12, 0.6) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    padding: 0.4rem 0.6rem !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  }
+  body:has(.hero-nav) .hero-stage-thumbs .hero-thumb-btn {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
+    border: 2px solid rgba(255, 255, 255, 0.25) !important;
+    background: #000000 !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    position: relative !important;
+    transition: transform 0.2s ease, border-color 0.2s ease !important;
+  }
+  body:has(.hero-nav) .hero-stage-thumbs .hero-thumb-btn.on {
+    border-color: var(--yellow) !important;
+    box-shadow: 0 0 12px rgba(239, 191, 56, 0.6) !important;
+    transform: scale(1.08) !important;
+  }
 
-@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
-  /* Editorial DM Serif Display title case + fluid cursive signature */
+  /* Bottom Editorial Section: Flush Warm Cream Welcome Card */
+  body:has(.hero-nav) .hero-card-left {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    background: #faf6ed !important;
+    padding: 4.5rem 2.5rem 5rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    overflow: visible !important;
+  }
   body:has(.hero-nav) .hero-card-left h1 {
     font-family: var(--font-serif), Georgia, serif !important;
-    font-weight: 700 !important;
-    font-size: clamp(3.4rem, 5.8vw, 5.6rem) !important;
-    line-height: 0.98 !important;
-    letter-spacing: -0.025em !important;
+    font-size: clamp(3.2rem, 5.2vw, 4.6rem) !important;
+    font-weight: 800 !important;
+    line-height: 1.05 !important;
+    color: #211a14 !important;
     text-transform: none !important;
-    color: #ffffff !important;
-    text-shadow: 0 3px 18px rgba(26, 17, 9, 0.45) !important;
+    letter-spacing: -0.02em !important;
+    text-shadow: none !important;
+    margin: 0 auto !important;
+    text-align: center !important;
   }
   body:has(.hero-nav) .hero-card-left h1 .head-line {
+    color: #211a14 !important;
     display: inline !important;
   }
   body:has(.hero-nav) .hero-card-left h1 .script {
-    display: block !important;
+    display: inline-block !important;
+    color: var(--deep, #763a12) !important;
     font-family: var(--font-script), cursive !important;
     font-weight: 400 !important;
-    font-size: 0.76em !important;
-    color: var(--yellow) !important;
-    margin-top: 0.12em !important;
-    text-shadow: 0 3px 20px rgba(26, 17, 9, 0.5) !important;
+    font-size: 0.95em !important;
+    margin-left: 0.35ch !important;
+    text-shadow: none !important;
+  }
+  body:has(.hero-nav) .hero-card-left p.lead {
+    color: #4a3b32 !important;
+    font-family: var(--font-body), sans-serif !important;
+    font-size: clamp(1.05rem, 1.35vw, 1.22rem) !important;
+    line-height: 1.72 !important;
+    max-width: 65ch !important;
+    margin: 1.6rem auto 0 !important;
+    text-shadow: none !important;
+    text-align: center !important;
+  }
+  body:has(.hero-nav) .hero-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1.25rem !important;
+    margin-top: 2.4rem !important;
+    padding-top: 0 !important;
+    width: 100% !important;
+  }
+  body:has(.hero-nav) .hero-actions .btn-primary {
+    background: var(--yellow) !important;
+    color: #211a14 !important;
+    font-weight: 800 !important;
+    font-size: 0.88rem !important;
+    letter-spacing: 0.08em !important;
+    padding: 1rem 2.6rem !important;
+    border-radius: 999px !important;
+    box-shadow: 0 4px 18px rgba(239, 191, 56, 0.4) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  body:has(.hero-nav) .hero-actions .btn-primary:hover {
+    background: var(--yellow-deep) !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 8px 26px rgba(224, 134, 0, 0.45) !important;
+  }
+  body:has(.hero-nav) .hero-actions .btn-ghost {
+    display: inline-flex !important;
+    background: #ffffff !important;
+    color: #211a14 !important;
+    border: 1.5px solid rgba(118, 58, 18, 0.2) !important;
+    font-weight: 800 !important;
+    font-size: 0.88rem !important;
+    letter-spacing: 0.08em !important;
+    padding: 1rem 2.6rem !important;
+    border-radius: 999px !important;
+    box-shadow: 0 2px 8px rgba(33, 26, 20, 0.06) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  body:has(.hero-nav) .hero-actions .btn-ghost:hover {
+    background: #ffffff !important;
+    border-color: var(--yellow-deep) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(33, 26, 20, 0.12) !important;
+  }
+  body:has(.hero-nav) .hero-card-right {
+    display: none !important;
   }
 }
 
@@ -7511,7 +7729,8 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     display: none !important;
   }
   body:has(.hero-nav) .hero-price,
-  body:has(.hero-nav) .hero-thumbs {
+  body:has(.hero-nav) .hero-thumbs,
+  body:has(.hero-nav) .hero-stage-thumbs {
     display: none !important;
   }
 
@@ -9824,92 +10043,11 @@ h2.title .accent,
   margin-top: 2rem;
 }
 
-/* ---------- Full-Width Hero Header Bar with Centered Links & Balanced Breathing Gaps ---------- */
-@media (min-width: 1367px), (min-width: 1024px) and (pointer: fine) {
-  body:has(.hero-nav) .hero .container.hero-cards {
-    min-height: 680px;
-  }
-  body:has(.hero-nav) .hero-nav {
-    position: absolute;
-    top: clamp(2.8rem, 4.8vh, 3.8rem);
-    left: clamp(2.8rem, 4.5vw, 4.4rem);
-    right: clamp(2.8rem, 4.5vw, 4.4rem);
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    pointer-events: auto;
-    margin-bottom: 0 !important;
-  }
-  body:has(.hero-nav) .hero-nav-links {
-    display: flex;
-    align-items: center;
-    gap: 2.5rem;
-    margin: 0 auto;
-    padding: 0;
-    list-style: none;
-    font-weight: 800;
-    font-size: 0.8rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-  body:has(.hero-nav) .hero-nav-links a {
-    color: var(--cream);
-    transition: opacity 0.2s ease;
-  }
-  body:has(.hero-nav) .hero-nav-links a:hover {
-    text-decoration: underline;
-    text-underline-offset: 5px;
-  }
-  body:has(.hero-nav) .hero-topbar {
-    position: static !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 1.2rem !important;
-    inset: auto !important;
-  }
-  body:has(.hero-nav) .hero-card-left {
-    padding: clamp(8.8rem, 15vh, 11rem) clamp(2.8rem, 4.5vw, 4.4rem) clamp(4.6rem, 8vh, 6.2rem) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-  }
-  body:has(.hero-nav) .hero-card-left h1 {
-    margin-top: 0 !important;
-  }
-  body:has(.hero-nav) .hero-actions {
-    margin-top: auto !important;
-    padding-top: 1.8rem !important;
-  }
-  body:has(.hero-nav) .hero-price {
-    right: clamp(2.8rem, 4.5vw, 4.4rem) !important;
-    bottom: clamp(4.6rem, 8vh, 6.2rem) !important;
-  }
-}
-@media (min-width: 1367px) and (max-height: 899px), (min-width: 1024px) and (pointer: fine) and (max-height: 899px) {
-  body:has(.hero-nav) .hero-nav {
-    top: 2.2rem;
-    left: 2.6rem;
-    right: 2.6rem;
-  }
-  body:has(.hero-nav) .hero-card-left {
-    padding: clamp(7.2rem, 12vh, 8.6rem) 2.6rem 4.4rem !important;
-  }
-  body:has(.hero-nav) .hero-price {
-    right: 2.6rem !important;
-    bottom: 4.4rem !important;
-  }
-}
-
 /* ---------- Ultra-Wide & Large Desktop Optimization (≥ 1600px / 4K) ---------- */
 @media (min-width: 1600px) {
   body:has(.hero-nav) .hero .container.hero-cards {
-    max-width: 1760px;
-    margin-inline: auto;
-    max-height: 980px;
-  }
-  body:has(.hero-nav) .hero-card-left h1 {
-    font-size: clamp(4.5rem, 5.2vw, 6.2rem);
+    max-width: 1440px !important;
+    margin-inline: auto !important;
   }
 }
 

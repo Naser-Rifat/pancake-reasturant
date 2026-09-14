@@ -8,7 +8,9 @@ import type { ApiMenuItem } from "@/lib/api";
 import { ChevronRight } from "lucide-react";
 
 const NAV = [
-  { href: "/menu", label: "Menu" },
+  { href: "/", label: "Home" },
+  { href: "/booking", label: "Book a Table" },
+  { href: "/menu", label: "Our Menu" },
   { href: "/gallery", label: "Gallery" },
   { href: "/#reviews", label: "Reviews" },
   { href: "/#contact", label: "Contact" },
@@ -54,7 +56,6 @@ export default function HeroShowcase({
 
   const [active, setActive] = useState(0);
   const current = slides[active] ?? slides[0];
-  const chip = heroCutout || dishes.find((d) => d.image)?.image;
 
   const headingWords = heading ? heading.trim().split(/\s+/) : ["Stack", "Into"];
 
@@ -71,6 +72,25 @@ export default function HeroShowcase({
             sizes="100vw"
           />
           <span className="hero-scrim" aria-hidden="true" />
+          {slides.length > 1 && (
+            <div className="hero-stage-thumbs" role="tablist" aria-label="Preview a dish">
+              {slides.map((s, i) => (
+                <button
+                  key={s.src}
+                  role="tab"
+                  type="button"
+                  aria-selected={i === active}
+                  aria-label={s.alt}
+                  title={s.label}
+                  className={`hero-thumb-btn ${i === active ? "on" : ""}`}
+                  onClick={() => setActive(i)}
+                >
+                  <Image src={s.src} alt="" width={100} height={100} sizes="44px" />
+                  {i === active && <span className="thumb-active-dot" />}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -126,7 +146,7 @@ export default function HeroShowcase({
           ) : (
             <>{heading}</>
           )}
-          <span className="script">{script}</span>
+          {script && <span className="script">{script}</span>}
         </h1>
         <p className="lead">{lead}</p>
 
@@ -139,26 +159,6 @@ export default function HeroShowcase({
               )}
             </Link>
           ))}
-
-          {slides.length > 1 && (
-            <div className="hero-thumbs" role="tablist" aria-label="Preview a dish">
-              {slides.map((s, i) => (
-                <button
-                  key={s.src}
-                  role="tab"
-                  type="button"
-                  aria-selected={i === active}
-                  aria-label={s.alt}
-                  title={s.label}
-                  className={`hero-thumb-btn ${i === active ? "on" : ""}`}
-                  onClick={() => setActive(i)}
-                >
-                  <Image src={s.src} alt="" width={120} height={120} sizes="56px" />
-                  {i === active && <span className="thumb-active-dot" />}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 
