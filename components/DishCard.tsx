@@ -90,7 +90,7 @@ export default function DishCard({
   const isRow = variant === "row";
 
   return (
-    <article className={`dish-card dc-${variant}`}>
+    <article className={`dish-card dc-${variant} fav-card`}>
       {/* the whole card is the target; the name keeps its own anchor for AT */}
       <Link href={href} className="dc-hit" aria-label={`View ${item.name} details`} />
 

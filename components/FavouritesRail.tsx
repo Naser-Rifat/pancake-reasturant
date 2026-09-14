@@ -67,17 +67,21 @@ export default function FavouritesRail({
         .filter((c) => c.is_active)
         .map((c) => ({
           slug: c.slug,
+          name: c.name,
+          icon: c.icon || "🥞",
           label: `${c.icon ? c.icon + " " : ""}${c.name}`,
           count: items.filter((i) => (i.category_slug ? i.category_slug === c.slug : i.tag === c.slug)).length,
         }))
         .filter((c) => c.count > 0);
     }
-    const map = new Map<string, { slug: string; label: string; count: number }>();
+    const map = new Map<string, { slug: string; name: string; icon: string; label: string; count: number }>();
     for (const item of items) {
       const slug = item.category_slug || item.tag;
-      const label = item.category_name || TAG_LABEL[slug] || (slug.charAt(0).toUpperCase() + slug.slice(1));
+      const name = item.category_name || TAG_LABEL[slug] || (slug.charAt(0).toUpperCase() + slug.slice(1));
+      const icon = item.category_icon || "🥞";
+      const label = `${icon} ${name}`;
       if (!map.has(slug)) {
-        map.set(slug, { slug, label, count: 0 });
+        map.set(slug, { slug, name, icon, label, count: 0 });
       }
       map.get(slug)!.count += 1;
     }
@@ -90,30 +94,39 @@ export default function FavouritesRail({
       : items.filter((i) => (i.category_slug || i.tag) === tab)
   ).slice(0, MAX);
 
+  const allCategory = {
+    slug: "all",
+    name: "All Stacks",
+    icon: "🥞",
+    count: items.length,
+  };
+  const allTiles = [allCategory, ...dynamicCategories];
+
   return (
     <>
       <div className={s.head}>
         <div className={s.h}>{title}</div>
         <div className={s.tabs} role="tablist" aria-label="Menu categories">
-          <button
-            role="tab"
-            aria-selected={tab === "all"}
-            className={`${s.pill}${tab === "all" ? " on" : ""}`}
-            onClick={() => setTab("all")}
-          >
-            All Stacks <span className="n">{items.length}</span>
-          </button>
-          {dynamicCategories.map((c, i) => (
-            <button
-              key={c.slug}
-              role="tab"
-              aria-selected={tab === c.slug}
-              className={`${s.pill} ${s.tints[i % s.tints.length]}${tab === c.slug ? " on" : ""}`}
-              onClick={() => setTab(c.slug)}
-            >
-              {c.label} <span className="n">{c.count}</span>
-            </button>
-          ))}
+          {allTiles.map((c) => {
+            const isSelected = tab === c.slug;
+            return (
+              <button
+                key={c.slug}
+                role="tab"
+                aria-selected={isSelected}
+                className={`${s.pill} fav-bento-tile${isSelected ? " on" : ""}`}
+                onClick={() => setTab(c.slug)}
+              >
+                <div className="fav-bento-top">
+                  <span className="fav-bento-icon" aria-hidden="true">
+                    {c.icon}
+                  </span>
+                  <span className="fav-bento-count">{c.count}</span>
+                </div>
+                <span className="fav-bento-name">{c.name}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
