@@ -7360,13 +7360,15 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     width: 100% !important;
     max-width: none !important;
     margin-inline: 0 !important;
+    height: 100svh !important;
     min-height: 100svh !important;
     border-radius: 0 !important;
     background: #faf6ed !important;
     position: relative !important;
-    overflow: visible !important;
+    overflow: hidden !important;
   }
   body:has(.hero-nav).has-announce .hero .container.hero-cards {
+    height: calc(100svh - 44px) !important;
     min-height: calc(100svh - 44px) !important;
   }
 
@@ -7375,9 +7377,10 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     position: relative !important;
     inset: auto !important;
     width: 100% !important;
-    height: 59svh !important;
-    min-height: 380px !important;
-    max-height: 560px !important;
+    height: 60% !important;
+    flex: 0 0 60% !important;
+    min-height: 60% !important;
+    max-height: 60% !important;
     flex-shrink: 0 !important;
     z-index: 1 !important;
     overflow: hidden !important;
@@ -7401,21 +7404,25 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     pointer-events: none !important;
   }
 
-  /* Bottom 2/5 Content Card (Sharp architectural division, 40% of viewport) */
+  /* Bottom 2/5 Content Card (Exact 40% of viewport, sharp architectural division) */
   body:has(.hero-nav) .hero-card-left {
     position: relative !important;
-    flex: 1 1 auto !important;
+    height: 40% !important;
+    flex: 0 0 40% !important;
+    min-height: 40% !important;
+    max-height: 40% !important;
     width: 100% !important;
     background: #faf6ed !important;
     border-radius: 0 !important;
     margin-top: 0 !important;
     z-index: 5 !important;
-    padding: 1.6rem 1.4rem calc(1.5rem + env(safe-area-inset-bottom, 0px)) !important;
+    padding: clamp(0.5rem, 1.8vh, 1.1rem) clamp(0.9rem, 3.8vw, 1.4rem) calc(clamp(0.5rem, 1.5vh, 0.9rem) + env(safe-area-inset-bottom, 0px)) !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     text-align: center !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
+    gap: clamp(0.25rem, 0.9vh, 0.5rem) !important;
     box-shadow: none !important;
     border-top: 1px solid rgba(26, 17, 9, 0.08) !important;
   }
@@ -7433,9 +7440,9 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     color: #1a1109 !important;
     font-family: var(--font-serif), Georgia, serif !important;
     font-weight: 400 !important;
-    font-size: clamp(2.3rem, 8.5vw, 2.9rem) !important;
-    line-height: 1.02 !important;
-    letter-spacing: -0.01em !important;
+    font-size: clamp(1.65rem, 5.8vw, 2.25rem) !important;
+    line-height: 1.05 !important;
+    letter-spacing: -0.015em !important;
     text-transform: none !important;
     text-shadow: none !important;
     text-align: center !important;
@@ -7449,8 +7456,8 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   }
   body:has(.hero-nav) .hero-card-left h1 .script {
     font-family: var(--font-script), cursive !important;
-    font-size: 0.95em !important;
-    margin-top: 0.15rem !important;
+    font-size: 0.92em !important;
+    margin-top: 0.05rem !important;
     display: block !important;
     color: #b85d19 !important; /* rich warm caramel/terracotta accent */
     text-shadow: none !important;
@@ -7459,48 +7466,47 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   body:has(.hero-nav) .hero-card-left h1 .head-chip {
     display: inline-block !important;
     vertical-align: middle !important;
-    margin-left: 0.35rem !important;
-    width: 30px !important;
-    height: 30px !important;
+    margin-left: 0.3rem !important;
+    width: clamp(22px, 5.5vw, 28px) !important;
+    height: clamp(22px, 5.5vw, 28px) !important;
     border-radius: 50% !important;
     overflow: hidden !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14) !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.14) !important;
   }
 
   /* Lead Description Copy (Centered) */
   body:has(.hero-nav) .hero-card-left p.lead {
     display: -webkit-box !important;
-    -webkit-line-clamp: 3 !important;
+    -webkit-line-clamp: 2 !important;
     -webkit-box-orient: vertical !important;
     overflow: hidden !important;
-    margin-top: 0.7rem !important;
-    margin-bottom: 0 !important;
+    margin: 0 !important;
     margin-inline: auto !important;
     text-align: center !important;
-    color: #4a3b32 !important;
-    font-size: clamp(0.88rem, 3.4vw, 0.95rem) !important;
-    line-height: 1.48 !important;
+    color: #5c4c42 !important;
+    font-size: clamp(0.78rem, 2.7vw, 0.86rem) !important;
+    line-height: 1.36 !important;
     font-weight: 450 !important;
-    max-width: 38ch !important;
+    max-width: 36ch !important;
   }
 
   /* Action Buttons */
   body:has(.hero-nav) .hero-actions {
-    margin-top: 1.15rem !important;
+    margin-top: 0.2rem !important;
     padding-top: 0 !important;
     width: 100% !important;
-    max-width: 100% !important;
+    max-width: 22rem !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 0.65rem !important;
+    gap: clamp(0.35rem, 1vh, 0.55rem) !important;
   }
   body:has(.hero-nav) .hero-actions .btn {
     width: 100% !important;
     justify-content: center !important;
-    min-height: 48px !important;
-    padding: 0.8rem 1.4rem !important;
-    font-size: 0.92rem !important;
+    min-height: clamp(38px, 5.2vh, 44px) !important;
+    padding: 0.55rem 1.2rem !important;
+    font-size: clamp(0.82rem, 2.8vw, 0.88rem) !important;
     border-radius: 999px !important;
     font-weight: 800 !important;
     letter-spacing: 0.03em !important;
@@ -7514,7 +7520,7 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
     background: linear-gradient(180deg, #f7cb46 0%, #e8a71f 100%) !important;
     color: #1a1109 !important;
     border: 1px solid rgba(26, 17, 9, 0.08) !important;
-    box-shadow: 0 4px 16px rgba(232, 167, 31, 0.38), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 4px 14px rgba(232, 167, 31, 0.36), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
   }
   body:has(.hero-nav) .hero-actions .btn-ghost {
     background: #ffffff !important;
@@ -7532,48 +7538,19 @@ body:has(.hero-nav) .hero-actions .btn-ghost:hover {
   /* Tablet layout (≥600px) */
   @media (min-width: 600px) {
     body:has(.hero-nav) .hero-card-left {
-      padding: 2.2rem 2.4rem calc(2rem + env(safe-area-inset-bottom, 0px)) !important;
+      padding: 1.8rem 2.4rem calc(1.6rem + env(safe-area-inset-bottom, 0px)) !important;
+      gap: 0.85rem !important;
     }
     body:has(.hero-nav) .hero-actions {
       flex-direction: row !important;
-      max-width: 30rem !important;
+      max-width: 28rem !important;
       gap: 0.85rem !important;
     }
     body:has(.hero-nav) .hero-actions .btn {
       width: auto !important;
       flex: 1 1 0 !important;
-      min-height: 50px !important;
-      padding: 0.85rem 1.4rem !important;
-    }
-  }
-
-  /* Short mobile viewports (e.g. iPhone SE / height ≤ 720px) */
-  @media (max-height: 720px) {
-    body:has(.hero-nav) .hero-bg {
-      height: 48svh !important;
-      min-height: 270px !important;
-    }
-    body:has(.hero-nav) .hero-card-left {
-      padding: 1.15rem 1.2rem calc(0.9rem + env(safe-area-inset-bottom, 0px)) !important;
-      margin-top: -20px !important;
-    }
-    body:has(.hero-nav) .hero-card-left h1 {
-      font-size: 1.9rem !important;
-    }
-    body:has(.hero-nav) .hero-card-left p.lead {
-      -webkit-line-clamp: 2 !important;
-      margin-top: 0.35rem !important;
-      font-size: 0.84rem !important;
-      line-height: 1.4 !important;
-    }
-    body:has(.hero-nav) .hero-actions {
-      margin-top: 0.7rem !important;
-      gap: 0.45rem !important;
-    }
-    body:has(.hero-nav) .hero-actions .btn {
-      min-height: 42px !important;
-      padding: 0.55rem 1.2rem !important;
-      font-size: 0.85rem !important;
+      min-height: 46px !important;
+      padding: 0.75rem 1.4rem !important;
     }
   }
 
