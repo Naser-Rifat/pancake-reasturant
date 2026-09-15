@@ -100,7 +100,7 @@ export function PhoneBookingModal({
             >
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20].map((n) => (
                 <option key={n} value={n}>
-                  {n} {n === 1 ? "Guest (Solo)" : `${n} Guests`}
+                  {n === 1 ? "1 Guest (Solo)" : `${n} Guests`}
                 </option>
               ))}
             </Select>
