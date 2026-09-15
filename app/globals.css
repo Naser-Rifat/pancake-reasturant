@@ -128,20 +128,11 @@ body {
   overflow-x: clip;
 }
 
-/* lavender page frame */
+/* lavender page frame — disabled so desktop viewport is clean edge-to-edge without yellow border bars */
 body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  border: var(--frame) solid var(--lavender);
-  pointer-events: none;
-  z-index: 60;
+  display: none !important;
 }
-@media (max-width: 1023px), (pointer: coarse) {
-  body::after {
-    display: none !important;
-  }
-}
+
 
 img {
   max-width: 100%;
@@ -4208,7 +4199,7 @@ textarea.input {
    ============================================ */
 @media (min-width: 1440px) {
   .container {
-    width: min(1320px, 90%);
+    width: min(1360px, 92%);
   }
   .experience,
   .certs,
@@ -4240,6 +4231,12 @@ textarea.input {
   }
   .about-collage {
     grid-template-rows: 230px 230px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .container {
+    width: min(1480px, 92%);
   }
 }
 
