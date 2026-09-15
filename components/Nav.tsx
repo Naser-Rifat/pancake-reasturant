@@ -143,11 +143,31 @@ export default function Nav({
   const cleanAddress = address.replace(/,\s*Australia$/i, "").trim();
   const whatsappDigits = whatsapp ? whatsapp.replace(/\D/g, "") : "";
 
+  const handleHomeClick = (e: React.MouseEvent) => {
+    if (pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const handleDrawerHomeClick = (e: React.MouseEvent) => {
+    setOpen(false);
+    if (pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   return (
     <>
       <header className={`nav${scrolled ? " scrolled" : ""}${pastHero ? " past-hero" : ""}`}>
         <div className="container nav-inner">
-          <Link href="/" className="logo" aria-label="The Pancake Club — home">
+          <Link
+            href="/"
+            className="logo"
+            aria-label="The Pancake Club — home"
+            onClick={handleHomeClick}
+          >
             <Image
               src="/logo.png"
               alt="The Pancake Club"
@@ -165,6 +185,7 @@ export default function Nav({
                 <Link
                   href={l.href}
                   className={pathname === l.href ? "active" : undefined}
+                  onClick={l.href === "/" ? handleHomeClick : undefined}
                 >
                   {l.label}
                 </Link>
@@ -231,7 +252,11 @@ export default function Nav({
         >
           {/* Drawer Header with Brand & Dedicated X Close Button */}
           <div className="mobile-nav-header">
-            <Link href="/" className="mobile-nav-logo" onClick={() => setOpen(false)}>
+            <Link
+              href="/"
+              className="mobile-nav-logo"
+              onClick={handleDrawerHomeClick}
+            >
               <Image
                 src="/logo.png"
                 alt="The Pancake Club"
@@ -262,7 +287,7 @@ export default function Nav({
                     <Link
                       href={l.href}
                       className={`mobile-nav-item${isActive ? " active" : ""}`}
-                      onClick={() => setOpen(false)}
+                      onClick={l.href === "/" ? handleDrawerHomeClick : () => setOpen(false)}
                     >
                       <span className="mobile-nav-item-label">{l.label}</span>
                       <ArrowRight size={17} className="mobile-nav-item-arrow" aria-hidden="true" />

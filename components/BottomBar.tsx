@@ -10,17 +10,83 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, House, Menu as MenuIcon, UtensilsCrossed } from "lucide-react";
 
-const TABS = [
-  { href: "/", label: "Home", Icon: House },
-  { href: "/menu", label: "Menu", Icon: UtensilsCrossed },
-  { href: "/booking", label: "Book", Icon: CalendarDays },
-];
+function HomeDinerIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3.5 10.2L10.8 3.8C11.5 3.2 12.5 3.2 13.2 3.8L20.5 10.2" />
+      <path d="M5.5 8.5V18.5C5.5 19.6 6.4 20.5 7.5 20.5H16.5C17.6 20.5 18.5 19.6 18.5 18.5V8.5" />
+      <path d="M9.8 20.5V14.2C9.8 13.2 10.7 12.4 11.8 12.4H12.2C13.3 12.4 14.2 13.2 14.2 14.2V20.5" />
+    </svg>
+  );
+}
 
-export const TOGGLE_MENU_EVENT = "pancakeclub:toggle-menu";
+function PancakeMenuIcon({ size = 21 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2.5 19.2C6.5 21.2 17.5 21.2 21.5 19.2" strokeWidth="2.1" />
+      <path d="M4.5 15.8C5.8 17.8 18.2 17.8 19.5 15.8" />
+      <path d="M4.5 12.2C5.8 14.2 18.2 14.2 19.5 12.2" />
+      <ellipse cx="12" cy="8.6" rx="7.5" ry="3" strokeWidth="2" />
+      <rect
+        x="10.2"
+        y="4.2"
+        width="3.6"
+        height="3"
+        rx="0.9"
+        fill="currentColor"
+        fillOpacity="0.28"
+        stroke="currentColor"
+        strokeWidth="1.6"
+      />
+    </svg>
+  );
+}
 
-function WhatsAppIcon({ size = 20 }: { size?: number }) {
+function ReservationCalendarIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3.5" y="4.5" width="17" height="16" rx="4" />
+      <path d="M3.5 9.5H20.5" strokeWidth="1.8" />
+      <path d="M8 2.5V5.5" strokeWidth="2.2" />
+      <path d="M16 2.5V5.5" strokeWidth="2.2" />
+      <circle cx="12" cy="14.8" r="3.2" strokeWidth="1.8" fill="currentColor" fillOpacity="0.15" />
+      <path d="M12 13.5V14.8L13.2 15.6" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
+function WhatsAppDinerIcon({ size = 20 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -33,6 +99,33 @@ function WhatsAppIcon({ size = 20 }: { size?: number }) {
     </svg>
   );
 }
+
+function OrganicMenuIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.3"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <line x1="4" y1="7" x2="20" y2="7" />
+      <line x1="4" y1="12" x2="16" y2="12" />
+      <line x1="4" y1="17" x2="20" y2="17" />
+    </svg>
+  );
+}
+
+const TABS = [
+  { href: "/", label: "Home", Icon: HomeDinerIcon },
+  { href: "/menu", label: "Menu", Icon: PancakeMenuIcon },
+  { href: "/booking", label: "Book", Icon: ReservationCalendarIcon },
+];
+
+export const TOGGLE_MENU_EVENT = "pancakeclub:toggle-menu";
 
 interface BottomBarProps {
   whatsapp?: string;
@@ -85,12 +178,18 @@ export default function BottomBar({ whatsapp }: BottomBarProps) {
           <Link
             key={href}
             href={href}
+            onClick={(e) => {
+              if (href === "/" && pathname === "/") {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            }}
             className={`tabbar-item${active ? " on" : ""}`}
             aria-current={active ? "page" : undefined}
             tabIndex={shown ? undefined : -1}
           >
             <span className="tabbar-icon">
-              <Icon size={20} strokeWidth={2.2} aria-hidden="true" />
+              <Icon size={21} />
             </span>
             <span className="tabbar-label">{label}</span>
           </Link>
@@ -107,7 +206,7 @@ export default function BottomBar({ whatsapp }: BottomBarProps) {
         tabIndex={shown ? undefined : -1}
       >
         <span className="tabbar-icon">
-          <WhatsAppIcon size={20} />
+          <WhatsAppDinerIcon size={20} />
         </span>
         <span className="tabbar-label">Chat</span>
       </a>
@@ -117,9 +216,10 @@ export default function BottomBar({ whatsapp }: BottomBarProps) {
         className="tabbar-item"
         onClick={() => window.dispatchEvent(new Event(TOGGLE_MENU_EVENT))}
         tabIndex={shown ? undefined : -1}
+        aria-label="Open More Menu"
       >
         <span className="tabbar-icon">
-          <MenuIcon size={20} strokeWidth={2.2} aria-hidden="true" />
+          <OrganicMenuIcon size={20} />
         </span>
         <span className="tabbar-label">More</span>
       </button>

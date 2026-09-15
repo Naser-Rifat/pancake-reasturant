@@ -9368,12 +9368,19 @@ body:has(.hero-nav) .hero-find {
     min-height: 44px;
     width: 44px;
     height: 44px;
-    border: 1px solid rgba(118, 58, 18, 0.08);
-    background: rgba(255, 255, 255, 0.82);
+    border: 1.5px solid rgba(118, 58, 18, 0.09);
+    background: #fffdfa;
     cursor: pointer;
     border-radius: 50%;
-    color: #5c4b3f;
+    color: #634d3f;
+    box-shadow: 0 2px 6px rgba(118, 58, 18, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
     transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .tabbar-item:hover {
+    color: #763a12;
+    border-color: rgba(118, 58, 18, 0.2);
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(118, 58, 18, 0.08);
   }
   .tabbar-item:active {
     transform: scale(0.92);
@@ -9387,6 +9394,13 @@ body:has(.hero-nav) .hero-find {
     place-items: center;
     line-height: 0;
     color: inherit;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .tabbar-item:hover .tabbar-icon {
+    transform: scale(1.06);
+  }
+  .tabbar-item:active .tabbar-icon {
+    transform: scale(0.92);
   }
   .tabbar-badge {
     position: absolute;
@@ -9413,14 +9427,16 @@ body:has(.hero-nav) .hero-find {
     background: #1e130b;
     color: #fffdfa;
     border-color: #1e130b;
-    gap: 0.45rem;
-    box-shadow: 0 3px 12px rgba(30, 19, 11, 0.28);
+    gap: 0.48rem;
+    box-shadow:
+      0 4px 16px rgba(30, 19, 11, 0.32),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
   .tabbar-item.on .tabbar-label {
     display: inline-block;
     font-family: var(--font-round), sans-serif;
     font-weight: 700;
-    font-size: 0.84rem;
+    font-size: 0.86rem;
     letter-spacing: 0.01em;
     color: #fffdfa;
     text-transform: none;
@@ -9435,14 +9451,15 @@ body:has(.hero-nav) .hero-find {
   }
   /* 💬 WhatsApp Chat Tab in Bottom Bar */
   .tabbar-chat {
-    color: #25d366;
-    text-decoration: none;
+    color: #1ea751;
+    background: rgba(30, 167, 81, 0.07);
+    border-color: rgba(30, 167, 81, 0.2);
   }
   .tabbar-chat:hover,
   .tabbar-chat:active {
-    background: rgba(37, 211, 102, 0.12);
-    border-color: rgba(37, 211, 102, 0.35);
-    color: #128c7e;
+    background: rgba(30, 167, 81, 0.14);
+    border-color: rgba(30, 167, 81, 0.35);
+    color: #167a3b;
   }
   /* Mobile & Tablet: WhatsApp lives inside the bottom tab bar — suppress floating bubble to keep food views clean */
   .wa-float {
