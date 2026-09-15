@@ -26,12 +26,75 @@ function InstagramIcon({ size = 15 }: { size?: number }) {
   );
 }
 
+function DrawerHomeIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3.5 10.2L10.8 3.8C11.5 3.2 12.5 3.2 13.2 3.8L20.5 10.2" />
+      <path d="M5.5 8.5V18.5C5.5 19.6 6.4 20.5 7.5 20.5H16.5C17.6 20.5 18.5 19.6 18.5 18.5V8.5" />
+      <path d="M9.8 20.5V14.2C9.8 13.2 10.7 12.4 11.8 12.4H12.2C13.3 12.4 14.2 13.2 14.2 14.2V20.5" />
+    </svg>
+  );
+}
+
+function DrawerPancakeIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M2.5 19.2C6.5 21.2 17.5 21.2 21.5 19.2" strokeWidth="2.1" />
+      <path d="M4.5 15.8C5.8 17.8 18.2 17.8 19.5 15.8" />
+      <path d="M4.5 12.2C5.8 14.2 18.2 14.2 19.5 12.2" />
+      <ellipse cx="12" cy="8.6" rx="7.5" ry="3" strokeWidth="2" />
+      <rect x="10.2" y="4.2" width="3.6" height="3" rx="0.9" fill="currentColor" fillOpacity="0.28" stroke="currentColor" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
+function DrawerGalleryIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="16" rx="4" />
+      <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
+      <path d="M21 15L16 10L6 20" />
+      <path d="M14 18L18 14L21 17" />
+    </svg>
+  );
+}
+
+function DrawerReviewsIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" fillOpacity="0.25" />
+    </svg>
+  );
+}
+
+function DrawerContactIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20 10C20 16 12 22 12 22C12 22 4 16 4 10C4 5.58 7.58 2 12 2C16.42 2 20 5.58 20 10Z" />
+      <circle cx="12" cy="10" r="3" fill="currentColor" fillOpacity="0.25" />
+    </svg>
+  );
+}
+
+function DrawerCalendarIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3.5" y="4.5" width="17" height="16" rx="4" />
+      <path d="M3.5 9.5H20.5" strokeWidth="1.8" />
+      <path d="M8 2.5V5.5" strokeWidth="2.2" />
+      <path d="M16 2.5V5.5" strokeWidth="2.2" />
+      <circle cx="12" cy="14.8" r="3.2" strokeWidth="1.8" fill="currentColor" fillOpacity="0.18" />
+      <path d="M12 13.5V14.8L13.2 15.6" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
 const LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/menu", label: "Menu" },
-  { href: "/gallery", label: "Gallery" },
-  { href: "/#reviews", label: "Reviews" },
-  { href: "/#contact", label: "Contact" },
+  { href: "/", label: "Home", subtitle: "Welcome & highlights", Icon: DrawerHomeIcon },
+  { href: "/menu", label: "Menu", subtitle: "Fresh stacks & drinks", Icon: DrawerPancakeIcon },
+  { href: "/gallery", label: "Gallery", subtitle: "Vibes & diner moments", Icon: DrawerGalleryIcon },
+  { href: "/#reviews", label: "Reviews", subtitle: "Loved by Geelong locals", Icon: DrawerReviewsIcon },
+  { href: "/#contact", label: "Contact", subtitle: "Location & opening hours", Icon: DrawerContactIcon },
 ];
 
 export default function Nav({
@@ -282,6 +345,7 @@ export default function Nav({
             <ul className="mobile-nav-links-list">
               {LINKS.map((l) => {
                 const isActive = pathname === l.href;
+                const Icon = l.Icon;
                 return (
                   <li key={l.href}>
                     <Link
@@ -289,8 +353,16 @@ export default function Nav({
                       className={`mobile-nav-item${isActive ? " active" : ""}`}
                       onClick={l.href === "/" ? handleDrawerHomeClick : () => setOpen(false)}
                     >
-                      <span className="mobile-nav-item-label">{l.label}</span>
-                      <ArrowRight size={17} className="mobile-nav-item-arrow" aria-hidden="true" />
+                      <div className="mobile-nav-item-left">
+                        <span className="mobile-nav-item-icon-box">
+                          <Icon size={19} />
+                        </span>
+                        <div className="mobile-nav-item-text">
+                          <span className="mobile-nav-item-label">{l.label}</span>
+                          <span className="mobile-nav-item-sub">{l.subtitle}</span>
+                        </div>
+                      </div>
+                      <ArrowRight size={16} className="mobile-nav-item-arrow" aria-hidden="true" />
                     </Link>
                   </li>
                 );
@@ -301,7 +373,15 @@ export default function Nav({
                   className="mobile-nav-item mobile-nav-item-book"
                   onClick={() => setOpen(false)}
                 >
-                  <span className="mobile-nav-item-label">Book a Table</span>
+                  <div className="mobile-nav-item-left">
+                    <span className="mobile-nav-item-icon-box book-icon-box">
+                      <DrawerCalendarIcon size={19} />
+                    </span>
+                    <div className="mobile-nav-item-text">
+                      <span className="mobile-nav-item-label">Book a Table</span>
+                      <span className="mobile-nav-item-sub">Instant table reservation</span>
+                    </div>
+                  </div>
                   <span className="mobile-nav-book-badge">Reserve ↗</span>
                 </Link>
               </li>
@@ -316,9 +396,14 @@ export default function Nav({
                   rel="noopener noreferrer"
                   className="mobile-drawer-uber-pill"
                 >
-                  <span className="m-uber-icon" aria-hidden="true">🛵</span>
-                  <span className="m-uber-text">Order on Uber Eats</span>
-                  <ExternalLink size={14} className="m-uber-arrow" aria-hidden="true" />
+                  <div className="m-uber-left">
+                    <span className="m-uber-badge">🛵</span>
+                    <div className="m-uber-text-wrap">
+                      <span className="m-uber-title">Order on Uber Eats</span>
+                      <span className="m-uber-sub">Delivery straight to your door</span>
+                    </div>
+                  </div>
+                  <span className="m-uber-pill-tag">Order ↗</span>
                 </a>
               )}
               {whatsappDigits && (
@@ -328,9 +413,14 @@ export default function Nav({
                   rel="noopener noreferrer"
                   className="mobile-drawer-wa-pill"
                 >
-                  <span className="m-wa-icon" aria-hidden="true">💬</span>
-                  <span className="m-wa-text">Chat on WhatsApp</span>
-                  <ExternalLink size={14} className="m-wa-arrow" aria-hidden="true" />
+                  <div className="m-wa-left">
+                    <span className="m-wa-badge">💬</span>
+                    <div className="m-wa-text-wrap">
+                      <span className="m-wa-title">Chat on WhatsApp</span>
+                      <span className="m-wa-sub">Quick answers &amp; enquiries</span>
+                    </div>
+                  </div>
+                  <ExternalLink size={15} className="m-wa-arrow" aria-hidden="true" />
                 </a>
               )}
             </div>
@@ -372,12 +462,14 @@ export default function Nav({
 
             {/* Store Location & Hours Footer */}
             <div className="mobile-nav-store-footer">
-              <p className="mobile-nav-store-addr">
-                📍 {cleanAddress}
-              </p>
-              <p className="mobile-nav-store-time">
-                Open Daily · 11:00 AM – 9:00 PM
-              </p>
+              <div className="mobile-nav-store-item">
+                <span className="m-store-icon">📍</span>
+                <span className="m-store-text">{cleanAddress}</span>
+              </div>
+              <div className="mobile-nav-store-item">
+                <span className="m-store-icon">⏰</span>
+                <span className="m-store-text">Open Daily · 11:00 AM – 9:00 PM</span>
+              </div>
             </div>
           </div>
         </div>
