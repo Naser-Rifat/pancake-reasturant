@@ -42,8 +42,8 @@
   --radius-xl: 8px; /* sharp section radius */
   --frame: 8px; /* lavender page frame — grows on tablet+ */
   --nav-h: 104px;
-  --ribbon-h: 36px;
-  --announce-h: 44px;
+  --ribbon-h: 34px;
+  --announce-h: 32px;
   --doodle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='%23fff' fill-opacity='0.15'%3E%3Cg transform='translate(18 16) rotate(-10 8 10)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3Cg transform='translate(92 26)'%3E%3Ccircle cx='9' cy='9' r='9'/%3E%3Ccircle cx='9' cy='9' r='3.2' fill='%23fff' fill-opacity='0.32'/%3E%3C/g%3E%3Cg transform='translate(56 66) rotate(8 6 8)'%3E%3Cpath d='M6 0 C6 0 0 8 0 12 a6 6 0 0 0 12 0 C12 8 6 0 6 0 Z'/%3E%3C/g%3E%3Cg transform='translate(118 88) rotate(15 8 10)'%3E%3Cpath d='M8 5 C12 5 15 9 13.5 14 C12 18 8 21 8 21 C8 21 4 18 2.5 14 C1 9 4 5 8 5 Z'/%3E%3Cpath d='M4 5 L8 0 L12 5 Z'/%3E%3C/g%3E%3Cg transform='translate(28 108) rotate(8 6 6)'%3E%3Crect width='12' height='12' rx='3'/%3E%3C/g%3E%3Cg transform='translate(74 124) rotate(-25 6 12)'%3E%3Crect x='4.5' y='8' width='3' height='16' rx='1.5'/%3E%3Crect x='1' width='2.2' height='9' rx='1'/%3E%3Crect x='4.9' width='2.2' height='9' rx='1'/%3E%3Crect x='8.8' width='2.2' height='9' rx='1'/%3E%3C/g%3E%3Cg transform='translate(138 44)'%3E%3Cpath d='M7 0 L8.5 5.5 L14 7 L8.5 8.5 L7 14 L5.5 8.5 L0 7 L5.5 5.5 Z'/%3E%3C/g%3E%3Cg transform='translate(112 138) rotate(12 6 7) scale(0.75)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   --doodle-strong: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='%23fff' fill-opacity='0.26'%3E%3Cg transform='translate(18 16) rotate(-10 8 10)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3Cg transform='translate(92 26)'%3E%3Ccircle cx='9' cy='9' r='9'/%3E%3Ccircle cx='9' cy='9' r='3.2' fill='%23fff' fill-opacity='0.5'/%3E%3C/g%3E%3Cg transform='translate(56 66) rotate(8 6 8)'%3E%3Cpath d='M6 0 C6 0 0 8 0 12 a6 6 0 0 0 12 0 C12 8 6 0 6 0 Z'/%3E%3C/g%3E%3Cg transform='translate(118 88) rotate(15 8 10)'%3E%3Cpath d='M8 5 C12 5 15 9 13.5 14 C12 18 8 21 8 21 C8 21 4 18 2.5 14 C1 9 4 5 8 5 Z'/%3E%3Cpath d='M4 5 L8 0 L12 5 Z'/%3E%3C/g%3E%3Cg transform='translate(28 108) rotate(8 6 6)'%3E%3Crect width='12' height='12' rx='3'/%3E%3C/g%3E%3Cg transform='translate(74 124) rotate(-25 6 12)'%3E%3Crect x='4.5' y='8' width='3' height='16' rx='1.5'/%3E%3Crect x='1' width='2.2' height='9' rx='1'/%3E%3Crect x='4.9' width='2.2' height='9' rx='1'/%3E%3Crect x='8.8' width='2.2' height='9' rx='1'/%3E%3C/g%3E%3Cg transform='translate(138 44)'%3E%3Cpath d='M7 0 L8.5 5.5 L14 7 L8.5 8.5 L7 14 L5.5 8.5 L0 7 L5.5 5.5 Z'/%3E%3C/g%3E%3Cg transform='translate(112 138) rotate(12 6 7) scale(0.75)'%3E%3Cpath d='M8 0 L16 9 L0 9 Z'/%3E%3Crect y='11' width='16' height='4' rx='2'/%3E%3Crect y='17' width='16' height='4' rx='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
@@ -136,6 +136,11 @@ body::after {
   border: var(--frame) solid var(--lavender);
   pointer-events: none;
   z-index: 60;
+}
+@media (max-width: 1023px), (pointer: coarse) {
+  body::after {
+    display: none !important;
+  }
 }
 
 img {
@@ -1992,23 +1997,28 @@ footer .logo {
 /* ---------- announcement bar (FR-08) ---------- */
 .announce {
   position: fixed;
-  inset: 0 0 auto 0;
-  height: 44px;
-  z-index: 110;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--announce-h, 32px);
+  z-index: 130;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.8rem;
-  background: var(--ink);
+  gap: 0.65rem;
+  background: #140c06;
+  border-bottom: 1px solid rgba(248, 242, 224, 0.12);
   color: var(--cream);
   font-weight: 600;
-  font-size: 0.75rem;
-  padding: 0 3rem 0 1rem;
+  font-size: 0.74rem;
+  padding: 0 3.2rem;
   text-align: center;
+  box-sizing: border-box;
 }
 .announce a {
   text-decoration: underline;
   color: var(--yellow);
+  font-weight: 700;
 }
 .announce-close {
   position: absolute;
@@ -2017,32 +2027,35 @@ footer .logo {
   transform: translateY(-50%);
   background: rgba(248, 242, 224, 0.16);
   border: none;
-  width: 26px;
-  height: 26px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: var(--cream);
   cursor: pointer;
   line-height: 1;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
 }
 .announce-close:hover {
   background: var(--pink);
 }
 body.has-announce .nav {
-  top: calc(22px + 44px);
+  top: calc(22px + var(--announce-h, 32px));
 }
 body.has-announce .hero {
-  padding-top: calc(var(--nav-h) + 1.5rem + var(--announce-h, 44px));
+  padding-top: calc(var(--nav-h) + 1.5rem + var(--announce-h, 32px));
 }
 body:has(.top-ribbon) .hero {
-  padding-top: calc(var(--nav-h) + 1.5rem + var(--ribbon-h, 36px));
+  padding-top: calc(var(--nav-h) + 1.5rem + var(--ribbon-h, 34px));
 }
 body:has(.top-ribbon).has-announce .hero {
-  padding-top: calc(var(--nav-h) + 1.5rem + var(--ribbon-h, 36px) + var(--announce-h, 44px));
+  padding-top: calc(var(--nav-h) + 1.5rem + var(--ribbon-h, 34px) + var(--announce-h, 32px));
 }
 body.has-announce .menu-hero,
 body.has-announce .page-hero {
-  padding-top: calc(var(--nav-h) + 2.5rem + var(--announce-h, 44px));
+  padding-top: calc(var(--nav-h) + 2.5rem + var(--announce-h, 32px));
 }
 body:has(.top-ribbon) .menu-hero,
 body:has(.top-ribbon) .page-hero {
@@ -2934,7 +2947,7 @@ h2.title.inline .accent {
   flex: 0 0 min(360px, 86vw);
   scroll-snap-align: start;
   background: #ffffff;
-  border-radius: 24px;
+  border-radius: 12px;
   padding: 1.8rem 1.6rem 1.6rem;
   border: 1.5px solid rgba(118, 58, 18, 0.1);
   box-shadow:
@@ -3951,10 +3964,7 @@ textarea.input {
    ============================================ */
 @media (min-width: 768px) {
   :root {
-    /* was 60px: the bands, ticket and footer rounded at 13-16% of their height
-       while the hero row sits hand-tuned at 32px — same page, two families.
-       40 keeps the soft retro feel and stays in step with the hero. */
-    --radius-xl: 40px;
+    --radius-xl: 12px;
     --frame: 14px;
   }
 
@@ -5456,7 +5466,7 @@ body:has(.cart-fab) .wa-float {
 .menu-cat-board {
   scroll-margin-top: calc(var(--ribbon-h, 34px) + var(--announce-h, 44px) + 72px);
   background: #ffffff;
-  border-radius: 26px;
+  border-radius: 12px;
   border: 1.5px solid rgba(118, 58, 18, 0.12);
   box-shadow:
     0 12px 32px rgba(33, 26, 20, 0.06),
@@ -6155,7 +6165,7 @@ body:has(.cart-fab) .wa-float {
    ============================================ */
 .promo-band {
   background: var(--deep);
-  border-radius: var(--radius-xl);
+  border-radius: 12px !important;
   padding: 2.2rem 2rem;
   display: grid;
   grid-template-columns: 1fr;
@@ -6326,7 +6336,7 @@ body:has(.cart-fab) .wa-float {
 .promo-ticket-card {
   background: #ffffff;
   border: 1.5px solid rgba(255, 255, 255, 0.4);
-  border-radius: 20px;
+  border-radius: 12px;
   padding: 0.75rem;
   display: flex;
   flex-direction: column;
@@ -7416,11 +7426,11 @@ body:has(.hero-nav) .hero-find {
     background: #faf6ed !important;
   }
   body:has(.hero-nav):has(.top-ribbon) .hero {
-    padding-top: 36px !important;
+    padding-top: var(--ribbon-h, 34px) !important;
     height: 100vh !important;
   }
   body:has(.hero-nav):has(.top-ribbon).has-announce .hero {
-    padding-top: calc(36px + 40px) !important;
+    padding-top: calc(var(--ribbon-h, 34px) + var(--announce-h, 32px)) !important;
     height: 100vh !important;
   }
 
@@ -7443,15 +7453,15 @@ body:has(.hero-nav) .hero-find {
     position: relative !important;
   }
 
-  /* Top 3/5ths Visual Stage: Exactly 60% of viewport height (image ta screen er 5 bag er 3 bag) */
+  /* Top Visual Stage: 64% of viewport height (allowing breathing room for editorial copy and buttons) */
   body:has(.hero-nav) .hero-bg {
     position: relative !important;
     inset: auto !important;
     width: 100% !important;
-    height: 60% !important;
-    flex: 0 0 60% !important;
-    min-height: 60% !important;
-    max-height: 60% !important;
+    height: 64% !important;
+    flex: 0 0 64% !important;
+    min-height: 64% !important;
+    max-height: 64% !important;
     overflow: hidden !important;
     background: radial-gradient(circle at center 50%, #2f3d2a 0%, #152013 65%, #0d150c 100%) !important;
   }
@@ -7633,16 +7643,16 @@ body:has(.hero-nav) .hero-find {
     transform: scale(1.08) !important;
   }
 
-  /* Bottom 2/5ths Editorial Section: Exactly 40% of hero height, perfectly centered */
+  /* Bottom Editorial Section: 36% of hero height, centered with generous gentle bottom gap */
   body:has(.hero-nav) .hero-card-left {
     position: relative !important;
     width: 100% !important;
-    height: 40% !important;
-    flex: 0 0 40% !important;
-    min-height: 40% !important;
-    max-height: 40% !important;
+    height: 36% !important;
+    flex: 0 0 36% !important;
+    min-height: 36% !important;
+    max-height: 36% !important;
     background: #faf6ed !important;
-    padding: 1rem 2rem !important;
+    padding: 0.6rem 2rem 2.6rem !important;
     box-sizing: border-box !important;
     display: flex !important;
     flex-direction: column !important;
@@ -7650,15 +7660,16 @@ body:has(.hero-nav) .hero-find {
     align-items: center !important;
     text-align: center !important;
     overflow: hidden !important;
+    gap: 0.4rem !important;
   }
   body:has(.hero-nav) .hero-card-left h1 {
     font-family: var(--font-serif), Georgia, serif !important;
-    font-size: clamp(2.1rem, 2.8vw, 2.9rem) !important;
+    font-size: clamp(1.85rem, 2.3vw, 2.5rem) !important;
     font-weight: 800 !important;
-    line-height: 1.12 !important;
+    line-height: 1.1 !important;
     color: #211a14 !important;
     text-transform: none !important;
-    letter-spacing: -0.02em !important;
+    letter-spacing: -0.015em !important;
     text-shadow: none !important;
     margin: 0 auto !important;
     text-align: center !important;
@@ -7679,10 +7690,10 @@ body:has(.hero-nav) .hero-find {
   body:has(.hero-nav) .hero-card-left p.lead {
     color: #4a3b32 !important;
     font-family: var(--font-body), sans-serif !important;
-    font-size: clamp(0.92rem, 1.1vw, 1.05rem) !important;
-    line-height: 1.5 !important;
-    max-width: 58ch !important;
-    margin: 0.5rem auto 0 !important;
+    font-size: clamp(0.85rem, 1vw, 0.96rem) !important;
+    line-height: 1.35 !important;
+    max-width: 56ch !important;
+    margin: 0.2rem auto 0 !important;
     text-shadow: none !important;
     text-align: center !important;
   }
@@ -7692,7 +7703,8 @@ body:has(.hero-nav) .hero-find {
     align-items: center !important;
     justify-content: center !important;
     gap: 1.1rem !important;
-    margin-top: 1rem !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.4rem !important;
     padding-top: 0 !important;
     width: 100% !important;
   }
@@ -7774,15 +7786,15 @@ body:has(.hero-nav) .hero-find {
     min-height: calc(100svh - 44px) !important;
   }
 
-  /* Top 3/5 Visual Stage (Exact 60% of viewport) */
+  /* Top 3.5/5 Visual Stage (Exact 70% of viewport) */
   body:has(.hero-nav) .hero-bg {
     position: relative !important;
     inset: auto !important;
     width: 100% !important;
-    height: 60% !important;
-    flex: 0 0 60% !important;
-    min-height: 60% !important;
-    max-height: 60% !important;
+    height: 70% !important;
+    flex: 0 0 70% !important;
+    min-height: 70% !important;
+    max-height: 70% !important;
     flex-shrink: 0 !important;
     z-index: 1 !important;
     overflow: hidden !important;
@@ -7806,25 +7818,25 @@ body:has(.hero-nav) .hero-find {
     pointer-events: none !important;
   }
 
-  /* Bottom 2/5 Content Card (Exact 40% of viewport, sharp architectural division) */
+  /* Bottom 1.5/5 Content Card (Exact 30% of viewport, sharp architectural division) */
   body:has(.hero-nav) .hero-card-left {
     position: relative !important;
-    height: 40% !important;
-    flex: 0 0 40% !important;
-    min-height: 40% !important;
-    max-height: 40% !important;
+    height: 30% !important;
+    flex: 0 0 30% !important;
+    min-height: 30% !important;
+    max-height: 30% !important;
     width: 100% !important;
     background: #faf6ed !important;
     border-radius: 0 !important;
     margin-top: 0 !important;
     z-index: 5 !important;
-    padding: clamp(0.5rem, 1.8vh, 1.1rem) clamp(0.9rem, 3.8vw, 1.4rem) calc(clamp(0.5rem, 1.5vh, 0.9rem) + env(safe-area-inset-bottom, 0px)) !important;
+    padding: clamp(0.35rem, 1vh, 0.65rem) clamp(0.9rem, 3.8vw, 1.4rem) calc(clamp(0.35rem, 1vh, 0.5rem) + env(safe-area-inset-bottom, 0px)) !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     text-align: center !important;
     justify-content: center !important;
-    gap: clamp(0.25rem, 0.9vh, 0.5rem) !important;
+    gap: clamp(0.2rem, 0.6vh, 0.4rem) !important;
     box-shadow: none !important;
     border-top: 1px solid rgba(26, 17, 9, 0.08) !important;
   }
@@ -7885,21 +7897,22 @@ body:has(.hero-nav) .hero-find {
 
   /* Action Buttons */
   body:has(.hero-nav) .hero-actions {
-    margin-top: 0.25rem !important;
+    margin-top: 0.2rem !important;
     padding-top: 0 !important;
     width: 100% !important;
     max-width: 22rem !important;
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
     align-items: center !important;
     gap: 0.45rem !important;
   }
   body:has(.hero-nav) .hero-actions .btn {
-    width: 100% !important;
+    flex: 1 !important;
+    width: auto !important;
     justify-content: center !important;
-    min-height: 42px !important;
-    padding: 0.6rem 1.2rem !important;
-    font-size: 0.88rem !important;
+    min-height: 38px !important;
+    padding: 0.45rem 0.8rem !important;
+    font-size: 0.8rem !important;
     border-radius: 999px !important;
     font-weight: 800 !important;
     letter-spacing: 0.03em !important;
@@ -8509,7 +8522,7 @@ body:has(.hero-nav) .hero-find {
   flex-wrap: wrap;
   padding: 1.25rem 1.5rem;
   background: var(--cream-card);
-  border-radius: 24px;
+  border-radius: 12px;
   border: 1.5px solid rgba(118, 58, 18, 0.08);
   box-shadow: 0 8px 24px rgba(33, 26, 20, 0.04);
   margin-bottom: 0.9rem;
@@ -8697,7 +8710,7 @@ body:has(.hero-nav) .hero-find {
     justify-content: space-between !important;
     min-height: 274px !important;
     height: auto !important;
-    border-radius: 28px !important;
+    border-radius: 14px 14px 2px 2px !important;
     padding: 1.25rem 1.25rem 0 !important;
     overflow: hidden !important;
     border: 1.5px solid rgba(118, 58, 18, 0.09);
@@ -8966,7 +8979,7 @@ body:has(.hero-nav) .hero-find {
     height: 100%;
     object-fit: cover;
     object-position: center center;
-    border-radius: 20px 20px 0 0;
+    border-radius: 10px 10px 0 0;
     transform: none;
     box-shadow: 0 -3px 14px rgba(33, 26, 20, 0.1);
   }
@@ -8981,7 +8994,7 @@ body:has(.hero-nav) .hero-find {
     justify-content: space-between !important;
     min-height: 274px !important;
     height: auto !important;
-    border-radius: 28px !important;
+    border-radius: 14px 14px 2px 2px !important;
     padding: 1.25rem 1.25rem 0 !important;
     overflow: hidden !important;
     border: 1.5px solid rgba(118, 58, 18, 0.12) !important;
@@ -9085,7 +9098,7 @@ body:has(.hero-nav) .hero-find {
     height: 100% !important;
     object-fit: cover !important;
     object-position: center center !important;
-    border-radius: 20px 20px 0 0 !important;
+    border-radius: 10px 10px 0 0 !important;
     transform: none !important;
     box-shadow: 0 -3px 14px rgba(33, 26, 20, 0.1) !important;
   }
@@ -9488,7 +9501,7 @@ h2.title .accent,
   position: relative;
   width: 100%;
   height: 580px;
-  border-radius: var(--radius-xl);
+  border-radius: 12px !important;
   overflow: hidden;
   box-shadow:
     0 16px 48px rgba(33, 26, 20, 0.22),
@@ -9561,7 +9574,7 @@ h2.title .accent,
   padding: 1.4rem 1.4rem 1.6rem 3.6rem;
   gap: 1.2rem;
   box-sizing: border-box;
-  border-radius: 40px;
+  border-radius: 12px;
 }
 /* the ticket's perforated inner rule */
 .camp-slide::after {
@@ -9569,7 +9582,7 @@ h2.title .accent,
   position: absolute;
   inset: 9px;
   border: 2px dashed rgba(118, 58, 18, 0.4);
-  border-radius: 30px;
+  border-radius: 9px;
   pointer-events: none;
 }
 .camp-left { z-index: 1; }
@@ -9584,12 +9597,12 @@ h2.title .accent,
   min-height: 0;
 }
 
-/* inset image with organic squircle corners matching reference */
+/* inset image with clean subtle corners */
 .camp-shot {
   position: relative;
   height: 100%;
   width: 100%;
-  border-radius: 36px 28px 42px 32px;
+  border-radius: 10px;
   overflow: hidden;
   background: var(--lav-soft);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
@@ -9816,19 +9829,19 @@ h2.title .accent,
 @media (max-width: 899px) {
   .camp-swiper {
     height: 590px !important;
-    border-radius: 28px !important;
+    border-radius: 12px !important;
   }
   .camp-slide {
     display: flex !important;
     flex-direction: column !important;
     padding: 1.2rem 1.2rem 1.4rem 2.8rem !important;
     gap: 0.75rem !important;
-    border-radius: 28px !important;
+    border-radius: 12px !important;
     box-sizing: border-box !important;
   }
   .camp-slide::after {
     inset: 6px !important;
-    border-radius: 22px !important;
+    border-radius: 9px !important;
   }
   .camp-swiper-pagination {
     left: 0.75rem !important;
@@ -9847,7 +9860,7 @@ h2.title .accent,
     width: 100% !important;
   }
   .camp-shot {
-    border-radius: 20px !important;
+    border-radius: 10px !important;
     box-shadow: 0 4px 14px rgba(33, 26, 20, 0.12) !important;
   }
   .camp-copy {
@@ -10936,15 +10949,15 @@ body:has(.hero-nav) .hero-bg img { animation: hero-drift 14s ease-out both; }
 
 /* Adjust .nav position when top ribbon is present on Desktop */
 body:has(.top-ribbon) .nav {
-  top: calc(var(--ribbon-h, 36px) + 12px);
+  top: calc(var(--ribbon-h, 34px) + 12px);
 }
 
 body:has(.top-ribbon).has-announce .nav {
-  top: calc(var(--ribbon-h, 36px) + var(--announce-h, 44px) + 12px);
+  top: calc(var(--ribbon-h, 34px) + var(--announce-h, 32px) + 12px);
 }
 
 body:has(.top-ribbon).has-announce .top-ribbon {
-  top: var(--announce-h, 44px);
+  top: var(--announce-h, 32px);
 }
 
 /* ==========================================================================
@@ -10991,7 +11004,7 @@ body:has(.top-ribbon).has-announce .top-ribbon {
     top: calc(var(--ribbon-h, 34px) + 10px) !important;
   }
   body:has(.top-ribbon).has-announce .nav {
-    top: calc(var(--ribbon-h, 34px) + var(--announce-h, 44px) + 10px) !important;
+    top: calc(var(--ribbon-h, 34px) + var(--announce-h, 32px) + 10px) !important;
   }
 
   /* Suppress permanent floating WhatsApp bubble from blocking food photography */

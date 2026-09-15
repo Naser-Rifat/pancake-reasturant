@@ -20,7 +20,7 @@ export default function Announce({ data }: { data: ApiAnnouncement | null }) {
   // instead — never both on one page. Folded into `shown` (not an early return)
   // so the hook order above never changes between renders.
   const isPreview = pathname === "/preview" || pathname?.startsWith("/preview");
-  const shown = Boolean(data) && visible && !isPreview && !(data?.image && pathname === "/");
+  const shown = Boolean(data) && visible && !isPreview;
 
   useEffect(() => {
     // the class reserves layout space, so it must follow what actually renders
