@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { MapPin, Phone, MessageCircle, Printer, PlusCircle } from "lucide-react";
 import { getOrder, money, type ApiOrder, type ApiSiteSettings } from "@/lib/api";
 import { useCart } from "@/lib/cart";
 
@@ -448,14 +449,14 @@ export default function OrderSuccessClient({
                     href={mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-outline pickup-action-btn"
+                    className="pickup-action-btn"
                   >
-                    <span>🗺️</span>
+                    <MapPin size={15} className="action-icon" aria-hidden="true" />
                     <span>Get Directions</span>
                   </a>
 
-                  <a href={`tel:${venuePhone.replace(/[^+\d]/g, "")}`} className="btn btn-outline pickup-action-btn">
-                    <span>📞</span>
+                  <a href={`tel:${venuePhone.replace(/[^+\d]/g, "")}`} className="pickup-action-btn">
+                    <Phone size={15} className="action-icon" aria-hidden="true" />
                     <span>Call Kitchen</span>
                   </a>
 
@@ -466,9 +467,9 @@ export default function OrderSuccessClient({
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-outline pickup-action-btn whatsapp"
+                      className="pickup-action-btn whatsapp"
                     >
-                      <span>💬</span>
+                      <MessageCircle size={15} className="action-icon" aria-hidden="true" />
                       <span>WhatsApp</span>
                     </a>
                   )}
@@ -600,23 +601,26 @@ export default function OrderSuccessClient({
 
                 {/* Print & Action Bar */}
                 <div className="receipt-actions no-print">
-                  <button type="button" className="btn btn-outline receipt-btn" onClick={handlePrint}>
-                    <span>🖨️</span>
+                  <button type="button" className="receipt-btn receipt-btn-outline" onClick={handlePrint}>
+                    <Printer size={16} aria-hidden="true" />
                     <span>Print / Save PDF</span>
                   </button>
-                  <Link href="/menu" className="btn btn-primary receipt-btn">
-                    <span>🥞</span>
+                  <Link href="/menu" className="receipt-btn receipt-btn-primary">
+                    <PlusCircle size={16} aria-hidden="true" />
                     <span>Order More</span>
                   </Link>
                 </div>
                 <div className="receipt-download-hint no-print">
-                  💡 Select <b>&ldquo;Save as PDF&rdquo;</b> in the print window to download receipt
+                  💡 Select <b>&ldquo;Save as PDF&rdquo;</b> in print dialog to download
                 </div>
 
-                <div className="receipt-barcode-wrap">
-                  <div className="receipt-barcode-lines" />
+                <div className="receipt-footer-wrap">
+                  <div className="receipt-footer-badge">
+                    <span>🥞</span>
+                    <span>Freshly Griddled · Geelong West</span>
+                  </div>
                   <div className="receipt-footer-text">
-                    Thank you for dining with The Pancake Club Geelong!
+                    Thank you for dining with The Pancake Club!
                   </div>
                 </div>
               </div>

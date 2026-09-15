@@ -2165,41 +2165,60 @@ footer .logo {
 }
 
 .pickup-actions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 0.65rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
 }
 
 .pickup-action-btn {
+  flex: 1 1 calc(33.333% - 0.6rem);
+  min-width: 120px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  padding: 0.65rem 0.9rem;
-  font-size: 0.84rem;
+  padding: 0.65rem 0.85rem;
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.82rem;
   font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: none;
   border-radius: 12px;
-  border: 1.5px solid rgba(118, 58, 18, 0.2);
+  border: 1.5px solid rgba(118, 58, 18, 0.18);
   background: #ffffff;
   color: #211a14;
   text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(33, 26, 20, 0.04);
   transition: all 0.2s ease;
+}
+
+.pickup-action-btn .action-icon {
+  flex-shrink: 0;
+  color: #763a12;
 }
 
 .pickup-action-btn:hover {
   background: #efbf38;
   border-color: #211a14;
+  color: #211a14;
   transform: translateY(-1px);
 }
 
 .pickup-action-btn.whatsapp {
   color: #047857;
-  border-color: rgba(16, 185, 129, 0.4);
+  border-color: rgba(16, 185, 129, 0.35);
+  background: #f0fdf4;
+}
+
+.pickup-action-btn.whatsapp .action-icon {
+  color: #10b981;
 }
 
 .pickup-action-btn.whatsapp:hover {
   background: #d1fae5;
   border-color: #10b981;
+  color: #065f46;
 }
 
 /* While You Wait Card */
@@ -2476,10 +2495,46 @@ footer .logo {
 
 .receipt-btn {
   flex: 1;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
-  padding: 0.65rem 0.9rem;
+  gap: 0.45rem;
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  padding: 0.72rem 0.75rem;
   border-radius: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  text-decoration: none;
+}
+
+.receipt-btn-outline {
+  background: #fdfbf7;
+  border: 1.5px solid rgba(118, 58, 18, 0.22);
+  color: #211a14;
+}
+
+.receipt-btn-outline:hover {
+  background: #f5eedf;
+  border-color: #763a12;
+  transform: translateY(-1px);
+}
+
+.receipt-btn-primary {
+  background: var(--yellow, #efbf38);
+  color: #211a14;
+  border: 1.5px solid #d99b00;
+  box-shadow: 0 4px 12px rgba(239, 191, 56, 0.25);
+}
+
+.receipt-btn-primary:hover {
+  background: #e0ac25;
+  transform: translateY(-1px);
 }
 
 .receipt-download-hint {
@@ -2494,35 +2549,30 @@ footer .logo {
   color: #211a14;
 }
 
-.receipt-barcode-wrap {
+.receipt-footer-wrap {
   text-align: center;
   margin-top: 1.25rem;
   padding-top: 1rem;
-  border-top: 1px dashed rgba(118, 58, 18, 0.15);
+  border-top: 1px dashed rgba(118, 58, 18, 0.18);
 }
 
-.receipt-barcode-lines {
-  height: 28px;
-  background: repeating-linear-gradient(
-    90deg,
-    #211a14 0px,
-    #211a14 2px,
-    transparent 2px,
-    transparent 4px,
-    #211a14 4px,
-    #211a14 7px,
-    transparent 7px,
-    transparent 9px
-  );
-  opacity: 0.45;
-  margin: 0 auto 0.5rem;
-  max-width: 180px;
+.receipt-footer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #763a12;
+  background: rgba(239, 191, 56, 0.18);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  margin-bottom: 0.4rem;
 }
 
 .receipt-footer-text {
-  font-size: 0.72rem;
-  color: #9ca3af;
-  font-style: italic;
+  font-size: 0.74rem;
+  color: #8c684d;
+  font-style: normal;
 }
 
 /* Order Not Found Screen */
