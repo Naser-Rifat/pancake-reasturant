@@ -1,12 +1,14 @@
-import type { Dispatch, SetStateAction } from "react";
-import { Building2, MapPin, Navigation, Phone, Share2, UtensilsCrossed } from "lucide-react";
+import { useState, type Dispatch, SetStateAction } from "react";
+import { Building2, Mail, MapPin, Navigation, Phone, Send, Share2, UtensilsCrossed } from "lucide-react";
 import { SaveBar, SaveButton } from "@/components/admin/SaveButton";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { updateSiteSettings, type AdminSiteSettings } from "@/lib/admin-api";
+import { useToast } from "@/components/ui/toast";
+import { sendTestEmail, updateSiteSettings, type AdminSiteSettings } from "@/lib/admin-api";
 import { AU_TIMEZONES, type RunSave, type SetSiteField } from "../_lib";
 import { FacebookIcon, InstagramIcon } from "./SocialIcons";
 
@@ -24,6 +26,9 @@ export function ContactTab({
   busy: string;
   run: RunSave;
 }) {
+  const { toast } = useToast();
+  const [testingEmail, setTestingEmail] = useState(false);
+
   return (
     <div className="space-y-6">
       <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-200 shadow-sm space-y-6">
@@ -104,6 +109,50 @@ export function ContactTab({
                 value={site.abn}
                 onChange={setS("abn")}
               />
+            </div>
+
+            {/* Test Email action */}
+            <div className="space-y-1 sm:col-span-2 lg:col-span-3 p-3.5 rounded-xl border border-amber-200/80 bg-amber-50/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-0.5">
+                <p className="text-xs font-bold text-[#763a12] flex items-center gap-1.5">
+                  <Mail className="h-3.5 w-3.5" /> Test SMTP Email Delivery
+                </p>
+                <p className="text-[11px] text-zinc-600">
+                  Sends a live test message to <strong>{site.email || "the email above"}</strong> to verify Brevo SMTP credentials and delivery.
+                </p>
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                loading={testingEmail}
+                disabled={!site.email}
+                onClick={async () => {
+                  setTestingEmail(true);
+                  try {
+                    const res = await sendTestEmail();
+                    if (!res.ok) throw new Error(res.detail);
+                    toast({
+                      variant: res.detail.includes("NOT") ? "info" : "success",
+                      title: res.detail.includes("NOT")
+                        ? "Email not configured yet"
+                        : `Test email dispatched to ${res.to}`,
+                      description: res.detail,
+                    });
+                  } catch (e) {
+                    toast({
+                      variant: "error",
+                      title: "Test email failed",
+                      description: e instanceof Error ? e.message : "Unknown error",
+                    });
+                  } finally {
+                    setTestingEmail(false);
+                  }
+                }}
+                className="font-bold text-xs border-amber-300 text-[#763a12] bg-white hover:bg-amber-50 rounded-xl shrink-0 shadow-2xs cursor-pointer"
+              >
+                <Send className="h-3 w-3 mr-1.5" /> Send Test Email
+              </Button>
             </div>
             <div className="space-y-1 sm:col-span-2 lg:col-span-3">
               <Label htmlFor="s-tz" className="text-xs font-semibold text-[#211a14]">
