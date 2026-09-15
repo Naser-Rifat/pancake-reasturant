@@ -31,11 +31,15 @@ export default function Announce({ data }: { data: ApiAnnouncement | null }) {
   if (!shown || !data) return null;
 
   return (
-    <div className="announce">
-      <span>
-        {data.message}{" "}
-        {data.link_text && <Link href={safeHref(data.link_url)}>{data.link_text}</Link>}
-      </span>
+    <aside className="announce" role="region" aria-label="Announcement">
+      <div className="announce-content">
+        <span className="announce-msg">{data.message}</span>
+        {data.link_text && (
+          <Link href={safeHref(data.link_url)} className="announce-link">
+            {data.link_text}
+          </Link>
+        )}
+      </div>
       <button
         className="announce-close"
         aria-label="Dismiss announcement"
@@ -48,6 +52,6 @@ export default function Announce({ data }: { data: ApiAnnouncement | null }) {
       >
         ✕
       </button>
-    </div>
+    </aside>
   );
 }

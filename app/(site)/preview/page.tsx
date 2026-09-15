@@ -673,9 +673,12 @@ export default function PreviewPage() {
                   )}
 
                   <div className="camp-actions-row">
-                    <Link href={announcement?.link_url || "/menu"} className="camp-cta">
-                      <span>{announcement?.link_text || "Explore Menu & Deals"}</span>
+                    <Link href="/booking" className="camp-cta">
+                      <span>Book a Table</span>
                       <ChevronRight size={16} strokeWidth={2.5} className="camp-btn-arrow" />
+                    </Link>
+                    <Link href={announcement?.link_url || "/menu"} className="camp-cta-secondary">
+                      <span>{announcement?.link_text || "Explore Menu"}</span>
                     </Link>
                   </div>
 

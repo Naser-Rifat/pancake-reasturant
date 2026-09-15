@@ -2005,38 +2005,65 @@ footer .logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.65rem;
   background: #140c06;
   border-bottom: 1px solid rgba(248, 242, 224, 0.12);
   color: var(--cream);
   font-weight: 600;
-  font-size: 0.74rem;
-  padding: 0 3.2rem;
-  text-align: center;
+  font-size: clamp(0.68rem, 1.8vw, 0.76rem);
+  padding: 0 2.2rem 0 0.8rem;
   box-sizing: border-box;
+  white-space: nowrap !important;
+  overflow: hidden;
 }
-.announce a {
+.announce-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.announce-msg {
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
+}
+.announce a,
+.announce-link {
   text-decoration: underline;
   color: var(--yellow);
   font-weight: 700;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+.announce a:hover,
+.announce-link:hover {
+  color: #fff;
 }
 .announce-close {
   position: absolute;
-  right: 1.2rem;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   background: rgba(248, 242, 224, 0.16);
   border: none;
-  width: 20px;
-  height: 20px;
+  width: 19px;
+  height: 19px;
   border-radius: 50%;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--cream);
   cursor: pointer;
   line-height: 1;
   display: inline-grid;
   place-items: center;
   padding: 0;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
 }
 .announce-close:hover {
   background: var(--pink);
@@ -4021,7 +4048,8 @@ textarea.input {
   }
 
   .announce {
-    font-size: 0.85rem;
+    font-size: clamp(0.72rem, 1.6vw, 0.8rem);
+    white-space: nowrap !important;
   }
 
   .menu-grid {
@@ -9741,6 +9769,34 @@ h2.title .accent,
   transform: translateX(4px);
 }
 
+.camp-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.6rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  font-family: var(--font-round), sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 999px;
+  border: 1.5px solid rgba(44, 24, 16, 0.35);
+  width: fit-content;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(44, 24, 16, 0.06);
+  transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.camp-cta-secondary:hover {
+  background: #ffffff;
+  border-color: var(--ink);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(44, 24, 16, 0.12);
+}
+
 /* ---------- Vintage Rubber Stamp Watermark ---------- */
 .camp-vintage-stamp {
   position: absolute;
@@ -9894,9 +9950,10 @@ h2.title .accent,
   .camp-actions-row {
     margin-top: 0.2rem !important;
   }
-  .camp-cta {
-    padding: 0.65rem 1.3rem !important;
-    font-size: 0.8rem !important;
+  .camp-cta,
+  .camp-cta-secondary {
+    padding: 0.65rem 1.2rem !important;
+    font-size: 0.78rem !important;
   }
   .camp-vintage-stamp {
     right: 0.4rem !important;
