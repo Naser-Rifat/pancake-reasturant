@@ -2482,6 +2482,18 @@ footer .logo {
   border-radius: 12px;
 }
 
+.receipt-download-hint {
+  font-size: 0.75rem;
+  color: #8c684d;
+  text-align: center;
+  margin-top: 0.55rem;
+  line-height: 1.35;
+}
+
+.receipt-download-hint b {
+  color: #211a14;
+}
+
 .receipt-barcode-wrap {
   text-align: center;
   margin-top: 1.25rem;
@@ -2561,32 +2573,127 @@ footer .logo {
 }
 
 /* Print styling */
+@page {
+  margin: 10mm;
+  size: portrait;
+}
+
 @media print {
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  html,
   body {
     background: #ffffff !important;
-    color: #000000 !important;
+    color: #111111 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    font-size: 11pt !important;
   }
-  .no-print,
-  .site-nav,
+
+  /* Completely hide all site navigation, banners, headers, footers, popups, and non-receipt page contents */
+  header,
+  footer,
+  nav,
+  aside,
+  .top-ribbon,
+  .announce,
+  .nav,
+  .tabbar,
+  .wa-float,
+  .whatsapp-float,
   .site-footer,
   .bottom-bar,
   .cart-fab,
+  .cart-backdrop,
+  .cart-drawer,
+  .scroll-fx,
+  .toast,
   .page-hero,
+  .order-success-hero,
+  .order-hero-pill-badge,
+  .order-status-column,
   .order-ref-card,
   .order-live-card,
   .order-pickup-card,
   .while-you-wait-card,
-  .toast {
+  .no-print,
+  .receipt-actions,
+  canvas {
     display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
   }
+
+  /* Reset layout wrapper to clean block flow */
+  .order-success-container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+
   .order-success-grid {
     display: block !important;
+    margin: 0 auto !important;
   }
+
+  .order-receipt-column {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+  }
+
   .order-receipt-paper {
-    border: none !important;
+    border: 1.5px solid #211a14 !important;
+    border-radius: 12px !important;
     box-shadow: none !important;
-    padding: 0 !important;
-    max-width: 100% !important;
+    padding: 1.5rem !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+    background: #ffffff !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .receipt-logo {
+    color: #211a14 !important;
+    font-size: 1.4rem !important;
+  }
+
+  .receipt-divider {
+    border-color: #211a14 !important;
+    opacity: 0.3 !important;
+  }
+
+  .receipt-item-name,
+  .receipt-item-total,
+  .receipt-meta-row b,
+  .receipt-row.grand-total {
+    color: #000000 !important;
+  }
+
+  .receipt-payment-badge {
+    border: 1px solid #10b981 !important;
+    background: #f0fdf4 !important;
+    color: #065f46 !important;
+  }
+
+  .receipt-payment-badge.unpaid {
+    border: 1px solid #f59e0b !important;
+    background: #fffbeb !important;
+    color: #92400e !important;
   }
 }
 .cart-backdrop {

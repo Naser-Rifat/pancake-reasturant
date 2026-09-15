@@ -602,12 +602,15 @@ export default function OrderSuccessClient({
                 <div className="receipt-actions no-print">
                   <button type="button" className="btn btn-outline receipt-btn" onClick={handlePrint}>
                     <span>🖨️</span>
-                    <span>Print Receipt</span>
+                    <span>Print / Save PDF</span>
                   </button>
                   <Link href="/menu" className="btn btn-primary receipt-btn">
                     <span>🥞</span>
-                    <span>Back to Menu</span>
+                    <span>Order More</span>
                   </Link>
+                </div>
+                <div className="receipt-download-hint no-print">
+                  💡 Select <b>&ldquo;Save as PDF&rdquo;</b> in the print window to download receipt
                 </div>
 
                 <div className="receipt-barcode-wrap">
