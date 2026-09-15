@@ -27,11 +27,13 @@ class PaymentError(Exception):
     """Raised when Stripe can't give us a checkout session."""
 
 
-def create_checkout_session(order) -> str:
+def create_checkout_session(order, frontend_url: str | None = None) -> str:
     """Create an AUD Checkout Session for the order and return its URL."""
     if not settings.STRIPE_SECRET_KEY:
         raise PaymentError("STRIPE_SECRET_KEY is not configured.")
     stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    base_frontend_url = (frontend_url or settings.FRONTEND_URL).rstrip("/")
 
     line_items = [
         {
@@ -74,8 +76,8 @@ def create_checkout_session(order) -> str:
             customer_email=order.email or None,
             metadata={"order_public_id": str(order.public_id)},
             expires_at=int(time.time()) + CHECKOUT_EXPIRE_SECONDS,
-            success_url=f"{settings.FRONTEND_URL}/order/success?order={order.public_id}",
-            cancel_url=f"{settings.FRONTEND_URL}/menu?payment=cancelled",
+            success_url=f"{base_frontend_url}/order/success?order={order.public_id}",
+            cancel_url=f"{base_frontend_url}/menu?payment=cancelled",
         )
     except stripe.StripeError as exc:
         log.error("Stripe session create failed for order %s: %s", order.public_id, exc)

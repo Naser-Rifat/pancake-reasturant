@@ -224,17 +224,14 @@ export default function CartDrawer({
       clear();
       setCouponCode("");
 
-      // -----------------------------------------------------------------------
-      // TODO: STRIPE PAYMENT SERVICE - UNCOMMENT WHEN RE-ENABLING STRIPE:
-      // if (!order.checkout_url) {
-      //   throw new Error("Payments are unavailable right now — please try again or call us.");
-      // }
-      // window.location.assign(order.checkout_url);
-      // -----------------------------------------------------------------------
-
-      // Direct redirect to order success page
-      const destination = order.checkout_url || `/order/success?order=${order.public_id}`;
-      window.location.assign(destination);
+      // Direct redirect to order success page:
+      // If order.checkout_url is a Stripe Checkout session, redirect to Stripe.
+      // Otherwise, always navigate relative to the current site/origin to prevent unwanted external redirects.
+      if (order.checkout_url && order.checkout_url.startsWith("https://checkout.stripe.com")) {
+        window.location.assign(order.checkout_url);
+      } else {
+        window.location.assign(`/order/success?order=${order.public_id}`);
+      }
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Something went wrong — please try again.");
       setPlacing(false);

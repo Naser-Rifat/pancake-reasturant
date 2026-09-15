@@ -193,8 +193,17 @@ export interface ApiOrder {
   coupon_code: string;
   discount_amount: string;
   total: string;
-  items: { slug: string; name: string; quantity: number; unit_price: string; line_total: string }[];
+  items: {
+    slug: string;
+    name: string;
+    quantity: number;
+    unit_price: string;
+    line_total: string;
+    photo?: string;
+    image?: string;
+  }[];
   created_at?: string;
+  cancel_reason?: string;
   /** present only in the placeOrder response — where Stripe takes the payment */
   checkout_url?: string;
 }

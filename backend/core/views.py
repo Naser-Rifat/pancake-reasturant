@@ -110,6 +110,23 @@ class BookingViewSet(
         emails.staff_new_booking(booking)  # the guest is emailed on confirm/decline
 
 
+def _resolve_frontend_url(request):
+    origin = (request.headers.get("origin") or request.headers.get("referer") or "").rstrip("/")
+    if "://" in origin:
+        parts = origin.split("/")
+        if len(parts) >= 3:
+            origin = f"{parts[0]}//{parts[2]}"
+    if origin and (
+        "localhost" in origin
+        or "127.0.0.1" in origin
+        or origin.endswith(".vercel.app")
+        or origin.endswith(".railway.app")
+        or "thepancakeclub" in origin
+    ):
+        return origin
+    return settings.FRONTEND_URL
+
+
 class OrderViewSet(
     ThrottleWritesOnlyMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
@@ -153,9 +170,10 @@ class OrderViewSet(
 
         # ----------------------------------------------------------------------
         # TODO: UNCOMMENT WHEN RE-ENABLING STRIPE PAYMENTS:
+        # frontend_url = _resolve_frontend_url(request)
         # order = serializer.save(status=Order.Status.PENDING_PAYMENT)
         # try:
-        #     checkout_url = payments.create_checkout_session(order)
+        #     checkout_url = payments.create_checkout_session(order, frontend_url=frontend_url)
         # except payments.PaymentError:
         #     order.delete()  # never leave a dangling order the customer can't pay for
         #     raise ValidationError(
@@ -163,8 +181,9 @@ class OrderViewSet(
         #     )
         # ----------------------------------------------------------------------
 
+        frontend_url = _resolve_frontend_url(request)
         data = OrderSerializer(order).data
-        data["checkout_url"] = f"{settings.FRONTEND_URL}/order/success?order={order.public_id}"
+        data["checkout_url"] = f"{frontend_url}/order/success?order={order.public_id}"
         return Response(data, status=http_status.HTTP_201_CREATED)
 
 

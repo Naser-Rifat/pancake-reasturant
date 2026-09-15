@@ -117,11 +117,13 @@ class OrderItemInputSerializer(serializers.Serializer):
 class OrderItemSerializer(serializers.ModelSerializer):
     slug = serializers.SlugField(source="menu_item.slug", read_only=True)
     name = serializers.CharField(source="menu_item.name", read_only=True)
+    photo = serializers.CharField(source="menu_item.photo", read_only=True)
+    image = serializers.CharField(source="menu_item.image", read_only=True)
     line_total = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
 
     class Meta:
         model = OrderItem
-        fields = ["slug", "name", "quantity", "unit_price", "line_total"]
+        fields = ["slug", "name", "quantity", "unit_price", "line_total", "photo", "image"]
 
 
 class OrderSerializer(serializers.ModelSerializer):
