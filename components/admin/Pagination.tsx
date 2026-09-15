@@ -17,6 +17,7 @@ export function Pagination({
   loading = false,
   onPageChange,
   className = "",
+  alwaysShow = true,
 }: {
   page: number;
   pageSize: number;
@@ -25,9 +26,10 @@ export function Pagination({
   loading?: boolean;
   onPageChange: (page: number) => void;
   className?: string;
+  alwaysShow?: boolean;
 }) {
   const knownPages = Math.max(1, Math.ceil(totalLoaded / pageSize));
-  if (knownPages <= 1 && !serverHasMore) return null;
+  if (!alwaysShow && knownPages <= 1 && !serverHasMore) return null;
 
   // compact window: 1 … p-1 p p+1 … last
   const nums: (number | "…")[] = [];

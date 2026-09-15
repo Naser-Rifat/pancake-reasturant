@@ -25,6 +25,7 @@ export default function OrdersPage() {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
@@ -171,7 +172,7 @@ export default function OrdersPage() {
 
   // numbered pagination over the filtered rows; stepping past the last loaded
   // page pulls the next batch from the server until it runs dry
-  const knownPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
+  const knownPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize));
   useEffect(() => {
     setPage(1);
   }, [filter, searchQuery]);
@@ -181,7 +182,7 @@ export default function OrdersPage() {
     else setPage(knownPages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, knownPages, hasMore, loadingMore]);
-  const pageOrders = filteredOrders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pageOrders = filteredOrders.slice((page - 1) * pageSize, page * pageSize);
 
   // ?focus=<id> from the dashboard feed lands on that exact row
   const { highlightId } = useRowFocus({
@@ -192,7 +193,7 @@ export default function OrdersPage() {
     hasMore,
     loadMore,
     setPage,
-    pageSize: PAGE_SIZE,
+    pageSize,
     onMiss: useCallback(
       () =>
         toast({
@@ -417,6 +418,22 @@ export default function OrdersPage() {
         {!loading && filteredOrders.length > 0 && (
           <div className="border-t border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-xs text-zinc-600">
+              <span className="font-medium text-zinc-500">Rows per page:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPage(1);
+                }}
+                aria-label="Orders per page"
+                className="h-8 rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20 cursor-pointer"
+              >
+                <option value={5}>5 rows</option>
+                <option value={10}>10 rows</option>
+                <option value={20}>20 rows</option>
+                <option value={50}>50 rows</option>
+              </select>
+              <span className="text-zinc-300">|</span>
               <span className="text-zinc-500 font-medium">
                 Showing {pageOrders.length} of {filteredOrders.length} {filteredOrders.length === 1 ? "order" : "orders"}
                 {hasMore ? " (more available on server)" : ""}
@@ -425,7 +442,7 @@ export default function OrdersPage() {
 
             <Pagination
               page={page}
-              pageSize={PAGE_SIZE}
+              pageSize={pageSize}
               totalLoaded={filteredOrders.length}
               serverHasMore={hasMore}
               loading={loadingMore}
