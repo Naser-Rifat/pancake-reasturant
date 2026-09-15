@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   MessageSquareHeart,
   Star,
@@ -29,6 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { useConfirm } from "@/components/ui/confirm";
 import { useToast } from "@/components/ui/toast";
+import { Pagination } from "@/components/admin/Pagination";
 
 type ReviewFilter = "all" | "pending" | "public" | "5star";
 
@@ -38,6 +39,9 @@ export default function ReviewsAdminPage() {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<ReviewFilter>("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(8);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { confirm: confirmDialog } = useConfirm();
 
@@ -142,6 +146,14 @@ export default function ReviewsAdminPage() {
       return matchesSearch && matchesFilter;
     });
   }, [reviews, searchQuery, filter]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, filter]);
+
+  const pageReviews = useMemo(() => {
+    return filteredReviews.slice((page - 1) * pageSize, page * pageSize);
+  }, [filteredReviews, page, pageSize]);
 
   // Statistics
   const totalCount = reviews.length;
@@ -311,31 +323,31 @@ export default function ReviewsAdminPage() {
       {/* ========================================================================= */}
       {/* REVIEWS GRID                                                              */}
       {/* ========================================================================= */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {loading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="p-6 rounded-xl bg-white border border-zinc-200 space-y-4">
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-6 w-36 rounded-xl" />
-                <Skeleton className="h-6 w-20 rounded-full" />
+      <div ref={containerRef} className="space-y-4">
+        <div className="grid gap-4 md:grid-cols-2">
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="p-6 rounded-xl bg-white border border-zinc-200 space-y-4">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-6 w-36 rounded-xl" />
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                </div>
+                <Skeleton className="h-16 w-full rounded-lg" />
+                <div className="flex items-center justify-between pt-2">
+                  <Skeleton className="h-5 w-28 rounded-lg" />
+                  <Skeleton className="h-8 w-8 rounded-xl" />
+                </div>
               </div>
-              <Skeleton className="h-16 w-full rounded-lg" />
-              <div className="flex items-center justify-between pt-2">
-                <Skeleton className="h-5 w-28 rounded-lg" />
-                <Skeleton className="h-8 w-8 rounded-xl" />
-              </div>
+            ))
+          ) : filteredReviews.length === 0 ? (
+            <div className="col-span-2 py-16 text-center space-y-3 bg-white rounded-xl border border-zinc-200">
+              <h3 className="text-base font-semibold text-[#211a14]">No reviews matched your filter</h3>
+              <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+                Try adjusting your search keyword or switching between filter tabs.
+              </p>
             </div>
-          ))
-        ) : filteredReviews.length === 0 ? (
-          <div className="col-span-2 py-16 text-center space-y-3 bg-white rounded-xl border border-zinc-200">
-            
-            <h3 className="text-base font-semibold text-[#211a14]">No reviews matched your filter</h3>
-            <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-              Try adjusting your search keyword or switching between filter tabs.
-            </p>
-          </div>
-        ) : (
-          filteredReviews.map((r) => {
+          ) : (
+            pageReviews.map((r) => {
             const dateStr = new Date(r.created_at).toLocaleDateString("en-AU", {
               day: "numeric",
               month: "short",
@@ -451,6 +463,46 @@ export default function ReviewsAdminPage() {
             );
           })
         )}
+      </div>
+
+      {/* Numbered Pagination & Reviews-Per-Page Controls */}
+      {!loading && filteredReviews.length > 0 && (
+        <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
+          <div className="flex items-center gap-2 text-xs text-zinc-600">
+            <span className="font-medium text-zinc-500">Reviews per page:</span>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setPage(1);
+              }}
+              aria-label="Reviews per page"
+              className="h-8 rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20 cursor-pointer"
+            >
+              <option value={6}>6 reviews</option>
+              <option value={8}>8 reviews</option>
+              <option value={12}>12 reviews</option>
+              <option value={24}>24 reviews</option>
+            </select>
+            <span className="text-zinc-300">|</span>
+            <span className="text-zinc-500 font-medium">
+              {filteredReviews.length} total {filteredReviews.length === 1 ? "review" : "reviews"}
+            </span>
+          </div>
+
+          <Pagination
+            page={page}
+            pageSize={pageSize}
+            totalLoaded={filteredReviews.length}
+            serverHasMore={false}
+            className="border-t-0 p-0"
+            onPageChange={(p) => {
+              setPage(p);
+              containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+          />
+        </div>
+      )}
       </div>
     </div>
   );

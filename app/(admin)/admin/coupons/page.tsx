@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   TicketPercent,
   Plus,
@@ -33,6 +33,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { useConfirm } from "@/components/ui/confirm";
 import { useToast } from "@/components/ui/toast";
+import { Pagination } from "@/components/admin/Pagination";
 
 type CouponFilter = "all" | "active" | "inactive" | "exhausted";
 
@@ -68,6 +69,9 @@ export default function CouponsAdminPage() {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<CouponFilter>("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const tableRef = useRef<HTMLDivElement>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<NewCouponForm>(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
@@ -252,6 +256,14 @@ export default function CouponsAdminPage() {
       return true;
     });
   }, [coupons, searchQuery, filter]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, filter]);
+
+  const pageCoupons = useMemo(() => {
+    return filtered.slice((page - 1) * pageSize, page * pageSize);
+  }, [filtered, page, pageSize]);
 
   return (
     <div className="space-y-6 pb-12">
@@ -606,7 +618,7 @@ export default function CouponsAdminPage() {
 
       {/* Coupons Table */}
       {!loading && !error && filtered.length > 0 && (
-        <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-2xs">
+        <div ref={tableRef} className="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-2xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -621,7 +633,7 @@ export default function CouponsAdminPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100 text-xs font-medium text-[#211a14]">
-                {filtered.map((c) => {
+                {pageCoupons.map((c) => {
                   const isPending = pendingIds.has(c.id);
                   const isExhausted = c.is_exhausted;
                   const isLive = c.is_active && !isExhausted;
@@ -760,6 +772,45 @@ export default function CouponsAdminPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Numbered Pagination & Rows-Per-Page Controls */}
+          {!loading && filtered.length > 0 && (
+            <div className="border-t border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-xs text-zinc-600">
+                <span className="font-medium text-zinc-500">Rows per page:</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  aria-label="Coupons per page"
+                  className="h-8 rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20 cursor-pointer"
+                >
+                  <option value={5}>5 rows</option>
+                  <option value={10}>10 rows</option>
+                  <option value={20}>20 rows</option>
+                  <option value={50}>50 rows</option>
+                </select>
+                <span className="text-zinc-300">|</span>
+                <span className="text-zinc-500 font-medium">
+                  {filtered.length} total {filtered.length === 1 ? "coupon" : "coupons"}
+                </span>
+              </div>
+
+              <Pagination
+                page={page}
+                pageSize={pageSize}
+                totalLoaded={filtered.length}
+                serverHasMore={false}
+                className="border-t-0 p-0"
+                onPageChange={(p) => {
+                  setPage(p);
+                  tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>

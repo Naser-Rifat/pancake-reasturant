@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from "react";
+import { useState, useMemo, useRef, useEffect, type Dispatch, type SetStateAction } from "react";
 import Image from "next/image";
 import { Plus, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +17,7 @@ import {
   type AdminGalleryPhoto,
   type AdminSiteSettings,
 } from "@/lib/admin-api";
+import { Pagination } from "@/components/admin/Pagination";
 import { EMPTY_PHOTO, type NewPhoto, type RunSave, type SetSiteField } from "../_lib";
 
 // Content studio panel for the /gallery page (header copy + photo album manager).
@@ -44,8 +45,23 @@ export function GalleryPageSection({
   run: RunSave;
 }) {
   const { confirm: confirmDialog } = useConfirm();
-  const filteredPhotos =
-    galleryFilter === "all" ? photos : photos.filter((p) => p.album === galleryFilter);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
+  const galleryGridRef = useRef<HTMLDivElement>(null);
+
+  const filteredPhotos = useMemo(
+    () => (galleryFilter === "all" ? photos : photos.filter((p) => p.album === galleryFilter)),
+    [photos, galleryFilter],
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [galleryFilter]);
+
+  const pagePhotos = useMemo(
+    () => filteredPhotos.slice((page - 1) * pageSize, page * pageSize),
+    [filteredPhotos, page, pageSize],
+  );
 
   return (
     <div className="space-y-6">
@@ -172,89 +188,130 @@ export function GalleryPageSection({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 [&>*]:min-w-0">
-          {filteredPhotos.map((p) => (
-            <div
-              key={p.id}
-              className="group relative overflow-hidden rounded-lg border border-zinc-200 bg-white p-2 shadow-xs hover:border-zinc-300 transition-all"
-            >
-              <div className="relative aspect-square rounded-xl overflow-hidden bg-zinc-100">
-                <Image
-                  src={p.image}
-                  alt={p.caption}
-                  fill
-                  sizes="300px"
-                  className="object-cover"
-                  style={{ objectPosition: `50% ${p.focus === "top" ? "18%" : p.focus === "bottom" ? "82%" : "50%"}` }}
-                />
-                <Badge className="absolute left-1.5 top-1.5 capitalize text-[10px] font-semibold bg-zinc-950 text-white border-0">
-                  {p.album}
-                </Badge>
-                <button
-                  className="absolute right-1.5 top-1.5 rounded-lg bg-black/80 text-white p-1.5 opacity-0 group-hover:opacity-100 hover:bg-destructive transition-opacity"
-                  aria-label={`Remove photo “${p.caption || "Untitled"}”`}
-                  onClick={async () => {
-                    const ok = await confirmDialog({
-                      title: `Remove “${p.caption || "this photo"}” from the gallery?`,
-                      description: "It also leaves the homepage strip if it was one of the first six.",
-                      confirmLabel: "Remove photo",
-                      destructive: true,
-                    });
-                    if (!ok) return;
-                    run(async () => {
-                      await deleteGalleryPhoto(p.id);
-                      setPhotos((xs) => xs.filter((x) => x.id !== p.id));
-                    }, "Gallery", { title: "Photo removed" });
-                  }}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              </div>
-              <div className="grid gap-1.5 p-1.5 pt-2">
-                <Input
-                  key={`gcap-${p.id}`}
-                  defaultValue={p.caption}
-                  placeholder="Caption…"
-                  className="h-8 text-xs border-zinc-200 font-medium rounded-lg"
-                  onBlur={(e) => {
-                    const v = e.target.value.trim();
-                    if (v === p.caption) return;
-                    run(async () => {
-                      await updateGalleryPhoto(p.id, { caption: v });
-                      setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, caption: v } : x)));
-                    }, "Caption", { title: "Caption saved" });
-                  }}
-                />
-                <div className="flex items-center gap-1.5 [&>*]:min-w-0">
-                  <Select
-                    className="h-8 flex-1 text-xs border-zinc-200 font-bold rounded-lg"
-                    aria-label="Which part of the photo stays visible when cropped"
-                    value={p.focus}
-                    onChange={(e) =>
-                      run(async () => {
-                        const focus = e.target.value as AdminGalleryPhoto["focus"];
-                        await updateGalleryPhoto(p.id, { focus });
-                        setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, focus } : x)));
-                      }, "Photo crop", { title: "Crop focus saved" })
-                    }
-                  >
-                    <option value="center">Focus: Centre</option>
-                    <option value="top">Focus: Top</option>
-                    <option value="bottom">Focus: Bottom</option>
-                  </Select>
-                  <UploadButton
-                    label="Replace"
-                    onUploaded={(url) =>
-                      run(async () => {
-                        await updateGalleryPhoto(p.id, { image: url });
-                        setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, image: url } : x)));
-                      }, "Gallery", { title: "Photo replaced" })
-                    }
+        <div ref={galleryGridRef} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 [&>*]:min-w-0">
+            {pagePhotos.map((p) => (
+              <div
+                key={p.id}
+                className="group relative overflow-hidden rounded-lg border border-zinc-200 bg-white p-2 shadow-xs hover:border-zinc-300 transition-all"
+              >
+                <div className="relative aspect-square rounded-xl overflow-hidden bg-zinc-100">
+                  <Image
+                    src={p.image}
+                    alt={p.caption}
+                    fill
+                    sizes="300px"
+                    className="object-cover"
+                    style={{ objectPosition: `50% ${p.focus === "top" ? "18%" : p.focus === "bottom" ? "82%" : "50%"}` }}
                   />
+                  <Badge className="absolute left-1.5 top-1.5 capitalize text-[10px] font-semibold bg-zinc-950 text-white border-0">
+                    {p.album}
+                  </Badge>
+                  <button
+                    className="absolute right-1.5 top-1.5 rounded-lg bg-black/80 text-white p-1.5 opacity-0 group-hover:opacity-100 hover:bg-destructive transition-opacity"
+                    aria-label={`Remove photo “${p.caption || "Untitled"}”`}
+                    onClick={async () => {
+                      const ok = await confirmDialog({
+                        title: `Remove “${p.caption || "this photo"}” from the gallery?`,
+                        description: "It also leaves the homepage strip if it was one of the first six.",
+                        confirmLabel: "Remove photo",
+                        destructive: true,
+                      });
+                      if (!ok) return;
+                      run(async () => {
+                        await deleteGalleryPhoto(p.id);
+                        setPhotos((xs) => xs.filter((x) => x.id !== p.id));
+                      }, "Gallery", { title: "Photo removed" });
+                    }}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <div className="grid gap-1.5 p-1.5 pt-2">
+                  <Input
+                    key={`gcap-${p.id}`}
+                    defaultValue={p.caption}
+                    placeholder="Caption…"
+                    className="h-8 text-xs border-zinc-200 font-medium rounded-lg"
+                    onBlur={(e) => {
+                      const v = e.target.value.trim();
+                      if (v === p.caption) return;
+                      run(async () => {
+                        await updateGalleryPhoto(p.id, { caption: v });
+                        setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, caption: v } : x)));
+                      }, "Caption", { title: "Caption saved" });
+                    }}
+                  />
+                  <div className="flex items-center gap-1.5 [&>*]:min-w-0">
+                    <Select
+                      className="h-8 flex-1 text-xs border-zinc-200 font-bold rounded-lg"
+                      aria-label="Which part of the photo stays visible when cropped"
+                      value={p.focus}
+                      onChange={(e) =>
+                        run(async () => {
+                          const focus = e.target.value as AdminGalleryPhoto["focus"];
+                          await updateGalleryPhoto(p.id, { focus });
+                          setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, focus } : x)));
+                        }, "Photo crop", { title: "Crop focus saved" })
+                      }
+                    >
+                      <option value="center">Focus: Centre</option>
+                      <option value="top">Focus: Top</option>
+                      <option value="bottom">Focus: Bottom</option>
+                    </Select>
+                    <UploadButton
+                      label="Replace"
+                      onUploaded={(url) =>
+                        run(async () => {
+                          await updateGalleryPhoto(p.id, { image: url });
+                          setPhotos((xs) => xs.map((x) => (x.id === p.id ? { ...x, image: url } : x)));
+                        }, "Gallery", { title: "Photo replaced" })
+                      }
+                    />
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+
+          {/* Numbered Pagination & Photos-Per-Page Controls */}
+          {filteredPhotos.length > 0 && (
+            <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center gap-2 text-xs text-zinc-600">
+                <span className="font-medium text-zinc-500">Photos per page:</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  aria-label="Photos per page"
+                  className="h-8 rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20 cursor-pointer"
+                >
+                  <option value={8}>8 photos</option>
+                  <option value={12}>12 photos</option>
+                  <option value={24}>24 photos</option>
+                  <option value={48}>48 photos</option>
+                </select>
+                <span className="text-zinc-300">|</span>
+                <span className="text-zinc-500 font-medium">
+                  {filteredPhotos.length} total {filteredPhotos.length === 1 ? "photo" : "photos"}
+                </span>
+              </div>
+
+              <Pagination
+                page={page}
+                pageSize={pageSize}
+                totalLoaded={filteredPhotos.length}
+                serverHasMore={false}
+                className="border-t-0 p-0"
+                onPageChange={(p) => {
+                  setPage(p);
+                  galleryGridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              />
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

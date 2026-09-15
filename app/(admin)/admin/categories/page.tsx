@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Layers,
@@ -34,6 +34,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { useConfirm } from "@/components/ui/confirm";
 import { useToast } from "@/components/ui/toast";
+import { Pagination } from "@/components/admin/Pagination";
 
 const PRESET_ICONS = [
   "🥞", "🍯", "🥑", "🍫", "☕", "🍟", "🥤", "🍓",
@@ -73,6 +74,9 @@ export default function AdminCategoriesPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const tableRef = useRef<HTMLDivElement>(null);
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -288,6 +292,14 @@ export default function AdminCategoriesPage() {
     });
   }, [categories, searchQuery, filterStatus]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, filterStatus]);
+
+  const pageCategories = useMemo(() => {
+    return filteredCategories.slice((page - 1) * pageSize, page * pageSize);
+  }, [filteredCategories, page, pageSize]);
+
   const totalCount = categories.length;
   const activeCount = categories.filter((c) => c.is_active).length;
   const totalDishes = categories.reduce((sum, c) => sum + (c.dish_count || 0), 0);
@@ -434,7 +446,7 @@ export default function AdminCategoriesPage() {
           </Button>
         </div>
       ) : (
-        <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden shadow-2xs">
+        <div ref={tableRef} className="rounded-xl border border-zinc-200 bg-white overflow-hidden shadow-2xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
@@ -449,7 +461,7 @@ export default function AdminCategoriesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200">
-                {filteredCategories.map((cat) => (
+                {pageCategories.map((cat) => (
                   <tr key={cat.id} className="hover:bg-zinc-50/60 transition-colors group">
                     {/* Sort Order Controls */}
                     <td className="py-3 px-3 text-center">
@@ -567,6 +579,45 @@ export default function AdminCategoriesPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Numbered Pagination & Rows-Per-Page Controls */}
+          {!loading && filteredCategories.length > 0 && (
+            <div className="border-t border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-xs text-zinc-600">
+                <span className="font-medium text-zinc-500">Rows per page:</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  aria-label="Categories per page"
+                  className="h-8 rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20 cursor-pointer"
+                >
+                  <option value={5}>5 rows</option>
+                  <option value={10}>10 rows</option>
+                  <option value={20}>20 rows</option>
+                  <option value={50}>50 rows</option>
+                </select>
+                <span className="text-zinc-300">|</span>
+                <span className="text-zinc-500 font-medium">
+                  {filteredCategories.length} total {filteredCategories.length === 1 ? "category" : "categories"}
+                </span>
+              </div>
+
+              <Pagination
+                page={page}
+                pageSize={pageSize}
+                totalLoaded={filteredCategories.length}
+                serverHasMore={false}
+                className="border-t-0 p-0"
+                onPageChange={(p) => {
+                  setPage(p);
+                  tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
 

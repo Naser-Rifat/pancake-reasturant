@@ -29,6 +29,7 @@ export default function OrdersPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState("");
+  const tableRef = useRef<HTMLDivElement>(null);
   const knownIds = useRef<Set<string> | null>(null);
   const nextPage = useRef(2);
   const { toast } = useToast();
@@ -371,14 +372,13 @@ export default function OrdersPage() {
       {/* ========================================================================= */}
       {/* ORDERS TABLE & KITCHEN ACTION SYSTEM                                      */}
       {/* ========================================================================= */}
-      <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+      <div ref={tableRef} className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-6">
             <TableSkeleton rows={6} cols={7} />
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="py-16 text-center space-y-3">
-            
             <h3 className="text-base font-semibold text-[#211a14]">No orders found</h3>
             <p className="text-xs text-zinc-500 max-w-sm mx-auto">
               No orders matched your filter or search query.
@@ -414,15 +414,28 @@ export default function OrdersPage() {
         )}
 
         {/* Numbered pagination */}
-        {!loading && (
-          <Pagination
-            page={page}
-            pageSize={PAGE_SIZE}
-            totalLoaded={filteredOrders.length}
-            serverHasMore={hasMore}
-            loading={loadingMore}
-            onPageChange={setPage}
-          />
+        {!loading && filteredOrders.length > 0 && (
+          <div className="border-t border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-xs text-zinc-600">
+              <span className="text-zinc-500 font-medium">
+                Showing {pageOrders.length} of {filteredOrders.length} {filteredOrders.length === 1 ? "order" : "orders"}
+                {hasMore ? " (more available on server)" : ""}
+              </span>
+            </div>
+
+            <Pagination
+              page={page}
+              pageSize={PAGE_SIZE}
+              totalLoaded={filteredOrders.length}
+              serverHasMore={hasMore}
+              loading={loadingMore}
+              className="border-t-0 p-0"
+              onPageChange={(p) => {
+                setPage(p);
+                tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            />
+          </div>
         )}
       </div>
     </div>
