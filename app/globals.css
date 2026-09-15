@@ -5015,10 +5015,11 @@ body:has(.cart-fab) .wa-float {
   margin-left: auto;
   font-family: var(--font-round);
   font-weight: 800;
-  font-size: 0.9rem;
+  font-size: 1.18rem;
   color: var(--ink);
   white-space: nowrap;
   line-height: 1;
+  letter-spacing: -0.01em;
 }
 .dc-name {
   margin: 0;
@@ -5113,7 +5114,8 @@ body:has(.cart-fab) .wa-float {
     max-width: 90%;
   }
   .dish-card.dc-tile .dc-price {
-    font-size: 0.95rem;
+    font-size: 1.18rem;
+    font-weight: 800;
     letter-spacing: -0.01em;
   }
   .dish-card.dc-tile .dc-add {
@@ -8966,9 +8968,10 @@ body:has(.hero-nav) .hero-find {
   .dish-card.dc-tile .dc-head .dc-price-head {
     display: inline-block !important;
     font-family: var(--font-round), sans-serif;
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: #5c4b3f;
+    font-weight: 800;
+    font-size: 1.18rem !important;
+    color: var(--ink);
+    letter-spacing: -0.01em;
     margin-left: auto;
   }
 
