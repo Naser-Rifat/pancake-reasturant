@@ -2,7 +2,7 @@ import { Ban, Check, Mail, Phone, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import type { AdminBooking } from "@/lib/admin-api";
-import { formatTime12h } from "../_lib";
+import { formatTime12h, parseBookingOffer } from "../_lib";
 
 // One reservation row in the bookings table.
 export function BookingRow({
@@ -17,6 +17,7 @@ export function BookingRow({
   pending?: boolean;
   onSetStatus: (b: AdminBooking, status: AdminBooking["status"]) => void;
 }) {
+  const { offer, cleanNotes } = parseBookingOffer(b.notes);
   return (
     <tr
       id={`row-${b.public_id}`}
@@ -73,7 +74,16 @@ export function BookingRow({
 
       {/* Favourites & Notes */}
       <td className="py-3.5 px-4 max-w-xs">
-        <div className="space-y-1">
+        <div className="space-y-1.5">
+          {offer && (
+            <div
+              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-950 border border-amber-300 shadow-2xs"
+              title={`Offer applied: ${offer}`}
+            >
+              <span className="text-xs">🎁</span>
+              <span className="truncate max-w-[200px]">Offer: {offer}</span>
+            </div>
+          )}
           {b.preselected_dish && (
             <div className="flex flex-wrap gap-1">
               {b.preselected_dish.split(", ").map((d) => (
@@ -86,11 +96,11 @@ export function BookingRow({
               ))}
             </div>
           )}
-          {b.notes ? (
+          {cleanNotes ? (
             <p className="text-[11px] text-zinc-600 line-clamp-2 italic">
-              &ldquo;{b.notes}&rdquo;
+              &ldquo;{cleanNotes}&rdquo;
             </p>
-          ) : !b.preselected_dish ? (
+          ) : !b.preselected_dish && !offer ? (
             <span className="text-zinc-400 text-[11px]">—</span>
           ) : null}
         </div>

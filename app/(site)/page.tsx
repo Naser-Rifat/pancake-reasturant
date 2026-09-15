@@ -84,11 +84,16 @@ export default async function Home() {
           const card2Dish =
             pickedDish(announcement.card2_dish) ??
             menu.items.find((m) => m.is_featured && (m.photo || m.image));
+          const offerMenuUrl =
+            announcement.link_url === "/menu" || !announcement.link_url
+              ? `/menu?tag=deals&offer=${encodeURIComponent(announcement.message)}`
+              : safeHref(announcement.link_url, "/menu");
+
           const cards = [
             card1Dish
               ? dishCard(card1Dish, "✨ Special")
               : {
-                  href: safeHref(announcement.link_url, "/menu"),
+                  href: offerMenuUrl,
                   label: "The Offer",
                   tag: "✨ Special",
                   img: announcement.image,
@@ -126,7 +131,7 @@ export default async function Home() {
                     <span className="promo-kicker">{site?.promo_kicker || "TODAY'S FEATURED SPECIAL"}</span>
                     <h2 className="promo-head">{announcement.message}</h2>
                     {announcement.link_url && (
-                      <Link href={safeHref(announcement.link_url, "/menu")} className="promo-cta-btn">
+                      <Link href={offerMenuUrl} className="promo-cta-btn">
                         <span>{announcement.link_text || "EXPLORE THE MENU"}</span>
                         <span className="promo-arrow">→</span>
                       </Link>

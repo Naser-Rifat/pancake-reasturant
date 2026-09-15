@@ -26,7 +26,7 @@ export const EMPTY_PHONE_BOOKING: PhoneBooking = {
   notes: "",
 };
 
-export { formatTime12h } from "@/lib/format";
+export { formatTime12h, parseBookingOffer } from "@/lib/format";
 
 // Two-tone chime for new incoming booking requests.
 export function newBookingChime() {

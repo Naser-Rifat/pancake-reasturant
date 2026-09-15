@@ -33,7 +33,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton, TableSkeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { StatusBadge } from "@/components/admin/StatusBadge";
-import { formatTime12h } from "@/lib/format";
+import { formatTime12h, parseBookingOffer } from "@/lib/format";
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -314,20 +314,31 @@ export default function DashboardPage() {
             <div className="py-12 text-center text-xs text-zinc-400">No upcoming reservations found.</div>
           ) : (
             <div className="space-y-3">
-              {recentBookings.map((b) => (
-                <Link
-                  key={b.public_id}
-                  href={`/admin/bookings?focus=${b.public_id}`}
-                  title="Open this reservation in Bookings"
-                  className="group p-3.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 hover:border-[#763a12]/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-xs text-[#211a14]">{b.name}</span>
-                      <span className="px-2 py-0.2 rounded-full text-[10px] font-semibold bg-amber-50 text-[#763a12] border border-amber-200">
-                        {b.party_size} {b.party_size === 1 ? "Guest" : "Guests"}
-                      </span>
-                    </div>
+              {recentBookings.map((b) => {
+                const { offer } = parseBookingOffer(b.notes);
+                return (
+                  <Link
+                    key={b.public_id}
+                    href={`/admin/bookings?focus=${b.public_id}`}
+                    title="Open this reservation in Bookings"
+                    className="group p-3.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 hover:border-[#763a12]/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-semibold text-xs text-[#211a14]">{b.name}</span>
+                        <span className="px-2 py-0.2 rounded-full text-[10px] font-semibold bg-amber-50 text-[#763a12] border border-amber-200">
+                          {b.party_size} {b.party_size === 1 ? "Guest" : "Guests"}
+                        </span>
+                        {offer && (
+                          <span
+                            className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-950 border border-amber-300 inline-flex items-center gap-1 shadow-2xs"
+                            title={`Offer: ${offer}`}
+                          >
+                            <span>🎁</span>
+                            <span className="truncate max-w-[150px]">{offer}</span>
+                          </span>
+                        )}
+                      </div>
                     <div className="text-[11px] text-zinc-500 flex items-center gap-2">
                       {(() => {
                         const day = new Date(`${b.date}T00:00:00`);
@@ -364,7 +375,8 @@ export default function DashboardPage() {
                     <ArrowRight className="h-3.5 w-3.5 text-[#763a12] opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </Link>
-              ))}
+              );
+            })}
             </div>
           )}
         </div>

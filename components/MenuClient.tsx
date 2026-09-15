@@ -38,43 +38,9 @@ export default function MenuClient({
   // cart data and drawer both live in lib/cart now
   const { loaded, add: addToCart, openCart, reconcile, setCouponCode, showToast } = useCart();
   const [selectedTag, setSelectedTag] = useState<string>("all");
+  const [activeOffer, setActiveOffer] = useState<string>("");
 
-  // Identify dishes associated with active campaigns or house specials
-  const dealItems = items.filter((item) => {
-    if (item.is_featured) return true;
-    return campaigns.some((c) => {
-      const matchSlug = c.card1_dish === item.slug || c.card2_dish === item.slug;
-      const matchText =
-        c.message.toLowerCase().includes(item.slug.toLowerCase()) ||
-        c.message.toLowerCase().includes(item.name.toLowerCase()) ||
-        c.details.toLowerCase().includes(item.name.toLowerCase()) ||
-        (item.slug === "buttermilk" && c.message.toLowerCase().includes("buttermilk"));
-      return matchSlug || matchText;
-    });
-  });
-
-  const getDealBadge = (slug: string) => {
-    const campaign = campaigns.find((c) => {
-      return (
-        c.card1_dish === slug ||
-        c.card2_dish === slug ||
-        c.message.toLowerCase().includes(slug) ||
-        (slug === "buttermilk" && c.message.toLowerCase().includes("buttermilk"))
-      );
-    });
-    if (campaign) {
-      const msg = campaign.message.toLowerCase();
-      if (msg.includes("2-for-1") || msg.includes("2 for 1")) return "🔥 2-for-1 Special";
-      if (msg.includes("20% off") || msg.includes("20%")) return "🔥 20% Off";
-      if (msg.includes("free")) return "🎁 Free Deal";
-      return "🔥 Special Deal";
-    }
-    const item = items.find((i) => i.slug === slug);
-    if (item?.is_featured) return "⭐ House Favourite";
-    return undefined;
-  };
-
-  // Handle URL query parameters (?tag=deals, ?coupon=..., ?add=...)
+  // Handle URL query parameters (?tag=deals, ?offer=..., ?coupon=..., ?add=...)
   useEffect(() => {
     if (!loaded) return;
     reconcile(items.map((b) => b.slug));
@@ -84,10 +50,29 @@ export default function MenuClient({
       showToast("Payment cancelled — your order is still in the cart. 🛒");
     }
 
-    // Switch to deals tab if requested
+    // Switch to deals tab if requested and capture specific offer
     const tagParam = params.get("tag");
-    if (tagParam === "deals" || params.get("deal") || params.get("special")) {
+    const offerParam = params.get("offer") || params.get("deal") || params.get("special");
+    if (offerParam) {
+      setActiveOffer(offerParam);
+    }
+
+    if (tagParam === "deals" || offerParam) {
       setSelectedTag("deals");
+      setTimeout(() => {
+        const banner = document.querySelector(".menu-deals-banner") || document.querySelector(".menu-filter-bar");
+        if (banner) {
+          const nav = document.querySelector(".nav");
+          const ribbon = document.querySelector(".top-ribbon");
+          const navBottom = nav
+            ? nav.getBoundingClientRect().bottom
+            : ribbon
+            ? ribbon.getBoundingClientRect().bottom + 60
+            : 120;
+          const y = banner.getBoundingClientRect().top + window.pageYOffset - (navBottom + 20);
+          window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+        }
+      }, 140);
     } else if (tagParam) {
       setSelectedTag(tagParam);
     }
@@ -117,6 +102,43 @@ export default function MenuClient({
   const add = (slug: string) => {
     addToCart(slug);
     showToast(`${itemBySlug(slug).name} added to your order 🥞`);
+  };
+
+  // Identify dishes associated with active campaigns or house specials
+  const dealItems = useMemo(() => {
+    return items.filter((item) => {
+      if (item.is_featured) return true;
+      return campaigns.some((c) => {
+        const matchSlug = c.card1_dish === item.slug || c.card2_dish === item.slug;
+        const matchText =
+          c.message.toLowerCase().includes(item.slug.toLowerCase()) ||
+          c.message.toLowerCase().includes(item.name.toLowerCase()) ||
+          (c.details && c.details.toLowerCase().includes(item.name.toLowerCase())) ||
+          (item.slug === "buttermilk" && c.message.toLowerCase().includes("buttermilk"));
+        return matchSlug || matchText;
+      });
+    });
+  }, [items, campaigns]);
+
+  const getDealBadge = (slug: string) => {
+    const campaign = campaigns.find((c) => {
+      return (
+        c.card1_dish === slug ||
+        c.card2_dish === slug ||
+        c.message.toLowerCase().includes(slug) ||
+        (slug === "buttermilk" && c.message.toLowerCase().includes("buttermilk"))
+      );
+    });
+    if (campaign) {
+      const msg = campaign.message.toLowerCase();
+      if (msg.includes("2-for-1") || msg.includes("2 for 1")) return "🔥 2-for-1 Special";
+      if (msg.includes("20% off") || msg.includes("20%")) return "🔥 20% Off";
+      if (msg.includes("free")) return "🎁 Free Deal";
+      return "🔥 Special Deal";
+    }
+    const item = items.find((i) => i.slug === slug);
+    if (item?.is_featured) return "⭐ House Favourite";
+    return undefined;
   };
 
   const displayCategories = useMemo(() => {
@@ -291,24 +313,52 @@ export default function MenuClient({
             {campaigns.length > 0 && (
               <div className="deals-cards-grid">
                 {campaigns.map((c) => {
-                  const isBooking = c.link_url?.includes("booking");
+                  const isBooking = c.link_url?.includes("booking") || c.message.toLowerCase().includes("free") || c.message.toLowerCase().includes("sunday");
+                  const isMatched = Boolean(
+                    activeOffer &&
+                    (c.message.toLowerCase().includes(activeOffer.toLowerCase()) ||
+                     activeOffer.toLowerCase().includes(c.message.toLowerCase()))
+                  );
+                  const bookingHref = `/booking?offer=${encodeURIComponent(c.message)}`;
+
                   return (
-                    <div className="deals-ticket-card" key={c.message}>
-                      <div className="ticket-tag">
-                        {isBooking ? "🍽️ Dine-In Special" : "🥞 Takeaway Offer"}
+                    <div
+                      className={`deals-ticket-card${isMatched ? " deals-ticket-highlighted" : ""}`}
+                      key={c.message}
+                      id={isMatched ? "active-deal-ticket" : undefined}
+                    >
+                      <div className="ticket-top-row">
+                        <div className="ticket-tag">
+                          {isBooking ? "🍽️ Dine-In Special" : "🥞 Takeaway & Dine-In"}
+                        </div>
+                        {isMatched && (
+                          <span className="ticket-active-badge">✨ Selected Offer</span>
+                        )}
                       </div>
                       <h4>{c.message}</h4>
                       {c.details && <p className="ticket-details">{c.details}</p>}
-                      {c.link_url && (
-                        <div className="ticket-action">
-                          <Link href={c.link_url} className="ticket-btn">
-                            <span>
-                              {c.link_text || (isBooking ? "Book a Table" : "Explore Deal")}
-                            </span>
+                      <div className="ticket-action">
+                        {isBooking ? (
+                          <Link href={bookingHref} className="ticket-btn">
+                            <span>Book a Table for Deal</span>
                             <span aria-hidden="true">→</span>
                           </Link>
-                        </div>
-                      )}
+                        ) : (
+                          <button
+                            type="button"
+                            className="ticket-btn"
+                            onClick={() => {
+                              const target = document.querySelector(".menu-deals-board");
+                              if (target) {
+                                target.scrollIntoView({ behavior: "smooth" });
+                              }
+                            }}
+                          >
+                            <span>Explore Special Dishes</span>
+                            <span aria-hidden="true">↓</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   );
                 })}

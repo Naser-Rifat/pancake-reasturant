@@ -147,12 +147,22 @@ export default function CampaignSlider({
               const urgency = endsLabel(c.ends_at);
               const imgSrc = c.image || DEFAULT_IMAGE;
 
+              const bookingUrl = `/booking?offer=${encodeURIComponent(c.message)}`;
+              const exploreUrl =
+                c.link_url === "/menu" || !c.link_url
+                  ? `/menu?tag=deals&offer=${encodeURIComponent(c.message)}`
+                  : safeHref(c.link_url);
+
               return (
                 <SwiperSlide key={c.message} className="camp-swiper-slide">
                   <article className="camp-slide diner-craft-ticket">
                     {/* Left: Pure mouth-watering food photography */}
                     <div className="camp-left">
-                      <div className="camp-shot">
+                      <Link
+                        href={exploreUrl}
+                        className="camp-shot"
+                        aria-label={`View deal: ${c.message}`}
+                      >
                         <Image
                           src={imgSrc}
                           alt={c.message}
@@ -161,7 +171,7 @@ export default function CampaignSlider({
                           priority
                           className="camp-shot-img"
                         />
-                      </div>
+                      </Link>
                     </div>
 
                     {/* Scissors on the coupon tear line */}
@@ -204,22 +214,13 @@ export default function CampaignSlider({
                       )}
 
                       <div className="camp-actions-row">
-                        <Link href="/booking" className="camp-cta">
+                        <Link href={bookingUrl} className="camp-cta">
                           <span>{c.link_url === "/booking" && c.link_text ? c.link_text : "Book a Table"}</span>
                           <ArrowRight size={16} strokeWidth={2.5} className="camp-btn-arrow" />
                         </Link>
-                        {c.link_url && c.link_url !== "/booking" ? (
-                          <Link
-                            href={c.link_url === "/menu" ? "/menu?tag=deals" : safeHref(c.link_url)}
-                            className="camp-cta-secondary"
-                          >
-                            <span>{c.link_text || "Explore Menu"}</span>
-                          </Link>
-                        ) : (
-                          <Link href="/menu?tag=deals" className="camp-cta-secondary">
-                            <span>Explore Menu</span>
-                          </Link>
-                        )}
+                        <Link href={exploreUrl} className="camp-cta-secondary">
+                          <span>{c.link_url !== "/booking" && c.link_text ? c.link_text : "Explore Menu"}</span>
+                        </Link>
                       </div>
 
                       {/* Vintage Rubber Stamp Watermark */}

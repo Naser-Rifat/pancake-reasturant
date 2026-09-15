@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import MenuClient from "@/components/MenuClient";
-import { getCampaigns, getCategories, getMenuWithStatus, getSite } from "@/lib/api";
+import { getAnnouncement, getCampaigns, getCategories, getMenuWithStatus, getSite } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -12,12 +12,19 @@ export const metadata: Metadata = {
 };
 
 export default async function MenuPage() {
-  const [{ items, live }, site, campaigns, categories] = await Promise.all([
+  const [announcement, { items, live }, site, campaigns, categories] = await Promise.all([
+    getAnnouncement(),
     getMenuWithStatus(),
     getSite(),
     getCampaigns(),
     getCategories(),
   ]);
+
+  // Ensure active announcement offer is present in the deals list for full consistency
+  const allCampaigns = [...campaigns];
+  if (announcement && !allCampaigns.some((c) => c.message === announcement.message)) {
+    allCampaigns.unshift(announcement);
+  }
 
   return (
     <>
@@ -34,7 +41,7 @@ export default async function MenuPage() {
       <MenuClient
         items={items}
         categories={categories}
-        campaigns={campaigns}
+        campaigns={allCampaigns}
         live={live && site.online_ordering_enabled}
         phone={site.phone}
         pauseMessage={site.online_ordering_disabled_message}

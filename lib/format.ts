@@ -74,3 +74,44 @@ export function validatePhoneNumber(phone: string): { isValid: boolean; error?: 
   return { isValid: true };
 }
 
+/**
+ * Extracts campaign / special offer name linked to a booking reservation note.
+ * Handles formats created when guests reserve via campaign CTAs:
+ * - "Special Offer: XYZ"
+ * - "Guest request · [Offer: XYZ]"
+ */
+export function parseBookingOffer(notes?: string | null): { offer: string | null; cleanNotes: string } {
+  if (!notes) return { offer: null, cleanNotes: "" };
+  const trimmed = notes.trim();
+
+  // Pattern 1: "[Offer: XYZ]"
+  const bracketMatch = trimmed.match(/\[Offer:\s*([^\]]+)\]/i);
+  if (bracketMatch) {
+    const offer = bracketMatch[1].trim();
+    const cleanNotes = trimmed
+      .replace(/·?\s*\[Offer:\s*[^\]]+\]/i, "")
+      .replace(/^·\s*/, "")
+      .trim();
+    return { offer, cleanNotes };
+  }
+
+  // Pattern 2: "Special Offer: XYZ" at start
+  const specialMatch = trimmed.match(/^(?:Special Offer|Offer):\s*(.+)$/i);
+  if (specialMatch) {
+    return { offer: specialMatch[1].trim(), cleanNotes: "" };
+  }
+
+  // Pattern 3: Inline delimiter "· Special Offer: XYZ"
+  const inlineMatch = trimmed.match(/(?:^|·)\s*(?:Special Offer|Offer):\s*([^·\n]+)/i);
+  if (inlineMatch) {
+    const offer = inlineMatch[1].trim();
+    const cleanNotes = trimmed
+      .replace(/(?:^|·)\s*(?:Special Offer|Offer):\s*[^·\n]+/i, "")
+      .replace(/^·\s*/, "")
+      .trim();
+    return { offer, cleanNotes };
+  }
+
+  return { offer: null, cleanNotes: trimmed };
+}
+

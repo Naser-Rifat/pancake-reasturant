@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createBooking, type ApiBooking } from "@/lib/api";
 import { validatePhoneNumber } from "@/lib/format";
 
@@ -18,6 +18,18 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
     party_size: 2,
     notes: "",
   });
+  const [offer, setOffer] = useState<string>("");
+
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const offerParam = params.get("offer") || params.get("campaign") || params.get("deal");
+      if (offerParam) {
+        setOffer(offerParam);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
   // several favourites, not one — joined into the booking's text field on submit
   const [dishes, setDishes] = useState<string[]>([]);
   // past this many dishes the chip wall would push the form apart — collapse the tail
@@ -46,10 +58,15 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
     }
 
     setSubmitting(true);
+    const finalNotes = offer
+      ? (form.notes.trim() ? `${form.notes.trim()} · [Offer: ${offer}]` : `Special Offer: ${offer}`)
+      : form.notes;
+
     try {
       setBooking(
         await createBooking({
           ...form,
+          notes: finalNotes,
           party_size: Number(form.party_size),
           preselected_dish: dishes.join(", "),
         })
@@ -68,7 +85,8 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
         <b>Request received, {form.name.split(" ")[0]}!</b>
         <span>
           {booking.date} at {booking.time.slice(0, 5)} for {booking.party_size}
-          {dishes.length > 0 ? ` (${dishes.join(", ")})` : ""} — we&apos;ll
+          {dishes.length > 0 ? ` (${dishes.join(", ")})` : ""}
+          {offer ? ` · Special Offer "${offer}" linked` : ""} — we&apos;ll
           email {form.email} as soon as it&apos;s confirmed.
         </span>
       </div>
@@ -77,6 +95,16 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
 
   return (
     <form className="bk-form" onSubmit={submit}>
+      {offer && (
+        <div className="bk-offer-badge" role="status">
+          <span className="bk-offer-sparkle">🎁</span>
+          <div className="bk-offer-info">
+            <span className="bk-offer-tag">Special Offer Reservation</span>
+            <strong className="bk-offer-name">{offer}</strong>
+          </div>
+          <span className="bk-offer-chip">Offer Linked ✓</span>
+        </div>
+      )}
       <input className="input" placeholder="Your name *" required value={form.name} autoComplete="name" onChange={set("name")} />
       <input className="input" type="email" placeholder="Email *" required value={form.email} autoComplete="email" onChange={set("email")} />
       <input className="input" placeholder="Phone (optional)" value={form.phone} autoComplete="tel" inputMode="tel" onChange={set("phone")} />

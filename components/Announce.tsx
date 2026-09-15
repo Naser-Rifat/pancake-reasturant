@@ -30,20 +30,31 @@ export default function Announce({ data }: { data: ApiAnnouncement | null }) {
 
   if (!shown || !data) return null;
 
+  const offerUrl =
+    data.link_url === "/menu" || !data.link_url
+      ? `/menu?tag=deals&offer=${encodeURIComponent(data.message)}`
+      : safeHref(data.link_url);
+
   return (
     <aside className="announce" role="region" aria-label="Announcement">
-      <div className="announce-content">
+      <Link
+        href={offerUrl}
+        className="announce-content"
+        aria-label={`${data.message} ${data.link_text || "Explore"}`}
+      >
         <span className="announce-msg">{data.message}</span>
         {data.link_text && (
-          <Link href={safeHref(data.link_url)} className="announce-link">
+          <span className="announce-link">
             {data.link_text}
-          </Link>
+          </span>
         )}
-      </div>
+      </Link>
       <button
         className="announce-close"
         aria-label="Dismiss announcement"
-        onClick={() => {
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
           setVisible(false);
           try {
             sessionStorage.setItem("krush-announce-closed", "1");
