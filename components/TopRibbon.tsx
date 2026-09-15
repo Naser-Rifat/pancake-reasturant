@@ -45,7 +45,7 @@ export default function TopRibbon({
 
   return (
     <aside className="top-ribbon" aria-label="Store Information and Online Ordering">
-      <div className="container top-ribbon-inner">
+      <div className="top-ribbon-inner">
         {/* Left: Store Location & Operating Note */}
         <div className="top-ribbon-left">
           <Link href="/#contact" className="top-ribbon-loc">
