@@ -12,7 +12,6 @@ import {
   AlertCircle,
   CheckCircle2,
   Utensils,
-  ArrowUpDown,
   MoveUp,
   MoveDown,
   X,
@@ -83,6 +82,7 @@ export default function AdminCategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(null);
   const [formData, setFormData] = useState<CategoryFormData>(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
+  const [reordering, setReordering] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [autoSlug, setAutoSlug] = useState(true);
 
@@ -219,25 +219,56 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  const handleOrderStep = async (cat: AdminCategory, delta: number) => {
-    const newOrder = Math.max(0, cat.sort_order + delta);
-    if (newOrder === cat.sort_order) return;
+  const orderedCategories = useMemo(
+    () =>
+      [...categories].sort(
+        (a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name),
+      ),
+    [categories],
+  );
 
-    setCategories((prev) =>
-      prev
-        .map((c) => (c.id === cat.id ? { ...c, sort_order: newOrder } : c))
-        .sort((a, b) => a.sort_order - b.sort_order)
+  const handleOrderStep = async (cat: AdminCategory, delta: -1 | 1) => {
+    if (reordering) return;
+
+    const from = orderedCategories.findIndex((item) => item.id === cat.id);
+    const to = from + delta;
+    if (from < 0 || to < 0 || to >= orderedCategories.length) return;
+
+    const previous = categories;
+    const reordered = [...orderedCategories];
+    [reordered[from], reordered[to]] = [reordered[to], reordered[from]];
+    const normalized = reordered.map((item, index) => ({
+      ...item,
+      sort_order: index + 1,
+    }));
+    const oldOrder = new Map(previous.map((item) => [item.id, item.sort_order]));
+    const changed = normalized.filter(
+      (item) => oldOrder.get(item.id) !== item.sort_order,
     );
 
+    setCategories(normalized);
+    setReordering(true);
     try {
-      await updateCategory(cat.id, { sort_order: newOrder });
+      await Promise.all(
+        changed.map((item) =>
+          updateCategory(item.id, { sort_order: item.sort_order }),
+        ),
+      );
+      toast({
+        variant: "success",
+        title: "Category order updated",
+        description: `“${cat.name}” is now in position ${to + 1}.`,
+      });
     } catch (err: any) {
-      loadCategories();
+      setCategories(previous);
+      await loadCategories();
       toast({
         title: "Reorder failed",
         description: err?.message || "Could not reorder category.",
         variant: "error",
       });
+    } finally {
+      setReordering(false);
     }
   };
 
@@ -274,7 +305,7 @@ export default function AdminCategoriesPage() {
   };
 
   const filteredCategories = useMemo(() => {
-    return categories.filter((c) => {
+    return orderedCategories.filter((c) => {
       const matchesSearch =
         !searchQuery.trim() ||
         c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -290,7 +321,7 @@ export default function AdminCategoriesPage() {
 
       return matchesSearch && matchesStatus;
     });
-  }, [categories, searchQuery, filterStatus]);
+  }, [orderedCategories, searchQuery, filterStatus]);
 
   useEffect(() => {
     setPage(1);
@@ -451,7 +482,7 @@ export default function AdminCategoriesPage() {
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-zinc-200 bg-zinc-50/70 text-zinc-600 font-bold uppercase tracking-wider text-[10px]">
-                  <th className="py-3 px-4 w-14 text-center">Order</th>
+                  <th className="py-3 px-4 w-24 text-center">Position</th>
                   <th className="py-3 px-4">Category</th>
                   <th className="py-3 px-4">Slug</th>
                   <th className="py-3 px-4">Description</th>
@@ -461,20 +492,23 @@ export default function AdminCategoriesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200">
-                {pageCategories.map((cat) => (
-                  <tr key={cat.id} className="hover:bg-zinc-50/60 transition-colors group">
+                {pageCategories.map((cat) => {
+                  const position = orderedCategories.findIndex((item) => item.id === cat.id);
+                  return (
+                    <tr key={cat.id} className="hover:bg-zinc-50/60 transition-colors group">
                     {/* Sort Order Controls */}
                     <td className="py-3 px-3 text-center">
                       <div className="inline-flex items-center gap-1">
                         <span className="font-mono font-bold text-zinc-700 w-5">
-                          {cat.sort_order}
+                          {position + 1}
                         </span>
                         <div className="flex flex-col gap-0.5">
                           <button
                             type="button"
                             title="Move Up"
                             onClick={() => handleOrderStep(cat, -1)}
-                            className="p-0.5 text-zinc-400 hover:text-zinc-900 rounded hover:bg-zinc-200"
+                            disabled={reordering || position === 0}
+                            className="p-0.5 text-zinc-400 hover:text-zinc-900 rounded hover:bg-zinc-200 disabled:opacity-25 disabled:pointer-events-none"
                           >
                             <MoveUp className="h-3 w-3" />
                           </button>
@@ -482,7 +516,8 @@ export default function AdminCategoriesPage() {
                             type="button"
                             title="Move Down"
                             onClick={() => handleOrderStep(cat, 1)}
-                            className="p-0.5 text-zinc-400 hover:text-zinc-900 rounded hover:bg-zinc-200"
+                            disabled={reordering || position === orderedCategories.length - 1}
+                            className="p-0.5 text-zinc-400 hover:text-zinc-900 rounded hover:bg-zinc-200 disabled:opacity-25 disabled:pointer-events-none"
                           >
                             <MoveDown className="h-3 w-3" />
                           </button>
@@ -574,8 +609,9 @@ export default function AdminCategoriesPage() {
                         </Button>
                       </div>
                     </td>
-                  </tr>
-                ))}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -760,24 +796,16 @@ export default function AdminCategoriesPage() {
               {/* Order & Active Status */}
               <div className="grid grid-cols-2 gap-4 pt-1">
                 <div>
-                  <Label htmlFor="cat-order" className="text-xs font-semibold text-zinc-800">
-                    Sort Order Priority
+                  <Label className="text-xs font-semibold text-zinc-800">
+                    Menu Position
                   </Label>
-                  <Input
-                    id="cat-order"
-                    type="number"
-                    min={0}
-                    value={formData.sort_order}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        sort_order: parseInt(e.target.value, 10) || 0,
-                      }))
-                    }
-                    className="mt-1 text-xs h-9 rounded-xl border-zinc-300"
-                  />
+                  <div className="mt-1 h-9 rounded-xl border border-zinc-200 bg-zinc-50 px-3 flex items-center text-xs font-bold text-zinc-700">
+                    {editingCategory
+                      ? `Position ${orderedCategories.findIndex((item) => item.id === editingCategory.id) + 1}`
+                      : "Added at the end"}
+                  </div>
                   <span className="text-[10px] text-zinc-400 mt-0.5 block">
-                    Lower numbers appear first (e.g. 1, 2, 3)
+                    Use the arrows in the category table to change it.
                   </span>
                 </div>
 
