@@ -6,17 +6,14 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import CertIcon from "@/components/CertIcon";
 import HeroShowcase from "@/components/HeroShowcase";
-import {
-  OrderOnlineSticker,
-  GriddleFreshSticker,
-  PickUpHotSticker,
-} from "@/components/icons/StepStickers";
+import MenuClient from "@/components/MenuClient";
+import type { ApiMenuItem } from "@/lib/api";
 import {
   type AdminSiteSettings,
   type AdminAnnouncement,
+  type AdminCategory,
   type AdminCertification,
   type AdminGalleryPhoto,
-  type AdminHomeStep,
   type AdminMenuItem,
 } from "@/lib/admin-api";
 import {
@@ -26,7 +23,6 @@ import {
   DEFAULT_DISHES,
   DEFAULT_PHOTOS,
   DEFAULT_SITE,
-  DEFAULT_STEPS,
 } from "./_lib";
 
 /** Honest banner over the deal preview: the design below is shown as you're
@@ -93,10 +89,16 @@ export default function PreviewPage() {
 
   const [certs, setCerts] = useState<AdminCertification[]>(DEFAULT_CERTS);
   const [photos, setPhotos] = useState<AdminGalleryPhoto[]>(DEFAULT_PHOTOS);
-  const [steps, setSteps] = useState<AdminHomeStep[]>(DEFAULT_STEPS);
+  const [categories, setCategories] = useState<AdminCategory[]>([]);
+  const [campaigns, setCampaigns] = useState<AdminAnnouncement[]>([]);
   const [dishes, setDishes] = useState<AdminMenuItem[]>(DEFAULT_DISHES);
 
   const featuredDishes = dishes.filter((dish) => dish.is_featured);
+  const previewMenuItems: ApiMenuItem[] = dishes.map((dish) => ({
+    ...dish,
+    category: null,
+    photos: [],
+  }));
 
   useEffect(() => {
     const handler = (e: MessageEvent) => {
@@ -112,7 +114,8 @@ export default function PreviewPage() {
         customBadge: nextBadge,
         certs: nextCerts,
         photos: nextPhotos,
-        steps: nextSteps,
+        categories: nextCategories,
+        campaigns: nextCampaigns,
         dishes: nextDishes,
       } = e.data;
       if (s) setSection(s);
@@ -125,8 +128,9 @@ export default function PreviewPage() {
       if (nextBadge !== undefined) setCustomBadge(nextBadge);
       if (nextCerts) setCerts(nextCerts);
       if (nextPhotos) setPhotos(nextPhotos);
-      if (nextSteps) setSteps(nextSteps);
-      if (nextDishes && Array.isArray(nextDishes) && nextDishes.length > 0) setDishes(nextDishes);
+      if (Array.isArray(nextCategories)) setCategories(nextCategories);
+      if (Array.isArray(nextCampaigns)) setCampaigns(nextCampaigns);
+      if (Array.isArray(nextDishes)) setDishes(nextDishes);
       setSynced(true);
     };
 
@@ -583,47 +587,28 @@ export default function PreviewPage() {
         </footer>
       )}
 
-      {/* ========================================================================= */}
-      {/* 7. MENU HEADER & 3-STEP PICKUP PREVIEW                                    */}
-      {/* ========================================================================= */}
+      {/* The real public menu component keeps category order and dish boards
+          identical between the storefront and this admin preview. */}
       {section === "menu" && (
-        /* same hero + sticker step cards as the live /menu page */
         <>
-          <section className="menu-hero" style={{ padding: "2rem 0 1rem" }}>
+          <section className="menu-hero">
             <div className="container">
               <h1>
-                {site.menu_hero_heading || "Stacks On"}{" "}
-                <span className="accent">{site.menu_hero_script || "Stacks."}</span>
+                {site.menu_hero_heading || "Pick your"}{" "}
+                <span className="accent">{site.menu_hero_script || "Favourites"}</span>
               </h1>
-              <p>{site.menu_hero_lead || "Signature pancake stacks. Griddled to order. Zero regrets."}</p>
+              <p>{site.menu_hero_lead || "Freshly made and served with love"}</p>
             </div>
           </section>
-          {steps.length > 0 && (
-            <section className="pickup-steps-section" style={{ padding: "0 0 1.5rem" }}>
-              <div className="container">
-                <div className="pickup-steps-grid">
-                  {steps.map((st, i) => {
-                    const stickers = [OrderOnlineSticker, GriddleFreshSticker, PickUpHotSticker];
-                    const StickerComp = stickers[i % stickers.length];
-                    return (
-                      <article className="pickup-step-card" key={st.id}>
-                        <div className="ps-icon-badge-wrap">
-                          <div className="ps-sticker-bubble">
-                            <StickerComp />
-                          </div>
-                          <span className="ps-step-pill">STEP 0{i + 1}</span>
-                        </div>
-                        <div className="ps-content">
-                          <h3 className="ps-title">{st.title}</h3>
-                          <p className="ps-desc">{st.text}</p>
-                        </div>
-                      </article>
-                    );
-                  })}
-                </div>
-              </div>
-            </section>
-          )}
+          <MenuClient
+            items={previewMenuItems}
+            categories={categories}
+            campaigns={campaigns}
+            live={site.online_ordering_enabled}
+            phone={site.phone}
+            pauseMessage={site.online_ordering_disabled_message}
+            uberEatsUrl={site.uber_eats_url}
+          />
         </>
       )}
 

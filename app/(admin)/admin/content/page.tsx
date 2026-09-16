@@ -22,12 +22,12 @@ import {
 import {
   getSiteSettings,
   listAnnouncements,
+  listCategories,
   listCertifications,
-  listHomeSteps,
   listMenu,
   listGalleryAdmin,
   updateSiteSettings,
-  type AdminHomeStep,
+  type AdminCategory,
   type AdminMenuItem,
   type AdminAnnouncement,
   type AdminCertification,
@@ -99,7 +99,7 @@ export default function ContentPage() {
   const [galleryFilter, setGalleryFilter] = useState<string>("all");
   const [newPhoto, setNewPhoto] = useState(EMPTY_PHOTO);
   const [newCert, setNewCert] = useState(EMPTY_CERT);
-  const [steps, setSteps] = useState<AdminHomeStep[]>([]);
+  const [categories, setCategories] = useState<AdminCategory[]>([]);
   const [menuItems, setMenuItems] = useState<AdminMenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -116,16 +116,16 @@ export default function ContentPage() {
       listAnnouncements(),
       listCertifications(),
       listGalleryAdmin(),
-      listHomeSteps(),
+      listCategories(),
       listMenu(),
     ])
-      .then(([s, anns, cs, ps, st, menu]) => {
+      .then(([s, anns, cs, ps, cats, menu]) => {
         setSite(s);
         setAnnouncements(anns);
         setSelectedDealId(anns[0]?.id ?? null);
         setCerts(cs);
         setPhotos(ps);
-        setSteps(st);
+        setCategories(cats);
         setMenuItems(menu);
         setError("");
       })
@@ -198,12 +198,13 @@ export default function ContentPage() {
         customBadge: activeDeal ? getDealCadence(activeDeal) : "",
         certs,
         photos,
-        steps,
+        categories,
+        campaigns: announcements,
         dishes: menuItems,
       },
       "*"
     );
-  }, [currentPreviewSection, site, activeDeal, certs, photos, steps, menuItems]);
+  }, [currentPreviewSection, site, activeDeal, announcements, certs, photos, categories, menuItems]);
 
   useEffect(() => {
     syncPreview();
@@ -662,8 +663,6 @@ export default function ContentPage() {
         <MenuPageSection
           site={site}
           setS={setS}
-          steps={steps}
-          setSteps={setSteps}
           busy={busy}
           run={run}
         />
