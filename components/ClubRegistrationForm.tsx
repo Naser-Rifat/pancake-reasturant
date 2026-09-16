@@ -15,7 +15,6 @@ interface FormState {
   email: string;
   marketing_consent: boolean;
   privacy_consent: boolean;
-  website: string;
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,7 +32,6 @@ export default function ClubRegistrationForm({ contactEmail }: { contactEmail: s
     email: "",
     marketing_consent: false,
     privacy_consent: false,
-    website: "",
   });
 
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<Field, string>>>({});
@@ -102,6 +100,16 @@ export default function ClubRegistrationForm({ contactEmail }: { contactEmail: s
     }));
   }
 
+  function handlePrivacyChange(checked: boolean) {
+    setFormValues((prev) => ({ ...prev, privacy_consent: checked }));
+    setTouched((prev) => ({ ...prev, privacy_consent: true }));
+    setFieldErrors((prev) => ({
+      ...prev,
+      privacy_consent: validateSingleField("privacy_consent", checked),
+    }));
+    setError("");
+  }
+
   function handleChange(field: keyof FormState, value: string | boolean) {
     setFormValues((prev) => ({ ...prev, [field]: value }));
     setError("");
@@ -155,7 +163,10 @@ export default function ClubRegistrationForm({ contactEmail }: { contactEmail: s
           email: formValues.email.trim(),
           privacy_consent: formValues.privacy_consent,
           marketing_consent: formValues.marketing_consent,
-          website: formValues.website,
+          // Keep the API's honeypot empty explicitly. A hidden browser input can
+          // be autofilled by password managers, which would make the API return
+          // its intentionally generic 202 response without saving the member.
+          website: "",
         }),
       });
 
@@ -302,19 +313,6 @@ export default function ClubRegistrationForm({ contactEmail }: { contactEmail: s
         )}
       </div>
 
-      {/* Honeypot for spam bots */}
-      <div className={styles.honeypot} aria-hidden="true">
-        <label htmlFor="club-website">Leave this empty</label>
-        <input
-          id="club-website"
-          name="website"
-          tabIndex={-1}
-          autoComplete="off"
-          value={formValues.website}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("website", e.target.value)}
-        />
-      </div>
-
       {/* Marketing Consent */}
       <label className={styles.check}>
         <input
@@ -336,10 +334,7 @@ export default function ClubRegistrationForm({ contactEmail }: { contactEmail: s
           type="checkbox"
           required
           checked={formValues.privacy_consent}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            handleChange("privacy_consent", e.target.checked);
-            handleBlur("privacy_consent");
-          }}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => handlePrivacyChange(e.target.checked)}
           aria-invalid={touched.privacy_consent && !!fieldErrors.privacy_consent}
           aria-describedby={fieldErrors.privacy_consent ? "club-privacy-error" : undefined}
         />
@@ -388,4 +383,3 @@ export default function ClubRegistrationForm({ contactEmail }: { contactEmail: s
     </form>
   );
 }
-

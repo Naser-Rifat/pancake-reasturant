@@ -56,7 +56,14 @@ test("club registration validates required fields and submits explicit consent",
   let calls = 0;
   await page.route("**/api/club/join/", async (route) => {
     calls++;
-    expect(route.request().postDataJSON()).toEqual({ name: "Alex Taylor", email: "alex@example.com", privacy_consent: true, marketing_consent: false, website: "" });
+    expect(route.request().postDataJSON()).toEqual({
+      name: "Alex Taylor",
+      email: "alex@example.com",
+      phone: "",
+      privacy_consent: true,
+      marketing_consent: false,
+      website: "",
+    });
     await route.fulfill({ status: 202, json: { detail: "Thanks for joining!" } });
   });
   await page.goto("/join-our-club");
@@ -67,6 +74,7 @@ test("club registration validates required fields and submits explicit consent",
   await page.getByLabel("Your name", { exact: true }).fill("Alex Taylor");
   await page.getByLabel("Email address", { exact: true }).fill("alex@example.com");
   await page.getByRole("checkbox", { name: /I agree to my details/ }).check();
+  await expect(page.getByText("Please agree to the privacy notice to join.")).toHaveCount(0);
   await page.getByRole("button", { name: "Count me in" }).click();
   await expect(page.getByRole("heading", { name: "Thanks for joining!" })).toBeVisible();
   expect(calls).toBe(1);

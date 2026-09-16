@@ -11,8 +11,9 @@ export const metadata = {
 
 export default function GlobalNotFound() {
   return (
-    <html lang="en-AU">
+    <html lang="en-AU" suppressHydrationWarning>
       <body
+        suppressHydrationWarning
         style={{
           margin: 0,
           minHeight: "100vh",

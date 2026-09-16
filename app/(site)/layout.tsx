@@ -128,8 +128,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   };
 
   return (
-    <html lang="en-AU">
+    <html lang="en-AU" suppressHydrationWarning>
       <body
+        suppressHydrationWarning
         data-theme={site.theme}
         style={themeStyle ?? undefined}
         className={`${serif.variable} ${script.variable} ${body.variable} ${round.variable} ${display.variable}`}

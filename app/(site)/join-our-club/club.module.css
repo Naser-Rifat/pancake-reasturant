@@ -688,14 +688,6 @@
   border-radius: 8px;
 }
 
-.honeypot {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-}
-
 .success {
   display: grid;
   gap: 16px;
@@ -871,4 +863,3 @@
     padding-bottom: 3rem;
   }
 }
-
