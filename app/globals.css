@@ -3983,20 +3983,11 @@ h2.title.inline .accent {
   overscroll-behavior-inline: contain;
   scroll-snap-type: inline mandatory;
   scroll-padding-inline: 0.2rem;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(118, 58, 18, 0.38) rgba(118, 58, 18, 0.08);
+  scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
 .cert-strip::-webkit-scrollbar {
-  height: 7px;
-}
-.cert-strip::-webkit-scrollbar-track {
-  background: rgba(118, 58, 18, 0.08);
-  border-radius: 999px;
-}
-.cert-strip::-webkit-scrollbar-thumb {
-  background: rgba(118, 58, 18, 0.38);
-  border-radius: 999px;
+  display: none;
 }
 .cert-strip:focus-visible {
   outline: 3px solid rgba(224, 134, 0, 0.32);
@@ -4063,13 +4054,27 @@ h2.title.inline .accent {
   font-weight: 500;
 }
 .cert-scroll-hint {
-  margin: 0.25rem 0 0;
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0.35rem auto 0;
+  padding: 0.35rem 0.85rem;
   text-align: center;
-  color: var(--muted);
-  font-size: 0.72rem;
-  font-weight: 700;
+  color: var(--deep, #763a12);
+  background: rgba(247, 200, 67, 0.16);
+  border: 1px dashed rgba(118, 58, 18, 0.22);
+  border-radius: 999px;
+  font-family: var(--font-round), sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+.cert-scroll-hint span {
+  color: var(--yellow-deep, #e08600);
+  font-size: 0.9rem;
+  line-height: 1;
 }
 @media (max-width: 640px) {
   .cert-strip {

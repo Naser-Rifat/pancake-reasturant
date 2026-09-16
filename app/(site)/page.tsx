@@ -479,7 +479,9 @@ export default async function Home() {
               ))}
             </ul>
             {certs.length > 1 && (
-              <p className="cert-scroll-hint" aria-hidden="true">Swipe or scroll to explore</p>
+              <p className="cert-scroll-hint" aria-hidden="true">
+                <span>←</span> Swipe or drag to explore <span>→</span>
+              </p>
             )}
           </div>
         </section>
