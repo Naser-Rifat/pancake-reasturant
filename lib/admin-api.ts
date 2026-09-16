@@ -5,6 +5,52 @@ import { API_URL, fetchWithTimeout, firstError } from "./api";
 
 const TOKEN_KEY = "krush-admin-token";
 
+export interface ClubMember {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  status: "active" | "archived";
+  marketing_consent: boolean;
+  marketing_consented_at: string | null;
+  privacy_accepted_at: string;
+  consent_version: string;
+  created_at: string;
+}
+
+export interface ClubStats {
+  total: number;
+  active: number;
+  archived: number;
+  consented: number;
+}
+
+export function getClubMembers(params: {
+  page: number;
+  pageSize: number;
+  search: string;
+  status: string;
+  consent?: string;
+}) {
+  const query = new URLSearchParams({
+    page: String(params.page),
+    page_size: String(params.pageSize),
+    search: params.search,
+    status: params.status,
+  });
+  if (params.consent) query.set("consent", params.consent);
+  return adminFetch<{ count: number; results: ClubMember[] }>(`/club-members/?${query}`);
+}
+
+export const getClubStats = () => adminFetch<ClubStats>("/club-members/stats/");
+
+export const updateClubMember = (id: number, status: ClubMember["status"]) =>
+  adminFetch<ClubMember>(`/club-members/${id}/`, { method: "PATCH", body: JSON.stringify({ status }) });
+export const revokeClubConsent = (id: number) =>
+  adminFetch<ClubMember>(`/club-members/${id}/revoke-consent/`, { method: "POST" });
+export const deleteClubMember = (id: number) =>
+  adminFetch<void>(`/club-members/${id}/`, { method: "DELETE" });
+
 export const getToken = () =>
   typeof window === "undefined" ? null : localStorage.getItem(TOKEN_KEY);
 export const setToken = (t: string) => localStorage.setItem(TOKEN_KEY, t);
@@ -349,6 +395,34 @@ export interface AdminSiteSettings {
   booking_hero_heading: string;
   booking_hero_script: string;
   booking_hero_lead: string;
+  club_hero_kicker?: string;
+  club_hero_heading?: string;
+  club_hero_script?: string;
+  club_hero_lead?: string;
+  club_bento_1_img?: string;
+  club_bento_1_badge?: string;
+  club_bento_1_title?: string;
+  club_bento_1_sub?: string;
+  club_bento_2_img?: string;
+  club_bento_2_badge?: string;
+  club_bento_2_title?: string;
+  club_bento_2_sub?: string;
+  club_bento_3_img?: string;
+  club_bento_3_badge?: string;
+  club_bento_3_title?: string;
+  club_bento_3_sub?: string;
+  club_pass_title?: string;
+  club_pass_sub?: string;
+  club_pass_badge?: string;
+  club_benefit_1_badge?: string;
+  club_benefit_1_title?: string;
+  club_benefit_1_desc?: string;
+  club_benefit_2_badge?: string;
+  club_benefit_2_title?: string;
+  club_benefit_2_desc?: string;
+  club_benefit_3_badge?: string;
+  club_benefit_3_title?: string;
+  club_benefit_3_desc?: string;
   address: string;
   phone: string;
   whatsapp: string;
@@ -475,4 +549,3 @@ export const updateCoupon = (id: number, patch: Partial<AdminCoupon>) =>
   adminFetch<AdminCoupon>(`/coupons/${id}/`, { method: "PATCH", body: JSON.stringify(patch) });
 export const deleteCoupon = (id: number) =>
   adminFetch<void>(`/coupons/${id}/`, { method: "DELETE" });
-

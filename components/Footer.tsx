@@ -7,6 +7,7 @@ const LINKS = [
   ["Menu", "/menu"],
   ["About Us", "/#about"],
   ["Gallery", "/gallery"],
+  ["Join Our Club", "/join-our-club"],
   ["Reviews", "/#reviews"],
   ["Find Us", "/#contact"],
 ];

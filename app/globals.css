@@ -8516,6 +8516,7 @@ body:has(.hero-nav) .hero-find {
       inset 0 -1px 0 rgba(0, 0, 0, 0.15) !important;
   }
   body:has(.hero-nav) .hero-nav-links a {
+    white-space: nowrap;
     color: rgba(255, 255, 255, 0.92) !important;
     font-weight: 800 !important;
     font-size: 0.82rem !important;
@@ -8548,6 +8549,7 @@ body:has(.hero-nav) .hero-find {
     display: none !important;
   }
   body:has(.hero-nav) .hero-order {
+    white-space: nowrap;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -12478,10 +12480,18 @@ body:has(.top-ribbon).has-announce .top-ribbon {
 }
 
 /* On desktop, hide mobile overlay completely */
+/* Keep the expanded navigation on one line on compact desktop screens. */
+@media (min-width: 1024px) and (max-width: 1199px) {
+  body:has(.hero-nav) .hero-nav-links a {
+    padding-inline: 0.65rem !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.08em !important;
+  }
+}
+
 @media (min-width: 1024px) {
   .mobile-nav-overlay {
     display: none !important;
   }
 }
-
 

@@ -2,7 +2,7 @@ from django.urls import include, path
 from django.views.decorators.cache import cache_page
 from rest_framework.routers import DefaultRouter
 
-from . import admin_api, payments, views
+from . import admin_api, club, payments, views
 
 # public read endpoints barely change — a 30s shared cache lets a traffic spike
 # hit memory instead of the database (admin endpoints stay uncached)
@@ -15,6 +15,7 @@ router.register("orders", views.OrderViewSet, basename="order")
 router.register("reviews", views.ReviewViewSet, basename="review")
 
 admin_router = DefaultRouter()
+admin_router.register("club-members", club.AdminClubMemberViewSet, basename="admin-club-member")
 admin_router.register("orders", admin_api.AdminOrderViewSet, basename="admin-order")
 admin_router.register("bookings", admin_api.AdminBookingViewSet, basename="admin-booking")
 admin_router.register("reviews", admin_api.AdminReviewViewSet, basename="admin-review")
@@ -29,6 +30,7 @@ admin_router.register("coupons", admin_api.AdminCouponViewSet, basename="admin-c
 admin_router.register("categories", admin_api.AdminCategoryViewSet, basename="admin-category")
 
 urlpatterns = [
+    path("club/join/", club.ClubRegistrationView.as_view(), name="club-join"),
     path("", include(router.urls)),
     path("categories/", public_cache(views.CategoryListView.as_view()), name="categories"),
     path("gallery/", public_cache(views.GalleryPhotoListView.as_view()), name="gallery"),

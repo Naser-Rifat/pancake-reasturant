@@ -93,6 +93,7 @@ const LINKS = [
   { href: "/", label: "Home", subtitle: "Welcome & highlights", Icon: DrawerHomeIcon },
   { href: "/menu", label: "Menu", subtitle: "Fresh stacks & drinks", Icon: DrawerPancakeIcon },
   { href: "/gallery", label: "Gallery", subtitle: "Vibes & diner moments", Icon: DrawerGalleryIcon },
+  { href: "/join-our-club", label: "Join Our Club", subtitle: "Good food, better company", Icon: DrawerReviewsIcon },
   { href: "/#reviews", label: "Reviews", subtitle: "Loved by Geelong locals", Icon: DrawerReviewsIcon },
   { href: "/#contact", label: "Contact", subtitle: "Location & opening hours", Icon: DrawerContactIcon },
 ];
@@ -477,4 +478,3 @@ export default function Nav({
     </>
   );
 }
-

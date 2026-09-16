@@ -9,6 +9,7 @@ import { ChevronRight } from "lucide-react";
 const NAV = [
   { href: "/menu", label: "Menu" },
   { href: "/gallery", label: "Gallery" },
+  { href: "/join-our-club", label: "Join Our Club" },
   { href: "/#reviews", label: "Reviews" },
   { href: "/#contact", label: "Contact" },
 ];

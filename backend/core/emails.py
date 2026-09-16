@@ -148,6 +148,25 @@ def staff_new_booking(booking) -> None:
     )
 
 
+def club_welcome(member) -> None:
+    """Warm welcome email for new club members."""
+    s = _info()
+    _send(
+        member.email,
+        f"Welcome to {RESTAURANT} 🥞",
+        f"G'day {member.name},\n\n"
+        f"You're in! Welcome to {RESTAURANT} — Geelong West's home of fluffy "
+        f"stacks, real maple, and good company.\n\n"
+        f"Here's what being a member means:\n"
+        f"  • Seasonal first tastes before public menu launch\n"
+        f"  • Secret parlour drops and birthday treats\n"
+        f"  • Always free — no fees, no passwords, cancel anytime\n\n"
+        f"Your membership is active right now. Next time you're nearby, "
+        f"pop in and say g'day — there's always a table for club members.\n\n"
+        f"See you at the griddle,\n{RESTAURANT}\n{s.address}",
+    )
+
+
 def send_test(to: str) -> tuple[bool, str]:
     """One verification email for the admin panel's "send test" button.
     Unlike the notification senders this surfaces the error, because its whole

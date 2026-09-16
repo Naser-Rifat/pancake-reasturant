@@ -17,7 +17,7 @@ export type SetActiveDeal = (
   next: AdminAnnouncement | null | ((a: AdminAnnouncement | null) => AdminAnnouncement | null),
 ) => void;
 
-export type PageTab = "home" | "menu" | "gallery" | "booking";
+export type PageTab = "home" | "menu" | "gallery" | "booking" | "club";
 export type ViewportMode = "desktop" | "mobile";
 export type CampaignFormat = "band" | "slider";
 export type DealCadence = "all" | "weekly" | "monthly" | "regular";

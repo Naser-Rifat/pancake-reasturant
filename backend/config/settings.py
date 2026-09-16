@@ -143,6 +143,7 @@ REST_FRAMEWORK = {
         "orders": "200/hour",
         "orders_burst": "15/min",
         "reviews": "5/hour",
+        "club": "10/hour",
         # A coupon code is a short guessable string, so this endpoint must not
         # be a free oracle for finding live codes. But the cart re-prices on
         # every change — add an item, change a quantity, remove one — so the
@@ -232,4 +233,3 @@ CSRF_TRUSTED_ORIGINS = [
     )
     if origin.startswith("http://") or origin.startswith("https://")
 ]
-

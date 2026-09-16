@@ -12,7 +12,7 @@ export default function PrivacyPage() {
       <section className="page-hero">
         <div className="container">
           <h1>Privacy <span className="accent">Policy.</span></h1>
-          <p>Last updated: August 2026</p>
+          <p>Last updated: September 2026</p>
         </div>
       </section>
 
@@ -28,6 +28,7 @@ export default function PrivacyPage() {
           <li><strong>Pickup orders</strong> — your name, and optionally a phone number and email address, so we can prepare your order and let you know when it&rsquo;s ready.</li>
           <li><strong>Table bookings</strong> — your name, email address, phone number, booking date/time, party size and any notes you add.</li>
           <li><strong>Reviews</strong> — the name, suburb and review text you choose to submit.</li>
+          <li><strong>Club registrations</strong> — your name, email address, registration date and privacy acknowledgement. We also record whether you separately opted in to marketing emails and when you submitted that consent.</li>
         </ul>
         <p>
           Online orders are paid securely through Stripe, our payment processor — your card details
@@ -43,6 +44,7 @@ export default function PrivacyPage() {
           <li>To prepare and hand over your order, and to email you order updates (confirmation, ready-for-pickup, or a cancellation with the reason)</li>
           <li>To manage your table booking and email you when it&rsquo;s confirmed or declined</li>
           <li>To publish your review on our website — only after our staff approve it, and only the details you submitted</li>
+          <li>To manage your club registration and email preferences. Marketing consent is optional and separate from joining. Contact us to change your details, withdraw consent or request deletion of your registration.</li>
         </ul>
         <p>
           We send <strong>transactional emails only</strong> — messages about your specific order or

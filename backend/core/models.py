@@ -15,6 +15,30 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
+class ClubMember(TimeStampedModel):
+    class Status(models.TextChoices):
+        ACTIVE = "active", "Active"
+        ARCHIVED = "archived", "Archived"
+
+    name = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20, blank=True, default="")
+    status = models.CharField(max_length=12, choices=Status.choices, default=Status.ACTIVE)
+    marketing_consent = models.BooleanField(default=False)
+    marketing_consented_at = models.DateTimeField(null=True, blank=True)
+    privacy_accepted_at = models.DateTimeField()
+    consent_version = models.CharField(max_length=30, default="club-v1")
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+        constraints = [
+            models.UniqueConstraint(models.functions.Lower("email"), name="club_email_ci_unique"),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
 class Category(TimeStampedModel):
     name = models.CharField(max_length=60, unique=True)
     slug = models.SlugField(max_length=60, unique=True)
@@ -488,6 +512,59 @@ class SiteSettings(models.Model):
     booking_hero_lead = models.CharField(
         max_length=200,
         default="Pick a date, pick a time — we'll have the griddle hot when you arrive.",
+    )
+    # Join Our Club page content (Hero, 3 Bento cards, Member Pass, 3 Privileges)
+    club_hero_kicker = models.CharField(max_length=80, default="The Pancake Club · Geelong West")
+    club_hero_heading = models.CharField(max_length=60, default="Good food.")
+    club_hero_script = models.CharField(max_length=60, default="Better company.")
+    club_hero_lead = models.CharField(
+        max_length=250,
+        default="Fluffy homemade stacks, secret tasting invites, and a table always saved for you.",
+    )
+    club_bento_1_img = models.CharField(
+        max_length=300,
+        default="https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&q=80",
+    )
+    club_bento_1_badge = models.CharField(max_length=60, default="🥞 Fresh Off The Griddle")
+    club_bento_1_title = models.CharField(max_length=60, default="Signature Stack")
+    club_bento_1_sub = models.CharField(max_length=80, default="Whipped butter & maple")
+
+    club_bento_2_img = models.CharField(
+        max_length=300,
+        default="https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=80",
+    )
+    club_bento_2_badge = models.CharField(max_length=60, default="🥞 Sunday Brunch")
+    club_bento_2_title = models.CharField(max_length=60, default="Brunch Club")
+    club_bento_2_sub = models.CharField(max_length=80, default="Weekend Table")
+
+    club_bento_3_img = models.CharField(
+        max_length=300,
+        default="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80",
+    )
+    club_bento_3_badge = models.CharField(max_length=60, default="☕ Geelong West")
+    club_bento_3_title = models.CharField(max_length=60, default="Our Parlour")
+    club_bento_3_sub = models.CharField(max_length=80, default="Open 7 days")
+
+    club_pass_title = models.CharField(max_length=80, default="FOUNDING MEMBER PASS · NO. 0824")
+    club_pass_sub = models.CharField(max_length=120, default="Priority Seasonal Tastings · Secret Drops · Free Forever")
+    club_pass_badge = models.CharField(max_length=40, default="ALL WELCOME")
+
+    club_benefit_1_badge = models.CharField(max_length=60, default="🥞 SEASONAL TASTES")
+    club_benefit_1_title = models.CharField(max_length=80, default="Seasonal First Tastes")
+    club_benefit_1_desc = models.TextField(
+        default="Be the first to preview autumn spiced ricotta hotcakes and summer berry compotes before public menu launch."
+    )
+
+    club_benefit_2_badge = models.CharField(max_length=60, default="☕ PARLOUR PERKS")
+    club_benefit_2_title = models.CharField(max_length=80, default="Secret Parlour Drops")
+    club_benefit_2_desc = models.TextField(
+        default="Occasional unlisted griddle specials, birthday stack treats, and intimate tasting invites for Geelong regulars."
+    )
+
+    club_benefit_3_badge = models.CharField(max_length=60, default="💛 ZERO STRINGS")
+    club_benefit_3_title = models.CharField(max_length=80, default="Always Your Choice")
+    club_benefit_3_desc = models.TextField(
+        default="No loyalty cards to scan, no passwords to memorize. Choose your email preference and opt out anytime with one click."
     )
     # campaign section headings — the Site content studio edits these
     promo_kicker = models.CharField(

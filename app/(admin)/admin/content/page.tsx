@@ -45,6 +45,7 @@ import { HomeStep4Badges } from "./_components/HomeStep4Badges";
 import { HomeStep5Cta } from "./_components/HomeStep5Cta";
 import { HomeStep6Footer } from "./_components/HomeStep6Footer";
 import { MenuPageSection } from "./_components/MenuPageSection";
+import { ClubPageSection } from "./_components/ClubPageSection";
 import { AdminError } from "@/components/ui/admin-error";
 import { useToast, type ToastInput } from "@/components/ui/toast";
 
@@ -71,7 +72,7 @@ export default function ContentPage() {
     }
   });
   const [activePage, setActivePage] = useState<PageTab>(() =>
-    ["home", "menu", "gallery", "booking"].includes(saved.page as string) ? (saved.page as PageTab) : "home",
+    ["home", "menu", "gallery", "booking", "club"].includes(saved.page as string) ? (saved.page as PageTab) : "home",
   );
   const [homeStepIndex, setHomeStepIndex] = useState<number>(() =>
     typeof saved.step === "number" && saved.step >= 1 && saved.step <= 6 ? saved.step : 1,
@@ -304,6 +305,13 @@ export default function ContentPage() {
       icon: Calendar,
       tag: "Header & Form",
     },
+    {
+      id: "club",
+      label: "Join Our Club",
+      path: "/join-our-club",
+      icon: Award,
+      tag: "Bento & Privileges",
+    },
   ] as const;
 
   // Exact step-by-step order of sections on the HOMEPAGE (top to bottom)
@@ -335,7 +343,7 @@ export default function ContentPage() {
 
           <div className="flex items-center gap-2">
             <a
-              href={activePage === "home" ? "/" : `/${activePage}`}
+              href={activePage === "home" ? "/" : activePage === "club" ? "/join-our-club" : `/${activePage}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-xs font-bold text-[#763a12] bg-white/95 hover:bg-white p-3 px-4 rounded-lg border border-zinc-200 shadow-sm hover:shadow-xs transition-all shrink-0 group"
@@ -691,6 +699,13 @@ export default function ContentPage() {
       {/* ========================================================================= */}
       {activePage === "booking" && (
         <BookingPageSection site={site} setS={setS} busy={busy} run={run} />
+      )}
+
+      {/* ========================================================================= */}
+      {/* ✨ PAGE 5: JOIN OUR CLUB STUDIO (/join-our-club)                           */}
+      {/* ========================================================================= */}
+      {activePage === "club" && (
+        <ClubPageSection site={site} setS={setS} busy={busy} run={run} />
       )}
     </div>
   );

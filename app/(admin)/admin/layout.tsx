@@ -17,6 +17,7 @@ import {
   TicketPercent,
   UtensilsCrossed,
   Layers,
+  UsersRound,
 } from "lucide-react";
 import LogoMark from "@/components/LogoMark";
 import { ConfirmProvider } from "@/components/ui/confirm";
@@ -32,6 +33,7 @@ const NAV = [
   { href: "/admin/categories", label: "Categories", icon: Layers },
   { href: "/admin/coupons", label: "Coupons", icon: TicketPercent },
   { href: "/admin/reviews", label: "Reviews", icon: Star },
+  { href: "/admin/club", label: "Club members", icon: UsersRound },
   { href: "/admin/content", label: "Site content", icon: Images },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
