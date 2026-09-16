@@ -75,6 +75,7 @@ export default function HeroShowcase({
             alt={current.alt}
             fill
             priority
+            loading="eager"
             sizes="100vw"
           />
           <span className="hero-scrim" aria-hidden="true" />
@@ -91,7 +92,14 @@ export default function HeroShowcase({
                   className={`hero-thumb-btn ${i === active ? "on" : ""}`}
                   onClick={() => setActive(i)}
                 >
-                  <Image src={s.src} alt="" width={100} height={100} sizes="44px" />
+                  <Image
+                    src={s.src}
+                    alt=""
+                    width={100}
+                    height={100}
+                    sizes="44px"
+                    style={{ width: "100%", height: "100%" }}
+                  />
                   {i === active && <span className="thumb-active-dot" />}
                 </button>
               ))}
