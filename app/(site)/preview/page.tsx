@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import CertIcon from "@/components/CertIcon";
+import HeroShowcase from "@/components/HeroShowcase";
 import {
   OrderOnlineSticker,
   GriddleFreshSticker,
@@ -78,7 +79,6 @@ export default function PreviewPage() {
   // stay invisible until the studio's first sync lands — otherwise the
   // built-in placeholder data flashes before the real content arrives
   const [synced, setSynced] = useState(false);
-  const [activeSlide, setActiveSlide] = useState<number>(0);
   const [site, setSite] = useState<AdminSiteSettings>(DEFAULT_SITE);
 
   const [announcement, setAnnouncement] = useState<AdminAnnouncement | null>(DEFAULT_ANNOUNCEMENT);
@@ -95,6 +95,8 @@ export default function PreviewPage() {
   const [photos, setPhotos] = useState<AdminGalleryPhoto[]>(DEFAULT_PHOTOS);
   const [steps, setSteps] = useState<AdminHomeStep[]>(DEFAULT_STEPS);
   const [dishes, setDishes] = useState<AdminMenuItem[]>(DEFAULT_DISHES);
+
+  const featuredDishes = dishes.filter((dish) => dish.is_featured);
 
   useEffect(() => {
     const handler = (e: MessageEvent) => {
@@ -137,8 +139,18 @@ export default function PreviewPage() {
     const sendSize = () => {
       const el = document.querySelector(".preview-container");
       if (!el) return;
+      const isHero = el.classList.contains("preview-container-hero");
+      const width = document.documentElement.clientWidth;
+      // A viewport-height hero cannot choose its iframe's height from its own
+      // measured height (that creates a circular dependency). Give the studio
+      // a stable, device-like viewport derived from width instead.
+      const height = isHero
+        ? width <= 1023
+          ? Math.min(820, Math.max(640, Math.round(width * 1.75)))
+          : Math.min(760, Math.max(520, Math.round(width * 0.5625)))
+        : Math.ceil(el.getBoundingClientRect().bottom);
       window.parent?.postMessage(
-        { type: "PANCAKE_PREVIEW_SIZE", height: Math.ceil(el.getBoundingClientRect().bottom) },
+        { type: "PANCAKE_PREVIEW_SIZE", height },
         "*",
       );
     };
@@ -157,31 +169,6 @@ export default function PreviewPage() {
       ro.disconnect();
     };
   }, []);
-
-  // Build slides for Hero
-  const featuredDishes = dishes.filter((m) => m.is_featured);
-  const cheapest = featuredDishes.length
-    ? Math.min(...featuredDishes.map((d) => parseFloat(d.price)).filter((n) => !isNaN(n)))
-    : 14;
-
-  const slides = [
-    {
-      src: site.hero_image,
-      alt: "Signature dish at The Pancake Club",
-      label: "Signature Stack",
-      price: cheapest ? `From $${cheapest}` : "From $14",
-    },
-    ...featuredDishes.slice(0, 2).map((d) => ({
-      src: d.photo || d.image,
-      alt: `${d.name} pancakes`,
-      label: d.name,
-      price: `$${parseFloat(d.price)}`,
-    })),
-  ].filter((s) => s.src);
-
-  const currentSlide = slides[activeSlide] ?? slides[0];
-  const chip = site.hero_cutout || featuredDishes.find((d) => d.image)?.image;
-  const headingWords = site.hero_heading ? site.hero_heading.trim().split(/\s+/) : ["Stack", "Into"];
 
   // Helper for safe photo URL
   const dealPhotoSrc =
@@ -204,7 +191,9 @@ export default function PreviewPage() {
 
   return (
     <div
-      className="preview-container bg-[var(--cream)] text-[var(--ink)] antialiased"
+      className={`preview-container bg-[var(--cream)] text-[var(--ink)] antialiased ${
+        section === "hero" ? "preview-container-hero" : ""
+      }`}
       style={{ visibility: synced ? "visible" : "hidden" }}
     >
       {/* 
@@ -225,7 +214,6 @@ export default function PreviewPage() {
         .nav-wrap,
         .site-nav,
         .nav-pill,
-        .hero-nav,
         footer:not(.preview-keep),
         .site-footer:not(.preview-keep),
         .whatsapp-float,
@@ -236,6 +224,13 @@ export default function PreviewPage() {
         .preview-container {
           overflow: hidden !important;
           padding: 8px !important;
+        }
+
+        /* The shared storefront hero is exactly 100vh/100svh. Padding this
+           iframe root made its measured content 16px taller than the iframe,
+           so the parent enlarged it by 16px on every ResizeObserver pass. */
+        .preview-container.preview-container-hero {
+          padding: 0 !important;
         }
 
         /* the site's fixed page-frame border is chrome, not content — hide it here */
@@ -260,260 +255,27 @@ export default function PreviewPage() {
           margin: 0.25rem auto !important;
         }
 
-        /* 1:1 Pixel-Perfect Hero Banner styling matching user screenshot */
-        .preview-hero-card {
-          position: relative;
-          min-height: 480px;
-          border-radius: 28px;
-          overflow: hidden;
-          display: flex;
-          align-items: flex-end;
-          padding: 2.5rem;
-          box-shadow: 0 12px 36px rgba(33, 26, 20, 0.12);
-        }
-
-        .preview-hero-bg {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-        }
-
-        .preview-hero-bg img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: center right;
-        }
-
-        .preview-hero-scrim {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(
-            100deg,
-            rgba(26, 17, 9, 0.92) 0%,
-            rgba(26, 17, 9, 0.84) 36%,
-            rgba(26, 17, 9, 0.5) 60%,
-            rgba(26, 17, 9, 0.15) 100%
-          );
-          z-index: 1;
-        }
-
-        .preview-hero-content {
-          position: relative;
-          z-index: 2;
-          max-width: 580px;
-        }
-
-        .preview-hero-h1 {
-          font-family: var(--font-display, Luckiest Guy, cursive);
-          font-size: clamp(2.4rem, 4.8vw, 4.2rem);
-          line-height: 0.95;
-          color: #fffdf9;
-          text-transform: uppercase;
-          letter-spacing: 0.01em;
-          margin: 0;
-          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-        }
-
-        .preview-head-line {
-          display: block;
-        }
-
-        .preview-head-chip {
-          display: inline-grid;
-          place-items: center;
-          width: 0.72em;
-          height: 0.72em;
-          border-radius: 50%;
-          background: #aa4c0a;
-          vertical-align: -0.03em;
-          overflow: hidden;
-          margin: 0 0.1em;
-          border: 2px solid rgba(255, 255, 255, 0.8);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-        }
-
-        .preview-head-chip img {
-          width: 90%;
-          height: 90%;
-          object-fit: cover;
-        }
-
-        .preview-script-word {
-          display: block;
-          font-family: var(--font-script, Pacifico, cursive);
-          text-transform: none;
-          font-size: 0.68em;
-          color: #efbf38;
-          transform: rotate(-2deg);
-          margin-top: 0.25rem;
-          line-height: 1.2;
-          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-        }
-
-        .preview-hero-lead {
-          color: rgba(248, 242, 224, 0.9);
-          font-size: 0.95rem;
-          line-height: 1.5;
-          max-width: 25rem;
-          margin: 1.2rem 0 1.6rem;
-          font-weight: 500;
-          text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-        }
-
-        .preview-hero-actions {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          gap: 1rem;
-        }
-
-        .preview-cta-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.4rem;
-          background: #efbf38;
-          color: #211a14;
-          font-weight: 900;
-          font-size: 0.85rem;
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
-          padding: 0.75rem 1.6rem;
-          border-radius: 999px;
-          text-decoration: none;
-          box-shadow: 0 6px 18px rgba(239, 191, 56, 0.35);
-          transition: transform 0.2s;
-        }
-
-        .preview-hero-thumbs {
-          display: flex;
-          gap: 0.5rem;
-          align-items: center;
-        }
-
-        .preview-thumb-btn {
-          width: 44px;
-          height: 44px;
-          padding: 2px;
-          border: 2px solid rgba(255, 255, 255, 0.35);
-          border-radius: 12px;
-          background: rgba(255, 255, 255, 0.15);
-          backdrop-filter: blur(6px);
-          cursor: pointer;
-          overflow: hidden;
-          position: relative;
-          transition: all 0.2s;
-        }
-
-        .preview-thumb-btn.on {
-          border-color: #efbf38;
-          box-shadow: 0 0 0 2px rgba(239, 191, 56, 0.5);
-          transform: scale(1.05);
-        }
-
-        .preview-thumb-btn img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          border-radius: 8px;
-        }
-
-        .preview-price-pill {
-          position: absolute;
-          right: 24px;
-          bottom: 24px;
-          z-index: 2;
-          background: rgba(33, 26, 20, 0.88);
-          color: #fffdf9;
-          font-weight: 800;
-          font-size: 0.88rem;
-          padding: 0.5rem 1.1rem;
-          border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-          backdrop-filter: blur(8px);
-        }
       `}</style>
 
-      {/* ========================================================================= */}
-      {/* 1. HERO PREVIEW (100% EXACT REPRODUCTION OF USER SCREENSHOT)              */}
-      {/* ========================================================================= */}
+      {/* The preview deliberately renders the storefront component itself. Keeping
+          only one hero implementation prevents the studio and website drifting. */}
       {section === "hero" && (
-        <div className="preview-hero-card">
-          {/* Full-bleed background photo & scrim */}
-          <div className="preview-hero-bg">
-            {currentSlide?.src && (
-              <Image
-                key={currentSlide.src}
-                src={currentSlide.src}
-                alt={currentSlide.alt || "Hero Stack"}
-                fill
-                priority
-                sizes="100vw"
-              />
-            )}
-            <div className="preview-hero-scrim" />
+        <section className="hero">
+          <div className="container hero-cards">
+            <HeroShowcase
+              heading={site.hero_heading}
+              script={site.hero_script}
+              lead={site.hero_lead}
+              ctas={[
+                { href: "/booking", label: "BOOK A TABLE", variant: "primary" },
+                { href: "/menu", label: "EXPLORE MENU", variant: "ghost" },
+              ]}
+              heroImage={site.hero_image}
+              heroCutout={site.hero_cutout}
+              dishes={dishes.filter((dish) => dish.is_featured)}
+            />
           </div>
-
-          {/* Left Text and CTA Content */}
-          <div className="preview-hero-content">
-            <h1 className="preview-hero-h1">
-              {headingWords.length >= 2 ? (
-                <>
-                  <span className="preview-head-line">{headingWords[0]}</span>
-                  <span className="preview-head-line">
-                    {headingWords.slice(1).join(" ")}
-                    {chip && (
-                      <span className="preview-head-chip">
-                        <Image src={chip} alt="" width={80} height={80} />
-                      </span>
-                    )}
-                  </span>
-                </>
-              ) : (
-                <>
-                  {site.hero_heading}
-                  {chip && (
-                    <span className="preview-head-chip">
-                      <Image src={chip} alt="" width={80} height={80} />
-                    </span>
-                  )}
-                </>
-              )}
-              <span className="preview-script-word">{site.hero_script}</span>
-            </h1>
-
-            <p className="preview-hero-lead">{site.hero_lead}</p>
-
-            <div className="preview-hero-actions">
-              <Link href="/booking" className="preview-cta-btn">
-                <span>Book a Table</span>
-                <ChevronRight className="h-4 w-4 stroke-[3]" />
-              </Link>
-
-              {slides.length > 1 && (
-                <div className="preview-hero-thumbs">
-                  {slides.map((s, idx) => (
-                    <button
-                      key={s.src + idx}
-                      type="button"
-                      onClick={() => setActiveSlide(idx)}
-                      className={`preview-thumb-btn ${idx === activeSlide ? "on" : ""}`}
-                      title={s.label}
-                    >
-                      <Image src={s.src} alt={s.label} width={40} height={40} />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Floating Price Pill on the Right */}
-          {currentSlide?.price && (
-            <div className="preview-price-pill">{currentSlide.price}</div>
-          )}
-        </div>
+        </section>
       )}
 
       {/* ========================================================================= */}

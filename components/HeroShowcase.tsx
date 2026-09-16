@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import LogoMark from "@/components/LogoMark";
-import type { ApiMenuItem } from "@/lib/api";
 import { ChevronRight } from "lucide-react";
 
 const NAV = [
@@ -15,6 +14,14 @@ const NAV = [
 ];
 
 type Cta = { href: string; label: string; variant: "primary" | "ghost" };
+
+// Keep the storefront hero independent from either API client. The public API
+// and the admin editor return slightly different menu-item shapes, but the
+// hero only needs this small shared view model.
+export type HeroDish = Pick<
+  import("@/lib/api").ApiMenuItem,
+  "name" | "price" | "photo" | "image"
+>;
 
 export default function HeroShowcase({
   heading,
@@ -32,7 +39,7 @@ export default function HeroShowcase({
   heroImage: string;
   /** the round cutout sitting inside the headline; set in Content → Hero */
   heroCutout: string;
-  dishes: ApiMenuItem[];
+  dishes: HeroDish[];
 }) {
   const cheapest = dishes.length
     ? Math.min(...dishes.map((d) => parseFloat(d.price)))
