@@ -449,11 +449,15 @@ export default async function Home() {
           <div className="container">
             <div style={{ textAlign: "center" }}>
               <p className="kicker">FEEL GOOD ABOUT EVERY BITE</p>
-              <h3 className="cert-section-heading">Certified &amp; award winning quality</h3>
+              <h2 className="cert-section-heading">Our standards &amp; recognition</h2>
             </div>
-            <div className="cert-strip reveal">
+            <ul
+              className="cert-strip reveal"
+              aria-label="Food standards and recognition"
+              tabIndex={0}
+            >
               {certs.map((c) => (
-                <div className="cert-badge quality-seal-badge" key={c.title}>
+                <li className="cert-badge quality-seal-badge" key={c.title}>
                   <span className="ic">
                     {c.image ? (
                       <Image
@@ -471,9 +475,12 @@ export default async function Home() {
                     <b>{c.title}</b>
                     <small>{c.subtitle}</small>
                   </div>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
+            {certs.length > 1 && (
+              <p className="cert-scroll-hint" aria-hidden="true">Swipe or scroll to explore</p>
+            )}
           </div>
         </section>
       )}

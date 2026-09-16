@@ -523,9 +523,9 @@ export default function PreviewPage() {
         <section style={{ padding: "8px 0" }}>
           <div className="container" style={{ padding: "0" }}>
             {/* same badge markup as the live homepage */}
-            <div className="cert-strip">
+            <ul className="cert-strip" aria-label="Food standards and recognition">
               {certs.filter((c) => c.is_active).map((c) => (
-                <div key={c.id} className="cert-badge quality-seal-badge">
+                <li key={c.id} className="cert-badge quality-seal-badge">
                   <span className="ic">
                     {c.image ? (
                       <Image
@@ -543,9 +543,9 @@ export default function PreviewPage() {
                     <b>{c.title}</b>
                     <small>{c.subtitle}</small>
                   </div>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </section>
       )}

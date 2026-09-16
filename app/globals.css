@@ -3974,13 +3974,38 @@ h2.title.inline .accent {
   margin: 0.2rem 0 0;
 }
 .cert-strip {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  display: flex;
   gap: 1.2rem;
   margin-top: 1.6rem;
+  padding: 0.35rem 0.2rem 0.85rem;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: inline mandatory;
+  scroll-padding-inline: 0.2rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(118, 58, 18, 0.38) rgba(118, 58, 18, 0.08);
+  -webkit-overflow-scrolling: touch;
+}
+.cert-strip::-webkit-scrollbar {
+  height: 7px;
+}
+.cert-strip::-webkit-scrollbar-track {
+  background: rgba(118, 58, 18, 0.08);
+  border-radius: 999px;
+}
+.cert-strip::-webkit-scrollbar-thumb {
+  background: rgba(118, 58, 18, 0.38);
+  border-radius: 999px;
+}
+.cert-strip:focus-visible {
+  outline: 3px solid rgba(224, 134, 0, 0.32);
+  outline-offset: 5px;
+  border-radius: 12px;
 }
 .quality-seal-badge {
   display: flex;
+  flex: 0 0 clamp(250px, 24vw, 330px);
   align-items: center;
   gap: 0.95rem;
   background: #ffffff;
@@ -3991,6 +4016,8 @@ h2.title.inline .accent {
     0 8px 20px rgba(33, 26, 20, 0.06),
     0 2px 4px rgba(33, 26, 20, 0.03);
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 .quality-seal-badge:hover {
   transform: translateY(-4px);
@@ -4034,6 +4061,25 @@ h2.title.inline .accent {
   color: var(--muted);
   font-size: 0.8rem;
   font-weight: 500;
+}
+.cert-scroll-hint {
+  margin: 0.25rem 0 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+@media (max-width: 640px) {
+  .cert-strip {
+    margin-inline: -1rem;
+    padding-inline: 1rem;
+    scroll-padding-inline: 1rem;
+  }
+  .quality-seal-badge {
+    flex-basis: min(82vw, 310px);
+  }
 }
 
 /* ===================================================================
@@ -12494,4 +12540,3 @@ body:has(.top-ribbon).has-announce .top-ribbon {
     display: none !important;
   }
 }
-
