@@ -52,4 +52,14 @@ test("admin panel authenticates staff and shows the dashboard", async ({ page })
   await page.click('button[type="submit"]');
   await page.waitForURL("**/admin");
   await expect(page.getByText("Orders today")).toBeVisible();
+
+  // Shared AdminDataTable contract: semantic column headers and the shared
+  // page-size control must survive navigation to a data-heavy admin screen.
+  await page.goto("/admin/orders");
+  await expect(page.locator("thead th[scope=col]")).toHaveCount(7);
+  const pageSize = page.getByLabel("Orders per page");
+  await expect(pageSize).toHaveValue("10");
+  await pageSize.selectOption("5");
+  await expect(pageSize).toHaveValue("5");
+  expect(await page.locator("tbody tr").count()).toBeLessThanOrEqual(5);
 });

@@ -14,11 +14,21 @@ import { TableSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm";
-import { Pagination } from "@/components/admin/Pagination";
+import { AdminDataTable, AdminTablePagination, AdminTableSurface, type AdminTableColumn } from "@/components/admin/AdminTable";
 import { useRowFocus } from "@/components/admin/use-row-focus";
 
 import { FILTERS, PAGE_SIZE, POLL_MS, newOrderChime } from "./_lib";
 import { OrderRow } from "./_components/OrderRow";
+
+const ORDER_COLUMNS: AdminTableColumn<AdminOrder>[] = [
+  { id: "customer", header: "Order & Customer", headerClassName: "py-3.5 px-4" },
+  { id: "items", header: "Ordered Items & Notes", headerClassName: "py-3.5 px-4" },
+  { id: "total", header: "Total Amount", headerClassName: "py-3.5 px-3" },
+  { id: "placed", header: "Placed Time", headerClassName: "py-3.5 px-3" },
+  { id: "status", header: "Order Status", headerClassName: "py-3.5 px-3 text-center" },
+  { id: "next", header: "Next Step", headerClassName: "py-3.5 px-3 text-center" },
+  { id: "actions", header: "Set Status", headerClassName: "py-3.5 px-4 text-right" },
+];
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
@@ -373,7 +383,7 @@ export default function OrdersPage() {
       {/* ========================================================================= */}
       {/* ORDERS TABLE & KITCHEN ACTION SYSTEM                                      */}
       {/* ========================================================================= */}
-      <div ref={tableRef} className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+      <AdminTableSurface ref={tableRef}>
         {loading ? (
           <div className="p-6">
             <TableSkeleton rows={6} cols={7} />
@@ -386,75 +396,40 @@ export default function OrdersPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-zinc-200 bg-white text-[#763a12] text-[11px] font-semibold uppercase tracking-wide">
-                  <th className="py-3.5 px-4">Order &amp; Customer</th>
-                  <th className="py-3.5 px-4">Ordered Items &amp; Notes</th>
-                  <th className="py-3.5 px-3">Total Amount</th>
-                  <th className="py-3.5 px-3">Placed Time</th>
-                  <th className="py-3.5 px-3 text-center">Order Status</th>
-                  <th className="py-3.5 px-3 text-center">Next Step</th>
-                  <th className="py-3.5 px-4 text-right">Set Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100 text-xs font-medium text-[#211a14] [&>tr>td]:align-top">
-                {pageOrders.map((o) => (
-                  <OrderRow
-                    key={o.public_id}
-                    o={o}
-                    highlighted={highlightId === o.public_id}
-                    pending={pendingId === o.public_id}
-                    onSetStatus={setStatus}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <AdminDataTable
+            rows={pageOrders}
+            rowKey={(order) => order.public_id}
+            columns={ORDER_COLUMNS}
+            bodyClassName="divide-y divide-zinc-100 text-xs font-medium text-[#211a14] [&>tr>td]:align-top"
+            renderRow={(order) => (
+              <OrderRow
+                o={order}
+                highlighted={highlightId === order.public_id}
+                pending={pendingId === order.public_id}
+                onSetStatus={setStatus}
+              />
+            )}
+          />
         )}
 
         {/* Numbered pagination */}
         {!loading && filteredOrders.length > 0 && (
-          <div className="border-t border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs text-zinc-600">
-              <span className="font-medium text-zinc-500">Rows per page:</span>
-              <select
-                value={pageSize}
-                onChange={(e) => {
-                  setPageSize(Number(e.target.value));
-                  setPage(1);
-                }}
-                aria-label="Orders per page"
-                className="h-8 rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20 cursor-pointer"
-              >
-                <option value={5}>5 rows</option>
-                <option value={10}>10 rows</option>
-                <option value={20}>20 rows</option>
-                <option value={50}>50 rows</option>
-              </select>
-              <span className="text-zinc-300">|</span>
-              <span className="text-zinc-500 font-medium">
-                Showing {pageOrders.length} of {filteredOrders.length} {filteredOrders.length === 1 ? "order" : "orders"}
-                {hasMore ? " (more available on server)" : ""}
-              </span>
-            </div>
-
-            <Pagination
-              page={page}
-              pageSize={pageSize}
-              totalLoaded={filteredOrders.length}
-              serverHasMore={hasMore}
-              loading={loadingMore}
-              className="border-t-0 p-0"
-              onPageChange={(p) => {
-                setPage(p);
-                tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-            />
-          </div>
+          <AdminTablePagination
+            page={page}
+            pageSize={pageSize}
+            totalLoaded={filteredOrders.length}
+            serverHasMore={hasMore}
+            loading={loadingMore}
+            pageSizeAriaLabel="Orders per page"
+            summary={<>Showing {pageOrders.length} of {filteredOrders.length} {filteredOrders.length === 1 ? "order" : "orders"}{hasMore ? " (more available on server)" : ""}</>}
+            onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+            onPageChange={(nextPage) => {
+              setPage(nextPage);
+              tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+          />
         )}
-      </div>
+      </AdminTableSurface>
     </div>
   );
 }

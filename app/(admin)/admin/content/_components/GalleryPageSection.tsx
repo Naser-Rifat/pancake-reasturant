@@ -17,7 +17,7 @@ import {
   type AdminGalleryPhoto,
   type AdminSiteSettings,
 } from "@/lib/admin-api";
-import { Pagination } from "@/components/admin/Pagination";
+import { AdminTablePagination } from "@/components/admin/AdminTable";
 import { EMPTY_PHOTO, type NewPhoto, type RunSave, type SetSiteField } from "../_lib";
 
 // Content studio panel for the /gallery page (header copy + photo album manager).
@@ -276,41 +276,26 @@ export function GalleryPageSection({
 
           {/* Numbered Pagination & Photos-Per-Page Controls */}
           {filteredPhotos.length > 0 && (
-            <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
-              <div className="flex items-center gap-2 text-xs text-zinc-600">
-                <span className="font-medium text-zinc-500">Photos per page:</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => {
-                    setPageSize(Number(e.target.value));
-                    setPage(1);
-                  }}
-                  aria-label="Photos per page"
-                  className="h-8 rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20 cursor-pointer"
-                >
-                  <option value={8}>8 photos</option>
-                  <option value={12}>12 photos</option>
-                  <option value={24}>24 photos</option>
-                  <option value={48}>48 photos</option>
-                </select>
-                <span className="text-zinc-300">|</span>
-                <span className="text-zinc-500 font-medium">
-                  {filteredPhotos.length} total {filteredPhotos.length === 1 ? "photo" : "photos"}
-                </span>
-              </div>
-
-              <Pagination
-                page={page}
-                pageSize={pageSize}
-                totalLoaded={filteredPhotos.length}
-                serverHasMore={false}
-                className="border-t-0 p-0"
-                onPageChange={(p) => {
-                  setPage(p);
-                  galleryGridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-              />
-            </div>
+            <AdminTablePagination
+              className="rounded-xl border border-zinc-200 shadow-2xs"
+              page={page}
+              pageSize={pageSize}
+              totalLoaded={filteredPhotos.length}
+              pageSizeLabel="Photos per page:"
+              pageSizeAriaLabel="Photos per page"
+              pageSizeOptions={[
+                { value: 8, label: "8 photos" },
+                { value: 12, label: "12 photos" },
+                { value: 24, label: "24 photos" },
+                { value: 48, label: "48 photos" },
+              ]}
+              summary={<>{filteredPhotos.length} total {filteredPhotos.length === 1 ? "photo" : "photos"}</>}
+              onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+              onPageChange={(nextPage) => {
+                setPage(nextPage);
+                galleryGridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            />
           )}
         </div>
       </div>

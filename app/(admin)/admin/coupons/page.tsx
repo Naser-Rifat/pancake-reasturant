@@ -33,9 +33,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { useConfirm } from "@/components/ui/confirm";
 import { useToast } from "@/components/ui/toast";
-import { Pagination } from "@/components/admin/Pagination";
+import { AdminDataTable, AdminTablePagination, AdminTableSurface, type AdminTableColumn } from "@/components/admin/AdminTable";
 
 type CouponFilter = "all" | "active" | "inactive" | "exhausted";
+
+const COUPON_COLUMNS: AdminTableColumn<AdminCoupon>[] = [
+  { id: "code", header: "Coupon Code", headerClassName: "py-3.5 px-4" },
+  { id: "discount", header: "Discount", headerClassName: "py-3.5 px-3" },
+  { id: "rules", header: "Rules & Limits", headerClassName: "py-3.5 px-3" },
+  { id: "redemptions", header: "Redemptions", headerClassName: "py-3.5 px-3" },
+  { id: "status", header: "Status", headerClassName: "py-3.5 px-3 text-center" },
+  { id: "active", header: "Active", headerClassName: "py-3.5 px-3 text-center" },
+  { id: "action", header: "Action", headerClassName: "py-3.5 px-4 text-right" },
+];
 
 interface NewCouponForm {
   code: string;
@@ -618,29 +628,20 @@ export default function CouponsAdminPage() {
 
       {/* Coupons Table */}
       {!loading && !error && filtered.length > 0 && (
-        <div ref={tableRef} className="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-2xs">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-zinc-200 bg-zinc-50/70 text-[#763a12] text-[11px] font-semibold uppercase tracking-wider">
-                  <th className="py-3.5 px-4">Coupon Code</th>
-                  <th className="py-3.5 px-3">Discount</th>
-                  <th className="py-3.5 px-3">Rules &amp; Limits</th>
-                  <th className="py-3.5 px-3">Redemptions</th>
-                  <th className="py-3.5 px-3 text-center">Status</th>
-                  <th className="py-3.5 px-3 text-center">Active</th>
-                  <th className="py-3.5 px-4 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100 text-xs font-medium text-[#211a14]">
-                {pageCoupons.map((c) => {
+        <AdminTableSurface ref={tableRef} className="rounded-2xl shadow-2xs">
+          <AdminDataTable
+            rows={pageCoupons}
+            rowKey={(coupon) => coupon.id}
+            columns={COUPON_COLUMNS}
+            tableClassName="[&_thead_tr]:bg-zinc-50/70 [&_thead_tr]:tracking-wider"
+            bodyClassName="divide-y divide-zinc-100 text-xs font-medium text-[#211a14]"
+            renderRow={(c) => {
                   const isPending = pendingIds.has(c.id);
                   const isExhausted = c.is_exhausted;
                   const isLive = c.is_active && !isExhausted;
 
                   return (
                     <tr
-                      key={c.id}
                       className="hover:bg-zinc-50/70 transition-colors"
                     >
                       {/* Code & Description */}
@@ -768,50 +769,25 @@ export default function CouponsAdminPage() {
                       </td>
                     </tr>
                   );
-                })}
-              </tbody>
-            </table>
-          </div>
+                }}
+          />
 
           {/* Numbered Pagination & Rows-Per-Page Controls */}
           {!loading && filtered.length > 0 && (
-            <div className="border-t border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-xs text-zinc-600">
-                <span className="font-medium text-zinc-500">Rows per page:</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => {
-                    setPageSize(Number(e.target.value));
-                    setPage(1);
-                  }}
-                  aria-label="Coupons per page"
-                  className="h-8 rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20 cursor-pointer"
-                >
-                  <option value={5}>5 rows</option>
-                  <option value={10}>10 rows</option>
-                  <option value={20}>20 rows</option>
-                  <option value={50}>50 rows</option>
-                </select>
-                <span className="text-zinc-300">|</span>
-                <span className="text-zinc-500 font-medium">
-                  {filtered.length} total {filtered.length === 1 ? "coupon" : "coupons"}
-                </span>
-              </div>
-
-              <Pagination
-                page={page}
-                pageSize={pageSize}
-                totalLoaded={filtered.length}
-                serverHasMore={false}
-                className="border-t-0 p-0"
-                onPageChange={(p) => {
-                  setPage(p);
-                  tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-              />
-            </div>
+            <AdminTablePagination
+              page={page}
+              pageSize={pageSize}
+              totalLoaded={filtered.length}
+              pageSizeAriaLabel="Coupons per page"
+              summary={<>{filtered.length} total {filtered.length === 1 ? "coupon" : "coupons"}</>}
+              onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+              onPageChange={(nextPage) => {
+                setPage(nextPage);
+                tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            />
           )}
-        </div>
+        </AdminTableSurface>
       )}
     </div>
   );

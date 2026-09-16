@@ -21,7 +21,7 @@ import { TableSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm";
-import { Pagination } from "@/components/admin/Pagination";
+import { AdminDataTable, AdminTablePagination, AdminTableSurface, type AdminTableColumn } from "@/components/admin/AdminTable";
 import { useRowFocus } from "@/components/admin/use-row-focus";
 
 import { BookingRow } from "./_components/BookingRow";
@@ -34,6 +34,15 @@ import {
   POLL_MS,
   newBookingChime,
 } from "./_lib";
+
+const BOOKING_COLUMNS: AdminTableColumn<AdminBooking>[] = [
+  { id: "guest", header: "Guest Info", headerClassName: "py-3.5 px-4" },
+  { id: "arrival", header: "Date & Arrival", headerClassName: "py-3.5 px-3" },
+  { id: "party", header: "Party Size", headerClassName: "py-3.5 px-3 text-center" },
+  { id: "requests", header: "Requests & Favourites", headerClassName: "py-3.5 px-4" },
+  { id: "status", header: "Status", headerClassName: "py-3.5 px-3 text-center" },
+  { id: "actions", header: "Actions", headerClassName: "py-3.5 px-4 text-right" },
+];
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<AdminBooking[]>([]);
@@ -446,7 +455,7 @@ export default function BookingsPage() {
       {/* ========================================================================= */}
       {/* BOOKINGS TABLE                                                            */}
       {/* ========================================================================= */}
-      <div ref={tableRef} className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+      <AdminTableSurface ref={tableRef}>
         {loading ? (
           <div className="p-6">
             <TableSkeleton rows={6} cols={6} />
@@ -459,74 +468,40 @@ export default function BookingsPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-zinc-200 bg-white text-[#763a12] text-[11px] font-semibold uppercase tracking-wide">
-                  <th className="py-3.5 px-4">Guest Info</th>
-                  <th className="py-3.5 px-3">Date &amp; Arrival</th>
-                  <th className="py-3.5 px-3 text-center">Party Size</th>
-                  <th className="py-3.5 px-4">Requests &amp; Favourites</th>
-                  <th className="py-3.5 px-3 text-center">Status</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100 text-xs font-medium text-[#211a14] [&>tr>td]:align-top">
-                {pageBookings.map((b) => (
-                  <BookingRow
-                    key={b.public_id}
-                    b={b}
-                    highlighted={highlightId === b.public_id}
-                    pending={pendingId === b.public_id}
-                    onSetStatus={setStatus}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <AdminDataTable
+            rows={pageBookings}
+            rowKey={(booking) => booking.public_id}
+            columns={BOOKING_COLUMNS}
+            bodyClassName="divide-y divide-zinc-100 text-xs font-medium text-[#211a14] [&>tr>td]:align-top"
+            renderRow={(booking) => (
+              <BookingRow
+                b={booking}
+                highlighted={highlightId === booking.public_id}
+                pending={pendingId === booking.public_id}
+                onSetStatus={setStatus}
+              />
+            )}
+          />
         )}
 
         {/* Numbered pagination */}
         {!loading && filteredBookings.length > 0 && (
-          <div className="border-t border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs text-zinc-600">
-              <span className="font-medium text-zinc-500">Rows per page:</span>
-              <select
-                value={pageSize}
-                onChange={(e) => {
-                  setPageSize(Number(e.target.value));
-                  setPage(1);
-                }}
-                aria-label="Bookings per page"
-                className="h-8 rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20 cursor-pointer"
-              >
-                <option value={5}>5 rows</option>
-                <option value={10}>10 rows</option>
-                <option value={20}>20 rows</option>
-                <option value={50}>50 rows</option>
-              </select>
-              <span className="text-zinc-300">|</span>
-              <span className="text-zinc-500 font-medium">
-                Showing {pageBookings.length} of {filteredBookings.length} {filteredBookings.length === 1 ? "booking" : "bookings"}
-                {hasMore ? " (more available on server)" : ""}
-              </span>
-            </div>
-
-            <Pagination
-              page={page}
-              pageSize={pageSize}
-              totalLoaded={filteredBookings.length}
-              serverHasMore={hasMore}
-              loading={loadingMore}
-              className="border-t-0 p-0"
-              onPageChange={(p) => {
-                setPage(p);
-                tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-            />
-          </div>
+          <AdminTablePagination
+            page={page}
+            pageSize={pageSize}
+            totalLoaded={filteredBookings.length}
+            serverHasMore={hasMore}
+            loading={loadingMore}
+            pageSizeAriaLabel="Bookings per page"
+            summary={<>Showing {pageBookings.length} of {filteredBookings.length} {filteredBookings.length === 1 ? "booking" : "bookings"}{hasMore ? " (more available on server)" : ""}</>}
+            onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+            onPageChange={(nextPage) => {
+              setPage(nextPage);
+              tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+          />
         )}
-      </div>
+      </AdminTableSurface>
     </div>
   );
 }

@@ -33,12 +33,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { useConfirm } from "@/components/ui/confirm";
 import { useToast } from "@/components/ui/toast";
-import { Pagination } from "@/components/admin/Pagination";
+import { AdminDataTable, AdminTablePagination, AdminTableSurface, type AdminTableColumn } from "@/components/admin/AdminTable";
 
 const PRESET_ICONS = [
   "🥞", "🍯", "🥑", "🍫", "☕", "🍟", "🥤", "🍓",
   "🍳", "🧇", "🍰", "🥐", "🍦", "🍨", "🍩", "🥗",
   "🥪", "🍕", "🌮", "🍹", "🍵", "🧃", "🧁", "🍪",
+];
+
+const CATEGORY_COLUMNS: AdminTableColumn<AdminCategory>[] = [
+  { id: "position", header: "Position", headerClassName: "py-3 px-4 w-24 text-center" },
+  { id: "category", header: "Category", headerClassName: "py-3 px-4" },
+  { id: "slug", header: "Slug", headerClassName: "py-3 px-4" },
+  { id: "description", header: "Description", headerClassName: "py-3 px-4" },
+  { id: "dishes", header: "Dishes", headerClassName: "py-3 px-4 text-center" },
+  { id: "status", header: "Status", headerClassName: "py-3 px-4 text-center" },
+  { id: "actions", header: "Actions", headerClassName: "py-3 px-4 text-right" },
 ];
 
 interface CategoryFormData {
@@ -477,25 +487,17 @@ export default function AdminCategoriesPage() {
           </Button>
         </div>
       ) : (
-        <div ref={tableRef} className="rounded-xl border border-zinc-200 bg-white overflow-hidden shadow-2xs">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-zinc-200 bg-zinc-50/70 text-zinc-600 font-bold uppercase tracking-wider text-[10px]">
-                  <th className="py-3 px-4 w-24 text-center">Position</th>
-                  <th className="py-3 px-4">Category</th>
-                  <th className="py-3 px-4">Slug</th>
-                  <th className="py-3 px-4">Description</th>
-                  <th className="py-3 px-4 text-center">Dishes</th>
-                  <th className="py-3 px-4 text-center">Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-200">
-                {pageCategories.map((cat) => {
+        <AdminTableSurface ref={tableRef} className="shadow-2xs">
+          <AdminDataTable
+            rows={pageCategories}
+            rowKey={(category) => category.id}
+            columns={CATEGORY_COLUMNS}
+            tableClassName="text-xs [&_thead_tr]:bg-zinc-50/70 [&_thead_tr]:text-[10px] [&_thead_tr]:font-bold [&_thead_tr]:tracking-wider [&_thead_tr]:text-zinc-600"
+            bodyClassName="divide-y divide-zinc-200"
+            renderRow={(cat) => {
                   const position = orderedCategories.findIndex((item) => item.id === cat.id);
                   return (
-                    <tr key={cat.id} className="hover:bg-zinc-50/60 transition-colors group">
+                    <tr className="hover:bg-zinc-50/60 transition-colors group">
                     {/* Sort Order Controls */}
                     <td className="py-3 px-3 text-center">
                       <div className="inline-flex items-center gap-1">
@@ -611,50 +613,25 @@ export default function AdminCategoriesPage() {
                     </td>
                     </tr>
                   );
-                })}
-              </tbody>
-            </table>
-          </div>
+                }}
+          />
 
           {/* Numbered Pagination & Rows-Per-Page Controls */}
           {!loading && filteredCategories.length > 0 && (
-            <div className="border-t border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-xs text-zinc-600">
-                <span className="font-medium text-zinc-500">Rows per page:</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => {
-                    setPageSize(Number(e.target.value));
-                    setPage(1);
-                  }}
-                  aria-label="Categories per page"
-                  className="h-8 rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20 cursor-pointer"
-                >
-                  <option value={5}>5 rows</option>
-                  <option value={10}>10 rows</option>
-                  <option value={20}>20 rows</option>
-                  <option value={50}>50 rows</option>
-                </select>
-                <span className="text-zinc-300">|</span>
-                <span className="text-zinc-500 font-medium">
-                  {filteredCategories.length} total {filteredCategories.length === 1 ? "category" : "categories"}
-                </span>
-              </div>
-
-              <Pagination
-                page={page}
-                pageSize={pageSize}
-                totalLoaded={filteredCategories.length}
-                serverHasMore={false}
-                className="border-t-0 p-0"
-                onPageChange={(p) => {
-                  setPage(p);
-                  tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-              />
-            </div>
+            <AdminTablePagination
+              page={page}
+              pageSize={pageSize}
+              totalLoaded={filteredCategories.length}
+              pageSizeAriaLabel="Categories per page"
+              summary={<>{filteredCategories.length} total {filteredCategories.length === 1 ? "category" : "categories"}</>}
+              onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+              onPageChange={(nextPage) => {
+                setPage(nextPage);
+                tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            />
           )}
-        </div>
+        </AdminTableSurface>
       )}
 
       {/* CREATE / EDIT CATEGORY MODAL DIALOG */}

@@ -30,7 +30,7 @@ import { useConfirm } from "@/components/ui/confirm";
 import { useToast } from "@/components/ui/toast";
 import { TableSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
-import { Pagination } from "@/components/admin/Pagination";
+import { AdminDataTable, AdminTablePagination, AdminTableSurface, type AdminTableColumn } from "@/components/admin/AdminTable";
 
 import {
   EMPTY_FORM,
@@ -41,6 +41,16 @@ import {
   type FormState,
 } from "./_lib";
 import { MenuDishEditor } from "./_components/MenuDishEditor";
+
+const MENU_COLUMNS: AdminTableColumn<AdminMenuItem>[] = [
+  { id: "dish", header: "Dish & Ingredients", headerClassName: "py-3.5 px-4" },
+  { id: "category", header: "Category", headerClassName: "py-3.5 px-3" },
+  { id: "price", header: "Price", headerClassName: "py-3.5 px-3" },
+  { id: "photos", header: "Photos", headerClassName: "py-3.5 px-3" },
+  { id: "available", header: "Available", headerClassName: "py-3.5 px-3 text-center" },
+  { id: "featured", header: "Home Star", headerClassName: "py-3.5 px-3 text-center" },
+  { id: "actions", header: "Actions", headerClassName: "py-3.5 px-4 text-right" },
+];
 
 export default function MenuAdminPage() {
   const [items, setItems] = useState<AdminMenuItem[]>([]);
@@ -558,7 +568,7 @@ export default function MenuAdminPage() {
       {/* ========================================================================= */}
       {/* MENU ITEMS TABLE                                                          */}
       {/* ========================================================================= */}
-      <div ref={tableRef} className="scroll-mt-6 bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+      <AdminTableSurface ref={tableRef} className="scroll-mt-6">
         {loading ? (
           <div className="p-6">
             <TableSkeleton rows={6} cols={7} />
@@ -583,26 +593,16 @@ export default function MenuAdminPage() {
             </Button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-zinc-200 bg-white text-[#763a12] text-[11px] font-semibold uppercase tracking-wide">
-                  <th className="py-3.5 px-4">Dish &amp; Ingredients</th>
-                  <th className="py-3.5 px-3">Category</th>
-                  <th className="py-3.5 px-3">Price</th>
-                  <th className="py-3.5 px-3">Photos</th>
-                  <th className="py-3.5 px-3 text-center">Available</th>
-                  <th className="py-3.5 px-3 text-center">Home Star</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100 text-xs font-medium text-[#211a14]">
-                {paginatedItems.map((item) => {
+          <AdminDataTable
+            rows={paginatedItems}
+            rowKey={(item) => item.slug}
+            columns={MENU_COLUMNS}
+            bodyClassName="divide-y divide-zinc-100 text-xs font-medium text-[#211a14]"
+            renderRow={(item) => {
                   const tagData = getCategoryBadge(item, categoriesMap);
                   const photoCount = photoCounts[item.slug] ?? 0;
                   return (
                     <tr
-                      key={item.slug}
                       className="hover:bg-zinc-50 transition-colors group"
                     >
                       {/* Dish & Image */}
@@ -726,51 +726,32 @@ export default function MenuAdminPage() {
                       </td>
                     </tr>
                   );
-                })}
-              </tbody>
-            </table>
-          </div>
+                }}
+          />
         )}
 
         {/* Numbered Pagination & Rows-Per-Page Controls */}
         {!loading && filteredItems.length > 0 && (
-          <div className="border-t border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs text-zinc-600">
-              <span className="font-medium text-zinc-500">Rows per page:</span>
-              <select
-                value={pageSize}
-                onChange={(e) => {
-                  setPageSize(Number(e.target.value));
-                  setPage(1);
-                }}
-                aria-label="Dishes per page"
-                className="h-8 rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20 cursor-pointer"
-              >
-                <option value={8}>8 dishes</option>
-                <option value={12}>12 dishes</option>
-                <option value={20}>20 dishes</option>
-                <option value={50}>50 dishes</option>
-              </select>
-              <span className="text-zinc-300">|</span>
-              <span className="text-zinc-500 font-medium">
-                {filteredItems.length} total {filteredItems.length === 1 ? "dish" : "dishes"}
-              </span>
-            </div>
-
-            <Pagination
-              page={page}
-              pageSize={pageSize}
-              totalLoaded={filteredItems.length}
-              serverHasMore={false}
-              className="border-t-0 p-0"
-              onPageChange={(p) => {
-                setPage(p);
-                tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-            />
-          </div>
+          <AdminTablePagination
+            page={page}
+            pageSize={pageSize}
+            totalLoaded={filteredItems.length}
+            pageSizeOptions={[
+              { value: 8, label: "8 dishes" },
+              { value: 12, label: "12 dishes" },
+              { value: 20, label: "20 dishes" },
+              { value: 50, label: "50 dishes" },
+            ]}
+            pageSizeAriaLabel="Dishes per page"
+            summary={<>{filteredItems.length} total {filteredItems.length === 1 ? "dish" : "dishes"}</>}
+            onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+            onPageChange={(nextPage) => {
+              setPage(nextPage);
+              tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+          />
         )}
-      </div>
+      </AdminTableSurface>
     </div>
   );
 }

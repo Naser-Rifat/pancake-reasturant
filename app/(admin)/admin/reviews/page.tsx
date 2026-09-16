@@ -29,7 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { useConfirm } from "@/components/ui/confirm";
 import { useToast } from "@/components/ui/toast";
-import { Pagination } from "@/components/admin/Pagination";
+import { AdminTablePagination } from "@/components/admin/AdminTable";
 
 type ReviewFilter = "all" | "pending" | "public" | "5star";
 
@@ -467,41 +467,26 @@ export default function ReviewsAdminPage() {
 
       {/* Numbered Pagination & Reviews-Per-Page Controls */}
       {!loading && filteredReviews.length > 0 && (
-        <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
-          <div className="flex items-center gap-2 text-xs text-zinc-600">
-            <span className="font-medium text-zinc-500">Reviews per page:</span>
-            <select
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setPage(1);
-              }}
-              aria-label="Reviews per page"
-              className="h-8 rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20 cursor-pointer"
-            >
-              <option value={6}>6 reviews</option>
-              <option value={8}>8 reviews</option>
-              <option value={12}>12 reviews</option>
-              <option value={24}>24 reviews</option>
-            </select>
-            <span className="text-zinc-300">|</span>
-            <span className="text-zinc-500 font-medium">
-              {filteredReviews.length} total {filteredReviews.length === 1 ? "review" : "reviews"}
-            </span>
-          </div>
-
-          <Pagination
-            page={page}
-            pageSize={pageSize}
-            totalLoaded={filteredReviews.length}
-            serverHasMore={false}
-            className="border-t-0 p-0"
-            onPageChange={(p) => {
-              setPage(p);
-              containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-            }}
-          />
-        </div>
+        <AdminTablePagination
+          className="rounded-xl border border-zinc-200 shadow-2xs"
+          page={page}
+          pageSize={pageSize}
+          totalLoaded={filteredReviews.length}
+          pageSizeLabel="Reviews per page:"
+          pageSizeAriaLabel="Reviews per page"
+          pageSizeOptions={[
+            { value: 6, label: "6 reviews" },
+            { value: 8, label: "8 reviews" },
+            { value: 12, label: "12 reviews" },
+            { value: 24, label: "24 reviews" },
+          ]}
+          summary={<>{filteredReviews.length} total {filteredReviews.length === 1 ? "review" : "reviews"}</>}
+          onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+          onPageChange={(nextPage) => {
+            setPage(nextPage);
+            containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+        />
       )}
       </div>
     </div>
