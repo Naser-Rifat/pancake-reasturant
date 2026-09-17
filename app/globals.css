@@ -7824,10 +7824,9 @@ body:has(.wa-float) .footer-bottom {
 .f-col-brand .f-brand-logo {
   display: block;
   width: 195px;
+  height: auto;
   aspect-ratio: 529 / 226;
-  background: var(--cream);
-  -webkit-mask: url("/logo.png") no-repeat center / contain;
-  mask: url("/logo.png") no-repeat center / contain;
+  object-fit: contain;
   margin-bottom: 0.9rem;
 }
 
@@ -11280,10 +11279,9 @@ footer .btn-secondary:hover {
 .f-brand-logo {
   display: block;
   width: 220px;
+  height: auto;
   aspect-ratio: 529 / 226;
-  background: var(--cream);
-  -webkit-mask: url("/logo.png") no-repeat center / contain;
-  mask: url("/logo.png") no-repeat center / contain;
+  object-fit: contain;
   margin-bottom: 1rem;
 }
 .f-brand-tag { color: #cfc5b3; font-size: 0.95rem; line-height: 1.5; max-width: 26ch; }
@@ -12552,5 +12550,318 @@ body:has(.top-ribbon).has-announce .top-ribbon {
 @media (min-width: 1024px) {
   .mobile-nav-overlay {
     display: none !important;
+  }
+}
+
+/* ===================================================================
+   FOOTER — warm editorial refinement
+   =================================================================== */
+.site-footer {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(3.5rem, 6vw, 5.5rem) 0 1.6rem;
+  background:
+    radial-gradient(circle at 9% 12%, rgba(239, 191, 56, 0.09), transparent 26rem),
+    linear-gradient(135deg, #211a14 0%, #17120e 100%);
+  border-top: 3px solid var(--yellow);
+}
+
+.site-footer::before {
+  content: "";
+  position: absolute;
+  top: -70px;
+  right: 7%;
+  width: 180px;
+  height: 180px;
+  border: 1px solid rgba(239, 191, 56, 0.12);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.site-footer > .container {
+  position: relative;
+  z-index: 1;
+  max-width: 1320px;
+}
+
+.footer-master-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.4rem;
+}
+
+.f-brand-panel {
+  width: min(100%, 290px);
+  padding: 1.15rem 1.25rem 1rem;
+  border: 1px solid rgba(248, 242, 224, 0.13);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(248, 242, 224, 0.09), rgba(248, 242, 224, 0.025));
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.06), 0 18px 45px rgba(0, 0, 0, 0.16);
+}
+
+.f-brand-kicker {
+  display: block;
+  margin-bottom: 0.7rem;
+  color: var(--yellow);
+  font-family: var(--font-round), sans-serif;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.f-col-brand .f-brand-logo,
+.f-brand-logo {
+  width: min(100%, 240px);
+  margin: 0;
+  filter: drop-shadow(0 7px 14px rgba(0, 0, 0, 0.22));
+}
+
+.f-brand-tag {
+  margin-top: 1rem;
+  color: #e0d8c8;
+  font-size: 0.94rem;
+}
+
+.f-actions {
+  margin-top: 1.25rem;
+}
+
+.f-cta-btn {
+  min-height: 44px;
+  padding-inline: 1.25rem !important;
+}
+
+.f-col-title {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1.15rem;
+}
+
+.f-col-title::before {
+  content: "";
+  width: 18px;
+  height: 2px;
+  flex: 0 0 auto;
+  border-radius: 99px;
+  background: var(--yellow);
+}
+
+.f-address-block {
+  gap: 0.7rem;
+}
+
+.f-address-text {
+  max-width: 28ch;
+  color: #f0e9db;
+}
+
+.f-directions-link,
+.f-contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 36px;
+}
+
+.f-directions-link svg,
+.f-contact-link svg {
+  flex: 0 0 auto;
+}
+
+.f-contact-link svg {
+  color: var(--yellow);
+}
+
+.f-hours-list {
+  gap: 0;
+}
+
+.f-hours-item {
+  min-height: 44px;
+  padding: 0.62rem 0;
+  border-bottom: 1px solid rgba(248, 242, 224, 0.1);
+}
+
+.f-day-label {
+  color: #f0e9db;
+}
+
+.f-explore-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem 1rem;
+}
+
+.f-explore-link {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.f-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(248, 242, 224, 0.1);
+}
+
+.f-socials a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 36px;
+  padding: 0.42rem 0.7rem;
+  border: 1px solid rgba(248, 242, 224, 0.16);
+  border-radius: 999px;
+  color: #e7dfd0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+}
+
+.f-socials a:hover {
+  border-color: var(--yellow);
+  background: rgba(239, 191, 56, 0.08);
+  color: var(--yellow);
+}
+
+.f-socials svg {
+  width: 13px;
+  height: 13px;
+}
+
+.footer-bottom-bar {
+  margin-top: clamp(2.4rem, 5vw, 3.8rem);
+  padding-top: 1.25rem;
+  border-color: rgba(248, 242, 224, 0.13);
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+}
+
+.f-privacy-link {
+  color: #bcb19f;
+  font-size: 0.78rem;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  transition: color 0.18s ease, text-decoration-color 0.18s ease;
+}
+
+.f-privacy-link:hover {
+  color: var(--yellow);
+  text-decoration-color: currentColor;
+}
+
+@media (min-width: 640px) {
+  .footer-master-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3rem 2.5rem;
+  }
+}
+
+@media (min-width: 1050px) {
+  .footer-master-grid {
+    grid-template-columns: minmax(240px, 1.08fr) minmax(210px, 0.92fr) minmax(320px, 1.28fr) minmax(190px, 0.75fr);
+    gap: clamp(2rem, 3vw, 3.4rem);
+  }
+}
+
+@media (max-width: 639px) {
+  .site-footer {
+    padding-top: 3rem;
+  }
+  .f-brand-panel {
+    width: 100%;
+    max-width: 330px;
+  }
+  .f-explore-list {
+    width: 100%;
+  }
+  .footer-bottom-bar {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+  .f-copyright-text {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Footer correction: quiet, brand-led, and intentionally free of decorative
+   cards. The logo and useful restaurant information carry the hierarchy. */
+.site-footer {
+  padding: clamp(3.6rem, 5vw, 4.8rem) 0 1.6rem;
+  background: linear-gradient(110deg, #211a14 0%, #18130f 100%);
+  border-top: 1px solid rgba(239, 191, 56, 0.55);
+}
+
+.site-footer::before {
+  display: none;
+}
+
+.footer-master-grid {
+  gap: 2.5rem;
+}
+
+.f-brand-panel {
+  display: contents;
+}
+
+.f-brand-kicker {
+  display: none;
+}
+
+.f-col-brand .f-brand-logo,
+.f-brand-logo {
+  width: min(100%, 235px);
+  margin-bottom: 1rem;
+  filter: none;
+}
+
+.f-brand-tag {
+  margin-top: 0;
+  color: #d8cfbf;
+}
+
+.f-col-title {
+  margin-bottom: 1.15rem;
+}
+
+.f-col-title::before {
+  display: none;
+}
+
+.f-explore-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.f-socials {
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+}
+
+.f-socials a {
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #d8cfbf;
+}
+
+.f-socials a:hover {
+  border: 0;
+  background: transparent;
+}
+
+@media (min-width: 1050px) {
+  .footer-master-grid {
+    grid-template-columns: minmax(230px, 1.05fr) minmax(220px, 1fr) minmax(320px, 1.25fr) minmax(150px, 0.68fr);
+    gap: clamp(2.2rem, 3.4vw, 3.8rem);
   }
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Mail, MapPin, Phone } from "lucide-react";
+import Image from "next/image";
+import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import { formatTime, getHours, getSite, telHref } from "@/lib/api";
 import BackToTop from "@/components/BackToTop";
 
@@ -23,10 +24,12 @@ export default async function Footer() {
         <div className="footer-master-grid">
           {/* Column 1: Brand & Actions */}
           <div className="f-col f-col-brand">
-            <span
+            <Image
+              src="/logo.png"
+              alt="The Pancake Club"
+              width={529}
+              height={226}
               className="f-brand-logo"
-              role="img"
-              aria-label="The Pancake Club"
             />
             <p className="f-brand-tag">
               {site.footer_tagline || "Fluffy stacks · real maple · est. 1999"}
@@ -107,31 +110,21 @@ export default async function Footer() {
                   </Link>
                 </li>
               ))}
-              {site.instagram_url && (
-                <li className="f-explore-social-item">
-                  <a
-                    href={site.instagram_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="f-explore-link"
-                  >
-                    Instagram ↗
-                  </a>
-                </li>
-              )}
-              {site.facebook_url && (
-                <li className="f-explore-social-item">
-                  <a
-                    href={site.facebook_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="f-explore-link"
-                  >
-                    Facebook ↗
-                  </a>
-                </li>
-              )}
             </ul>
+            {(site.instagram_url || site.facebook_url) && (
+              <div className="f-socials" aria-label="Social media">
+                {site.instagram_url && (
+                  <a href={site.instagram_url} target="_blank" rel="noopener noreferrer">
+                    Instagram <ArrowUpRight aria-hidden="true" />
+                  </a>
+                )}
+                {site.facebook_url && (
+                  <a href={site.facebook_url} target="_blank" rel="noopener noreferrer">
+                    Facebook <ArrowUpRight aria-hidden="true" />
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -140,6 +133,7 @@ export default async function Footer() {
           <p className="f-copyright-text">
             © {new Date().getFullYear()} The Pancake Club — All rights reserved. {site.abn}
           </p>
+          <Link href="/privacy" className="f-privacy-link">Privacy</Link>
           <div className="f-back-to-top-container">
             <BackToTop />
           </div>

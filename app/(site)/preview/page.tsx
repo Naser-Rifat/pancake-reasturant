@@ -579,7 +579,13 @@ export default function PreviewPage() {
         <footer className="site-footer preview-keep" style={{ padding: "2.2rem 0" }}>
           <div className="container">
             <div className="f-col f-col-brand">
-              <span className="f-brand-logo" role="img" aria-label="The Pancake Club" />
+              <Image
+                src="/logo.png"
+                alt="The Pancake Club"
+                width={529}
+                height={226}
+                className="f-brand-logo"
+              />
               <p className="f-brand-tag">
                 {site.footer_tagline || "Fluffy stacks · real maple · est. 1999"}
               </p>
