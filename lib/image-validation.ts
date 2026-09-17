@@ -298,3 +298,44 @@ export function validateDishImageFile(file: File): Promise<ImageValidationResult
   });
 }
 
+export interface AspectImageSpec {
+  label: string;
+  targetRatio: number;
+  ratioTolerance: number;
+  minWidth: number;
+  minHeight: number;
+  recommendedSize: string;
+}
+
+/** Builds a validator for a specific CMS image slot. It reuses the shared
+ * file/type/size/decode checks, then enforces the dimensions that match the
+ * exact public component rather than applying generic menu-card rules. */
+export function validateImageForAspect(spec: AspectImageSpec) {
+  return async (file: File): Promise<ImageValidationResult> => {
+    const check = await validateDishImageFile(file);
+    if (!check.valid || !check.width || !check.height) return check;
+
+    if (check.width < spec.minWidth || check.height < spec.minHeight) {
+      return {
+        ...check,
+        valid: false,
+        error: `${spec.label} needs at least ${spec.minWidth}×${spec.minHeight}px (recommended ${spec.recommendedSize}). This image is ${check.width}×${check.height}px and may look blurry.`,
+      };
+    }
+
+    const difference = Math.abs(check.ratio - spec.targetRatio);
+    if (difference > spec.ratioTolerance) {
+      return {
+        ...check,
+        valid: false,
+        error: `${spec.label} uses a fixed ${spec.label.includes("4:5") ? "4:5 portrait" : "4:3 landscape"} frame. This image is ${check.width}×${check.height}px (${check.ratio.toFixed(2)}:1), so important content would be cropped. Crop it to ${spec.recommendedSize} and try again.`,
+      };
+    }
+
+    return {
+      ...check,
+      ratioLabel: spec.label,
+      warning: undefined,
+    };
+  };
+}

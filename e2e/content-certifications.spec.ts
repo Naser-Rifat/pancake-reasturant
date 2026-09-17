@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { FALLBACK_SITE } from "../lib/fallback-data";
 
 test("certification save exposes its API pending state", async ({ page }) => {
   await page.addInitScript(() =>
@@ -58,4 +59,28 @@ test("certification save exposes its API pending state", async ({ page }) => {
     page.getByRole("button", { name: "Save", exact: true }),
   ).toBeEnabled();
   await expect(page.getByText("Badge updated")).toBeVisible();
+});
+
+test("club bento upload explains the required crop and blocks the wrong ratio", async ({ page }) => {
+  await page.addInitScript(() =>
+    localStorage.setItem("krush-admin-token", "test-token"),
+  );
+
+  await page.route("**/api/admin/**", async (route) => {
+    const pathname = new URL(route.request().url()).pathname;
+    if (pathname.endsWith("/admin/stats/")) {
+      return route.fulfill({ json: { active_orders: 0, pending_bookings: 0 } });
+    }
+    if (pathname.endsWith("/admin/site/")) return route.fulfill({ json: FALLBACK_SITE });
+    return route.fulfill({ json: [] });
+  });
+
+  await page.goto("/admin/content");
+  await page.getByRole("button", { name: /Join Our Club/ }).click();
+  await expect(page.getByText(/manager is the exact public bento layout/)).toBeVisible();
+  await expect(page.getByText("Recommended 1200×1500px", { exact: false })).toBeVisible();
+
+  await page.locator('input[type="file"]').first().setInputFiles("public/menu/pancake-logo.png");
+  await expect(page.getByText(/uses a fixed 4:5 portrait frame/).first()).toBeVisible();
+  await expect(page.getByText("Upload Blocked by Validation", { exact: false })).toBeVisible();
 });

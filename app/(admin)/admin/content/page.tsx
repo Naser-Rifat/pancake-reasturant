@@ -17,6 +17,7 @@ import {
   Megaphone,
   Camera,
   Smartphone,
+  Tablet,
   Monitor,
   Ticket,
 } from "lucide-react";
@@ -79,7 +80,11 @@ export default function ContentPage() {
     typeof saved.step === "number" && saved.step >= 1 && saved.step <= 6 ? saved.step : 1,
   );
   const [viewport, setViewport] = useState<ViewportMode>(() =>
-    saved.viewport === "mobile" ? "mobile" : "desktop",
+    saved.viewport === "mobile"
+      ? "mobile"
+      : saved.viewport === "tablet"
+      ? "tablet"
+      : "desktop",
   );
   const [campaignChannel, setCampaignChannel] = useState<"channel1" | "channel2">(() =>
     saved.channel === "channel2" ? "channel2" : "channel1",
@@ -294,7 +299,7 @@ export default function ContentPage() {
     {
       id: "club",
       label: "Join Our Club",
-      path: "/join-our-club",
+      path: "/club",
       icon: Award,
       tag: "Bento & Privileges",
     },
@@ -345,26 +350,29 @@ export default function ContentPage() {
       {/* ========================================================================= */}
       {/* 🥞 LEVEL 1: SLEEK PAGE NAVIGATOR (CAPSULE PILLS)                          */}
       {/* ========================================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-2 bg-zinc-100 rounded-lg border border-zinc-200">
-        <div className="flex flex-wrap items-center gap-1.5 w-full">
-          {PAGES.map((p) => {
+      <div className="p-1.5 bg-zinc-100 rounded-xl border border-zinc-200">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 w-full">
+          {PAGES.map((p, idx) => {
             const Icon = p.icon;
             const isSelected = activePage === p.id;
+            const isLastOdd = idx === PAGES.length - 1;
             return (
               <button
                 key={p.id}
                 type="button"
                 onClick={() => setActivePage(p.id as PageTab)}
-                className={`flex-1 min-w-[130px] flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-xl font-bold text-xs transition-all ${
+                className={`h-10 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-2 transition-all whitespace-nowrap overflow-hidden ${
+                  isLastOdd ? "col-span-2 sm:col-span-1" : ""
+                } ${
                   isSelected
-                    ? "bg-[#763a12] text-white shadow-sm shadow-[#763a12]/30"
-                    : "bg-white/60 hover:bg-white text-[#763a12] hover:text-[#211a14] border border-transparent"
+                    ? "bg-[#763a12] text-white shadow-xs"
+                    : "bg-white/80 hover:bg-white text-[#763a12] hover:text-[#211a14] border border-zinc-200/60"
                 }`}
               >
-                <Icon className={`h-4 w-4 ${isSelected ? "text-amber-300" : "text-[#763a12]/70"}`} />
-                <span>{p.label}</span>
+                <Icon className={`h-4 w-4 shrink-0 ${isSelected ? "text-amber-300" : "text-[#763a12]/70"}`} />
+                <span className="truncate whitespace-nowrap">{p.label}</span>
                 <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                  className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono shrink-0 whitespace-nowrap hidden xl:inline-block ${
                     isSelected ? "bg-white/20 text-white" : "bg-black/5 text-[#763a12]/60"
                   }`}
                 >
@@ -388,7 +396,7 @@ export default function ContentPage() {
                 <span>Homepage sections</span>
               </span>
               <div className="flex items-center gap-3">
-                {/* Desktop / Mobile Preview Mode Switcher */}
+                {/* Desktop / Tablet / Mobile Preview Mode Switcher */}
                 <div className="flex items-center bg-zinc-100 p-1 rounded-xl border border-zinc-200">
                   <button
                     type="button"
@@ -402,6 +410,19 @@ export default function ContentPage() {
                   >
                     <Monitor className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline">Desktop</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewport("tablet")}
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                      viewport === "tablet"
+                        ? "bg-[#763a12] text-white shadow-xs"
+                        : "text-[#763a12] hover:text-[#211a14]"
+                    }`}
+                    title="Tablet Preview"
+                  >
+                    <Tablet className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Tablet</span>
                   </button>
                   <button
                     type="button"
@@ -505,39 +526,92 @@ export default function ContentPage() {
             )}
           </div>
 
-          {activePage === "home" && (
-            <Button
-              size="sm"
-              className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl shadow-xs"
-              loading={busy === "All content"}
-              onClick={() =>
-                run(async () => {
-                  await updateSiteSettings({
-                    hero_heading: site.hero_heading,
-                    hero_script: site.hero_script,
-                    hero_lead: site.hero_lead,
-                    hero_image: site.hero_image,
-                    hero_cutout: site.hero_cutout,
-                    promo_kicker: site.promo_kicker,
-                    offers_kicker: site.offers_kicker,
-                    offers_title: site.offers_title,
-                    cta_heading: site.cta_heading,
-                    cta_script: site.cta_script,
-                    cta_lead: site.cta_lead,
-                    cta_button_label: site.cta_button_label,
-                    cta_button_url: site.cta_button_url,
-                    footer_tagline: site.footer_tagline,
-                  });
-                }, "All content")
-              }
-            >
-              <Save className="h-3.5 w-3.5 mr-1.5" /> Save Section Changes
-            </Button>
-          )}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Viewport Mode Switcher in Live Preview header: available on ALL pages */}
+            <div className="flex items-center bg-zinc-100 p-1 rounded-xl border border-zinc-200">
+              <button
+                type="button"
+                onClick={() => setViewport("desktop")}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                  viewport === "desktop"
+                    ? "bg-[#763a12] text-white shadow-xs"
+                    : "text-[#763a12] hover:text-[#211a14]"
+                }`}
+                title="Desktop Viewport (100% width)"
+              >
+                <Monitor className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Desktop</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewport("tablet")}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                  viewport === "tablet"
+                    ? "bg-[#763a12] text-white shadow-xs"
+                    : "text-[#763a12] hover:text-[#211a14]"
+                }`}
+                title="Tablet Viewport (768px width)"
+              >
+                <Tablet className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Tablet</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewport("mobile")}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                  viewport === "mobile"
+                    ? "bg-[#763a12] text-white shadow-xs"
+                    : "text-[#763a12] hover:text-[#211a14]"
+                }`}
+                title="Mobile Phone Viewport (420px width)"
+              >
+                <Smartphone className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Mobile</span>
+              </button>
+            </div>
+
+            {activePage === "home" && (
+              <Button
+                size="sm"
+                className="font-bold text-xs bg-[#763a12] hover:bg-[#5e2d0d] text-white rounded-xl shadow-xs"
+                loading={busy === "All content"}
+                onClick={() =>
+                  run(async () => {
+                    await updateSiteSettings({
+                      hero_heading: site.hero_heading,
+                      hero_script: site.hero_script,
+                      hero_lead: site.hero_lead,
+                      hero_image: site.hero_image,
+                      hero_cutout: site.hero_cutout,
+                      promo_kicker: site.promo_kicker,
+                      offers_kicker: site.offers_kicker,
+                      offers_title: site.offers_title,
+                      cta_heading: site.cta_heading,
+                      cta_script: site.cta_script,
+                      cta_lead: site.cta_lead,
+                      cta_button_label: site.cta_button_label,
+                      cta_button_url: site.cta_button_url,
+                      footer_tagline: site.footer_tagline,
+                    });
+                  }, "All content")
+                }
+              >
+                <Save className="h-3.5 w-3.5 mr-1.5" /> Save Section Changes
+              </Button>
+            )}
+          </div>
         </div>
 
-        {/* Simulated Public Device Frame */}
-        <div className={`mx-auto transition-all ${activePage === "home" && viewport === "mobile" ? "max-w-[420px]" : "w-full"}`}>
+        {/* Simulated Public Device Frame: responsive width across Desktop, Tablet, and Mobile */}
+        <div
+          className={`mx-auto transition-all duration-300 ${
+            viewport === "mobile"
+              ? "max-w-[420px]"
+              : viewport === "tablet"
+              ? "max-w-[768px]"
+              : "w-full"
+          }`}
+        >
           <div className="rounded-xl overflow-hidden border border-zinc-200 shadow-sm bg-white">
             <iframe
               ref={iframeRef}
@@ -689,7 +763,7 @@ export default function ContentPage() {
       {/* ✨ PAGE 5: JOIN OUR CLUB STUDIO (/join-our-club)                           */}
       {/* ========================================================================= */}
       {activePage === "club" && (
-        <ClubPageSection site={site} setS={setS} busy={busy} run={run} />
+        <ClubPageSection site={site} setSite={setSite} setS={setS} busy={busy} run={run} />
       )}
     </div>
   );

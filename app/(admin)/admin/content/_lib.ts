@@ -18,7 +18,7 @@ export type SetActiveDeal = (
 ) => void;
 
 export type PageTab = "home" | "menu" | "gallery" | "booking" | "club";
-export type ViewportMode = "desktop" | "mobile";
+export type ViewportMode = "desktop" | "tablet" | "mobile";
 export type CampaignFormat = "band" | "slider";
 export type DealCadence = "all" | "weekly" | "monthly" | "regular";
 

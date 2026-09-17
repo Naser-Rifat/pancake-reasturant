@@ -1,26 +1,223 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Trash2 } from "lucide-react";
 import { SaveBar, SaveButton } from "@/components/admin/SaveButton";
+import { UploadButton } from "@/components/ui/upload-button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { updateSiteSettings, type AdminSiteSettings } from "@/lib/admin-api";
+import { validateImageForAspect, type AspectImageSpec } from "@/lib/image-validation";
+import { useConfirm } from "@/components/ui/confirm";
 import type { RunSave, SetSiteField } from "../_lib";
+
+type BentoImageKey = "club_bento_1_img" | "club_bento_2_img" | "club_bento_3_img";
+
+const BENTO_SPECS: Record<BentoImageKey, AspectImageSpec> = {
+  club_bento_1_img: {
+    label: "4:5 Portrait",
+    targetRatio: 4 / 5,
+    ratioTolerance: 0.06,
+    minWidth: 800,
+    minHeight: 1000,
+    recommendedSize: "1200×1500px",
+  },
+  club_bento_2_img: {
+    label: "4:3 Landscape",
+    targetRatio: 4 / 3,
+    ratioTolerance: 0.1,
+    minWidth: 800,
+    minHeight: 600,
+    recommendedSize: "1600×1200px",
+  },
+  club_bento_3_img: {
+    label: "4:3 Landscape",
+    targetRatio: 4 / 3,
+    ratioTolerance: 0.1,
+    minWidth: 800,
+    minHeight: 600,
+    recommendedSize: "1600×1200px",
+  },
+};
+
+function BentoPhotoEditor({
+  slot,
+  title,
+  imageKey,
+  badgeKey,
+  titleKey,
+  subKey,
+  site,
+  setS,
+  setImage,
+  run,
+  className = "",
+}: {
+  slot: string;
+  title: string;
+  imageKey: BentoImageKey;
+  badgeKey: "club_bento_1_badge" | "club_bento_2_badge" | "club_bento_3_badge";
+  titleKey: "club_bento_1_title" | "club_bento_2_title" | "club_bento_3_title";
+  subKey: "club_bento_1_sub" | "club_bento_2_sub" | "club_bento_3_sub";
+  site: AdminSiteSettings;
+  setS: SetSiteField;
+  setImage: (key: BentoImageKey, value: string) => void;
+  run: RunSave;
+  className?: string;
+}) {
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
+  const { confirm: confirmDialog } = useConfirm();
+  const spec = BENTO_SPECS[imageKey];
+  const imageUrl = localPreview || site[imageKey] || "";
+
+  const handleUploaded = (url: string) => {
+    setImage(imageKey, url);
+    setLocalPreview(null);
+    run(async () => {
+      await updateSiteSettings({ ...site, [imageKey]: url });
+    }, "Bento photo", { title: `Photo saved to ${slot}` });
+  };
+
+  const handleRemove = async () => {
+    const ok = await confirmDialog({
+      title: `Remove ${slot} photo?`,
+      description: "This slot will show the empty state until a new photo is uploaded.",
+      confirmLabel: "Remove photo",
+      destructive: true,
+    });
+    if (!ok) return;
+    setImage(imageKey, "");
+    setLocalPreview(null);
+    run(async () => {
+      await updateSiteSettings({ ...site, [imageKey]: "" });
+    }, "Bento photo", { title: `Photo removed from ${slot}` });
+  };
+
+  return (
+    <div className={`club-studio-slot ${className}`}>
+      <span
+        className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-zinc-950 text-white shadow-xs"
+        style={{ position: "absolute", top: "12px", left: "12px", zIndex: 6 }}
+      >
+        {slot}
+      </span>
+
+      {imageUrl ? (
+        <>
+          <button
+            type="button"
+            aria-label={`Remove ${slot} photo`}
+            onClick={handleRemove}
+            className="rounded-lg bg-black/80 text-white p-1.5 hover:bg-destructive transition-colors cursor-pointer"
+            style={{ position: "absolute", top: "10px", right: "10px", zIndex: 6 }}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+          <div className="club-studio-img">
+            <Image
+              src={imageUrl}
+              alt={`${slot} crop preview`}
+              fill
+              unoptimized={Boolean(localPreview)}
+              className="object-cover"
+            />
+          </div>
+        </>
+      ) : (
+        <div className="club-studio-img flex flex-col items-center justify-center gap-2.5 border-2 border-dashed border-[#d9c7b4] bg-[#faf5ee] p-5 text-center">
+          <p className="text-xs font-bold text-[#763a12]">{title} · empty</p>
+          <p className="max-w-64 text-[11px] leading-4 text-zinc-500">
+            {spec.label} · recommended {spec.recommendedSize}<br />
+            minimum {spec.minWidth}×{spec.minHeight}px · max 5 MB
+          </p>
+          <UploadButton
+            label="Add Photo"
+            dropzone
+            validate={validateImageForAspect(spec)}
+            onLocalPreview={setLocalPreview}
+            onUploaded={handleUploaded}
+          />
+        </div>
+      )}
+
+      {/* Card Content Controls */}
+      <div className="pt-2.5 space-y-2">
+        {/* Row 1: Badge text + Replace/Upload button */}
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
+          <Input
+            aria-label={`${slot} badge`}
+            className="h-8 text-xs border-zinc-200 font-medium rounded-lg min-w-0 flex-1 bg-white"
+            value={site[badgeKey] ?? ""}
+            onChange={setS(badgeKey)}
+            placeholder="Badge (e.g. 🥞 Fresh Off The Griddle)"
+          />
+          <UploadButton
+            label={imageUrl ? "Replace" : "Upload"}
+            validate={validateImageForAspect(spec)}
+            onLocalPreview={setLocalPreview}
+            onUploaded={handleUploaded}
+          />
+        </div>
+
+        {/* Row 2: Title (Script) & Sub-caption */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <Input
+            aria-label={`${slot} title`}
+            className="h-8 text-xs border-zinc-200 font-serif italic rounded-lg min-w-0 bg-white"
+            value={site[titleKey] ?? ""}
+            onChange={setS(titleKey)}
+            placeholder="Title (e.g. Signature Stack)"
+          />
+          <Input
+            aria-label={`${slot} caption`}
+            className="h-8 text-xs border-zinc-200 rounded-lg min-w-0 bg-white"
+            value={site[subKey] ?? ""}
+            onChange={setS(subKey)}
+            placeholder="Sub-caption (e.g. Whipped butter & maple)"
+          />
+        </div>
+
+        {/* Row 3: Aspect label & Paste URL toggle */}
+        <div className="flex items-center justify-between text-[10px] text-zinc-500 pt-0.5 px-0.5">
+          <span>{spec.label} · {spec.recommendedSize}</span>
+          <details className="inline-block">
+            <summary className="cursor-pointer font-semibold text-zinc-500 hover:text-zinc-800">
+              Paste URL
+            </summary>
+            <div className="mt-1">
+              <Input
+                className="h-7 text-[11px] bg-white border-zinc-200"
+                value={site[imageKey] ?? ""}
+                onChange={setS(imageKey)}
+                placeholder="https://…"
+              />
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function ClubPageSection({
   site,
+  setSite,
   setS,
   busy,
   run,
 }: {
   site: AdminSiteSettings;
+  setSite: React.Dispatch<React.SetStateAction<AdminSiteSettings | null>>;
   setS: SetSiteField;
   busy: string;
   run: RunSave;
 }) {
+  const setImage = (key: BentoImageKey, value: string) =>
+    setSite((current) => (current ? { ...current, [key]: value } : current));
+
   return (
     <div className="space-y-8">
       {/* 1. Club Hero Section */}
@@ -85,153 +282,118 @@ export function ClubPageSection({
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          {/* Slot 1: Tall Hero Stack */}
-          <div className="p-4 rounded-xl border border-zinc-200 bg-[#faf8f5] space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#763a12]">Slot 1 · Tall Feature</span>
-              <span className="text-[10px] bg-white px-2 py-0.5 rounded border text-zinc-600 font-semibold">Hero Stack</span>
-            </div>
-            {site.club_bento_1_img && (
-              <div className="relative w-full h-32 rounded-lg overflow-hidden border border-zinc-200 bg-zinc-100">
-                <Image src={site.club_bento_1_img} alt="Slot 1 preview" fill className="object-cover" />
-              </div>
-            )}
-            <div className="space-y-1">
-              <Label className="text-[11px] font-semibold text-zinc-700">Image URL</Label>
-              <Input
-                className="border-zinc-300 text-xs h-9 bg-white"
-                value={site.club_bento_1_img ?? ""}
-                onChange={setS("club_bento_1_img")}
-                placeholder="https://..."
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[11px] font-semibold text-zinc-700">Badge Text</Label>
-              <Input
-                className="border-zinc-300 text-xs h-9 bg-white"
-                value={site.club_bento_1_badge ?? ""}
-                onChange={setS("club_bento_1_badge")}
-                placeholder="🥞 Fresh Off The Griddle"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[11px] font-semibold text-zinc-700">Card Title (Script)</Label>
-              <Input
-                className="border-zinc-300 text-xs h-9 bg-white font-serif italic"
-                value={site.club_bento_1_title ?? ""}
-                onChange={setS("club_bento_1_title")}
-                placeholder="Signature Stack"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[11px] font-semibold text-zinc-700">Sub-caption</Label>
-              <Input
-                className="border-zinc-300 text-xs h-9 bg-white"
-                value={site.club_bento_1_sub ?? ""}
-                onChange={setS("club_bento_1_sub")}
-                placeholder="Whipped butter & maple"
-              />
-            </div>
-          </div>
-
-          {/* Slot 2: Top-right Brunch */}
-          <div className="p-4 rounded-xl border border-zinc-200 bg-[#faf8f5] space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#763a12]">Slot 2 · Top Right</span>
-              <span className="text-[10px] bg-white px-2 py-0.5 rounded border text-zinc-600 font-semibold">Brunch Spread</span>
-            </div>
-            {site.club_bento_2_img && (
-              <div className="relative w-full h-32 rounded-lg overflow-hidden border border-zinc-200 bg-zinc-100">
-                <Image src={site.club_bento_2_img} alt="Slot 2 preview" fill className="object-cover" />
-              </div>
-            )}
-            <div className="space-y-1">
-              <Label className="text-[11px] font-semibold text-zinc-700">Image URL</Label>
-              <Input
-                className="border-zinc-300 text-xs h-9 bg-white"
-                value={site.club_bento_2_img ?? ""}
-                onChange={setS("club_bento_2_img")}
-                placeholder="https://..."
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[11px] font-semibold text-zinc-700">Badge Text</Label>
-              <Input
-                className="border-zinc-300 text-xs h-9 bg-white"
-                value={site.club_bento_2_badge ?? ""}
-                onChange={setS("club_bento_2_badge")}
-                placeholder="🥞 Sunday Brunch"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[11px] font-semibold text-zinc-700">Card Title (Script)</Label>
-              <Input
-                className="border-zinc-300 text-xs h-9 bg-white font-serif italic"
-                value={site.club_bento_2_title ?? ""}
-                onChange={setS("club_bento_2_title")}
-                placeholder="Brunch Club"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[11px] font-semibold text-zinc-700">Sub-caption</Label>
-              <Input
-                className="border-zinc-300 text-xs h-9 bg-white"
-                value={site.club_bento_2_sub ?? ""}
-                onChange={setS("club_bento_2_sub")}
-                placeholder="Weekend Table"
-              />
-            </div>
-          </div>
-
-          {/* Slot 3: Bottom-right Parlour */}
-          <div className="p-4 rounded-xl border border-zinc-200 bg-[#faf8f5] space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#763a12]">Slot 3 · Bottom Right</span>
-              <span className="text-[10px] bg-white px-2 py-0.5 rounded border text-zinc-600 font-semibold">Parlour Space</span>
-            </div>
-            {site.club_bento_3_img && (
-              <div className="relative w-full h-32 rounded-lg overflow-hidden border border-zinc-200 bg-zinc-100">
-                <Image src={site.club_bento_3_img} alt="Slot 3 preview" fill className="object-cover" />
-              </div>
-            )}
-            <div className="space-y-1">
-              <Label className="text-[11px] font-semibold text-zinc-700">Image URL</Label>
-              <Input
-                className="border-zinc-300 text-xs h-9 bg-white"
-                value={site.club_bento_3_img ?? ""}
-                onChange={setS("club_bento_3_img")}
-                placeholder="https://..."
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[11px] font-semibold text-zinc-700">Badge Text</Label>
-              <Input
-                className="border-zinc-300 text-xs h-9 bg-white"
-                value={site.club_bento_3_badge ?? ""}
-                onChange={setS("club_bento_3_badge")}
-                placeholder="☕ Geelong West"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[11px] font-semibold text-zinc-700">Card Title (Script)</Label>
-              <Input
-                className="border-zinc-300 text-xs h-9 bg-white font-serif italic"
-                value={site.club_bento_3_title ?? ""}
-                onChange={setS("club_bento_3_title")}
-                placeholder="Our Parlour"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[11px] font-semibold text-zinc-700">Sub-caption</Label>
-              <Input
-                className="border-zinc-300 text-xs h-9 bg-white"
-                value={site.club_bento_3_sub ?? ""}
-                onChange={setS("club_bento_3_sub")}
-                placeholder="Open 7 days"
-              />
-            </div>
-          </div>
+        <p className="-mt-2 text-xs font-medium text-zinc-600">
+          This manager is the exact public bento layout—Slot #1 is the tall hero. Drop a correctly sized photo into an empty slot, or use Replace on a filled one.
+        </p>
+        <style>{`
+          .club-studio-bento {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+          }
+          .club-studio-slot {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+            position: relative;
+            padding: 10px 10px 12px;
+            border-radius: 16px;
+            border: 1.5px solid rgba(118, 58, 18, 0.12);
+            background: #fff;
+            box-shadow: 0 8px 22px rgba(33, 26, 20, 0.08);
+          }
+          .club-studio-img {
+            position: relative;
+            min-height: 180px;
+            flex: 1;
+            overflow: hidden;
+            border-radius: 12px;
+            background: #f4ebe1;
+          }
+          /* Mobile (< 640px) */
+          @media (max-width: 639px) {
+            .club-studio-img {
+              min-height: 160px;
+            }
+            .club-studio-hero .club-studio-img {
+              min-height: 230px;
+            }
+          }
+          /* Tablet (640px to 1023px) */
+          @media (min-width: 640px) and (max-width: 1023px) {
+            .club-studio-bento {
+              grid-template-columns: 1.1fr 1fr;
+              grid-template-rows: auto auto;
+              gap: 14px;
+              align-items: stretch;
+            }
+            .club-studio-hero {
+              grid-row: span 2;
+            }
+            .club-studio-img {
+              min-height: 155px;
+            }
+            .club-studio-hero .club-studio-img {
+              min-height: 360px;
+            }
+          }
+          /* Desktop (>= 1024px) */
+          @media (min-width: 1024px) {
+            .club-studio-bento {
+              grid-template-columns: 1.15fr 1fr;
+              grid-template-rows: minmax(310px, auto) minmax(310px, auto);
+              gap: 18px;
+              align-items: stretch;
+            }
+            .club-studio-hero {
+              grid-row: span 2;
+            }
+            .club-studio-img {
+              min-height: 180px;
+            }
+            .club-studio-hero .club-studio-img {
+              min-height: 420px;
+            }
+          }
+        `}</style>
+        <div className="club-studio-bento">
+          <BentoPhotoEditor
+            className="club-studio-hero"
+            slot="#1 · Tall Hero"
+            title="Main pancake story"
+            imageKey="club_bento_1_img"
+            badgeKey="club_bento_1_badge"
+            titleKey="club_bento_1_title"
+            subKey="club_bento_1_sub"
+            site={site}
+            setS={setS}
+            setImage={setImage}
+            run={run}
+          />
+          <BentoPhotoEditor
+            slot="#2 · Top Right"
+            title="Brunch spread"
+            imageKey="club_bento_2_img"
+            badgeKey="club_bento_2_badge"
+            titleKey="club_bento_2_title"
+            subKey="club_bento_2_sub"
+            site={site}
+            setS={setS}
+            setImage={setImage}
+            run={run}
+          />
+          <BentoPhotoEditor
+            slot="#3 · Bottom Right"
+            title="Venue or atmosphere"
+            imageKey="club_bento_3_img"
+            badgeKey="club_bento_3_badge"
+            titleKey="club_bento_3_title"
+            subKey="club_bento_3_sub"
+            site={site}
+            setS={setS}
+            setImage={setImage}
+            run={run}
+          />
         </div>
       </div>
 

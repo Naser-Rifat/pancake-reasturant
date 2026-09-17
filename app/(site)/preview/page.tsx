@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { Award, ChevronRight, Ticket } from "lucide-react";
 import CertIcon from "@/components/CertIcon";
 import HeroShowcase from "@/components/HeroShowcase";
 import MenuClient from "@/components/MenuClient";
 import type { ApiMenuItem } from "@/lib/api";
+import clubStyles from "@/app/(site)/join-our-club/club.module.css";
 import {
   type AdminSiteSettings,
   type AdminAnnouncement,
@@ -643,6 +644,122 @@ export default function PreviewPage() {
             <p>{site.booking_hero_lead || "Pick a date, pick a time — we'll have the griddle hot when you arrive."}</p>
           </div>
         </section>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 9. JOIN OUR CLUB PAGE PREVIEW                                             */}
+      {/* ========================================================================= */}
+      {section === "club" && (
+        <div style={{ padding: "0.25rem 0 2rem", background: "linear-gradient(180deg, #faf5ee 0%, #f4ebe1 100%)" }}>
+          {/* Master Hero Stage */}
+          <section className={clubStyles.heroStage} style={{ paddingTop: "1.5rem", paddingBottom: "1.75rem" }}>
+            <div className="container">
+              <div className={clubStyles.heroBadgeWrap}>
+                <span className={clubStyles.heroBadge}>
+                  <span className={clubStyles.heroBadgeDot} aria-hidden="true">🥞</span>
+                  <span>{site.club_hero_kicker || "The Pancake Club · Geelong West"}</span>
+                </span>
+              </div>
+              <h1 className={clubStyles.heroHeading}>
+                {site.club_hero_heading || "Good food."}{" "}
+                <span className={clubStyles.heroScript}>{site.club_hero_script || "Better company."}</span>
+              </h1>
+              <p className={clubStyles.heroLead}>
+                {site.club_hero_lead || "Fluffy homemade stacks, secret tasting invites, and a table always saved for you."}
+              </p>
+            </div>
+          </section>
+
+          {/* 3-Image Bento Mosaic */}
+          <div className="container" style={{ maxWidth: "1000px", padding: "0 1rem" }}>
+            <div className={clubStyles.imageBento}>
+              {/* Slot 1: Tall Feature Image */}
+              <div className={clubStyles.bentoSlotTall}>
+                <div className={clubStyles.bentoImgFrame}>
+                  <Image
+                    src={site.club_bento_1_img || "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&q=80"}
+                    alt={site.club_bento_1_title || "Signature Stack"}
+                    fill
+                    sizes="(max-width: 640px) 55vw, (max-width: 1024px) 50vw, 460px"
+                    priority
+                    className={clubStyles.bentoImg}
+                  />
+                </div>
+                <div className={clubStyles.bentoBadge}>
+                  <span>{site.club_bento_1_badge || "🥞 Fresh Off The Griddle"}</span>
+                </div>
+                <div className={clubStyles.bentoCaption}>
+                  <span className={clubStyles.bentoCaptionTitle}>{site.club_bento_1_title || "Signature Stack"}</span>
+                  <span className={clubStyles.bentoCaptionSub}>{site.club_bento_1_sub || "Whipped butter & maple"}</span>
+                </div>
+              </div>
+
+              {/* Slot 2: Top Right */}
+              <div className={clubStyles.bentoSlotTopRight}>
+                <div className={clubStyles.bentoImgFrame}>
+                  <Image
+                    src={site.club_bento_2_img || "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=80"}
+                    alt={site.club_bento_2_title || "Brunch Club"}
+                    fill
+                    sizes="(max-width: 640px) 45vw, (max-width: 1024px) 40vw, 320px"
+                    priority
+                    className={clubStyles.bentoImg}
+                  />
+                </div>
+                <div className={clubStyles.bentoBadge}>
+                  <span>{site.club_bento_2_badge || "🥞 Sunday Brunch"}</span>
+                </div>
+                <div className={clubStyles.bentoCaption}>
+                  <span className={clubStyles.bentoCaptionTitle}>{site.club_bento_2_title || "Brunch Club"}</span>
+                  <span className={clubStyles.bentoCaptionSub}>{site.club_bento_2_sub || "Weekend Table"}</span>
+                </div>
+              </div>
+
+              {/* Slot 3: Bottom Right */}
+              <div className={clubStyles.bentoSlotBottomRight}>
+                <div className={clubStyles.bentoImgFrame}>
+                  <Image
+                    src={site.club_bento_3_img || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80"}
+                    alt={site.club_bento_3_title || "Our Parlour"}
+                    fill
+                    sizes="(max-width: 640px) 45vw, (max-width: 1024px) 40vw, 320px"
+                    priority
+                    className={clubStyles.bentoImg}
+                  />
+                </div>
+                <div className={clubStyles.bentoBadge}>
+                  <span>{site.club_bento_3_badge || "☕ Geelong West"}</span>
+                </div>
+                <div className={clubStyles.bentoCaption}>
+                  <span className={clubStyles.bentoCaptionTitle}>{site.club_bento_3_title || "Our Parlour"}</span>
+                  <span className={clubStyles.bentoCaptionSub}>{site.club_bento_3_sub || "Open 7 days"}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Integrated Founding Member Pass Bar */}
+            <div className={clubStyles.memberPassStrip}>
+              <div className={clubStyles.passStripLeft}>
+                <span className={clubStyles.passSealSmall}>
+                  <Award size={18} strokeWidth={2.2} aria-hidden="true" />
+                </span>
+                <div>
+                  <strong className={clubStyles.passStripTitle}>
+                    {site.club_pass_title || "FOUNDING MEMBER PASS · NO. 0824"}
+                  </strong>
+                  <p className={clubStyles.passStripSub}>
+                    {site.club_pass_sub || "Priority Seasonal Tastings · Secret Drops · Free Forever"}
+                  </p>
+                </div>
+              </div>
+              <div className={clubStyles.passStripRight}>
+                <span className={clubStyles.passStripBadge}>
+                  <Ticket size={12} aria-hidden="true" /> {site.club_pass_badge || "ALL WELCOME"}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
