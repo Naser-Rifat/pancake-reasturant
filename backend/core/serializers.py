@@ -169,6 +169,15 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             "blank": "Please enter your phone number.",
         },
     )
+    email = serializers.EmailField(
+        required=True,
+        allow_blank=False,
+        error_messages={
+            "required": "Please enter your email address.",
+            "blank": "Please enter your email address.",
+            "invalid": "Please enter a valid email address.",
+        },
+    )
     items = OrderItemInputSerializer(many=True, allow_empty=False, write_only=True)
     # the browser sends a CODE and nothing else — every dollar is worked out
     # here, the same rule the item price snapshot already follows

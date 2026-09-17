@@ -57,8 +57,12 @@ class ClubTests(TestCase):
         self.assertEqual(member.name, "Alex")
         self.assertEqual(member.status, "archived")
         self.assertFalse(member.marketing_consent)
-        # No welcome email for duplicate registrations
-        self.assertEqual(len(mail.outbox), 0)
+        # A repeat submission gets an acknowledgement, but never a second welcome
+        # or a preference/status mutation.
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["alex@example.com"])
+        self.assertIn("already in the club", mail.outbox[0].subject.lower())
+        self.assertIn("preferences unchanged", mail.outbox[0].body.lower())
 
     def test_case_insensitive_uniqueness_is_enforced_in_database(self):
         self.member()
@@ -168,4 +172,3 @@ class ClubTests(TestCase):
         self.assertEqual(stats.data, {"total": 2, "active": 1, "archived": 1, "consented": 1})
         self.assertEqual(self.client.get("/api/admin/club-members/?consent=true").data["count"], 1)
         self.assertEqual(self.client.get("/api/admin/club-members/?consent=false").data["count"], 1)
-

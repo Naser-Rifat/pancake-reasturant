@@ -28,6 +28,50 @@ test("booking submission exposes pending state and renders the API result", asyn
   await expect(page.getByText("Request received, Alex!")).toBeVisible();
 });
 
+test("order checkout requires an email and sends it to the API", async ({ page }) => {
+  let submitted: Record<string, unknown> | null = null;
+  await page.route("**/api/orders/", async (route) => {
+    submitted = route.request().postDataJSON();
+    await route.fulfill({
+      status: 201,
+      json: {
+        public_id: "order-email-e2e",
+        status: "received",
+        payment_status: "unpaid",
+        subtotal: "17.00",
+        discount_amount: "0.00",
+        total: "17.00",
+        items: [],
+        checkout_url: "",
+      },
+    });
+  });
+
+  await page.goto("/menu");
+  const firstDishHref = await page.locator(".diner-dish-row .dc-details").first().getAttribute("href");
+  const firstDishSlug = firstDishHref?.split("/").pop();
+  expect(firstDishSlug).toBeTruthy();
+  await page.goto(`/menu?add=${encodeURIComponent(firstDishSlug!)}`);
+  await expect(page.getByRole("complementary", { name: "Shopping cart" })).toHaveClass(/open/);
+  await page.locator("#cart-customer-name").fill("Alex Guest");
+  await page.locator("#cart-customer-phone").fill("0412 345 678");
+
+  await page.getByRole("button", { name: /Place order/ }).click();
+  await expect(page.locator("#cart-customer-email-error")).toHaveText(
+    "Email is required for order updates.",
+  );
+  expect(submitted).toBeNull();
+
+  await page.locator("#cart-customer-email").fill("alex@example.com");
+  await page.getByRole("button", { name: /Place order/ }).click();
+  await expect.poll(() => submitted).not.toBeNull();
+  expect(submitted).toMatchObject({
+    customer_name: "Alex Guest",
+    email: "alex@example.com",
+    phone: "0412 345 678",
+  });
+});
+
 test("review submission surfaces an API validation error", async ({ page }) => {
   await page.route("**/api/reviews/", (route) =>
     route.fulfill({ status: 400, json: { quote: ["Please add a little more detail."] } }),

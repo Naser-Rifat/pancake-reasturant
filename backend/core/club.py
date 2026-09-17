@@ -1,4 +1,5 @@
 import re
+
 from django.utils import timezone
 from rest_framework import filters, mixins, serializers, status, viewsets
 from rest_framework.decorators import action
@@ -8,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
+from . import emails
 from .models import ClubMember
 
 
@@ -80,9 +82,9 @@ class ClubRegistrationView(APIView):
                 },
             )
             if created:
-                from . import emails
-
                 emails.club_welcome(member)
+            else:
+                emails.club_already_registered(member)
         return Response(
             {"detail": "Thanks for joining! If your email is already registered, we've kept your existing preferences."},
             status=status.HTTP_202_ACCEPTED,

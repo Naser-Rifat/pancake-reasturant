@@ -34,6 +34,8 @@ export default function CartDrawer({
     useCart();
   const [name, setName] = useState("");
   const [nameError, setNameError] = useState("");
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
   // the box starts closed: an empty coupon field in front of every customer
@@ -162,6 +164,23 @@ export default function CartDrawer({
     }
   };
 
+  const emailIsValid = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+
+  const handleEmailChange = (val: string) => {
+    setEmail(val);
+    if (emailError && emailIsValid(val)) setEmailError("");
+  };
+
+  const handleEmailBlur = () => {
+    if (!email.trim()) {
+      setEmailError("Email is required for order updates.");
+    } else if (!emailIsValid(email)) {
+      setEmailError("Please enter a valid email address.");
+    } else {
+      setEmailError("");
+    }
+  };
+
   const handlePhoneBlur = () => {
     if (!phone.trim()) {
       setPhoneError("Phone number is required so we can notify you.");
@@ -192,6 +211,17 @@ export default function CartDrawer({
       return showToast("Name must be at least 2 characters!");
     }
 
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !emailIsValid(trimmedEmail)) {
+      const msg = trimmedEmail
+        ? "Please enter a valid email address."
+        : "Email is required for order updates.";
+      setEmailError(msg);
+      document.getElementById("cart-customer-email")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      document.getElementById("cart-customer-email")?.focus();
+      return showToast(msg);
+    }
+
     const trimmedPhone = phone.trim();
     if (!trimmedPhone) {
       setPhoneError("Phone number is required so we can notify you.");
@@ -211,6 +241,7 @@ export default function CartDrawer({
     try {
       const order = await orderMutation.mutateAsync({
         customer_name: name.trim(),
+        email: trimmedEmail,
         phone: phone.trim(),
         items: cartLines,
         ...(coupon ? { coupon_code: coupon.code } : {}),
@@ -316,6 +347,40 @@ export default function CartDrawer({
                           }}
                         >
                           {nameError}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <input
+                        id="cart-customer-email"
+                        className={`input${emailError ? " error" : ""}`}
+                        style={emailError ? { borderColor: "#ef4444", backgroundColor: "#fef2f2" } : undefined}
+                        type="email"
+                        placeholder="Email address *"
+                        value={email}
+                        autoComplete="email"
+                        inputMode="email"
+                        required
+                        aria-invalid={!!emailError}
+                        aria-describedby={emailError ? "cart-customer-email-error" : undefined}
+                        onChange={(e) => handleEmailChange(e.target.value)}
+                        onBlur={handleEmailBlur}
+                      />
+                      {emailError && (
+                        <p
+                          id="cart-customer-email-error"
+                          className="cart-email-error"
+                          role="alert"
+                          style={{
+                            color: "#dc2626",
+                            fontSize: "0.75rem",
+                            marginTop: "0.25rem",
+                            marginBottom: "0.25rem",
+                            fontWeight: 600,
+                            paddingLeft: "0.25rem",
+                          }}
+                        >
+                          {emailError}
                         </p>
                       )}
                     </div>

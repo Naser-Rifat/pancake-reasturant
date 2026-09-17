@@ -104,10 +104,9 @@ class BookingViewSet(
     queryset = Booking.objects.all()
 
     def perform_create(self, serializer):
-        from . import emails
-
         booking = serializer.save()
-        emails.staff_new_booking(booking)  # the guest is emailed on confirm/decline
+        emails.booking_request_received(booking)
+        emails.staff_new_booking(booking)
 
 
 def _resolve_frontend_url(request):

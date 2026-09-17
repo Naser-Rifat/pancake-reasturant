@@ -7,6 +7,7 @@ terminal; production uses SMTP via the DJANGO_EMAIL_* env vars.
 import logging
 
 from django.core.mail import send_mail
+from .models import SiteSettings
 
 logger = logging.getLogger(__name__)
 
@@ -15,18 +16,24 @@ RESTAURANT = "The Pancake Club"
 
 def _info():
     """Live business details — managed by staff in the admin panel Settings page."""
-    from .models import SiteSettings
 
     return SiteSettings.load()
 
 
-def _send(to: str, subject: str, body: str) -> None:
+def _send(to: str, subject: str, body: str) -> bool:
     if not to:
-        return
+        logger.warning("Skipped email %r because no recipient was supplied", subject)
+        return False
     try:
-        send_mail(subject, body, None, [to])  # from = DEFAULT_FROM_EMAIL
+        sent = send_mail(subject, body, None, [to], fail_silently=False)
     except Exception:
         logger.exception("Could not send email %r to %s", subject, to)
+        return False
+    if sent != 1:
+        logger.error("Email backend accepted %s messages for %r to %s; expected 1", sent, subject, to)
+        return False
+    logger.info("Email accepted by backend: %r to %s", subject, to)
+    return True
 
 
 def _nice_time(t) -> str:
@@ -64,6 +71,25 @@ def booking_status_changed(booking) -> None:
             f"another time that works.\n\n"
             f"Sorry for the trouble,\n{RESTAURANT}",
         )
+
+
+def booking_request_received(booking) -> None:
+    """Acknowledge a public request without implying that the table is confirmed."""
+    s = _info()
+    when = f"{_nice_date(booking.date)} at {_nice_time(booking.time)}"
+    guests = f"{booking.party_size} {'guest' if booking.party_size == 1 else 'guests'}"
+    _send(
+        booking.email,
+        f"We received your booking request — {RESTAURANT} 🥞",
+        f"G'day {booking.name},\n\n"
+        f"We've received your table request and will confirm it shortly. "
+        f"Your table is not confirmed until you receive a confirmation email.\n\n"
+        f"  When:   {when}\n"
+        f"  Party:  {guests}\n"
+        f"  Where:  {s.address}\n\n"
+        f"Need to change anything? Call us on {s.phone}.\n\n"
+        f"Thanks,\n{RESTAURANT}",
+    )
 
 
 def order_status_changed(order) -> None:
@@ -164,6 +190,21 @@ def club_welcome(member) -> None:
         f"Your membership is active right now. Next time you're nearby, "
         f"pop in and say g'day — there's always a table for club members.\n\n"
         f"See you at the griddle,\n{RESTAURANT}\n{s.address}",
+    )
+
+
+def club_already_registered(member) -> None:
+    """Confirm a repeat submission without changing consent or account state."""
+    s = _info()
+    _send(
+        member.email,
+        f"You're already in the club — {RESTAURANT} 🥞",
+        f"G'day {member.name},\n\n"
+        f"We received a club sign-up request for this email address. You're already "
+        f"registered, so we kept your existing membership and communication preferences unchanged.\n\n"
+        f"If this wasn't you, no action is needed. To update your details or leave the "
+        f"club, contact us at {s.email} or call {s.phone}.\n\n"
+        f"See you at the griddle,\n{RESTAURANT}",
     )
 
 

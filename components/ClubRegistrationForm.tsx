@@ -214,7 +214,7 @@ export default function ClubRegistrationForm({ contactEmail }: { contactEmail: s
         <h3>Thanks for joining!</h3>
         <p>There’s always room for another pancake person.</p>
         <p>
-          We’ve sent a confirmation email to <strong>{formValues.email}</strong>. If your email was already registered, we’ve kept your existing preferences.
+          We’ve sent an update to <strong>{formValues.email}</strong>. New members receive a welcome; existing members keep their saved preferences unchanged.
         </p>
         <p>
           To change them or leave the club anytime, <a href={`mailto:${contactEmail}`}>get in touch</a>.

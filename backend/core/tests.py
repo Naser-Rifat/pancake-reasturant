@@ -19,8 +19,8 @@ WEBHOOK_SECRET = "whsec_test_suite"
 
 
 def place_order(client, payload, format="json"):
-    """POST a valid pickup order, supplying the required contact phone."""
-    payload = {"phone": "0412 345 678", **payload}
+    """POST a valid pickup order, supplying the required customer contacts."""
+    payload = {"phone": "0412 345 678", "email": "alex@example.com", **payload}
     with patch("core.payments.create_checkout_session", return_value="https://stripe.test/pay"):
         return client.post("/api/orders/", payload, format=format)
 
@@ -123,12 +123,39 @@ class OrderApiTests(TestCase):
             "/api/orders/",
             {
                 "customer_name": "Alex",
+                "email": "alex@example.com",
                 "items": [{"slug": "berry", "quantity": 1}],
             },
             format="json",
         )
         self.assertEqual(res.status_code, 400)
         self.assertIn("phone", res.json())
+
+    def test_order_requires_a_valid_email(self):
+        missing = self.client.post(
+            "/api/orders/",
+            {
+                "customer_name": "Alex",
+                "phone": "0412 345 678",
+                "items": [{"slug": "berry", "quantity": 1}],
+            },
+            format="json",
+        )
+        self.assertEqual(missing.status_code, 400)
+        self.assertIn("email", missing.json())
+
+        invalid = self.client.post(
+            "/api/orders/",
+            {
+                "customer_name": "Alex",
+                "email": "not-an-email",
+                "phone": "0412 345 678",
+                "items": [{"slug": "berry", "quantity": 1}],
+            },
+            format="json",
+        )
+        self.assertEqual(invalid.status_code, 400)
+        self.assertIn("email", invalid.json())
 
     def test_order_placement_sends_confirmation_with_abn(self):
         from django.core import mail
@@ -239,6 +266,8 @@ class BookingApiTests(TestCase):
         self.assertEqual(res.status_code, 400)
 
     def test_creates_pending_booking(self):
+        from django.core import mail
+
         tomorrow = timezone.localdate() + timedelta(days=1)
         res = self.client.post(
             "/api/bookings/",
@@ -257,6 +286,10 @@ class BookingApiTests(TestCase):
         self.assertNotIn("email", detail.json())
         self.assertNotIn("phone", detail.json())
         self.assertNotIn("notes", detail.json())
+        self.assertEqual(len(mail.outbox), 2)
+        customer_mail = next(message for message in mail.outbox if message.to == ["a@b.co"])
+        self.assertIn("received your booking request", customer_mail.subject.lower())
+        self.assertIn("not confirmed", customer_mail.body.lower())
 
 
 class AdminApiTests(TestCase):

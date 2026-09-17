@@ -416,7 +416,7 @@ async function post<T>(path: string, payload: unknown): Promise<T> {
 export function placeOrder(payload: {
   customer_name: string;
   phone: string;
-  email?: string;
+  email: string;
   notes?: string;
   items: { slug: string; quantity: number }[];
   coupon_code?: string;
