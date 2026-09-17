@@ -17,7 +17,7 @@ from django.utils import timezone
 from PIL import Image
 from rest_framework.test import APIClient
 
-from .emails import _send, send_test
+from .emails import _send, booking_request_received, send_test
 from .models import (
     Announcement,
     Booking,
@@ -110,6 +110,24 @@ class MenuApiTests(TestCase):
 
 
 class EmailDeliveryTests(TestCase):
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_customer_html_template_escapes_customer_supplied_content(self):
+        booking = Booking.objects.create(
+            name="<b>Alex</b>",
+            email="alex@example.com",
+            phone="0412 345 678",
+            date=timezone.localdate() + timedelta(days=30),
+            time=datetime_time(18, 30),
+            party_size=2,
+            preselected_dish="<script>alert('x')</script>",
+        )
+
+        self.assertTrue(booking_request_received(booking))
+        html = mail.outbox[0].alternatives[0].content
+        self.assertIn("&lt;b&gt;Alex&lt;/b&gt;", html)
+        self.assertIn("&lt;script&gt;", html)
+        self.assertNotIn("<script>", html)
+
     @override_settings(
         EMAIL_BACKEND="anymail.backends.brevo.EmailBackend",
         ANYMAIL={"BREVO_API_KEY": "test-api-key", "REQUESTS_TIMEOUT": 7},
@@ -278,9 +296,13 @@ class OrderApiTests(TestCase):
         # immediately in the pay-at-counter flow
         self.assertEqual(len(mail.outbox), 2)
         customer_mail = next(m for m in mail.outbox if "alex@example.com" in m.to)
-        self.assertIn("got your order", customer_mail.subject)
+        self.assertIn("Order received", customer_mail.subject)
+        self.assertRegex(customer_mail.subject, r"TPC-[A-F0-9]{6}")
         self.assertIn("ABN", customer_mail.body)
         self.assertIn("incl. GST", customer_mail.body)
+        self.assertIn("Pay at counter on collection", customer_mail.body)
+        self.assertEqual(customer_mail.alternatives[0].mimetype, "text/html")
+        self.assertIn("The kitchen has your order", customer_mail.alternatives[0].content)
         staff_mail = next(m for m in mail.outbox if "alex@example.com" not in m.to)
         self.assertIn("New pickup order", staff_mail.subject)
 
@@ -310,6 +332,8 @@ class OrderApiTests(TestCase):
         refund.assert_not_called()
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("Out of blueberries tonight", mail.outbox[0].body)
+        self.assertIn("No payment was taken", mail.outbox[0].body)
+        self.assertIn("Your order was cancelled", mail.outbox[0].alternatives[0].content)
 
     def test_rejects_oversized_orders(self):
         res = place_order(
@@ -360,7 +384,8 @@ class BookingApiTests(TestCase):
         res = self.client.post(
             "/api/bookings/",
             {
-                "name": "Alex", "email": "a@b.co", "date": str(yesterday),
+                "name": "Alex", "email": "a@b.co", "phone": "0412 345 678",
+                "date": str(yesterday),
                 "time": "18:00", "party_size": 2,
             },
             format="json",
@@ -372,8 +397,10 @@ class BookingApiTests(TestCase):
         res = self.client.post(
             "/api/bookings/",
             {
-                "name": "Alex", "email": "a@b.co", "date": str(tomorrow),
+                "name": "Alex", "email": "a@b.co", "phone": "0412 345 678",
+                "date": str(tomorrow),
                 "time": "18:00", "party_size": 4,
+                "preselected_dish": "Classic Buttermilk Stack ($14.00)",
             },
             format="json",
         )
@@ -389,8 +416,35 @@ class BookingApiTests(TestCase):
         self.assertNotIn("notes", detail.json())
         self.assertEqual(len(mail.outbox), 2)
         customer_mail = next(message for message in mail.outbox if message.to == ["a@b.co"])
-        self.assertIn("received your booking request", customer_mail.subject.lower())
+        self.assertIn("booking request received", customer_mail.subject.lower())
+        self.assertRegex(customer_mail.subject, r"TPC-BK-[A-F0-9]{6}")
         self.assertIn("not confirmed", customer_mail.body.lower())
+        self.assertIn(
+            "Pre-selected favourites: Classic Buttermilk Stack ($14.00)",
+            customer_mail.body,
+        )
+        self.assertIn("not a paid food pre-order", customer_mail.body)
+        self.assertEqual(customer_mail.alternatives[0].mimetype, "text/html")
+        self.assertIn("We’ve received your request", customer_mail.alternatives[0].content)
+        self.assertIn("Classic Buttermilk Stack ($14.00)", customer_mail.alternatives[0].content)
+
+    def test_public_booking_requires_phone_number(self):
+        tomorrow = timezone.localdate() + timedelta(days=1)
+        response = self.client.post(
+            "/api/bookings/",
+            {
+                "name": "Alex",
+                "email": "a@b.co",
+                "date": str(tomorrow),
+                "time": "18:00",
+                "party_size": 2,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["phone"], ["Please enter your phone number."])
+        self.assertFalse(Booking.objects.exists())
 
     @patch("core.views.emails.staff_new_booking", return_value=True)
     @patch("core.views.emails.booking_request_received", return_value=False)
@@ -403,6 +457,7 @@ class BookingApiTests(TestCase):
             {
                 "name": "Alex",
                 "email": "a@b.co",
+                "phone": "0412 345 678",
                 "date": str(tomorrow),
                 "time": "18:00",
                 "party_size": 4,
@@ -497,6 +552,7 @@ class AdminApiTests(TestCase):
         booking = Booking.objects.create(
             name="Sam", email="sam@example.com", date="2030-01-15",
             time="18:30", party_size=4,
+            preselected_dish="Berry Bliss ($17.00), Choc Stack ($18.00)",
         )
         token = self.login("boss").json()["token"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
@@ -507,6 +563,12 @@ class AdminApiTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ["sam@example.com"])
         self.assertIn("confirmed", mail.outbox[0].subject.lower())
+        self.assertIn(
+            "Pre-selected favourites: Berry Bliss ($17.00), Choc Stack ($18.00)",
+            mail.outbox[0].body,
+        )
+        self.assertIn("not a paid food pre-order", mail.outbox[0].body)
+        self.assertIn("Your table is confirmed", mail.outbox[0].alternatives[0].content)
         # saving again with the same status must NOT re-send
         self.client.patch(
             f"/api/admin/bookings/{booking.public_id}/", {"status": "confirmed"}, format="json"
@@ -533,6 +595,7 @@ class AdminApiTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ["alex@example.com"])
         self.assertIn("ready", mail.outbox[0].subject.lower())
+        self.assertIn("Your order is ready", mail.outbox[0].alternatives[0].content)
 
     def test_phone_booking_with_email_sends_confirmation(self):
 
@@ -568,7 +631,13 @@ class AdminApiTests(TestCase):
     def test_public_booking_still_requires_email(self):
         res = self.client.post(
             "/api/bookings/",
-            {"name": "NoEmail", "date": "2030-01-15", "time": "18:00", "party_size": 2},
+            {
+                "name": "NoEmail",
+                "phone": "0412 345 678",
+                "date": "2030-01-15",
+                "time": "18:00",
+                "party_size": 2,
+            },
             format="json",
         )
         self.assertEqual(res.status_code, 400)

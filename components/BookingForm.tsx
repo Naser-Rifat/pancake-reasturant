@@ -55,12 +55,17 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
     e.preventDefault();
     setError("");
 
-    if (form.phone.trim()) {
-      const phoneValidation = validatePhoneNumber(form.phone);
-      if (!phoneValidation.isValid) {
-        setError(phoneValidation.error || "Please enter a valid phone number.");
-        return;
-      }
+    if (!form.phone.trim()) {
+      setError("Please enter your phone number.");
+      document.getElementById("booking-phone")?.focus();
+      return;
+    }
+
+    const phoneValidation = validatePhoneNumber(form.phone);
+    if (!phoneValidation.isValid) {
+      setError(phoneValidation.error || "Please enter a valid phone number.");
+      document.getElementById("booking-phone")?.focus();
+      return;
     }
 
     const finalNotes = offer
@@ -110,7 +115,18 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
       )}
       <input className="input" placeholder="Your name *" required value={form.name} autoComplete="name" onChange={set("name")} />
       <input className="input" type="email" placeholder="Email *" required value={form.email} autoComplete="email" onChange={set("email")} />
-      <input className="input" placeholder="Phone (optional)" value={form.phone} autoComplete="tel" inputMode="tel" onChange={set("phone")} />
+      <input
+        id="booking-phone"
+        className="input"
+        type="tel"
+        placeholder="Phone *"
+        required
+        aria-required="true"
+        value={form.phone}
+        autoComplete="tel"
+        inputMode="tel"
+        onChange={set("phone")}
+      />
       <div className="bk-row">
         <input className="input" type="date" required min={new Date().toISOString().split("T")[0]} value={form.date} onChange={set("date")} aria-label="Date" />
         <input className="input" type="time" required value={form.time} onChange={set("time")} aria-label="Time" />

@@ -83,9 +83,19 @@ class MenuItemSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    # required on the public form (confirmation emails go here), even though
-    # the model allows blank for staff-entered phone bookings
+    # Required on the public form, while the model remains permissive for
+    # staff-created bookings entered from phone calls.
     email = serializers.EmailField(write_only=True)
+    phone = serializers.CharField(
+        write_only=True,
+        required=True,
+        allow_blank=False,
+        max_length=30,
+        error_messages={
+            "required": "Please enter your phone number.",
+            "blank": "Please enter your phone number.",
+        },
+    )
 
     class Meta:
         model = Booking
@@ -96,7 +106,6 @@ class BookingSerializer(serializers.ModelSerializer):
         read_only_fields = ["public_id", "status", "created_at"]
         extra_kwargs = {
             "name": {"write_only": True},
-            "phone": {"write_only": True},
             "preselected_dish": {"write_only": True},
             "notes": {"write_only": True},
         }

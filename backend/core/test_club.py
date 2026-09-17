@@ -42,6 +42,8 @@ class ClubTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("Welcome", mail.outbox[0].subject)
         self.assertEqual(mail.outbox[0].to, ["alex@example.com"])
+        self.assertEqual(mail.outbox[0].alternatives[0].mimetype, "text/html")
+        self.assertIn("Welcome to the club", mail.outbox[0].alternatives[0].content)
 
     @patch("core.club.emails.club_welcome", return_value=False)
     def test_registration_reports_welcome_failure_without_losing_member(self, _welcome):
@@ -72,8 +74,9 @@ class ClubTests(TestCase):
         # or a preference/status mutation.
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ["alex@example.com"])
-        self.assertIn("already in the club", mail.outbox[0].subject.lower())
+        self.assertIn("membership is already active", mail.outbox[0].subject.lower())
         self.assertIn("preferences unchanged", mail.outbox[0].body.lower())
+        self.assertIn("You’re already in the club", mail.outbox[0].alternatives[0].content)
 
     def test_case_insensitive_uniqueness_is_enforced_in_database(self):
         self.member()

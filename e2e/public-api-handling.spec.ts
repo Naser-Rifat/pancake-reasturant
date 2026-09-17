@@ -1,7 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 test("booking submission exposes pending state and renders the API result", async ({ page }) => {
+  let submitted = false;
   await page.route("**/api/bookings/", async (route) => {
+    submitted = true;
     await new Promise((resolve) => setTimeout(resolve, 350));
     const request = route.request().postDataJSON();
     await route.fulfill({
@@ -22,6 +24,12 @@ test("booking submission exposes pending state and renders the API result", asyn
   await page.getByPlaceholder("Email *").fill("alex@example.com");
   await page.locator('input[type="date"]').fill("2030-01-15");
   await page.locator('input[type="time"]').fill("18:30");
+
+  await page.getByRole("button", { name: "Request a Table" }).click();
+  await expect(page.getByPlaceholder("Phone *")).toBeFocused();
+  expect(submitted).toBe(false);
+
+  await page.getByPlaceholder("Phone *").fill("0412 345 678");
   await page.getByRole("button", { name: "Request a Table" }).click();
 
   const pending = page.getByRole("button", { name: "Sending…" });

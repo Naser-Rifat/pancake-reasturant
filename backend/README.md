@@ -96,7 +96,9 @@ DJANGO_FROM_EMAIL="The Pancake Club <hello@thepancakeclub.com.au>"
 ```
 
 The Django Anymail backend sends over HTTPS while preserving the standard
-`send_mail()` interface. Send failures are logged and never block the status
+`send_mail()` interface. Customer notifications include a responsive branded
+HTML layout plus a complete plain-text fallback for accessibility and older
+email clients. Send failures are logged and never block the status
 change itself. Customer-facing create responses report whether the provider
 accepted the confirmation. Explicit HTTP 429/5xx failures are retried once;
 ambiguous timeouts are not retried to avoid duplicate customer mail. SMTP
