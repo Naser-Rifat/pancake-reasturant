@@ -10,13 +10,12 @@ import Image from "next/image";
 import { Scissors, Star, Trash2, UploadCloud } from "lucide-react";
 import { UploadButton } from "@/components/ui/upload-button";
 import { useToast } from "@/components/ui/toast";
-import { API_URL } from "@/lib/api";
 import { cloudinaryReady, uploadToCloudinary } from "@/lib/cloudinary";
 import {
   createMenuItemPhoto,
   deleteMenuItemPhoto,
-  getToken,
   listMenuItemPhotos,
+  removeImageBackground,
   type AdminMenuItemPhoto,
 } from "@/lib/admin-api";
 import {
@@ -125,16 +124,9 @@ export default function PhotoBoard({
   });
   const cutoutMutation = useMutation({
     mutationFn: async (url: string) => {
-      const file = await (await fetch(url)).blob();
-      const form = new FormData();
-      form.append("file", new File([file], "dish.png", { type: file.type || "image/png" }));
-      const response = await fetch(`${API_URL}/admin/remove-bg/`, {
-        method: "POST",
-        headers: { Authorization: `Token ${getToken()}` },
-        body: form,
-      });
-      if (!response.ok) throw new Error("Background removal failed — try a photo on a plain background");
-      return response.blob();
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Could not download that photo for background removal.");
+      return removeImageBackground(await response.blob());
     },
   });
 

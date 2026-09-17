@@ -85,7 +85,7 @@ class MenuItemSerializer(serializers.ModelSerializer):
 class BookingSerializer(serializers.ModelSerializer):
     # required on the public form (confirmation emails go here), even though
     # the model allows blank for staff-entered phone bookings
-    email = serializers.EmailField()
+    email = serializers.EmailField(write_only=True)
 
     class Meta:
         model = Booking
@@ -94,6 +94,12 @@ class BookingSerializer(serializers.ModelSerializer):
             "party_size", "preselected_dish", "notes", "status", "created_at",
         ]
         read_only_fields = ["public_id", "status", "created_at"]
+        extra_kwargs = {
+            "name": {"write_only": True},
+            "phone": {"write_only": True},
+            "preselected_dish": {"write_only": True},
+            "notes": {"write_only": True},
+        }
 
     def validate_phone(self, value):
         return validate_phone_number(value)

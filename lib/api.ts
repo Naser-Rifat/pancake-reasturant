@@ -445,13 +445,27 @@ export function validateCoupon(
 /** Client-side order lookup — the success page polls this until Stripe's
  * webhook flips payment_status to "paid". */
 export async function getOrder(publicId: string): Promise<ApiOrder | null> {
+  let res: Response;
   try {
-    const res = await fetchWithTimeout(`${API_URL}/orders/${publicId}/`, { cache: "no-store" });
-    if (!res.ok) return null;
-    return (await res.json()) as ApiOrder;
+    res = await fetchWithTimeout(`${API_URL}/orders/${publicId}/`, {
+      cache: "no-store",
+    });
   } catch {
-    return null;
+    throw new Error(
+      "We couldn’t reach the kitchen for the latest order status. Please try again.",
+    );
   }
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    let detail: string | null = null;
+    try {
+      detail = firstError(await res.json());
+    } catch {
+      /* non-JSON error body */
+    }
+    throw new Error(detail ?? "Couldn’t retrieve this order right now.");
+  }
+  return (await res.json()) as ApiOrder;
 }
 
 export function submitReview(payload: {

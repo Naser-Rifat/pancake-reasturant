@@ -162,6 +162,8 @@ export default function OrderSuccessClient({
   });
   const order = orderQuery.data ?? null;
   const loading = Boolean(publicId) && orderQuery.isPending;
+  const orderError =
+    orderQuery.error instanceof Error ? orderQuery.error.message : "";
   const [copied, setCopied] = useState(false);
   const [manualId, setManualId] = useState("");
 
@@ -605,11 +607,24 @@ export default function OrderSuccessClient({
         ) : (
           /* Missing or Custom Lookup Screen */
           <div className="order-not-found-card">
-            <div className="not-found-icon">🥞❓</div>
-            <h2>Order Lookup</h2>
+            <div className="not-found-icon">{orderError ? "⚠️" : "🥞❓"}</div>
+            <h2>{orderError ? "Status temporarily unavailable" : "Order Lookup"}</h2>
             <p>
-              We couldn&apos;t find an active order with that reference. If you recently placed an order, please enter your Order ID or phone number below.
+              {orderError
+                ? orderError
+                : "We couldn’t find an active order with that reference. If you recently placed an order, please enter your Order ID below."}
             </p>
+
+            {orderError && (
+              <button
+                type="button"
+                className="btn btn-outline"
+                disabled={orderQuery.isFetching}
+                onClick={() => orderQuery.refetch()}
+              >
+                {orderQuery.isFetching ? "Checking again…" : "Try again"}
+              </button>
+            )}
 
             <form
               onSubmit={(e) => {

@@ -179,6 +179,45 @@ async function adminFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   return (await res.json()) as T;
 }
 
+/** Upload an image to the authenticated background-removal endpoint while
+ * preserving the same timeout, auth-expiry and readable-error behaviour as
+ * every JSON admin request. */
+export async function removeImageBackground(file: Blob): Promise<Blob> {
+  const form = new FormData();
+  form.append("file", file, file instanceof File ? file.name : "dish.png");
+
+  let res: Response;
+  try {
+    res = await fetchWithTimeout(`${API_URL}/admin/remove-bg/`, {
+      method: "POST",
+      headers: getToken() ? { Authorization: `Token ${getToken()}` } : {},
+      body: form,
+    });
+  } catch (e) {
+    throw new Error(
+      e instanceof DOMException && e.name === "AbortError"
+        ? "Background removal took too long — please try again."
+        : "Can't reach the server — check your connection and try again.",
+    );
+  }
+
+  if (res.status === 401 || res.status === 403) {
+    clearToken();
+    if (typeof window !== "undefined") window.location.href = "/admin/login";
+    throw new Error("Session expired — please log in again.");
+  }
+  if (!res.ok) {
+    let detail: string | null = null;
+    try {
+      detail = firstError(await res.json());
+    } catch {
+      /* non-JSON error body */
+    }
+    throw new Error(detail ?? "Background removal failed — try a photo on a plain background.");
+  }
+  return res.blob();
+}
+
 /** Paginated DRF responses arrive as {results}; unpaginated as bare arrays. */
 const unwrap = <T,>(data: { results: T[] } | T[]): T[] =>
   Array.isArray(data) ? data : data.results;
@@ -236,7 +275,7 @@ export async function adminLogout() {
   const token = getToken();
   if (token) {
     try {
-      await fetch(`${API_URL}/admin/logout/`, {
+      await fetchWithTimeout(`${API_URL}/admin/logout/`, {
         method: "POST",
         headers: { Authorization: `Token ${token}` },
       });

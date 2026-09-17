@@ -46,6 +46,7 @@ urlpatterns = [
     # TODO: STRIPE PAYMENT SERVICE - UNCOMMENT WHEN RE-ENABLING STRIPE:
     # path("webhooks/stripe/", payments.stripe_webhook, name="stripe-webhook"),
     path("admin/login/", admin_api.AdminLoginView.as_view(), name="admin-login"),
+    path("admin/logout/", admin_api.AdminLogoutView.as_view(), name="admin-logout"),
     path("admin/stats/", admin_api.AdminStatsView.as_view(), name="admin-stats"),
     path("admin/site/", admin_api.AdminSiteSettingsView.as_view(), name="admin-site"),
     path("admin/test-email/", admin_api.AdminTestEmailView.as_view(), name="admin-test-email"),

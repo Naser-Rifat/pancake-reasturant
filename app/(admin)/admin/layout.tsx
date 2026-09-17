@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -42,6 +42,7 @@ const NAV = [
 export default function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const isLogin = pathname === "/admin/login";
   const [ready, setReady] = useState(false);
   // live counts on the sidebar: the per-page chimes only help while that page
@@ -62,7 +63,13 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     orders: statsQuery.data?.active_orders ?? 0,
     bookings: statsQuery.data?.pending_bookings ?? 0,
   };
-  const logoutMutation = useMutation({ mutationFn: adminLogout });
+  const logoutMutation = useMutation({
+    mutationFn: adminLogout,
+    onSettled: () => {
+      queryClient.clear();
+      router.replace("/admin/login");
+    },
+  });
 
   useEffect(() => {
     if (!isLogin && !getToken()) {
@@ -184,14 +191,12 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                   View site
                 </a>
                 <button
-                  onClick={async () => {
-                  await logoutMutation.mutateAsync();
-                    router.replace("/admin/login");
-                  }}
-                  className="flex items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+                  onClick={() => logoutMutation.mutate()}
+                  disabled={logoutMutation.isPending}
+                  className="flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <LogOut className="h-4 w-4" />
-                  Log out
+                  <LogOut className={cn("h-4 w-4", logoutMutation.isPending && "animate-pulse")} />
+                  {logoutMutation.isPending ? "Logging out…" : "Log out"}
                 </button>
               </div>
             </aside>

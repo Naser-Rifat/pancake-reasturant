@@ -64,6 +64,19 @@ class AdminLoginView(APIView):
         return Response({"token": token.key, "username": user.username})
 
 
+class AdminLogoutView(APIView):
+    """Revoke the current staff token instead of only forgetting it in the browser."""
+
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        # TokenAuthentication places the authenticated Token instance here.
+        # Deleting it makes a copied/stolen token unusable immediately.
+        if isinstance(request.auth, Token):
+            request.auth.delete()
+        return Response(status=http_status.HTTP_204_NO_CONTENT)
+
+
 # ---------- serializers ----------
 
 class AdminOrderSerializer(OrderSerializer):

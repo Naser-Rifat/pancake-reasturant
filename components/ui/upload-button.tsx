@@ -4,8 +4,7 @@ import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { API_URL } from "@/lib/api";
-import { getToken } from "@/lib/admin-api";
+import { removeImageBackground } from "@/lib/admin-api";
 import { cloudinaryReady, uploadToCloudinary } from "@/lib/cloudinary";
 import { useToast } from "@/components/ui/toast";
 import {
@@ -51,18 +50,7 @@ export function UploadButton({
   const { toast } = useToast();
   const removeBgMutation = useMutation({
     mutationFn: async (file: File) => {
-      const form = new FormData();
-      form.append("file", file);
-      const res = await fetch(`${API_URL}/admin/remove-bg/`, {
-        method: "POST",
-        headers: { Authorization: `Token ${getToken()}` },
-        body: form,
-      });
-      if (!res.ok)
-        throw new Error(
-          "Background removal failed — try a photo on a plain, light background",
-        );
-      const blob = await res.blob();
+      const blob = await removeImageBackground(file);
       return new File([blob], file.name.replace(/\.[^.]+$/, "") + "-cutout.png", {
         type: "image/png",
       });

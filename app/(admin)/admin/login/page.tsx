@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,13 +14,17 @@ import { Label } from "@/components/ui/label";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const login = useMutation({
     mutationFn: () => adminLogin(username, password),
-    onSuccess: () => router.replace("/admin"),
+    onSuccess: () => {
+      queryClient.clear();
+      router.replace("/admin");
+    },
     onError: (err) =>
       setError(err instanceof Error ? err.message : "Invalid username or password"),
   });

@@ -1,10 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-// Smoke suite: proves the storefront renders live API data, ordering is
-// available, and the admin panel authenticates. Backend must be migrated,
-// seeded (seed_demo) and have the staff user below.
-const ADMIN_USER = process.env.E2E_ADMIN_USER ?? "admin";
-const ADMIN_PASS = process.env.E2E_ADMIN_PASS ?? "krush2026";
+// Smoke suite: proves the storefront renders live API data and the admin UI
+// handles the authenticated API contract. Django's own suite tests real token
+// issuance; the browser test is isolated from mutable local staff passwords.
 // same backend the site renders from (playwright.config loads .env.local)
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
 
@@ -45,10 +43,64 @@ test("no horizontal overflow on phone-width home page", async ({ page }) => {
 });
 
 test("admin panel authenticates staff and shows the dashboard", async ({ page }) => {
+  await page.route("**/api/admin/**", async (route) => {
+    const { pathname } = new URL(route.request().url());
+    if (pathname.endsWith("/admin/login/")) {
+      return route.fulfill({ json: { token: "e2e-admin-token", username: "admin" } });
+    }
+    if (pathname.endsWith("/admin/stats/")) {
+      return route.fulfill({
+        json: {
+          orders_today: 0,
+          revenue_today: "0.00",
+          active_orders: 0,
+          pending_bookings: 0,
+          pending_reviews: 0,
+          total_orders: 0,
+          total_bookings: 0,
+        },
+      });
+    }
+    if (pathname.endsWith("/admin/site/")) {
+      return route.fulfill({ json: { online_ordering_enabled: true } });
+    }
+    if (pathname.endsWith("/admin/orders/")) {
+      return route.fulfill({
+        json: [
+          {
+            public_id: "e2e-order-1",
+            customer_name: "Test Guest",
+            email: "guest@example.com",
+            phone: "0412 345 678",
+            notes: "",
+            status: "received",
+            payment_status: "unpaid",
+            cancel_reason: "",
+            total: "14.00",
+            created_at: "2026-09-17T10:00:00Z",
+            items: [
+              {
+                slug: "buttermilk",
+                name: "Buttermilk Stack",
+                quantity: 1,
+                unit_price: "14.00",
+                line_total: "14.00",
+              },
+            ],
+          },
+        ],
+      });
+    }
+    if (pathname.endsWith("/admin/bookings/")) {
+      return route.fulfill({ json: [] });
+    }
+    return route.fulfill({ json: [] });
+  });
+
   await page.goto("/admin");
   await page.waitForURL("**/admin/login"); // guard redirects anonymous visitors
-  await page.fill("#username", ADMIN_USER);
-  await page.fill("#password", ADMIN_PASS);
+  await page.fill("#username", "admin");
+  await page.fill("#password", "test-password");
   await page.click('button[type="submit"]');
   await page.waitForURL("**/admin");
   await expect(page.getByText("Orders today")).toBeVisible();
