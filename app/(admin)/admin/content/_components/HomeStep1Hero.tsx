@@ -72,7 +72,7 @@ export function HomeStep1Hero({
           <Textarea
             rows={2}
             className="border-zinc-300 bg-white text-[#211a14] font-medium text-sm rounded-xl"
-            placeholder="e.g. We flip the best homemade pancakes in Sydney..."
+            placeholder="e.g. We flip the best homemade pancakes in Geelong..."
             value={site.hero_lead}
             onChange={setS("hero_lead")}
           />

@@ -70,7 +70,8 @@ the computed `total`.
 
 ### Booking rules
 
-- Date/time must not be in the past (validated in `Australia/Sydney` time)
+- Date/time must not be in the past (validated in the venue's configured timezone,
+  defaulting to `Australia/Melbourne`)
 - Party size 1–20; groups of 10+ are asked to call in the storefront UI
 
 ## Moderation & operations
@@ -113,8 +114,9 @@ remains an optional fallback on hosts that permit it; see `.env.example`.
 ## Production notes
 
 - Set `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=0`, `DJANGO_ALLOWED_HOSTS`,
-  `DJANGO_CORS_ORIGINS` (comma-separated)
+  `DJANGO_CORS_ORIGINS`, `DJANGO_CSRF_TRUSTED_ORIGINS` (comma-separated),
+  `DJANGO_FRONTEND_URL`, and a persistent Postgres `DATABASE_URL`
 - Run behind gunicorn/uvicorn + a reverse proxy; `STATIC_ROOT` is configured
   for `collectstatic`
-- SQLite → Postgres: change `DATABASES` or wire `dj-database-url`
-- Rotate the dev admin password (`krush2026`) before launch
+- Configure Railway/external uptime monitoring against `/api/health/`
+- Use a unique staff password; never use the demo seed credentials in production

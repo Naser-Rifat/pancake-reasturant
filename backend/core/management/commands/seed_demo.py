@@ -2,8 +2,6 @@
 from datetime import time
 
 from django.core.management.base import BaseCommand, CommandError
-import os
-from django.contrib.auth import get_user_model
 from core.models import Category
 from core.models import (
     Announcement,
@@ -210,21 +208,4 @@ class Command(BaseCommand):
                     is_active=True,
                 ),
             )
-
-      
-        User = get_user_model()
-        admin_username = os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin")
-        admin_password = os.environ.get("DJANGO_SUPERUSER_PASSWORD", "admin123456")
-        admin_email = os.environ.get("DJANGO_SUPERUSER_EMAIL", "admin@thepancakeclub.com")
-
-        user, created = User.objects.get_or_create(
-            username=admin_username,
-            defaults={"email": admin_email, "is_staff": True, "is_superuser": True},
-        )
-        user.is_staff = True
-        user.is_superuser = True
-        user.set_password(admin_password)
-        user.save()
-        self.stdout.write(self.style.SUCCESS(f"Superuser '{admin_username}' configured."))
-
         self.stdout.write(self.style.SUCCESS("Demo content seeded."))

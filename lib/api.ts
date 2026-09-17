@@ -232,7 +232,7 @@ export interface ApiOrder {
   }[];
   created_at?: string;
   cancel_reason?: string;
-  /** present only in the placeOrder response — where Stripe takes the payment */
+  /** Success-page destination returned when an order is accepted. */
   checkout_url?: string;
   /** Whether the email provider accepted the initial customer confirmation. */
   email_delivery?: "accepted" | "failed";
@@ -438,8 +438,8 @@ export interface ApiCouponPreview {
 }
 
 /** Price a code against the cart so the drawer can show the discount before
- *  checkout. The same server helper prices the real order, so this preview
- *  cannot disagree with what Stripe charges. */
+ *  checkout. The same server helper prices the real order, so the preview and
+ *  the amount due at collection cannot disagree. */
 export function validateCoupon(
   code: string,
   items: { slug: string; quantity: number }[]
@@ -447,8 +447,7 @@ export function validateCoupon(
   return post("/coupons/validate/", { code, items });
 }
 
-/** Client-side order lookup — the success page polls this until Stripe's
- * webhook flips payment_status to "paid". */
+/** Client-side order lookup used by the live order-status page. */
 export async function getOrder(publicId: string): Promise<ApiOrder | null> {
   let res: Response;
   try {

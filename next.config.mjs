@@ -1,5 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Browser tests use a separate directory so they can run beside the
+  // developer's normal `next dev` process without sharing its lock/cache.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
+  // Playwright binds the isolated dev server to the loopback IP. Next's dev
+  // asset protection otherwise treats that as cross-origin from `localhost`
+  // and blocks hydration, leaving client-driven admin/cart flows inert.
+  allowedDevOrigins: ["127.0.0.1"],
   // App has multiple root layouts (route groups), so a normal app/not-found
   // can't compose one global 404 for unmatched URLs — use global-not-found.
   experimental: {

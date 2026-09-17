@@ -17,8 +17,8 @@ export type RunSave = (fn: () => Promise<void>, what: string, success?: ToastInp
 export type HoursRow = { label: string; opens: string; closes: string };
 
 export const AU_TIMEZONES = [
-  "Australia/Sydney",
   "Australia/Melbourne",
+  "Australia/Sydney",
   "Australia/Brisbane",
   "Australia/Adelaide",
   "Australia/Perth",

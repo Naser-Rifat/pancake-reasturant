@@ -25,6 +25,7 @@ admin_router.register("coupons", admin_api.AdminCouponViewSet, basename="admin-c
 admin_router.register("categories", admin_api.AdminCategoryViewSet, basename="admin-category")
 
 urlpatterns = [
+    path("health/", views.HealthView.as_view(), name="health"),
     path("club/join/", club.ClubRegistrationView.as_view(), name="club-join"),
     path("", include(router.urls)),
     path("categories/", views.CategoryListView.as_view(), name="categories"),

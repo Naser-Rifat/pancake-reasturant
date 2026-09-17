@@ -369,7 +369,7 @@ export default function CouponsAdminPage() {
                 <Plus className="h-5 w-5 text-[#763a12]" /> Create New Discount Code
               </h2>
               <p className="text-xs text-zinc-500">
-                The code is priced and locked on the server so Stripe charges match the discount preview.
+                The code is priced and locked on the server so the amount due matches the discount preview.
               </p>
             </div>
             <button

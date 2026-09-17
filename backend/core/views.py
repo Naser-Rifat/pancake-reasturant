@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.conf import settings
+from django.db import DatabaseError, connection
 from django.db.models import Count, Q
 from rest_framework import mixins, status as http_status, viewsets
 from rest_framework.exceptions import ValidationError
@@ -295,6 +296,23 @@ class CampaignListView(ListAPIView):
 
     def get_queryset(self):
         return Announcement.live().filter(placement="slider")
+
+
+class HealthView(APIView):
+    """Minimal readiness probe for Railway and external uptime monitors."""
+
+    authentication_classes = []
+    permission_classes = []
+    throttle_classes = []
+
+    def get(self, request):
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT 1")
+                cursor.fetchone()
+        except DatabaseError:
+            return Response({"status": "unavailable"}, status=http_status.HTTP_503_SERVICE_UNAVAILABLE)
+        return Response({"status": "ok"})
 
 
 class HomeStepListView(ListAPIView):

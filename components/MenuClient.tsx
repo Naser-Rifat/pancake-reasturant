@@ -23,7 +23,7 @@ export default function MenuClient({
   categories = [],
   campaigns = [],
   live = true,
-  phone: restaurantPhone = "(02) 5550 1234",
+  phone: restaurantPhone = "+61 452 135 499",
   pauseMessage = "",
   uberEatsUrl = "",
 }: {

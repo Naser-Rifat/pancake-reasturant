@@ -54,7 +54,7 @@ export function ContactTab({
               <Input
                 id="s-address"
                 className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
-                placeholder="e.g. 123 Pancake Lane, Sydney NSW 2000"
+                placeholder="e.g. 18 Pakington Street, Geelong West VIC"
                 value={site.address}
                 onChange={setS("address")}
               />
@@ -66,7 +66,7 @@ export function ContactTab({
               <Input
                 id="s-phone"
                 className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
-                placeholder="e.g. (02) 9876 5432"
+                placeholder="e.g. +61 452 135 499"
                 value={site.phone}
                 onChange={setS("phone")}
               />

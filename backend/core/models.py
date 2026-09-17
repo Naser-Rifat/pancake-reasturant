@@ -469,7 +469,7 @@ class SiteSettings(models.Model):
     hero_heading = models.CharField(max_length=60, default="Stack Into")
     hero_script = models.CharField(max_length=60, default="Happiness")
     hero_lead = models.TextField(
-        default="We flip the best homemade pancakes in Sydney — griddled to order, "
+        default="We flip the best homemade pancakes in Geelong — griddled to order, "
                 "stacked high, drowned in real maple."
     )
     hero_image = models.CharField(
@@ -488,7 +488,7 @@ class SiteSettings(models.Model):
         blank=True,
         default="Batter whisked fresh every morning\n"
                 "100% pure Canadian maple — never syrup-flavoured\n"
-                "Berries & fruit from local NSW growers\n"
+                "Berries & fruit from local Victorian growers\n"
                 "Cloud-light ricotta & buttermilk stacks",
         help_text="One tick per line. These are public claims — keep them true.",
     )
@@ -504,7 +504,7 @@ class SiteSettings(models.Model):
     gallery_hero_lead = models.CharField(
         max_length=200, default="Our food, our space, and the good times in between."
     )
-    booking_hero_kicker = models.CharField(max_length=60, default="Reserve Online — Free & Instant")
+    booking_hero_kicker = models.CharField(max_length=60, default="Request Online — Free & Easy")
     booking_hero_heading = models.CharField(max_length=60, default="Book a")
     booking_hero_script = models.CharField(max_length=60, default="Table.")
     booking_hero_lead = models.CharField(
@@ -587,7 +587,7 @@ class SiteSettings(models.Model):
     cta_script = models.CharField(max_length=60, default="Book a Table.")
     cta_lead = models.CharField(
         max_length=200,
-        default="Reserve online in seconds — free, instant confirmation, open 7 days.",
+        default="Request a table online in seconds — free, with confirmation by email.",
     )
     cta_button_label = models.CharField(max_length=40, default="Book a Table")
     cta_button_url = models.CharField(max_length=200, default="/booking")
@@ -602,15 +602,18 @@ class SiteSettings(models.Model):
                 "griddle, flipped at exactly the right bubble, and stacked warm with "
                 "real maple. No shortcuts, no pre-mix — just food that feels good."
     )
-    address = models.CharField(max_length=200, default="123 George Street, Sydney NSW 2000")
-    phone = models.CharField(max_length=30, default="(02) 5550 1234")
+    address = models.CharField(
+        max_length=200,
+        default="18 Pakington Street, Geelong West VIC, Australia",
+    )
+    phone = models.CharField(max_length=30, default="+61 452 135 499")
     # international format; blank hides the floating WhatsApp button
     whatsapp = models.CharField(max_length=30, blank=True, default="")
     email = models.EmailField(default="hello@thepancakeclub.com.au")
     abn = models.CharField(max_length=40, default="ABN 00 000 000 000")
     map_embed = models.CharField(
         max_length=500,
-        default="https://www.google.com/maps?q=George%20Street%20Sydney%20NSW&output=embed",
+        default="https://www.google.com/maps?q=18%20Pakington%20Street%2C%20Geelong%20West%20VIC%20Australia&output=embed",
     )
     # "Find Us" info chips shown under the address — one chip per line.
     # Defaults mirror the previously hardcoded chips so existing sites look
@@ -645,7 +648,7 @@ class SiteSettings(models.Model):
         default="15–20 mins",
         help_text="Estimated preparation and pickup time displayed to customers in cart and checkout",
     )
-    timezone = models.CharField(max_length=50, default="Australia/Sydney")
+    timezone = models.CharField(max_length=50, default="Australia/Melbourne")
 
     THEME_CHOICES = [
         ("golden", "Golden Morning"),

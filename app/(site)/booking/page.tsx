@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Book a Table",
   description:
-    "Book a table at The Pancake Club online — free, instant confirmation, open 7 days. Large groups welcome by phone.",
+    "Request a table at The Pancake Club online. We will confirm your booking by email. Large groups are welcome by phone.",
   alternates: { canonical: "/booking" },
 };
 
@@ -17,7 +17,7 @@ export default async function BookingPage() {
     <>
       <section className="page-hero">
         <div className="container">
-          <p className="kicker">{site.booking_hero_kicker || "Reserve Online — Free & Instant"}</p>
+          <p className="kicker">{site.booking_hero_kicker || "Request Online — Free & Easy"}</p>
           <h1>
             {site.booking_hero_heading || "Book a"}{" "}
             <span className="accent">{site.booking_hero_script || "Table."}</span>

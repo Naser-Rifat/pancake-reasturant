@@ -6,10 +6,7 @@
 // order it had just added to. It now mounts once in the site layout and any
 // cart button opens it through the shared provider.
 //
-// Checkout hands off to Stripe: placeOrder creates the order unpaid and returns
-// a Checkout URL, and the cart is deliberately NOT cleared here — /order/success
-// clears it once the webhook confirms payment, so a customer who backs out of
-// Stripe comes back with their order intact.
+// Direct pickup orders are accepted by the API and paid at the counter.
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -78,7 +75,7 @@ export default function CartDrawer({
 
   // Re-price on every cart change, not just on apply: a code with a $30 minimum
   // must fall away the moment the cart drops below it, and the number beside
-  // "Total" has to be the number Stripe will charge.
+  // "Total" has to match the server-calculated amount due at collection.
   const couponQuery = useQuery({
     queryKey: ["cart", "coupon", couponCode, cartKey],
     queryFn: () => validateCoupon(couponCode, JSON.parse(cartKey)),
@@ -255,9 +252,8 @@ export default function CartDrawer({
       clear();
       setCouponCode("");
 
-      // Direct redirect to order success page:
-      // If order.checkout_url is a Stripe Checkout session, redirect to Stripe.
-      // Otherwise, always navigate relative to the current site/origin to prevent unwanted external redirects.
+      // Historical/future Stripe orders may still return a hosted URL. Direct
+      // pickup orders always navigate within this site.
       if (order.checkout_url && order.checkout_url.startsWith("https://checkout.stripe.com")) {
         window.location.assign(order.checkout_url);
       } else {

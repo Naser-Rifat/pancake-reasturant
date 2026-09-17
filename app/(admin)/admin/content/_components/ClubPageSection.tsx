@@ -182,7 +182,7 @@ function BentoPhotoEditor({
 
         {/* Row 3: Aspect label & Paste URL toggle */}
         <div className="flex items-center justify-between text-[10px] text-zinc-500 pt-0.5 px-0.5">
-          <span>{spec.label} · {spec.recommendedSize}</span>
+          <span>{spec.label} · Recommended {spec.recommendedSize}</span>
           <details className="inline-block">
             <summary className="cursor-pointer font-semibold text-zinc-500 hover:text-zinc-800">
               Paste URL

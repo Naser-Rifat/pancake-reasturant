@@ -453,7 +453,7 @@ export default function PreviewPage() {
                   <div className="camp-vintage-stamp" aria-hidden="true">
                     <span>FLUFFY</span>
                     <b>{displayBadgeTag.toUpperCase()}</b>
-                    <small>SYDNEY</small>
+                    <small>GEELONG</small>
                   </div>
 
                   <span className="camp-botanical" aria-hidden="true" />
@@ -483,7 +483,7 @@ export default function PreviewPage() {
               {photos.slice(0, 6).map((p, i) => {
                 const tapes = ["tape-left", "tape-right", "tape-center", "tape-left", "tape-pin", "tape-right"];
                 const tape = tapes[i % tapes.length];
-                const stamps = ["🥞 100% Fluffy", "✨ Sydney Vibe", "☕ Fresh Brew", "🍓 Berry Sweet", "💛 Café Mood", "🍯 Golden Maple"];
+                const stamps = ["🥞 100% Fluffy", "✨ Geelong Vibe", "☕ Fresh Brew", "🍓 Berry Sweet", "💛 Café Mood", "🍯 Golden Maple"];
                 const stamp = stamps[i % stamps.length];
                 const isHero = i === 0;
                 return (
@@ -506,7 +506,7 @@ export default function PreviewPage() {
                     {isHero && p.caption && (
                       <div className="mosaic-hero-chin">
                         <p className="mosaic-hero-caption">{p.caption}</p>
-                        <span className="mosaic-hero-tag">📍 Sydney, NSW</span>
+                        <span className="mosaic-hero-tag">📍 Geelong, Victoria</span>
                       </div>
                     )}
                   </div>
@@ -642,7 +642,7 @@ export default function PreviewPage() {
         /* same page-hero as the live /booking page */
         <section className="page-hero" style={{ padding: "2rem 0" }}>
           <div className="container">
-            <p className="kicker">{site.booking_hero_kicker || "Reserve Online — Free & Instant"}</p>
+            <p className="kicker">{site.booking_hero_kicker || "Request Online — Free & Easy"}</p>
             <h1>
               {site.booking_hero_heading || "Book a"}{" "}
               <span className="accent">{site.booking_hero_script || "Table."}</span>

@@ -112,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "en-au"
-TIME_ZONE = "Australia/Sydney"
+TIME_ZONE = "Australia/Melbourne"
 USE_I18N = True
 USE_TZ = True
 
@@ -209,7 +209,10 @@ DEFAULT_FROM_EMAIL = os.environ.get(
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 # storefront origin Checkout redirects back to after payment
-FRONTEND_URL = os.environ.get("DJANGO_FRONTEND_URL", "http://localhost:3000").rstrip("/")
+FRONTEND_URL = os.environ.get(
+    "DJANGO_FRONTEND_URL",
+    "http://localhost:3000" if DEBUG else "https://www.thepancakeclub.com.au",
+).rstrip("/")
 
 
 # ---------- CORS ----------
@@ -219,7 +222,7 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     origin for origin in _env_list(
         "DJANGO_CORS_ORIGINS",
-        "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://localhost:3002,http://127.0.0.1:3002,http://localhost:5173,http://127.0.0.1:5173,https://web-production-db507.up.railway.app",
+        "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://localhost:3002,http://127.0.0.1:3002,http://localhost:5173,http://127.0.0.1:5173,https://www.thepancakeclub.com.au,https://thepancakeclub.com.au,https://web-production-db507.up.railway.app",
     )
     if origin.startswith("http://") or origin.startswith("https://")
 ]
@@ -259,7 +262,7 @@ if not DEBUG:
 CSRF_TRUSTED_ORIGINS = [
     origin for origin in _env_list(
         "DJANGO_CSRF_TRUSTED_ORIGINS",
-        "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://localhost:3002,http://127.0.0.1:3002,http://localhost:5173,http://127.0.0.1:5173,https://*.railway.app,https://*.up.railway.app,https://*.vercel.app",
+        "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://localhost:3002,http://127.0.0.1:3002,http://localhost:5173,http://127.0.0.1:5173,https://www.thepancakeclub.com.au,https://thepancakeclub.com.au,https://*.railway.app,https://*.up.railway.app,https://*.vercel.app",
     )
     if origin.startswith("http://") or origin.startswith("https://")
 ]

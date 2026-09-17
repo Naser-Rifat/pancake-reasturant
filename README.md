@@ -36,8 +36,9 @@ cd backend && .venv/bin/python manage.py test   # API/unit suite
 npm run test:e2e                                # Playwright smoke (needs both servers seeded)
 ```
 
-CI (GitHub Actions) runs backend tests, a production build and the e2e smoke
-suite on every push/PR — see `.github/workflows/ci.yml`.
+CI (GitHub Actions) checks backend migrations/tests, frontend type checking and
+the production build, then runs the seeded Playwright browser suite on every
+push/PR — see `.github/workflows/ci.yml`.
 
 ## Project map
 

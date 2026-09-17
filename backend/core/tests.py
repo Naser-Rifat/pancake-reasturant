@@ -14,6 +14,7 @@ from django.core.cache import cache
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.core.mail import send_mail as django_send_mail
+from django.db import DatabaseError
 from django.test import TestCase, override_settings
 from django.utils import timezone
 from PIL import Image
@@ -693,12 +694,24 @@ class SiteContentApiTests(TestCase):
         ).json()["token"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
 
+    def test_health_endpoint_is_public_and_checks_database(self):
+        response = self.client.get("/api/health/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"status": "ok"})
+
+    @patch("core.views.connection.cursor", side_effect=DatabaseError("database offline"))
+    def test_health_endpoint_reports_database_outage(self, _cursor):
+        response = self.client.get("/api/health/")
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(response.json(), {"status": "unavailable"})
+
     def test_public_site_settings_and_certifications(self):
 
         Certification.objects.create(title="Shown", icon="⭐")
         Certification.objects.create(title="Hidden", icon="⭐", is_active=False)
         site = self.client.get("/api/site/").json()
-        self.assertIn("George Street", site["address"])
+        self.assertIn("Pakington Street", site["address"])
+        self.assertEqual(site["timezone"], "Australia/Melbourne")
         certs = self.client.get("/api/certifications/").json()
         self.assertEqual([c["title"] for c in certs], ["Shown"])
 

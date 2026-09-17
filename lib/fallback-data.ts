@@ -131,7 +131,7 @@ export const FALLBACK_SITE: ApiSiteSettings = {
   gallery_hero_heading: "The",
   gallery_hero_script: "Gallery.",
   gallery_hero_lead: "Our food, our space, and the good times in between.",
-  booking_hero_kicker: "Reserve Online — Free & Instant",
+  booking_hero_kicker: "Request Online — Free & Easy",
   booking_hero_heading: "Book a",
   booking_hero_script: "Table.",
   booking_hero_lead: "Pick a date, pick a time — we'll have the griddle hot when you arrive.",

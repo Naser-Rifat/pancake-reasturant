@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getSite, telHref } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -6,7 +7,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy" },
 };
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const site = await getSite();
+
   return (
     <>
       <section className="page-hero">
@@ -25,18 +28,14 @@ export default function PrivacyPage() {
 
         <h2>What we collect</h2>
         <ul>
-          <li><strong>Pickup orders</strong> — your name, and optionally a phone number and email address, so we can prepare your order and let you know when it&rsquo;s ready.</li>
+          <li><strong>Pickup orders</strong> — your name, email address and phone number, so we can prepare your order and let you know when it&rsquo;s ready.</li>
           <li><strong>Table bookings</strong> — your name, email address, phone number, booking date/time, party size and any notes you add.</li>
           <li><strong>Reviews</strong> — the name, suburb and review text you choose to submit.</li>
           <li><strong>Club registrations</strong> — your name, email address, registration date and privacy acknowledgement. We also record whether you separately opted in to marketing emails and when you submitted that consent.</li>
         </ul>
         <p>
-          Online orders are paid securely through Stripe, our payment processor — your card details
-          go directly to Stripe and are never seen or stored by us. Stripe&rsquo;s handling of your
-          information is described in the{" "}
-          <a href="https://stripe.com/au/privacy" target="_blank" rel="noopener noreferrer">
-            Stripe Privacy Policy
-          </a>.
+          Website pickup orders are currently paid at the counter when collected. This website does
+          not ask for, collect or store payment-card details.
         </p>
 
         <h2>How we use it</h2>
@@ -47,8 +46,8 @@ export default function PrivacyPage() {
           <li>To manage your club registration and email preferences. Marketing consent is optional and separate from joining. Contact us to change your details, withdraw consent or request deletion of your registration.</li>
         </ul>
         <p>
-          We send <strong>transactional emails only</strong> — messages about your specific order or
-          booking. We do not send marketing emails without your separate consent, consistent with the
+          We send transactional messages about your order, booking or club registration. We do not
+          send marketing emails without your separate consent, consistent with the
           <em> Spam Act 2003</em> (Cth).
         </p>
 
@@ -69,8 +68,8 @@ export default function PrivacyPage() {
         <h2>Access, correction &amp; complaints</h2>
         <p>
           You can ask us to access, correct or delete the personal information we hold about you —
-          email <a href="mailto:hello@thepancakeclub.com.au">hello@thepancakeclub.com.au</a> or call{" "}
-          <a href="tel:+61255501234">(02) 5550 1234</a>. If you have a privacy concern we can&rsquo;t
+          email <a href={`mailto:${site.email}`}>{site.email}</a> or call{" "}
+          <a href={telHref(site.phone)}>{site.phone}</a>. If you have a privacy concern we can&rsquo;t
           resolve, you can contact the Office of the Australian Information Commissioner (oaic.gov.au).
         </p>
       </main>
