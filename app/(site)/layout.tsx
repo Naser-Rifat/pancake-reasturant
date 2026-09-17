@@ -25,7 +25,10 @@ const round = Baloo_2({ weight: ["700", "800"], subsets: ["latin"], variable: "-
 // hero headline: the chunky hand-cut caps from the reference
 const display = Luckiest_Guy({ weight: "400", subsets: ["latin"], variable: "--font-display" });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.thepancakeclub.com.au"
+).replace(/\/$/, "");
+const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION?.trim();
 
 const SITE_TITLE = "The Pancake Club — Pancakes & Stacks, Geelong";
 const SITE_DESC =
@@ -47,6 +50,9 @@ export const metadata: Metadata = {
     "The Pancake Club",
   ],
   alternates: { canonical: "/" },
+  verification: GOOGLE_SITE_VERIFICATION
+    ? { google: GOOGLE_SITE_VERIFICATION }
+    : undefined,
   manifest: "/manifest.webmanifest",
   icons: {
     icon: "/icons/icon-192.png",

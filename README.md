@@ -87,3 +87,19 @@ when whatever caused the maintenance is broken.
 Frontend → Vercel; backend + Postgres → Railway/Render. Set the env vars listed
 in `backend/README.md` (secret key, hosts, CORS, Brevo API) and `NEXT_PUBLIC_API_URL`
 on the frontend. Change the default admin password before launch.
+
+## Google Search Console
+
+The storefront already publishes canonical URLs, `/robots.txt`, a dynamic
+`/sitemap.xml`, Restaurant structured data, and no-index rules for admin and
+private order pages. To verify the production URL-prefix property:
+
+1. In Search Console, add `https://www.thepancakeclub.com.au` as a **URL-prefix** property.
+2. Choose **HTML tag** and copy only the value inside `content="..."`.
+3. Add it to the Vercel Production environment as `GOOGLE_SITE_VERIFICATION`.
+4. Ensure `NEXT_PUBLIC_SITE_URL=https://www.thepancakeclub.com.au`, then redeploy.
+5. Click **Verify**, then submit `https://www.thepancakeclub.com.au/sitemap.xml`.
+
+The verification tag is omitted when the variable is empty. A Search Console
+**Domain** property can alternatively be verified by adding Google's TXT record
+at the DNS provider; that method does not require a code change.

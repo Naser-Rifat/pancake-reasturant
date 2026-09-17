@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const BASE = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.thepancakeclub.com.au"
+).replace(/\/$/, "");
 
 // AI/answer-engine crawlers we explicitly welcome, so the restaurant shows up
 // in ChatGPT, Claude, Perplexity and Google's AI answers (GEO).
