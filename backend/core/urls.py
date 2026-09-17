@@ -1,12 +1,7 @@
 from django.urls import include, path
-from django.views.decorators.cache import cache_page
 from rest_framework.routers import DefaultRouter
 
 from . import admin_api, club, payments, views
-
-# public read endpoints barely change — a 30s shared cache lets a traffic spike
-# hit memory instead of the database (admin endpoints stay uncached)
-public_cache = cache_page(30)
 
 router = DefaultRouter()
 router.register("menu", views.MenuItemViewSet, basename="menu")
@@ -32,14 +27,14 @@ admin_router.register("categories", admin_api.AdminCategoryViewSet, basename="ad
 urlpatterns = [
     path("club/join/", club.ClubRegistrationView.as_view(), name="club-join"),
     path("", include(router.urls)),
-    path("categories/", public_cache(views.CategoryListView.as_view()), name="categories"),
-    path("gallery/", public_cache(views.GalleryPhotoListView.as_view()), name="gallery"),
-    path("announcement/", public_cache(views.AnnouncementView.as_view()), name="announcement"),
-    path("campaigns/", public_cache(views.CampaignListView.as_view()), name="campaigns"),
-    path("hours/", public_cache(views.OpeningHoursListView.as_view()), name="hours"),
-    path("certifications/", public_cache(views.CertificationListView.as_view()), name="certifications"),
-    path("home-steps/", public_cache(views.HomeStepListView.as_view()), name="home-steps"),
-    path("site/", public_cache(views.SiteSettingsView.as_view()), name="site"),
+    path("categories/", views.CategoryListView.as_view(), name="categories"),
+    path("gallery/", views.GalleryPhotoListView.as_view(), name="gallery"),
+    path("announcement/", views.AnnouncementView.as_view(), name="announcement"),
+    path("campaigns/", views.CampaignListView.as_view(), name="campaigns"),
+    path("hours/", views.OpeningHoursListView.as_view(), name="hours"),
+    path("certifications/", views.CertificationListView.as_view(), name="certifications"),
+    path("home-steps/", views.HomeStepListView.as_view(), name="home-steps"),
+    path("site/", views.SiteSettingsView.as_view(), name="site"),
     # not cached and not a ViewSet: it prices a specific cart, and it is the
     # one public endpoint that answers questions about secret strings
     path("coupons/validate/", views.CouponValidateView.as_view(), name="coupon-validate"),

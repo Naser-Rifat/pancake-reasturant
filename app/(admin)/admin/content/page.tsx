@@ -251,9 +251,8 @@ export default function ContentPage() {
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setSite((s) => (s ? { ...s, [key]: e.target.value } : s));
 
-  // Which deal is the big top band right now: the newest ACTIVE band deal
-  // inside its date window; if the band list is empty the website falls back
-  // to the newest live slider deal (mirrors Announcement.current()).
+  // Which deal is the big top band right now: the newest active band deal
+  // inside its date window. Slider offers never leak into the top band.
   const nowMs = Date.now();
   const liveDeals = announcements.filter(
     (a) =>
@@ -262,9 +261,7 @@ export default function ContentPage() {
       (!a.ends_at || new Date(a.ends_at).getTime() >= nowMs),
   );
   const topBannerId =
-    (liveDeals.find((a) => (a.placement ?? "slider") === "band") ?? liveDeals[0])?.id ?? null;
-  const bandUsingFallback =
-    topBannerId !== null && !liveDeals.some((a) => (a.placement ?? "slider") === "band");
+    liveDeals.find((a) => (a.placement ?? "slider") === "band")?.id ?? null;
 
   // 4 Top Level Public Pages (Sleek Floating Pill Control)
   const PAGES = [
@@ -664,7 +661,6 @@ export default function ContentPage() {
               setActiveDeal={setActiveDeal}
               legacyBackend={legacyBackend}
               topBannerId={topBannerId}
-              bandUsingFallback={bandUsingFallback}
               menuItems={menuItems}
               run={run}
               busy={busy}

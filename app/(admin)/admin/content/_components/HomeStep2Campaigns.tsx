@@ -42,7 +42,6 @@ export function HomeStep2Campaigns({
   setActiveDeal,
   legacyBackend,
   topBannerId,
-  bandUsingFallback,
   menuItems,
   run,
   busy,
@@ -61,7 +60,6 @@ export function HomeStep2Campaigns({
   setActiveDeal: SetActiveDeal;
   legacyBackend: boolean;
   topBannerId: number | null;
-  bandUsingFallback: boolean;
   menuItems: AdminMenuItem[];
   run: RunSave;
   busy: string;
@@ -215,13 +213,6 @@ export function HomeStep2Campaigns({
             </Button>
           </div>
 
-          {campaignChannel === "channel1" && bandUsingFallback && !legacyBackend && (
-            <p className="text-[11px] font-bold text-amber-800 bg-white border border-zinc-200 rounded-xl p-2.5">
-              No live band deal yet — the website is temporarily showing the newest slider offer in
-              the band. Create a band deal and turn Show ON to take over.
-            </p>
-          )}
-
           <div className="grid gap-2.5 [&>*]:min-w-0">
             {stationDeals.map((a) => {
               const isSelected = (activeDeal?.id ?? null) === a.id;
@@ -305,7 +296,7 @@ export function HomeStep2Campaigns({
                 </div>
               );
             })}
-            {stationDeals.length === 0 && !(campaignChannel === "channel1" && bandUsingFallback && !legacyBackend) && (
+            {stationDeals.length === 0 && (
               <p className="text-xs text-zinc-500 p-3">
                 {campaignChannel === "channel1"
                   ? "No band deals yet — create one with “New Deal”."

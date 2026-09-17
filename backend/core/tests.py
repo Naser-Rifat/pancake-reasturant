@@ -11,6 +11,8 @@ from unittest.mock import Mock, patch
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.cache import cache
+from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.core.mail import send_mail as django_send_mail
 from django.test import TestCase, override_settings
 from django.utils import timezone
@@ -739,6 +741,34 @@ class SiteContentApiTests(TestCase):
         self.assertEqual(campaigns.status_code, 200)
         self.assertEqual([campaign["message"] for campaign in campaigns.json()], ["Slider deal"])
 
+    def test_slider_offer_never_reappears_as_top_band_after_band_delete(self):
+        band = Announcement.objects.create(message="Delete me", placement="band", is_active=True)
+        Announcement.objects.create(message="Slider only", placement="slider", is_active=True)
+        self.auth()
+
+        deleted = self.client.delete(f"/api/admin/announcements/{band.id}/")
+        self.assertEqual(deleted.status_code, 204)
+        self.assertFalse(Announcement.objects.filter(pk=band.pk).exists())
+
+        # A slider offer remains a slider; it must not fill the deleted top band.
+        self.client.credentials()
+        self.assertEqual(self.client.get("/api/announcement/").status_code, 204)
+        campaigns = self.client.get("/api/campaigns/")
+        self.assertEqual([row["message"] for row in campaigns.json()], ["Slider only"])
+
+    def test_demo_seed_refuses_to_overwrite_existing_staff_content(self):
+        Category.objects.create(name="Staff category", slug="staff", icon="🥞")
+        category_ids_before = list(Category.objects.order_by("id").values_list("id", flat=True))
+
+        with self.assertRaisesMessage(CommandError, "Refusing to seed a non-empty database"):
+            call_command("seed_demo")
+
+        self.assertEqual(
+            list(Category.objects.order_by("id").values_list("id", flat=True)),
+            category_ids_before,
+        )
+        self.assertTrue(Category.objects.filter(slug="staff").exists())
+
     def test_admin_settings_patch_requires_staff_and_flows_into_emails(self):
 
 
@@ -767,10 +797,7 @@ class SiteContentApiTests(TestCase):
         self.auth()
         res = self.client.patch("/api/admin/site/", {"theme": "berry"}, format="json")
         self.assertEqual(res.status_code, 200)
-        # the public endpoint is behind a 30s shared cache now — drop it so the
-        # roundtrip reads the fresh value (in production the delay is intended)
-
-        cache.clear()
+        # Public content reads reflect admin edits immediately.
         self.assertEqual(self.client.get("/api/site/").json()["theme"], "berry")
         # unknown palettes are rejected, so the frontend can trust the value
         res = self.client.patch("/api/admin/site/", {"theme": "neon"}, format="json")

@@ -426,10 +426,8 @@ class Announcement(TimeStampedModel):
 
     @classmethod
     def current(cls):
-        """The big band under the hero: the newest live BAND deal. Falls back
-        to the newest live deal of any placement so the band never goes dark
-        on data that predates the placement split."""
-        return cls.live().filter(placement="band").first() or cls.live().first()
+        """The big band under the hero: the newest live band deal, if any."""
+        return cls.live().filter(placement="band").first()
 
 
 class HomeStep(TimeStampedModel):

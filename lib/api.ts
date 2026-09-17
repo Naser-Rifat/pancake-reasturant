@@ -350,8 +350,9 @@ export interface ApiHomeStep {
 
 export async function getCampaigns(): Promise<ApiAnnouncement[]> {
   const { FALLBACK_CAMPAIGNS } = await import("./fallback-data");
-  const data = await get<ApiAnnouncement[]>("/campaigns/", FALLBACK_CAMPAIGNS);
-  return data && data.length > 0 ? data : FALLBACK_CAMPAIGNS;
+  // An empty response is valid: staff may deliberately remove every offer.
+  // The generic helper already uses fallback data only when the API fails.
+  return get<ApiAnnouncement[]>("/campaigns/", FALLBACK_CAMPAIGNS);
 }
 
 export async function getHomeSteps(): Promise<ApiHomeStep[]> {

@@ -1,7 +1,7 @@
-"""Seed the database with the storefront's current demo content. Idempotent."""
+"""Seed an empty development database with demo storefront content."""
 from datetime import time
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 import os
 from django.contrib.auth import get_user_model
 from core.models import Category
@@ -86,9 +86,31 @@ HOURS = [
 
 
 class Command(BaseCommand):
-    help = "Seed demo content matching the Next.js storefront (safe to re-run)."
+    help = "Seed an empty database with demo content; use --force to overwrite existing content."
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--force",
+            action="store_true",
+            help="Overwrite/recreate seeded content in a non-empty database.",
+        )
 
     def handle(self, *args, **options):
+        managed_models = (
+            Category,
+            MenuItem,
+            Review,
+            GalleryPhoto,
+            OpeningHours,
+            Certification,
+            Announcement,
+        )
+        if not options["force"] and any(model.objects.exists() for model in managed_models):
+            raise CommandError(
+                "Refusing to seed a non-empty database because this can overwrite staff edits "
+                "and recreate deleted content. Use --force only when that reset is intentional."
+            )
+
         cat_map = {}
         for name, slug, icon, sort_order in CATEGORIES:
             cat, _ = Category.objects.update_or_create(

@@ -2,8 +2,6 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.db.models import Count, Q
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
 from rest_framework import mixins, status as http_status, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.throttling import ScopedRateThrottle
@@ -59,9 +57,6 @@ class ThrottleWritesOnlyMixin:
         return []
 
 
-# the public menu is the busiest read — a 30s shared cache absorbs spikes
-@method_decorator(cache_page(30), name="list")
-@method_decorator(cache_page(30), name="retrieve")
 class MenuItemViewSet(viewsets.ReadOnlyModelViewSet):
     """Public menu. `?featured=1` returns the home-page picks, `?category=sweet` or `?tag=sweet` filters."""
 
@@ -247,7 +242,6 @@ class CouponValidateView(APIView):
             }
         )
 
-@method_decorator(cache_page(30), name="list")
 class ReviewViewSet(
     ThrottleWritesOnlyMixin, mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
 ):

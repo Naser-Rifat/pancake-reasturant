@@ -15,9 +15,9 @@ cd backend
 python3.12 -m venv .venv  # needs Python 3.10+ (Django 5.2)
 .venv/bin/pip install -r requirements.txt
 .venv/bin/python manage.py migrate
-.venv/bin/python manage.py seed_demo        # demo content matching the storefront
-# ⚠️ seed_demo resets the seeded items to their demo values — run it ONCE at
-# setup. Re-running later will overwrite any staff edits to those items.
+.venv/bin/python manage.py seed_demo        # run once, only on an empty database
+# The command refuses a non-empty database. `--force` is an intentional reset
+# that can overwrite staff edits and recreate deleted content.
 .venv/bin/python manage.py createsuperuser  # for /admin/
 .venv/bin/python manage.py runserver 8000
 ```
