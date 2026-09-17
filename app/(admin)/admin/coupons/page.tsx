@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   TicketPercent,
   Plus,
@@ -75,8 +76,6 @@ const EMPTY_FORM: NewCouponForm = {
 
 export default function CouponsAdminPage() {
   const [coupons, setCoupons] = useState<AdminCoupon[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<CouponFilter>("all");
   const [page, setPage] = useState(1);
@@ -84,7 +83,6 @@ export default function CouponsAdminPage() {
   const tableRef = useRef<HTMLDivElement>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<NewCouponForm>(EMPTY_FORM);
-  const [submitting, setSubmitting] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   // Locked coupon IDs during async mutations
@@ -92,24 +90,31 @@ export default function CouponsAdminPage() {
 
   const { toast } = useToast();
   const { confirm: confirmDialog } = useConfirm();
+  const queryClient = useQueryClient();
+  const refreshCoupons = () =>
+    queryClient.invalidateQueries({ queryKey: ["admin"] });
 
-  const load = useCallback(() => {
-    setLoading(true);
-    setError("");
-    listCoupons()
-      .then((data) => {
-        setCoupons(data);
-        setError("");
-      })
-      .catch((err) => {
-        setError(err instanceof Error ? err.message : "Failed to load coupons");
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
+  const couponsQuery = useQuery({ queryKey: ["admin", "coupons"], queryFn: listCoupons });
   useEffect(() => {
-    load();
-  }, [load]);
+    if (couponsQuery.data) setCoupons(couponsQuery.data);
+  }, [couponsQuery.data]);
+  const loading = couponsQuery.isPending;
+  const error = couponsQuery.error instanceof Error ? couponsQuery.error.message : "";
+  const load = () => void couponsQuery.refetch();
+  const updateMutation = useMutation({
+    mutationFn: ({ id, patch }: { id: number; patch: Parameters<typeof updateCoupon>[1] }) =>
+      updateCoupon(id, patch),
+    onSettled: refreshCoupons,
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteCoupon,
+    onSettled: refreshCoupons,
+  });
+  const createMutation = useMutation({
+    mutationFn: createCoupon,
+    onSettled: refreshCoupons,
+  });
+  const submitting = createMutation.isPending;
 
   const markPending = (id: number, active: boolean) => {
     setPendingIds((prev) => {
@@ -136,7 +141,7 @@ export default function CouponsAdminPage() {
     );
 
     try {
-      await updateCoupon(coupon.id, { is_active });
+      await updateMutation.mutateAsync({ id: coupon.id, patch: { is_active } });
       toast({
         variant: "success",
         title: is_active
@@ -172,7 +177,7 @@ export default function CouponsAdminPage() {
 
     markPending(coupon.id, true);
     try {
-      await deleteCoupon(coupon.id);
+      await deleteMutation.mutateAsync(coupon.id);
       setCoupons((list) => list.filter((c) => c.id !== coupon.id));
       toast({ variant: "success", title: `Coupon ${coupon.code} deleted` });
     } catch (err) {
@@ -206,7 +211,6 @@ export default function CouponsAdminPage() {
       return;
     }
 
-    setSubmitting(true);
     try {
       const payload = {
         code: cleanCode,
@@ -221,7 +225,7 @@ export default function CouponsAdminPage() {
         description: form.description.trim(),
       };
 
-      const created = await createCoupon(payload);
+      const created = await createMutation.mutateAsync(payload);
       setCoupons((prev) => [created, ...prev]);
       setShowForm(false);
       setForm(EMPTY_FORM);
@@ -236,8 +240,6 @@ export default function CouponsAdminPage() {
         title: "Failed to create coupon",
         description: err instanceof Error ? err.message : undefined,
       });
-    } finally {
-      setSubmitting(false);
     }
   };
 

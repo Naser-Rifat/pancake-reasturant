@@ -2,6 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  useIsFetching,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
   Phone,
   X,
   Search,
@@ -50,52 +56,63 @@ export default function BookingsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
-  const [error, setError] = useState("");
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState(EMPTY_PHONE_BOOKING);
-  const [saving, setSaving] = useState(false);
   const { toast } = useToast();
   const { confirm: confirmDialog } = useConfirm();
+  const queryClient = useQueryClient();
+  const refreshBookings = () =>
+    queryClient.invalidateQueries({ queryKey: ["admin"] });
 
   const tableRef = useRef<HTMLDivElement>(null);
   const knownIds = useRef<Set<string> | null>(null);
   const nextPage = useRef(2);
 
-  const load = useCallback(
-    (isInitial = true) => {
-      if (isInitial) setLoading(true);
-      listBookingsPage(1, filter === "all" ? undefined : filter)
-        .then((page) => {
-          const fresh = knownIds.current
-            ? page.results.filter((b) => b.status === "pending" && !knownIds.current!.has(b.public_id))
-            : [];
-          if (fresh.length > 0) {
-            newBookingChime();
-            toast({
-              variant: "info",
-              title: fresh.length === 1 ? "New booking request" : `${fresh.length} new booking requests`,
-              description: fresh.map((b) => `${b.name} · ${b.date} ${b.time.slice(0, 5)}`).join(", "),
-            });
-          }
-          if (knownIds.current === null) knownIds.current = new Set();
-          page.results.forEach((b) => knownIds.current!.add(b.public_id));
-          setBookings((prev) => mergeRows(prev, page.results));
-          if (nextPage.current === 2) setHasMore(page.hasMore);
-          setError("");
-        })
-        .catch((e) => setError(e instanceof Error ? e.message : "Failed to load bookings"))
-        .finally(() => setLoading(false));
-    },
-    [filter, toast]
-  );
+  const bookingsQuery = useQuery({
+    queryKey: ["admin", "bookings", filter],
+    queryFn: () => listBookingsPage(1, filter === "all" ? undefined : filter),
+    refetchInterval: POLL_MS,
+  });
+  useEffect(() => {
+    const result = bookingsQuery.data;
+    if (!result) return;
+    const fresh = knownIds.current
+      ? result.results.filter(
+          (booking) => booking.status === "pending" && !knownIds.current!.has(booking.public_id),
+        )
+      : [];
+    if (fresh.length > 0) {
+      newBookingChime();
+      toast({
+        variant: "info",
+        title: fresh.length === 1 ? "New booking request" : `${fresh.length} new booking requests`,
+        description: fresh.map((booking) => `${booking.name} · ${booking.date} ${booking.time.slice(0, 5)}`).join(", "),
+      });
+    }
+    if (knownIds.current === null) knownIds.current = new Set();
+    result.results.forEach((booking) => knownIds.current!.add(booking.public_id));
+    setBookings((previous) => mergeRows(previous, result.results));
+    if (nextPage.current === 2) setHasMore(result.hasMore);
+  }, [bookingsQuery.data, toast]);
+  const loading = bookingsQuery.isPending;
+  const error = bookingsQuery.error instanceof Error ? bookingsQuery.error.message : "";
+  const load = () => void bookingsQuery.refetch();
+  const loadingMore =
+    useIsFetching({ queryKey: ["admin", "bookings", "page"] }) > 0;
 
   const loadMore = async () => {
-    setLoadingMore(true);
     try {
-      const page = await listBookingsPage(nextPage.current, filter === "all" ? undefined : filter);
+      const pageNumber = nextPage.current;
+      const page = await queryClient.fetchQuery({
+        queryKey: ["admin", "bookings", "page", filter, pageNumber],
+        queryFn: () =>
+          listBookingsPage(
+            pageNumber,
+            filter === "all" ? undefined : filter,
+          ),
+        staleTime: 0,
+      });
       nextPage.current += 1;
       page.results.forEach((b) => knownIds.current?.add(b.public_id));
       setBookings((prev) => mergeRows(prev, page.results));
@@ -106,8 +123,6 @@ export default function BookingsPage() {
         title: "Could not load older bookings",
         description: e instanceof Error ? e.message : undefined,
       });
-    } finally {
-      setLoadingMore(false);
     }
   };
 
@@ -115,13 +130,21 @@ export default function BookingsPage() {
     setBookings([]);
     nextPage.current = 2;
     setHasMore(false);
-    load(true);
-    const id = setInterval(() => load(false), POLL_MS);
-    return () => clearInterval(id);
-  }, [load]);
+    knownIds.current = null;
+  }, [filter]);
 
   // the booking whose status change is in flight — locks that row's buttons
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const statusMutation = useMutation({
+    mutationFn: ({ id, patch }: { id: string; patch: Parameters<typeof updateBooking>[1] }) =>
+      updateBooking(id, patch),
+    onSettled: refreshBookings,
+  });
+  const createMutation = useMutation({
+    mutationFn: createAdminBooking,
+    onSettled: refreshBookings,
+  });
+  const saving = createMutation.isPending;
 
   const setStatus = async (b: AdminBooking, status: AdminBooking["status"]) => {
     if (pendingId === b.public_id) return;
@@ -158,7 +181,7 @@ export default function BookingsPage() {
     setPendingId(b.public_id);
     setBookings((bs) => bs.map((x) => (x.public_id === b.public_id ? { ...x, status } : x)));
     try {
-      await updateBooking(b.public_id, { status });
+      await statusMutation.mutateAsync({ id: b.public_id, patch: { status } });
       toast({
         variant: "success",
         title:
@@ -187,10 +210,8 @@ export default function BookingsPage() {
 
   const submitPhoneBooking = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
-    setError("");
     try {
-      await createAdminBooking({
+      await createMutation.mutateAsync({
         name: form.name,
         phone: form.phone,
         email: form.email,
@@ -214,8 +235,6 @@ export default function BookingsPage() {
         title: "Could not save booking",
         description: err instanceof Error ? err.message : undefined,
       });
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -296,7 +315,7 @@ export default function BookingsPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => load(true)}
+            onClick={load}
             className="border-zinc-300 text-[#763a12] bg-white hover:bg-zinc-50 text-xs font-bold rounded-lg h-10 px-4"
           >
             <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Refresh
@@ -304,7 +323,6 @@ export default function BookingsPage() {
           <Button
             onClick={() => {
               setAdding(true);
-              setError("");
             }}
             className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 px-5 h-10 rounded-lg shadow-xs shrink-0 transition-transform"
           >

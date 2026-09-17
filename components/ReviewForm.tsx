@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { PenLine, Sparkles, Send, X } from "lucide-react";
 import { submitReview } from "@/lib/api";
 
@@ -11,26 +12,23 @@ export default function ReviewForm() {
   const [rating, setRating] = useState(5);
   const [quote, setQuote] = useState("");
   const [error, setError] = useState("");
-  const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
+  const reviewMutation = useMutation({
+    mutationFn: submitReview,
+    onSuccess: () => setDone(true),
+    onError: (err) =>
+      setError(err instanceof Error ? err.message : "Something went wrong — please try again."),
+  });
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setSending(true);
-    try {
-      await submitReview({
-        name: name.trim(),
-        suburb: suburb.trim(),
-        rating,
-        quote: quote.trim(),
-      });
-      setDone(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong — please try again.");
-    } finally {
-      setSending(false);
-    }
+    reviewMutation.mutate({
+      name: name.trim(),
+      suburb: suburb.trim(),
+      rating,
+      quote: quote.trim(),
+    });
   };
 
   if (done) {
@@ -124,9 +122,9 @@ export default function ReviewForm() {
           )}
 
           <div className="rev-form-actions">
-            <button className="btn btn-primary" type="submit" disabled={sending}>
+            <button className="btn btn-primary" type="submit" disabled={reviewMutation.isPending}>
               <Send size={15} className="mr-1 inline-block" />
-              <span>{sending ? "Sending note…" : "Post to Guestbook"}</span>
+              <span>{reviewMutation.isPending ? "Sending note…" : "Post to Guestbook"}</span>
             </button>
             <button className="btn btn-ghost" type="button" onClick={() => setOpen(false)}>
               Cancel

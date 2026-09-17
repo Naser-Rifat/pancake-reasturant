@@ -1,6 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useIsFetching,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Search, RefreshCw, X } from "lucide-react";
 import {
   listOrdersPage,
@@ -36,51 +42,51 @@ export default function OrdersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
-  const [error, setError] = useState("");
   const tableRef = useRef<HTMLDivElement>(null);
   const knownIds = useRef<Set<string> | null>(null);
   const nextPage = useRef(2);
   const { toast } = useToast();
   const { promptText } = useConfirm();
+  const queryClient = useQueryClient();
 
-  const load = useCallback(
-    async (isInitial = false) => {
-      if (isInitial) setLoading(true);
-      try {
-        const page = await listOrdersPage(1);
-        if (knownIds.current !== null) {
-          const fresh = page.results.filter((o) => !knownIds.current!.has(o.public_id));
-          if (fresh.length > 0) {
-            newOrderChime();
-            toast({
-              variant: "info",
-              title: fresh.length === 1 ? "New order received" : `${fresh.length} new orders received`,
-              description: fresh.map((o) => `${o.customer_name} · $${o.total}`).join(", "),
-            });
-          }
-        } else {
-          knownIds.current = new Set();
-        }
-        page.results.forEach((o) => knownIds.current!.add(o.public_id));
-        setOrders((prev) => mergeRows(prev, page.results));
-        if (nextPage.current === 2) setHasMore(page.hasMore);
-        setError("");
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load orders");
-      } finally {
-        setLoading(false);
+  const ordersQuery = useQuery({
+    queryKey: ["admin", "orders", "latest"],
+    queryFn: () => listOrdersPage(1),
+    refetchInterval: POLL_MS,
+  });
+  useEffect(() => {
+    const result = ordersQuery.data;
+    if (!result) return;
+    if (knownIds.current !== null) {
+      const fresh = result.results.filter((order) => !knownIds.current!.has(order.public_id));
+      if (fresh.length > 0) {
+        newOrderChime();
+        toast({
+          variant: "info",
+          title: fresh.length === 1 ? "New order received" : `${fresh.length} new orders received`,
+          description: fresh.map((order) => `${order.customer_name} · $${order.total}`).join(", "),
+        });
       }
-    },
-    [toast]
-  );
+    } else knownIds.current = new Set();
+    result.results.forEach((order) => knownIds.current!.add(order.public_id));
+    setOrders((previous) => mergeRows(previous, result.results));
+    if (nextPage.current === 2) setHasMore(result.hasMore);
+  }, [ordersQuery.data, toast]);
+  const loading = ordersQuery.isPending;
+  const error = ordersQuery.error instanceof Error ? ordersQuery.error.message : "";
+  const load = () => void ordersQuery.refetch();
+  const loadingMore =
+    useIsFetching({ queryKey: ["admin", "orders", "page"] }) > 0;
 
   const loadMore = async () => {
-    setLoadingMore(true);
     try {
-      const page = await listOrdersPage(nextPage.current);
+      const pageNumber = nextPage.current;
+      const page = await queryClient.fetchQuery({
+        queryKey: ["admin", "orders", "page", pageNumber],
+        queryFn: () => listOrdersPage(pageNumber),
+        staleTime: 0,
+      });
       nextPage.current += 1;
       page.results.forEach((o) => knownIds.current?.add(o.public_id));
       setOrders((prev) => mergeRows(prev, page.results));
@@ -91,20 +97,18 @@ export default function OrdersPage() {
         title: "Could not load older orders",
         description: e instanceof Error ? e.message : undefined,
       });
-    } finally {
-      setLoadingMore(false);
     }
   };
-
-  useEffect(() => {
-    load(true);
-    const id = setInterval(() => load(false), POLL_MS);
-    return () => clearInterval(id);
-  }, [load]);
 
   // the order whose status change is in flight — its row controls lock so a
   // double-tap can't fire the same transition twice
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const statusMutation = useMutation({
+    mutationFn: ({ id, patch }: { id: string; patch: Parameters<typeof updateOrder>[1] }) =>
+      updateOrder(id, patch),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ["admin"] }),
+  });
 
   const setStatus = async (o: AdminOrder, status: AdminOrder["status"]) => {
     if (pendingId === o.public_id) return;
@@ -136,7 +140,7 @@ export default function OrdersPage() {
       os.map((x) => (x.public_id === o.public_id ? { ...x, status, cancel_reason } : x))
     );
     try {
-      await updateOrder(o.public_id, { status, cancel_reason });
+      await statusMutation.mutateAsync({ id: o.public_id, patch: { status, cancel_reason } });
       toast({
         variant: "success",
         title:
@@ -245,7 +249,7 @@ export default function OrdersPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => load(true)}
+            onClick={load}
             className="border-zinc-300 text-[#763a12] bg-white hover:bg-zinc-50 text-xs font-bold rounded-lg h-10 px-4"
           >
             <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Refresh Orders
@@ -313,7 +317,7 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {error && <AdminError message={error} onRetry={() => load(true)} />}
+      {error && <AdminError message={error} onRetry={load} />}
 
       {/* ========================================================================= */}
       {/* SEARCH & STATUS FILTER BAR                                                */}

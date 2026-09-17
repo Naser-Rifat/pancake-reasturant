@@ -5,6 +5,7 @@
 // nothing is promoted automatically behind your back.
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { Scissors, Star, Trash2, UploadCloud } from "lucide-react";
 import { UploadButton } from "@/components/ui/upload-button";
@@ -56,6 +57,9 @@ export default function PhotoBoard({
   const [dragging, setDragging] = useState(false);
   const [busy, setBusy] = useState("");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const refreshPhotos = () =>
+    queryClient.invalidateQueries({ queryKey: ["admin"] });
 
   const onCountChangeRef = useRef(onCountChange);
   useEffect(() => {
@@ -96,23 +100,43 @@ export default function PhotoBoard({
     }
   }, [mainUrl, cutoutUrl]);
 
-  const load = useCallback(async () => {
-    if (!slug) {
-      setPhotos([]);
-      return;
-    }
-    try {
-      const data = await listMenuItemPhotos(slug);
-      setPhotos(data);
-      onCountChangeRef.current?.(slug, data.length);
-    } catch {
-      setPhotos([]);
-    }
-  }, [slug]);
-
+  const photosQuery = useQuery({
+    queryKey: ["admin", "menu", slug, "photos"],
+    queryFn: () => listMenuItemPhotos(slug),
+    enabled: Boolean(slug),
+  });
   useEffect(() => {
-    load();
-  }, [load]);
+    if (!slug) setPhotos([]);
+    else if (photosQuery.data) {
+      setPhotos(photosQuery.data);
+      onCountChangeRef.current?.(slug, photosQuery.data.length);
+    } else if (photosQuery.isError) setPhotos([]);
+  }, [slug, photosQuery.data, photosQuery.isError]);
+  const createPhotoMutation = useMutation({
+    mutationFn: createMenuItemPhoto,
+    onSettled: refreshPhotos,
+  });
+  const deletePhotoMutation = useMutation({
+    mutationFn: deleteMenuItemPhoto,
+    onSettled: refreshPhotos,
+  });
+  const uploadMutation = useMutation({
+    mutationFn: ({ file, name }: { file: Blob; name?: string }) => uploadToCloudinary(file, name),
+  });
+  const cutoutMutation = useMutation({
+    mutationFn: async (url: string) => {
+      const file = await (await fetch(url)).blob();
+      const form = new FormData();
+      form.append("file", new File([file], "dish.png", { type: file.type || "image/png" }));
+      const response = await fetch(`${API_URL}/admin/remove-bg/`, {
+        method: "POST",
+        headers: { Authorization: `Token ${getToken()}` },
+        body: form,
+      });
+      if (!response.ok) throw new Error("Background removal failed — try a photo on a plain background");
+      return response.blob();
+    },
+  });
 
   const add = useCallback(
     async (url: string, check?: ImageValidationResult) => {
@@ -132,7 +156,7 @@ export default function PhotoBoard({
         return;
       }
       try {
-        const created = await createMenuItemPhoto({
+        const created = await createPhotoMutation.mutateAsync({
           menu_item: slug,
           image: url,
           alt: `${name} photo`,
@@ -186,7 +210,7 @@ export default function PhotoBoard({
         });
       }
       try {
-        const uploadedUrl = await uploadToCloudinary(file);
+        const uploadedUrl = await uploadMutation.mutateAsync({ file });
         await add(uploadedUrl, check);
       } catch (err) {
         toast({ variant: "error", title: "Upload failed", description: err instanceof Error ? err.message : undefined });
@@ -199,7 +223,7 @@ export default function PhotoBoard({
     if (busy) return; // one photo mutation at a time — no double-delete 404s
     setBusy("Removing photo…");
     try {
-      await deleteMenuItemPhoto(p.id);
+      await deletePhotoMutation.mutateAsync(p.id);
       let count = 0;
       setPhotos((ps) => {
         const next = (ps ?? []).filter((x) => x.id !== p.id);
@@ -222,17 +246,8 @@ export default function PhotoBoard({
   const makeCutout = async (url: string) => {
     setBusy("Extracting transparent cutout with AI…");
     try {
-      const file = await (await fetch(url)).blob();
-      const form = new FormData();
-      form.append("file", new File([file], "dish.png", { type: file.type || "image/png" }));
-      const res = await fetch(`${API_URL}/admin/remove-bg/`, {
-        method: "POST",
-        headers: { Authorization: `Token ${getToken()}` },
-        body: form,
-      });
-      if (!res.ok) throw new Error("Background removal failed — try a photo on a plain background");
-      const cutBlob = await res.blob();
-      const newCutoutUrl = await uploadToCloudinary(cutBlob, "cutout.png");
+      const cutBlob = await cutoutMutation.mutateAsync(url);
+      const newCutoutUrl = await uploadMutation.mutateAsync({ file: cutBlob, name: "cutout.png" });
       onSetCutout(newCutoutUrl);
       // Automatically make cutout active on storefront
       onSetMain(newCutoutUrl);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,20 +18,17 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
+  const login = useMutation({
+    mutationFn: () => adminLogin(username, password),
+    onSuccess: () => router.replace("/admin"),
+    onError: (err) =>
+      setError(err instanceof Error ? err.message : "Invalid username or password"),
+  });
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setBusy(true);
-    try {
-      await adminLogin(username, password);
-      router.replace("/admin");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid username or password");
-    } finally {
-      setBusy(false);
-    }
+    login.mutate();
   };
 
   return (
@@ -127,12 +125,12 @@ export default function AdminLoginPage() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                disabled={busy}
-                loading={busy}
+                disabled={login.isPending}
+                loading={login.isPending}
                 className="w-full h-11 text-sm font-semibold rounded-xl !text-white bg-[#763a12] hover:bg-[#5e2d0d] shadow-xs mt-2 transition-all"
                 style={{ color: "#ffffff" }}
               >
-                {busy ? "Signing in..." : "Sign in to Dashboard"}
+                {login.isPending ? "Signing in..." : "Sign in to Dashboard"}
               </Button>
             </form>
           </CardContent>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import {
   CheckCircle2,
@@ -31,7 +32,6 @@ import {
   revokeClubConsent,
   deleteClubMember,
   type ClubMember,
-  type ClubStats,
 } from "@/lib/admin-api";
 
 const date = (value: string) =>
@@ -50,18 +50,9 @@ export default function ClubMembersPage() {
     pageSize: 10,
   });
   const [search, setSearch] = useState("");
-  const [data, setData] = useState<{ count: number; results: ClubMember[] }>({
-    count: 0,
-    results: [],
-  });
-  const [stats, setStats] = useState<ClubStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [refresh, setRefresh] = useState(0);
-  const [busy, setBusy] = useState(false);
-  const mutationPending = useRef(false);
   const { confirm } = useConfirm();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Debounced search
   useEffect(() => {
@@ -77,36 +68,33 @@ export default function ClubMembersPage() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Fetch members and stats
-  useEffect(() => {
-    let stale = false;
-    setLoading(true);
-    setError("");
+  const membersQuery = useQuery({
+    queryKey: ["admin", "club", filters],
+    queryFn: async () => {
+      const [data, stats] = await Promise.all([
+        getClubMembers(filters),
+        getClubStats().catch(() => null),
+      ]);
+      return { data, stats };
+    },
+  });
+  const data = membersQuery.data?.data ?? { count: 0, results: [] };
+  const stats = membersQuery.data?.stats ?? null;
+  const loading = membersQuery.isPending;
+  const error = membersQuery.error instanceof Error ? membersQuery.error.message : "";
 
-    Promise.all([
-      getClubMembers(filters),
-      getClubStats().catch(() => null),
-    ])
-      .then(([result, statsResult]) => {
-        if (stale) return;
-        setData(result);
-        if (statsResult) setStats(statsResult);
-      })
-      .catch((e) => {
-        if (!stale) setError(e instanceof Error ? e.message : "Could not load members.");
-      })
-      .finally(() => {
-        if (!stale) setLoading(false);
-      });
-
-    return () => {
-      stale = true;
-    };
-  }, [filters, refresh]);
+  const memberMutation = useMutation({
+    mutationFn: async ({ member, action }: { member: ClubMember; action: "status" | "consent" | "delete" }) => {
+      if (action === "delete") await deleteClubMember(member.id);
+      else if (action === "consent") await revokeClubConsent(member.id);
+      else await updateClubMember(member.id, member.status === "active" ? "archived" : "active");
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin"] }),
+  });
+  const busy = memberMutation.isPending;
 
   async function manage(member: ClubMember, action: "status" | "consent" | "delete") {
-    if (mutationPending.current) return;
-    mutationPending.current = true;
+    if (memberMutation.isPending) return;
     const removing = action === "delete";
 
     try {
@@ -128,20 +116,9 @@ export default function ClubMembersPage() {
       )
         return;
 
-      setBusy(true);
-      if (removing) {
-        await deleteClubMember(member.id);
-      } else if (action === "consent") {
-        await revokeClubConsent(member.id);
-      } else {
-        await updateClubMember(
-          member.id,
-          member.status === "active" ? "archived" : "active"
-        );
-      }
+      await memberMutation.mutateAsync({ member, action });
 
       setFilters((prev) => ({ ...prev, page: 1 }));
-      setRefresh((n) => n + 1);
       toast({
         variant: "success",
         title: removing ? "Registration deleted" : "Member updated",
@@ -152,9 +129,6 @@ export default function ClubMembersPage() {
         title: "Could not save changes",
         description: e instanceof Error ? e.message : "Please try again.",
       });
-    } finally {
-      mutationPending.current = false;
-      setBusy(false);
     }
   }
 
@@ -475,7 +449,7 @@ export default function ClubMembersPage() {
             <p role="alert" className="mb-4 text-red-700 font-medium">
               {error}
             </p>
-            <Button variant="outline" onClick={() => setRefresh((n) => n + 1)}>
+            <Button variant="outline" onClick={() => membersQuery.refetch()} loading={membersQuery.isFetching}>
               Try again
             </Button>
           </div>

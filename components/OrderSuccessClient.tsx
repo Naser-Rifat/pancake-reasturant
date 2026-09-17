@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Phone, MessageCircle, Printer, PlusCircle } from "lucide-react";
@@ -152,8 +153,15 @@ export default function OrderSuccessClient({
   site,
 }: OrderSuccessClientProps) {
   const { clear, setCouponCode } = useCart();
-  const [order, setOrder] = useState<ApiOrder | null>(null);
-  const [loading, setLoading] = useState(!!publicId);
+  const orderQuery = useQuery({
+    queryKey: ["order", publicId],
+    queryFn: () => getOrder(publicId),
+    enabled: Boolean(publicId),
+    refetchInterval: 4_000,
+    staleTime: 0,
+  });
+  const order = orderQuery.data ?? null;
+  const loading = Boolean(publicId) && orderQuery.isPending;
   const [copied, setCopied] = useState(false);
   const [manualId, setManualId] = useState("");
 
@@ -167,38 +175,6 @@ export default function OrderSuccessClient({
     clear();
     setCouponCode("");
   }, [clear, setCouponCode]);
-
-  // Initial order fetch and live polling every 4 seconds
-  useEffect(() => {
-    if (!publicId) {
-      setLoading(false);
-      return;
-    }
-
-    let active = true;
-
-    const fetchStatus = async () => {
-      const data = await getOrder(publicId);
-      if (active) {
-        if (data) {
-          setOrder(data);
-        }
-        setLoading(false);
-      }
-    };
-
-    fetchStatus();
-
-    // Poll live every 4 seconds to catch kitchen updates (received -> preparing -> ready -> completed)
-    const interval = setInterval(() => {
-      fetchStatus();
-    }, 4000);
-
-    return () => {
-      active = false;
-      clearInterval(interval);
-    };
-  }, [publicId]);
 
   const times = formatOrderTimes(order?.created_at, site?.order_prep_time);
 

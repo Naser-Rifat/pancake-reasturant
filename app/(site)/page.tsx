@@ -458,13 +458,13 @@ export default async function Home() {
             >
               {certs.map((c) => (
                 <li className="cert-badge quality-seal-badge" key={c.title}>
-                  <span className="ic">
+                  <span className={`ic${c.image ? " cert-real-logo" : ""}`}>
                     {c.image ? (
                       <Image
                         src={c.image}
                         alt={c.title}
-                        width={48}
-                        height={48}
+                        width={72}
+                        height={52}
                         style={{ width: "100%", height: "100%", objectFit: "contain" }}
                       />
                     ) : (

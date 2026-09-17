@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, type FormEvent, type ChangeEvent } from "react";
+import { useState, type FormEvent, type ChangeEvent } from "react";
+import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { ArrowRight, Check, LoaderCircle, LockKeyhole, AlertCircle } from "lucide-react";
 import { API_URL, fetchWithTimeout } from "@/lib/api";
@@ -20,9 +21,40 @@ interface FormState {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const NAME_LETTERS_REGEX = /[a-zA-Z\u00C0-\u017F]/;
 
+type JoinError = Error & { fieldErrors?: Partial<Record<Field, string>> };
+
+async function joinClub(values: FormState) {
+  const res = await fetchWithTimeout(`${API_URL}/club/join/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: values.name.trim(),
+      phone: values.phone.trim(),
+      email: values.email.trim(),
+      privacy_consent: values.privacy_consent,
+      marketing_consent: values.marketing_consent,
+      website: "",
+    }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (res.ok) return body;
+
+  const fieldErrors: Partial<Record<Field, string>> = {};
+  for (const key of ["name", "phone", "email", "privacy_consent"] as const) {
+    if (Array.isArray(body[key])) fieldErrors[key] = body[key][0];
+  }
+  const error = new Error(
+    res.status === 429
+      ? "Too many attempts. Please try again in a few moments."
+      : Object.keys(fieldErrors).length
+        ? "Please check the highlighted fields."
+        : "We couldn’t save your registration. Please try again.",
+  ) as JoinError;
+  error.fieldErrors = fieldErrors;
+  throw error;
+}
+
 export default function ClubRegistrationForm({ contactEmail }: { contactEmail: string }) {
-  const [busy, setBusy] = useState(false);
-  const pending = useRef(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
@@ -36,6 +68,8 @@ export default function ClubRegistrationForm({ contactEmail }: { contactEmail: s
 
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<Field, string>>>({});
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({});
+  const joinMutation = useMutation({ mutationFn: joinClub });
+  const busy = joinMutation.isPending;
 
   function validateSingleField(field: Field, val: string | boolean): string | undefined {
     if (field === "name") {
@@ -126,7 +160,7 @@ export default function ClubRegistrationForm({ contactEmail }: { contactEmail: s
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (pending.current) return;
+    if (joinMutation.isPending) return;
 
     // Run full client-side validation
     const { isValid, errors } = validateAll();
@@ -149,54 +183,18 @@ export default function ClubRegistrationForm({ contactEmail }: { contactEmail: s
       return;
     }
 
-    pending.current = true;
-    setBusy(true);
     setError("");
 
     try {
-      const res = await fetchWithTimeout(`${API_URL}/club/join/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formValues.name.trim(),
-          phone: formValues.phone.trim(),
-          email: formValues.email.trim(),
-          privacy_consent: formValues.privacy_consent,
-          marketing_consent: formValues.marketing_consent,
-          // Keep the API's honeypot empty explicitly. A hidden browser input can
-          // be autofilled by password managers, which would make the API return
-          // its intentionally generic 202 response without saving the member.
-          website: "",
-        }),
-      });
-
-      const body = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        const serverErrors: Partial<Record<Field, string>> = {};
-        for (const key of ["name", "phone", "email", "privacy_consent"] as const) {
-          if (Array.isArray(body[key])) serverErrors[key] = body[key][0];
-        }
-        if (Object.keys(serverErrors).length > 0) {
-          setFieldErrors((prev) => ({ ...prev, ...serverErrors }));
-          const first = Object.keys(serverErrors)[0];
-          if (first) {
-            const el = document.getElementById(`club-${first}`);
-            el?.scrollIntoView({ behavior: "smooth", block: "center" });
-            el?.focus();
-          }
-        }
-        throw new Error(
-          res.status === 429
-            ? "Too many attempts. Please try again in a few moments."
-            : Object.keys(serverErrors).length
-            ? "Please check the highlighted fields."
-            : "We couldn’t save your registration. Please try again."
-        );
-      }
-
+      await joinMutation.mutateAsync(formValues);
       setSuccess(true);
     } catch (e) {
+      const serverErrors = (e as JoinError).fieldErrors;
+      if (serverErrors && Object.keys(serverErrors).length > 0) {
+        setFieldErrors((prev) => ({ ...prev, ...serverErrors }));
+        const first = Object.keys(serverErrors)[0];
+        document.getElementById(`club-${first}`)?.focus();
+      }
       setError(
         e instanceof TypeError || (e instanceof DOMException && e.name === "AbortError")
           ? "We couldn’t reach the club. Please check your connection and try again."
@@ -204,9 +202,6 @@ export default function ClubRegistrationForm({ contactEmail }: { contactEmail: s
           ? e.message
           : "Something went wrong. Please try again."
       );
-    } finally {
-      pending.current = false;
-      setBusy(false);
     }
   }
 

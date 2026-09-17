@@ -1,4 +1,7 @@
-import { useState, type Dispatch, SetStateAction } from "react";
+"use client";
+
+import type { Dispatch, SetStateAction } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Building2, Mail, MapPin, Navigation, Phone, Send, Share2, UtensilsCrossed } from "lucide-react";
 import { SaveBar, SaveButton } from "@/components/admin/SaveButton";
 import { Button } from "@/components/ui/button";
@@ -27,7 +30,28 @@ export function ContactTab({
   run: RunSave;
 }) {
   const { toast } = useToast();
-  const [testingEmail, setTestingEmail] = useState(false);
+  const testEmail = useMutation({
+    mutationFn: async () => {
+      const response = await sendTestEmail();
+      if (!response.ok) throw new Error(response.detail);
+      return response;
+    },
+    onSuccess: (res) => {
+      toast({
+        variant: res.detail.includes("NOT") ? "info" : "success",
+        title: res.detail.includes("NOT")
+          ? "Email not configured yet"
+          : `Test email dispatched to ${res.to}`,
+        description: res.detail,
+      });
+    },
+    onError: (error) =>
+      toast({
+        variant: "error",
+        title: "Test email failed",
+        description: error instanceof Error ? error.message : "Unknown error",
+      }),
+  });
 
   return (
     <div className="space-y-6">
@@ -125,30 +149,9 @@ export function ContactTab({
                 type="button"
                 size="sm"
                 variant="outline"
-                loading={testingEmail}
-                disabled={!site.email}
-                onClick={async () => {
-                  setTestingEmail(true);
-                  try {
-                    const res = await sendTestEmail();
-                    if (!res.ok) throw new Error(res.detail);
-                    toast({
-                      variant: res.detail.includes("NOT") ? "info" : "success",
-                      title: res.detail.includes("NOT")
-                        ? "Email not configured yet"
-                        : `Test email dispatched to ${res.to}`,
-                      description: res.detail,
-                    });
-                  } catch (e) {
-                    toast({
-                      variant: "error",
-                      title: "Test email failed",
-                      description: e instanceof Error ? e.message : "Unknown error",
-                    });
-                  } finally {
-                    setTestingEmail(false);
-                  }
-                }}
+                loading={testEmail.isPending}
+                disabled={!site.email || testEmail.isPending}
+                onClick={() => testEmail.mutate()}
                 className="font-bold text-xs border-amber-300 text-[#763a12] bg-white hover:bg-amber-50 rounded-xl shrink-0 shadow-2xs cursor-pointer"
               >
                 <Send className="h-3 w-3 mr-1.5" /> Send Test Email

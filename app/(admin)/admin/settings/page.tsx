@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Building2,
   UtensilsCrossed,
@@ -16,7 +17,7 @@ import {
 } from "@/lib/admin-api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
-import { useToast, type ToastInput } from "@/components/ui/toast";
+import { useRunSave } from "@/components/admin/use-run-save";
 
 import { ContactTab } from "./_components/ContactTab";
 import { KitchenTab } from "./_components/KitchenTab";
@@ -44,43 +45,28 @@ export default function SettingsPage() {
   const [site, setSite] = useState<AdminSiteSettings | null>(null);
   const [hours, setHours] = useState<AdminHours[]>([]);
   const [newRow, setNewRow] = useState(EMPTY_ROW);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState("");
-  const { toast } = useToast();
+  const { busy, run } = useRunSave();
 
-  const load = useCallback(() => {
-    setLoading(true);
-    setError("");
-    Promise.all([getSiteSettings(), listHoursAdmin()])
-      .then(([s, h]) => {
-        setSite(s);
-        setHours(h);
-        setError("");
-      })
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load settings"))
-      .finally(() => setLoading(false));
-  }, []);
+  const settingsQuery = useQuery({
+    queryKey: ["admin", "settings"],
+    queryFn: async () => {
+      const [siteSettings, openingHours] = await Promise.all([
+        getSiteSettings(),
+        listHoursAdmin(),
+      ]);
+      return { siteSettings, openingHours };
+    },
+  });
 
   useEffect(() => {
-    load();
-  }, [load]);
+    if (!settingsQuery.data) return;
+    setSite(settingsQuery.data.siteSettings);
+    setHours(settingsQuery.data.openingHours);
+  }, [settingsQuery.data]);
 
-  const run = async (fn: () => Promise<void>, what: string, success?: ToastInput) => {
-    setBusy(what);
-    try {
-      await fn();
-      toast({ variant: "success", title: `${what} saved`, ...success });
-    } catch (e) {
-      toast({
-        variant: "error",
-        title: `${what} — action failed`,
-        description: e instanceof Error ? e.message : undefined,
-      });
-    } finally {
-      setBusy("");
-    }
-  };
+  const loading = settingsQuery.isPending;
+  const error = settingsQuery.error instanceof Error ? settingsQuery.error.message : "";
+  const load = () => void settingsQuery.refetch();
 
   const setS = (key: keyof AdminSiteSettings) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -240,7 +226,7 @@ export default function SettingsPage() {
       )}
 
       {activeTab === "kitchen" && (
-        <KitchenTab site={site} setSite={setSite} busy={busy} setBusy={setBusy} run={run} />
+        <KitchenTab site={site} setSite={setSite} busy={busy} run={run} />
       )}
 
       {activeTab === "hours" && (

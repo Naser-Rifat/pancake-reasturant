@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import {
   ShoppingBag,
@@ -24,10 +24,6 @@ import {
   listBookings,
   listOrders,
   getSiteSettings,
-  type AdminBooking,
-  type AdminOrder,
-  type AdminStats,
-  type AdminSiteSettings,
 } from "@/lib/admin-api";
 import { Button } from "@/components/ui/button";
 import { Skeleton, TableSkeleton } from "@/components/ui/skeleton";
@@ -36,48 +32,31 @@ import { StatusBadge } from "@/components/admin/StatusBadge";
 import { formatTime12h, parseBookingOffer } from "@/lib/format";
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<AdminStats | null>(null);
-  const [site, setSite] = useState<AdminSiteSettings | null>(null);
-  const [recentOrders, setRecentOrders] = useState<AdminOrder[]>([]);
-  const [recentBookings, setRecentBookings] = useState<AdminBooking[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  const loadData = useCallback(async (isInitial = true) => {
-    if (isInitial) setLoading(true);
-    setError("");
-    try {
+  const dashboardQuery = useQuery({
+    queryKey: ["admin", "dashboard"],
+    queryFn: async () => {
       const [s, o, b, siteRes] = await Promise.all([
         getStats(),
         listOrders(),
         listBookings(),
         getSiteSettings().catch(() => null),
       ]);
-      setStats(s);
-      setRecentOrders(o.slice(0, 5));
+      const recentOrders = o.slice(0, 5);
       // the card promises UPCOMING arrivals: nearest future dates first,
       // cancelled and past bookings left out (the API returns newest-request-first)
       const todayISO = new Date().toISOString().slice(0, 10);
-      setRecentBookings(
-        b
+      const recentBookings = b
           .filter((x) => x.status !== "cancelled" && x.date >= todayISO)
           .sort((x, y) => `${x.date}T${x.time}`.localeCompare(`${y.date}T${y.time}`))
-          .slice(0, 5),
-      );
-      if (siteRes) setSite(siteRes);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load dashboard data.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadData(true);
-    // keep the "command center" live without skeleton flashes
-    const id = setInterval(() => loadData(false), 60_000);
-    return () => clearInterval(id);
-  }, [loadData]);
+          .slice(0, 5);
+      return { stats: s, recentOrders, recentBookings, site: siteRes };
+    },
+    refetchInterval: 60_000,
+  });
+  const { stats, recentOrders = [], recentBookings = [], site } = dashboardQuery.data ?? {};
+  const loading = dashboardQuery.isPending;
+  const error = dashboardQuery.error instanceof Error ? dashboardQuery.error.message : "";
+  const loadData = () => void dashboardQuery.refetch();
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">

@@ -1,4 +1,7 @@
+"use client";
+
 import type { Dispatch, SetStateAction } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { AlertCircle, Clock, Mail, Send } from "lucide-react";
 import { SaveButton } from "@/components/admin/SaveButton";
 import { Button } from "@/components/ui/button";
@@ -13,16 +16,37 @@ export function KitchenTab({
   site,
   setSite,
   busy,
-  setBusy,
   run,
 }: {
   site: AdminSiteSettings;
   setSite: Dispatch<SetStateAction<AdminSiteSettings | null>>;
   busy: string;
-  setBusy: Dispatch<SetStateAction<string>>;
   run: RunSave;
 }) {
   const { toast } = useToast();
+  const testEmail = useMutation({
+    mutationFn: async () => {
+      const response = await sendTestEmail();
+      if (!response.ok) throw new Error(response.detail);
+      return response;
+    },
+    onSuccess: (res) => {
+      toast({
+        variant: res.detail.includes("NOT") ? "info" : "success",
+        title: res.detail.includes("NOT")
+          ? "Email not configured yet"
+          : `Test email dispatched to ${res.to}`,
+        description: res.detail,
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "error",
+        title: "Test email failed",
+        description: error instanceof Error ? error.message : undefined,
+      });
+    },
+  });
 
   return (
     <div className="space-y-6">
@@ -254,29 +278,9 @@ export function KitchenTab({
             size="sm"
             variant="outline"
             className="font-bold text-xs border-zinc-300 text-[#763a12] bg-white hover:bg-zinc-50 rounded-xl shrink-0"
-            loading={busy === "TestEmail"}
-            onClick={async () => {
-              setBusy("TestEmail");
-              try {
-                const res = await sendTestEmail();
-                if (!res.ok) throw new Error(res.detail);
-                toast({
-                  variant: res.detail.includes("NOT") ? "info" : "success",
-                  title: res.detail.includes("NOT")
-                    ? "Email not configured yet"
-                    : `Test email dispatched to ${res.to}`,
-                  description: res.detail,
-                });
-              } catch (e) {
-                toast({
-                  variant: "error",
-                  title: "Test email failed",
-                  description: e instanceof Error ? e.message : undefined,
-                });
-              } finally {
-                setBusy("");
-              }
-            }}
+            loading={testEmail.isPending}
+            disabled={testEmail.isPending}
+            onClick={() => testEmail.mutate()}
           >
             <Send className="h-3.5 w-3.5 mr-1.5" /> Send Test Email
           </Button>

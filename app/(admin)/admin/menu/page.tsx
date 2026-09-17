@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -55,8 +56,6 @@ const MENU_COLUMNS: AdminTableColumn<AdminMenuItem>[] = [
 export default function MenuAdminPage() {
   const [items, setItems] = useState<AdminMenuItem[]>([]);
   const [categories, setCategories] = useState<AdminCategory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<FilterCategory>("all");
   const [page, setPage] = useState(1);
@@ -65,7 +64,6 @@ export default function MenuAdminPage() {
   // null = form closed, "" = adding new, slug = editing that item
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
-  const [saving, setSaving] = useState(false);
   // photo counts per slug so the list can show them without opening anything
   const [photoCounts, setPhotoCounts] = useState<Record<string, number>>({});
   // uploads made before the dish exists; attached right after it is created
@@ -78,6 +76,9 @@ export default function MenuAdminPage() {
   const pristine = useRef<FormState>(EMPTY_FORM);
   const { toast } = useToast();
   const { confirm } = useConfirm();
+  const queryClient = useQueryClient();
+  const refreshMenu = () =>
+    queryClient.invalidateQueries({ queryKey: ["admin"] });
 
   // the form opens above a long table — bring it into view smoothly
   useEffect(() => {
@@ -102,27 +103,48 @@ export default function MenuAdminPage() {
 
   const categoriesMap = useMemo(() => new Map(categories.map((c) => [c.slug, c])), [categories]);
 
-  const load = useCallback(() => {
-    setLoading(true);
-    setError("");
-    Promise.all([listMenu(), listCategories().catch(() => [])])
-      .then(async ([list, cats]) => {
-        setItems(list);
-        setCategories(cats);
-        const counts = await Promise.all(
-          list.map((i) =>
-            listMenuItemPhotos(i.slug)
-              .then((ps) => [i.slug, ps.length] as const)
-              .catch(() => [i.slug, 0] as const)
-          )
-        );
-        setPhotoCounts(Object.fromEntries(counts));
-      })
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load menu items"))
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(load, [load]);
+  const menuQuery = useQuery({
+    queryKey: ["admin", "menu"],
+    queryFn: async () => {
+      const [items, categories] = await Promise.all([listMenu(), listCategories().catch(() => [])]);
+      const counts = await Promise.all(
+        items.map((item) =>
+          listMenuItemPhotos(item.slug)
+            .then((photos) => [item.slug, photos.length] as const)
+            .catch(() => [item.slug, 0] as const),
+        ),
+      );
+      return { items, categories, photoCounts: Object.fromEntries(counts) };
+    },
+  });
+  useEffect(() => {
+    if (!menuQuery.data) return;
+    setItems(menuQuery.data.items);
+    setCategories(menuQuery.data.categories);
+    setPhotoCounts(menuQuery.data.photoCounts);
+  }, [menuQuery.data]);
+  const loading = menuQuery.isPending;
+  const queryError = menuQuery.error instanceof Error ? menuQuery.error.message : "";
+  const load = () => void menuQuery.refetch();
+  const saveMutation = useMutation({
+    mutationFn: ({ slug, payload }: { slug?: string; payload: Partial<AdminMenuItem> }) =>
+      slug ? updateMenuItem(slug, payload) : createMenuItem(payload),
+    onSettled: refreshMenu,
+  });
+  const photoMutation = useMutation({
+    mutationFn: createMenuItemPhoto,
+    onSettled: refreshMenu,
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteMenuItem,
+    onSettled: refreshMenu,
+  });
+  const updateMutation = useMutation({
+    mutationFn: ({ slug, changes }: { slug: string; changes: Partial<AdminMenuItem> }) =>
+      updateMenuItem(slug, changes),
+    onSettled: refreshMenu,
+  });
+  const saving = saveMutation.isPending || photoMutation.isPending;
 
   const openAdd = () => {
     jumpTo.current = "top"; // a previous photo-jump must not aim the scroll at a hidden section
@@ -131,7 +153,6 @@ export default function MenuAdminPage() {
     setStep(1);
     pristine.current = EMPTY_FORM;
     setEditing("");
-    setError("");
   };
 
   const openEdit = (item: AdminMenuItem, jumpToPhotos = false) => {
@@ -160,7 +181,6 @@ export default function MenuAdminPage() {
     setPendingPhotos([]);
     setStep(1);
     setEditing(item.slug);
-    setError("");
   };
 
   /** shared required-field + numeric-price guard for both the wizard and edit save */
@@ -198,8 +218,6 @@ export default function MenuAdminPage() {
     e?.preventDefault();
     // edit save skips the wizard, so guard both paths here before hitting the API
     if (!validate()) return;
-    setSaving(true);
-    setError("");
     const payload: Partial<AdminMenuItem> = {
       slug: editing || form.slug || slugify(form.name),
       name: form.name,
@@ -218,12 +236,12 @@ export default function MenuAdminPage() {
     };
     try {
       if (editing) {
-        await updateMenuItem(editing, payload);
+        await saveMutation.mutateAsync({ slug: editing, payload });
         pristine.current = form;
         toast({ variant: "success", title: `${form.name} updated` });
         setEditing(null);
       } else {
-        const created = await createMenuItem(payload);
+        const created = await saveMutation.mutateAsync({ payload });
         // The dish now exists. Switch to edit mode *before* attaching photos so a
         // failed photo upload can't strand the form in create mode — a retry would
         // otherwise re-POST the same slug and be rejected as a duplicate.
@@ -232,7 +250,7 @@ export default function MenuAdminPage() {
         const failed: string[] = [];
         for (const [i, url] of pendingPhotos.entries()) {
           try {
-            await createMenuItemPhoto({
+            await photoMutation.mutateAsync({
               menu_item: created.slug,
               image: url,
               alt: `${created.name} photo`,
@@ -265,8 +283,6 @@ export default function MenuAdminPage() {
         title: "Save failed",
         description: err instanceof Error ? err.message : undefined,
       });
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -294,7 +310,7 @@ export default function MenuAdminPage() {
     markPending(item.slug, true);
     setItems((xs) => xs.filter((x) => x.slug !== item.slug));
     try {
-      await deleteMenuItem(item.slug);
+      await deleteMutation.mutateAsync(item.slug);
       toast({ variant: "success", title: `${item.name} deleted from the menu` });
     } catch (err) {
       setItems(prev);
@@ -314,7 +330,7 @@ export default function MenuAdminPage() {
     markPending(item.slug, true);
     setItems((xs) => xs.map((x) => (x.slug === item.slug ? { ...x, ...changes } : x)));
     try {
-      await updateMenuItem(item.slug, changes);
+      await updateMutation.mutateAsync({ slug: item.slug, changes });
       toast({ variant: "success", title: note });
     } catch (err) {
       setItems(prev);
@@ -463,7 +479,7 @@ export default function MenuAdminPage() {
         </div>
       </div>
 
-      {error && <AdminError message={error} onRetry={load} />}
+      {queryError && <AdminError message={queryError} onRetry={load} />}
 
       {/* ========================================================================= */}
       {/* DISH CREATION & EDITING MODAL / CARD                                      */}

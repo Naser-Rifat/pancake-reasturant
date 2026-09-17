@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { createBooking, type ApiBooking } from "@/lib/api";
 import { validatePhoneNumber } from "@/lib/format";
 
@@ -37,9 +38,14 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
   const [showAllDishes, setShowAllDishes] = useState(false);
   const toggleDish = (label: string) =>
     setDishes((d) => (d.includes(label) ? d.filter((x) => x !== label) : [...d, label]));
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [booking, setBooking] = useState<ApiBooking | null>(null);
+  const bookingMutation = useMutation({
+    mutationFn: createBooking,
+    onSuccess: setBooking,
+    onError: (err) =>
+      setError(err instanceof Error ? err.message : "Something went wrong — please try again."),
+  });
 
   const set = (key: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -57,25 +63,16 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
       }
     }
 
-    setSubmitting(true);
     const finalNotes = offer
       ? (form.notes.trim() ? `${form.notes.trim()} · [Offer: ${offer}]` : `Special Offer: ${offer}`)
       : form.notes;
 
-    try {
-      setBooking(
-        await createBooking({
-          ...form,
-          notes: finalNotes,
-          party_size: Number(form.party_size),
-          preselected_dish: dishes.join(", "),
-        })
-      );
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong — please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    bookingMutation.mutate({
+      ...form,
+      notes: finalNotes,
+      party_size: Number(form.party_size),
+      preselected_dish: dishes.join(", "),
+    });
   };
 
   if (booking) {
@@ -153,8 +150,8 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
       )}
       <textarea className="input" rows={2} placeholder="Anything we should know? Special requests or dietary needs (optional)" value={form.notes} onChange={set("notes")} />
       {error && <p className="form-error" role="alert">{error}</p>}
-      <button className="btn btn-primary" type="submit" disabled={submitting}>
-        {submitting ? "Sending…" : "Request a Table"}
+      <button className="btn btn-primary" type="submit" disabled={bookingMutation.isPending}>
+        {bookingMutation.isPending ? "Sending…" : "Request a Table"}
       </button>
     </form>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Save,
   Home,
@@ -35,6 +36,7 @@ import {
   type AdminSiteSettings,
 } from "@/lib/admin-api";
 import { Button } from "@/components/ui/button";
+import { useRunSave } from "@/components/admin/use-run-save";
 import { ContentSkeleton } from "./_components/ContentSkeleton";
 import { BookingPageSection } from "./_components/BookingPageSection";
 import { HomeStep1Hero } from "./_components/HomeStep1Hero";
@@ -47,7 +49,6 @@ import { HomeStep6Footer } from "./_components/HomeStep6Footer";
 import { MenuPageSection } from "./_components/MenuPageSection";
 import { ClubPageSection } from "./_components/ClubPageSection";
 import { AdminError } from "@/components/ui/admin-error";
-import { useToast, type ToastInput } from "@/components/ui/toast";
 
 import {
   EMPTY_CERT,
@@ -102,41 +103,42 @@ export default function ContentPage() {
   const [newCert, setNewCert] = useState(EMPTY_CERT);
   const [categories, setCategories] = useState<AdminCategory[]>([]);
   const [menuItems, setMenuItems] = useState<AdminMenuItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState("");
-  const { toast } = useToast();
+  const { busy, run } = useRunSave();
 
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
-  const load = useCallback(() => {
-    setLoading(true);
-    setError("");
-    Promise.all([
-      getSiteSettings(),
-      listAnnouncements(),
-      listCertifications(),
-      listGalleryAdmin(),
-      listCategories(),
-      listMenu(),
-    ])
-      .then(([s, anns, cs, ps, cats, menu]) => {
-        setSite(s);
-        setAnnouncements(anns);
-        setSelectedDealId(anns[0]?.id ?? null);
-        setCerts(cs);
-        setPhotos(ps);
-        setCategories(cats);
-        setMenuItems(menu);
-        setError("");
-      })
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load content settings"))
-      .finally(() => setLoading(false));
-  }, []);
+  const contentQuery = useQuery({
+    queryKey: ["admin", "content"],
+    queryFn: async () => {
+      const [siteSettings, deals, certifications, gallery, categoryRows, menu] =
+        await Promise.all([
+          getSiteSettings(),
+          listAnnouncements(),
+          listCertifications(),
+          listGalleryAdmin(),
+          listCategories(),
+          listMenu(),
+        ]);
+      return { siteSettings, deals, certifications, gallery, categoryRows, menu };
+    },
+  });
 
   useEffect(() => {
-    load();
-  }, [load]);
+    if (!contentQuery.data) return;
+    const { siteSettings, deals, certifications, gallery, categoryRows, menu } =
+      contentQuery.data;
+    setSite(siteSettings);
+    setAnnouncements(deals);
+    setSelectedDealId(deals[0]?.id ?? null);
+    setCerts(certifications);
+    setPhotos(gallery);
+    setCategories(categoryRows);
+    setMenuItems(menu);
+  }, [contentQuery.data]);
+
+  const loading = contentQuery.isPending;
+  const error = contentQuery.error instanceof Error ? contentQuery.error.message : "";
+  const load = () => void contentQuery.refetch();
 
   // The two homepage campaign surfaces are managed as separate stations:
   // station 1 = the band under the hero (changes often), station 2 = the
@@ -225,22 +227,6 @@ export default function ContentPage() {
     window.addEventListener("message", onMsg);
     return () => window.removeEventListener("message", onMsg);
   }, [syncPreview]);
-
-  const run = async (fn: () => Promise<void>, what: string, success?: ToastInput) => {
-    setBusy(what);
-    try {
-      await fn();
-      toast({ variant: "success", title: `${what} saved`, ...success });
-    } catch (e) {
-      toast({
-        variant: "error",
-        title: `${what} — could not save`,
-        description: e instanceof Error ? e.message : undefined,
-      });
-    } finally {
-      setBusy("");
-    }
-  };
 
   if (loading) {
     return <ContentSkeleton />;
@@ -635,8 +621,6 @@ export default function ContentPage() {
               setCerts={setCerts}
               newCert={newCert}
               setNewCert={setNewCert}
-              busy={busy}
-              run={run}
               setHomeStepIndex={setHomeStepIndex}
             />
           )}

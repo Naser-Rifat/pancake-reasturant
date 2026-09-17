@@ -13,15 +13,17 @@ export function SaveButton({
   children,
   icon = true,
   className = "",
+  loading,
   ...props
 }: ComponentProps<typeof Button> & { icon?: boolean }) {
   return (
     <Button
       size="sm"
       className={`bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs ${className}`}
+      loading={loading}
       {...props}
     >
-      {icon && <Save className="h-3.5 w-3.5 mr-1.5" />}
+      {icon && !loading && <Save className="h-3.5 w-3.5 mr-1.5" />}
       {children}
     </Button>
   );
@@ -30,5 +32,9 @@ export function SaveButton({
 /** Right-aligned action bar that closes a form card — save lives here, at
  *  the end of the fields, never up in the card header. */
 export function SaveBar({ children }: { children: ReactNode }) {
-  return <div className="flex justify-end pt-3 border-t border-zinc-200">{children}</div>;
+  return (
+    <div className="flex justify-end pt-3 border-t border-zinc-200">
+      {children}
+    </div>
+  );
 }

@@ -526,13 +526,13 @@ export default function PreviewPage() {
             <ul className="cert-strip" aria-label="Food standards and recognition">
               {certs.filter((c) => c.is_active).map((c) => (
                 <li key={c.id} className="cert-badge quality-seal-badge">
-                  <span className="ic">
+                  <span className={`ic${c.image ? " cert-real-logo" : ""}`}>
                     {c.image ? (
                       <Image
                         src={c.image}
                         alt={c.title}
-                        width={48}
-                        height={48}
+                        width={72}
+                        height={52}
                         style={{ width: "100%", height: "100%", objectFit: "contain" }}
                       />
                     ) : (

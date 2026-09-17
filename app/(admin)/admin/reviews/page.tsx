@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   MessageSquareHeart,
   Star,
@@ -35,8 +36,6 @@ type ReviewFilter = "all" | "pending" | "public" | "5star";
 
 export default function ReviewsAdminPage() {
   const [reviews, setReviews] = useState<AdminReview[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<ReviewFilter>("all");
   const [page, setPage] = useState(1);
@@ -44,31 +43,35 @@ export default function ReviewsAdminPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { confirm: confirmDialog } = useConfirm();
+  const queryClient = useQueryClient();
+  const refreshReviews = () =>
+    queryClient.invalidateQueries({ queryKey: ["admin"] });
 
-  const load = useCallback(() => {
-    setLoading(true);
-    setError("");
-    listReviews()
-      .then((res) => {
-        // Moderation queue first: unapproved on top, then newest first
-        setReviews(
-          [...res].sort((a, b) =>
-            a.is_approved === b.is_approved
-              ? b.created_at.localeCompare(a.created_at)
-              : a.is_approved
-              ? 1
-              : -1
-          )
-        );
-        setError("");
-      })
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load customer reviews"))
-      .finally(() => setLoading(false));
-  }, []);
-
+  const reviewsQuery = useQuery({ queryKey: ["admin", "reviews"], queryFn: listReviews });
   useEffect(() => {
-    load();
-  }, [load]);
+    if (!reviewsQuery.data) return;
+    setReviews(
+      [...reviewsQuery.data].sort((a, b) =>
+        a.is_approved === b.is_approved
+          ? b.created_at.localeCompare(a.created_at)
+          : a.is_approved
+            ? 1
+            : -1,
+      ),
+    );
+  }, [reviewsQuery.data]);
+  const loading = reviewsQuery.isPending;
+  const error = reviewsQuery.error instanceof Error ? reviewsQuery.error.message : "";
+  const load = () => void reviewsQuery.refetch();
+  const updateMutation = useMutation({
+    mutationFn: ({ id, patch }: { id: number; patch: Parameters<typeof updateReview>[1] }) =>
+      updateReview(id, patch),
+    onSettled: refreshReviews,
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteReview,
+    onSettled: refreshReviews,
+  });
 
   // review ids with a request in flight — locks that card's switch
   const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
@@ -86,7 +89,7 @@ export default function ReviewsAdminPage() {
     markPending(r.id, true);
     setReviews((rs) => rs.map((x) => (x.id === r.id ? { ...x, is_approved } : x)));
     try {
-      await updateReview(r.id, { is_approved });
+      await updateMutation.mutateAsync({ id: r.id, patch: { is_approved } });
       toast({
         variant: "success",
         title: is_approved
@@ -116,7 +119,7 @@ export default function ReviewsAdminPage() {
     const prev = reviews;
     setReviews((rs) => rs.filter((x) => x.id !== r.id));
     try {
-      await deleteReview(r.id);
+      await deleteMutation.mutateAsync(r.id);
       toast({ variant: "success", title: "Review deleted" });
     } catch (e) {
       setReviews(prev);
@@ -380,7 +383,7 @@ export default function ReviewsAdminPage() {
                         const prev = reviews;
                         setReviews((rs) => rs.map((x) => (x.id === r.id ? { ...x, avatar: v } : x)));
                         try {
-                          await updateReview(r.id, { avatar: v });
+                          await updateMutation.mutateAsync({ id: r.id, patch: { avatar: v } });
                           toast({
                             variant: "success",
                             title: v ? `Avatar emoji updated for ${r.name}` : `Default avatar reset to 🥞`,

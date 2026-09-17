@@ -12,6 +12,7 @@
 // Stripe comes back with their order intact.
 
 import { useEffect, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Clock } from "lucide-react";
 import { money, placeOrder, validateCoupon, type ApiCouponPreview, type ApiMenuItem } from "@/lib/api";
@@ -35,14 +36,12 @@ export default function CartDrawer({
   const [nameError, setNameError] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
-  const [placing, setPlacing] = useState(false);
   // the box starts closed: an empty coupon field in front of every customer
   // sends the ones without a code off to hunt for one, and they don't come back
   const [couponOpen, setCouponOpen] = useState(false);
   const [couponDraft, setCouponDraft] = useState("");
   const [coupon, setCoupon] = useState<ApiCouponPreview | null>(null);
   const [couponError, setCouponError] = useState("");
-  const [checkingCoupon, setCheckingCoupon] = useState(false);
   const [targetClock, setTargetClock] = useState("");
 
   useEffect(() => {
@@ -78,32 +77,33 @@ export default function CartDrawer({
   // Re-price on every cart change, not just on apply: a code with a $30 minimum
   // must fall away the moment the cart drops below it, and the number beside
   // "Total" has to be the number Stripe will charge.
+  const couponQuery = useQuery({
+    queryKey: ["cart", "coupon", couponCode, cartKey],
+    queryFn: () => validateCoupon(couponCode, JSON.parse(cartKey)),
+    enabled: Boolean(couponCode && count),
+    staleTime: 0,
+  });
   useEffect(() => {
     if (!couponCode || !count) {
       setCoupon(null);
       setCouponError("");
-      return;
+    } else if (couponQuery.data) {
+      setCoupon(couponQuery.data);
+      setCouponError("");
+    } else if (couponQuery.error) {
+      setCoupon(null);
+      setCouponError(
+        couponQuery.error instanceof Error ? couponQuery.error.message : "That code isn't valid.",
+      );
     }
-    let cancelled = false;
-    setCheckingCoupon(true);
-    validateCoupon(couponCode, JSON.parse(cartKey))
-      .then((preview) => {
-        if (cancelled) return;
-        setCoupon(preview);
-        setCouponError("");
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setCoupon(null);
-        setCouponError(err instanceof Error ? err.message : "That code isn't valid.");
-      })
-      .finally(() => {
-        if (!cancelled) setCheckingCoupon(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [couponCode, cartKey, count]);
+  }, [couponCode, count, couponQuery.data, couponQuery.error]);
+
+  const applyCouponMutation = useMutation({
+    mutationFn: (code: string) => validateCoupon(code, JSON.parse(cartKey)),
+  });
+  const orderMutation = useMutation({ mutationFn: placeOrder });
+  const checkingCoupon = couponQuery.isFetching || applyCouponMutation.isPending;
+  const placing = orderMutation.isPending;
 
   // a code carried in on a campaign link should show itself, not hide behind
   // "Have a coupon?" as though the customer had done nothing
@@ -115,21 +115,18 @@ export default function CartDrawer({
     const code = couponDraft.trim().toUpperCase();
     if (!code) return;
     setCouponError("");
-    setCheckingCoupon(true);
-    validateCoupon(code, JSON.parse(cartKey))
-      .then((preview) => {
+    applyCouponMutation.mutate(code, {
+      onSuccess: (preview) => {
         setCoupon(preview);
         setCouponCode(code);
         setCouponDraft("");
         setCouponError("");
-      })
-      .catch((err) => {
+      },
+      onError: (err) => {
         setCoupon(null);
         setCouponError(err instanceof Error ? err.message : "That code isn't valid.");
-      })
-      .finally(() => {
-        setCheckingCoupon(false);
-      });
+      },
+    });
   };
 
   const removeCoupon = () => {
@@ -211,9 +208,8 @@ export default function CartDrawer({
       return showToast(msg);
     }
 
-    setPlacing(true);
     try {
-      const order = await placeOrder({
+      const order = await orderMutation.mutateAsync({
         customer_name: name.trim(),
         phone: phone.trim(),
         items: cartLines,
@@ -234,7 +230,6 @@ export default function CartDrawer({
       }
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Something went wrong — please try again.");
-      setPlacing(false);
     }
     // no finally — the button stays busy through the redirect
   };

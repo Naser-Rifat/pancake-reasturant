@@ -90,7 +90,7 @@ export default function DishCard({
   const isRow = variant === "row";
 
   return (
-    <article className={`dish-card dc-${variant} fav-card`}>
+    <article className={`dish-card dc-${variant} fav-card${isRow ? " diner-dish-row" : ""}`}>
       {/* the whole card is the target; the name keeps its own anchor for AT */}
       <Link href={href} className="dc-hit" aria-label={`View ${item.name} details`} />
 
@@ -141,7 +141,7 @@ export default function DishCard({
           <>
             <button
               type="button"
-              className="dc-add dc-add-desktop"
+              className={`dc-add dc-add-desktop${isRow ? " diner-add-btn" : ""}`}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -155,7 +155,7 @@ export default function DishCard({
             {isRow && (
               <button
                 type="button"
-                className="dc-add dc-add-bag"
+                className="dc-add dc-add-bag diner-add-btn"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -172,4 +172,3 @@ export default function DishCard({
     </article>
   );
 }
-

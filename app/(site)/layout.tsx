@@ -12,6 +12,7 @@ import CartDrawer from "@/components/CartDrawer";
 import CartButton from "@/components/CartButton";
 import BottomBar from "@/components/BottomBar";
 import { CartProvider } from "@/lib/cart";
+import { QueryProvider } from "@/components/QueryProvider";
 import { getAnnouncement, getHours, getMenuWithStatus, getReviews, getSite } from "@/lib/api";
 import { customThemeStyle } from "@/lib/theme";
 import { jsonLd } from "@/lib/utils";
@@ -141,6 +142,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         />
         {/* the cart wraps everything: the drawer mounts once here, every page's
             cart button opens it, and the tab bar reads its count */}
+        <QueryProvider>
         <CartProvider>
           <TopRibbon
             address={site.address}
@@ -174,6 +176,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             orderPrepTime={site.order_prep_time || "15–20 mins"}
           />
         </CartProvider>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { API_URL } from "@/lib/api";
@@ -27,15 +28,20 @@ export function UploadButton({
   cutout = false,
   label = "Upload",
   multiple = false,
+  disabled = false,
   validate,
 }: {
-  onUploaded?: (url: string, check?: ImageValidationResult) => void | Promise<void>;
+  onUploaded?: (
+    url: string,
+    check?: ImageValidationResult,
+  ) => void | Promise<void>;
   /** dual mode: one pick returns BOTH the original photo and its cutout */
   onPair?: (urls: { photo: string; cutout: string }) => void | Promise<void>;
   cutout?: boolean;
   label?: string;
   /** let staff pick several files in one go — onUploaded fires per file */
   multiple?: boolean;
+  disabled?: boolean;
   /** custom pre-flight validation callback */
   validate?: (file: File) => Promise<ImageValidationResult>;
 }) {
@@ -43,21 +49,30 @@ export function UploadButton({
   const [stage, setStage] = useState<"" | "cutting" | "uploading">("");
   const [error, setError] = useState("");
   const { toast } = useToast();
+  const removeBgMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch(`${API_URL}/admin/remove-bg/`, {
+        method: "POST",
+        headers: { Authorization: `Token ${getToken()}` },
+        body: form,
+      });
+      if (!res.ok)
+        throw new Error(
+          "Background removal failed — try a photo on a plain, light background",
+        );
+      const blob = await res.blob();
+      return new File([blob], file.name.replace(/\.[^.]+$/, "") + "-cutout.png", {
+        type: "image/png",
+      });
+    },
+  });
+  const cloudUploadMutation = useMutation({
+    mutationFn: (file: Blob | File) => uploadToCloudinary(file),
+  });
 
   if (!cloudinaryReady) return null;
-
-  const removeBg = async (file: File) => {
-    const form = new FormData();
-    form.append("file", file);
-    const res = await fetch(`${API_URL}/admin/remove-bg/`, {
-      method: "POST",
-      headers: { Authorization: `Token ${getToken()}` },
-      body: form,
-    });
-    if (!res.ok) throw new Error("Background removal failed — try a photo on a plain, light background");
-    const blob = await res.blob();
-    return new File([blob], file.name.replace(/\.[^.]+$/, "") + "-cutout.png", { type: "image/png" });
-  };
 
   const upload = async (file: File) => {
     setError("");
@@ -70,28 +85,36 @@ export function UploadButton({
       if (!check.valid) {
         const errMsg = check.error || "Image validation failed";
         setError(errMsg);
-        toast({ variant: "error", title: "❌ Upload Blocked by Validation", description: errMsg });
+        toast({
+          variant: "error",
+          title: "❌ Upload Blocked by Validation",
+          description: errMsg,
+        });
         return;
       }
       if (check.warning) {
-        toast({ variant: "info", title: "Aspect ratio note", description: check.warning });
+        toast({
+          variant: "info",
+          title: "Aspect ratio note",
+          description: check.warning,
+        });
       }
 
       if (onPair) {
-        const photo = await uploadToCloudinary(file);
+        const photo = await cloudUploadMutation.mutateAsync(file);
         setStage("cutting");
-        const cut = await removeBg(file);
+        const cut = await removeBgMutation.mutateAsync(file);
         setStage("uploading");
-        await onPair({ photo, cutout: await uploadToCloudinary(cut) });
+        await onPair({ photo, cutout: await cloudUploadMutation.mutateAsync(cut) });
         return;
       }
       let payload: File = file;
       if (cutout) {
         setStage("cutting");
-        payload = await removeBg(file);
+        payload = await removeBgMutation.mutateAsync(file);
         setStage("uploading");
       }
-      const uploadedUrl = await uploadToCloudinary(payload);
+      const uploadedUrl = await cloudUploadMutation.mutateAsync(payload);
       if (onUploaded) {
         await onUploaded(uploadedUrl, check);
       }
@@ -113,6 +136,7 @@ export function UploadButton({
         accept="image/*"
         className="hidden"
         multiple={multiple}
+        disabled={disabled || stage !== ""}
         onChange={async (e) => {
           const files = [...(e.target.files ?? [])];
           for (const f of files) await upload(f);
@@ -123,10 +147,15 @@ export function UploadButton({
         variant="outline"
         size="sm"
         loading={stage !== ""}
+        disabled={disabled}
         onClick={() => fileRef.current?.click()}
       >
         <Upload />
-        {stage === "cutting" ? "Removing background…" : stage === "uploading" ? "Validating & Uploading…" : label}
+        {stage === "cutting"
+          ? "Removing background…"
+          : stage === "uploading"
+            ? "Validating & Uploading…"
+            : label}
       </Button>
       {error && (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-red-50 text-red-700 border border-red-200">

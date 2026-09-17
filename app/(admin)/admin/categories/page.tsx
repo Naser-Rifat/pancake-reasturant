@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import {
   Layers,
@@ -79,8 +80,6 @@ const slugify = (text: string) =>
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<AdminCategory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all");
   const [page, setPage] = useState(1);
@@ -91,30 +90,43 @@ export default function AdminCategoriesPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(null);
   const [formData, setFormData] = useState<CategoryFormData>(EMPTY_FORM);
-  const [submitting, setSubmitting] = useState(false);
-  const [reordering, setReordering] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [autoSlug, setAutoSlug] = useState(true);
 
   const { confirm } = useConfirm();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const refreshCategories = () =>
+    queryClient.invalidateQueries({ queryKey: ["admin"] });
 
-  const loadCategories = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await listCategories();
-      setCategories(data);
-    } catch (err: any) {
-      setError(err?.message || "Failed to load categories.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  const categoriesQuery = useQuery({ queryKey: ["admin", "categories"], queryFn: listCategories });
   useEffect(() => {
-    loadCategories();
-  }, [loadCategories]);
+    if (categoriesQuery.data) setCategories(categoriesQuery.data);
+  }, [categoriesQuery.data]);
+  const loading = categoriesQuery.isPending;
+  const error = categoriesQuery.error instanceof Error ? categoriesQuery.error.message : null;
+  const loadCategories = () => categoriesQuery.refetch();
+  const saveMutation = useMutation({
+    mutationFn: ({ id, payload }: { id?: number; payload: Parameters<typeof createCategory>[0] }) =>
+      id ? updateCategory(id, payload) : createCategory(payload),
+    onSettled: refreshCategories,
+  });
+  const updateMutation = useMutation({
+    mutationFn: ({ id, patch }: { id: number; patch: Parameters<typeof updateCategory>[1] }) =>
+      updateCategory(id, patch),
+    onSettled: refreshCategories,
+  });
+  const reorderMutation = useMutation({
+    mutationFn: (items: AdminCategory[]) =>
+      Promise.all(items.map((item) => updateCategory(item.id, { sort_order: item.sort_order }))),
+    onSettled: refreshCategories,
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteCategory,
+    onSettled: refreshCategories,
+  });
+  const submitting = saveMutation.isPending;
+  const reordering = reorderMutation.isPending;
 
   const openCreateModal = () => {
     setEditingCategory(null);
@@ -170,7 +182,6 @@ export default function AdminCategoriesPage() {
     }
 
     try {
-      setSubmitting(true);
       setFormError(null);
 
       const payload = {
@@ -183,13 +194,13 @@ export default function AdminCategoriesPage() {
       };
 
       if (editingCategory) {
-        const updated = await updateCategory(editingCategory.id, payload);
+        const updated = await saveMutation.mutateAsync({ id: editingCategory.id, payload });
         setCategories((prev) =>
           prev.map((c) => (c.id === updated.id ? updated : c)).sort((a, b) => a.sort_order - b.sort_order)
         );
         toast({ variant: "success", title: "Category updated", description: `"${updated.name}" has been updated.` });
       } else {
-        const created = await createCategory(payload);
+        const created = await saveMutation.mutateAsync({ payload });
         setCategories((prev) =>
           [...prev, created].sort((a, b) => a.sort_order - b.sort_order)
         );
@@ -199,8 +210,6 @@ export default function AdminCategoriesPage() {
       setModalOpen(false);
     } catch (err: any) {
       setFormError(err?.message || "Failed to save category.");
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -210,7 +219,7 @@ export default function AdminCategoriesPage() {
       prev.map((c) => (c.id === cat.id ? { ...c, is_active: nextVal } : c))
     );
     try {
-      await updateCategory(cat.id, { is_active: nextVal });
+      await updateMutation.mutateAsync({ id: cat.id, patch: { is_active: nextVal } });
       toast({
         variant: "success",
         title: nextVal ? "Category activated" : "Category hidden",
@@ -257,13 +266,8 @@ export default function AdminCategoriesPage() {
     );
 
     setCategories(normalized);
-    setReordering(true);
     try {
-      await Promise.all(
-        changed.map((item) =>
-          updateCategory(item.id, { sort_order: item.sort_order }),
-        ),
-      );
+      await reorderMutation.mutateAsync(changed);
       toast({
         variant: "success",
         title: "Category order updated",
@@ -277,8 +281,6 @@ export default function AdminCategoriesPage() {
         description: err?.message || "Could not reorder category.",
         variant: "error",
       });
-    } finally {
-      setReordering(false);
     }
   };
 
@@ -302,7 +304,7 @@ export default function AdminCategoriesPage() {
     if (!ok) return;
 
     try {
-      await deleteCategory(cat.id);
+      await deleteMutation.mutateAsync(cat.id);
       setCategories((prev) => prev.filter((c) => c.id !== cat.id));
       toast({ variant: "success", title: "Category deleted", description: `"${cat.name}" has been removed.` });
     } catch (err: any) {
