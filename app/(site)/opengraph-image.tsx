@@ -5,7 +5,7 @@ import { ImageResponse } from "next/og";
 // Branded 1200×630 card shown when the site is shared on WhatsApp, Facebook,
 // iMessage, Slack, X, etc. Generated at request time. The real logo is read
 // from /public and inlined so the preview shows our actual brand mark.
-export const alt = "The Pancake Club — Pancakes & Stacks, Sydney";
+export const alt = "The Pancake Club | Geelong's Best Pancakes";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

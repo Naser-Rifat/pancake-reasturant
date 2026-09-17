@@ -30,9 +30,9 @@ const SITE_URL = (
 ).replace(/\/$/, "");
 const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION?.trim();
 
-const SITE_TITLE = "The Pancake Club — Pancakes & Stacks, Geelong";
+const SITE_TITLE = "The Pancake Club | Geelong's Best Pancakes";
 const SITE_DESC =
-  "Fluffy homemade pancakes in Geelong. View the menu, book a table online, and see why locals love The Pancake Club. Real maple, fresh berries, zero guilt.";
+  "Fluffy homemade pancakes in Geelong. Explore our menu, book a table, or visit us in Geelong West.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
