@@ -32,7 +32,7 @@ export default async function Footer() {
               className="f-brand-logo"
             />
             <p className="f-brand-tag">
-              {site.footer_tagline || "Fluffy stacks · real maple · est. 1999"}
+              {site.footer_tagline || "Fluffy stacks · made to order · Geelong West"}
             </p>
 
             <div className="f-actions">
@@ -131,7 +131,8 @@ export default async function Footer() {
         {/* Bottom Copyright & Back to Top Bar */}
         <div className="footer-bottom-bar">
           <p className="f-copyright-text">
-            © {new Date().getFullYear()} The Pancake Club — All rights reserved. {site.abn}
+            © {new Date().getFullYear()} The Pancake Club — All rights reserved.
+            {site.abn ? ` ${site.abn}` : ""}
           </p>
           <Link href="/privacy" className="f-privacy-link">Privacy</Link>
           <div className="f-back-to-top-container">

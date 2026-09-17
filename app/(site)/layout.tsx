@@ -107,6 +107,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   ]);
   const themeStyle =
     site.theme === "custom" ? customThemeStyle(site.custom_primary, site.custom_accent) : null;
+  // Site settings express staff intent; menu.live proves the API can currently
+  // accept and price an order. Both must be true anywhere a cart can open.
+  const orderingLive = site.online_ordering_enabled && menu.live;
   // Restaurant schema markup for Google's local results and generative engines —
   // kept in sync with the business details staff manage in the admin panel
   const rating = aggregateRating(reviews);
@@ -158,7 +161,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           />
           <Announce data={announcement} />
           <Nav
-            live={site.online_ordering_enabled}
+            live={orderingLive}
             facebookUrl={site.facebook_url}
             instagramUrl={site.instagram_url}
             uberEatsUrl={site.uber_eats_url}
@@ -174,10 +177,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <BottomBar whatsapp={site.whatsapp} />
           {/* desktop's cart — mobile/tablet use the app header's, which sits
               in Nav. globals.css shows exactly one of them per breakpoint. */}
-          <CartButton live={site.online_ordering_enabled} className="cart-fab" size={26} />
+          <CartButton live={orderingLive} className="cart-fab" size={26} />
           <CartDrawer
             items={menu.items}
-            live={site.online_ordering_enabled}
+            live={orderingLive}
             uberEatsUrl={site.uber_eats_url}
             orderPrepTime={site.order_prep_time || "15–20 mins"}
           />

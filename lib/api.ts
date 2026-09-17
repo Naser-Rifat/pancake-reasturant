@@ -8,6 +8,9 @@ export const API_URL = rawApiUrl.endsWith("/api") ? rawApiUrl : `${rawApiUrl}/ap
 /** Default cap for JSON API calls. Uploads (Cloudinary/background-removal) are
  *  intentionally NOT wrapped — they can legitimately take much longer. */
 export const API_TIMEOUT_MS = 15_000;
+// Public server-rendered reads should fail over quickly. Mutations retain the
+// longer timeout above so a customer submit is not aborted too aggressively.
+const PUBLIC_READ_TIMEOUT_MS = 4_000;
 
 /** fetch() that aborts if the server hasn't responded within `timeoutMs`, so a
  *  hung backend surfaces as an error instead of a request that never resolves. */
@@ -282,7 +285,11 @@ export function formatTime(t: string) {
 
 async function get<T>(path: string, fallback: T): Promise<T> {
   try {
-    const res = await fetchWithTimeout(`${API_URL}${path}`, { cache: "no-store" });
+    const res = await fetchWithTimeout(
+      `${API_URL}${path}`,
+      { cache: "no-store" },
+      PUBLIC_READ_TIMEOUT_MS
+    );
     if (!res.ok) return fallback;
     return (await res.json()) as T;
   } catch {
@@ -294,7 +301,11 @@ async function get<T>(path: string, fallback: T): Promise<T> {
 export async function getMenuWithStatus(): Promise<{ items: ApiMenuItem[]; live: boolean }> {
   const { FALLBACK_MENU } = await import("./fallback-data");
   try {
-    const res = await fetchWithTimeout(`${API_URL}/menu/`, { cache: "no-store" });
+    const res = await fetchWithTimeout(
+      `${API_URL}/menu/`,
+      { cache: "no-store" },
+      PUBLIC_READ_TIMEOUT_MS
+    );
     if (!res.ok) return { items: FALLBACK_MENU, live: false };
     return { items: (await res.json()) as ApiMenuItem[], live: true };
   } catch {
@@ -374,7 +385,11 @@ export async function getAnnouncement(): Promise<ApiAnnouncement | null> {
   // No fallback here on purpose: better to show no promo than a stale one
   // the restaurant may have already ended.
   try {
-    const res = await fetchWithTimeout(`${API_URL}/announcement/`, { cache: "no-store" });
+    const res = await fetchWithTimeout(
+      `${API_URL}/announcement/`,
+      { cache: "no-store" },
+      PUBLIC_READ_TIMEOUT_MS
+    );
     if (!res.ok) return null; // includes 204 = deliberately no announcement
     return (await res.json()) as ApiAnnouncement;
   } catch {

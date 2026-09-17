@@ -83,6 +83,18 @@ def _reference(prefix: str, public_id) -> str:
     return f"{prefix}-{str(public_id).replace('-', '')[-6:].upper()}"
 
 
+def _abn_number(site) -> str:
+    value = (site.abn or "").strip()
+    return value[3:].strip() if value.upper().startswith("ABN") else value
+
+
+def _business_signature(site) -> str:
+    abn = _abn_number(site)
+    if not abn:
+        return RESTAURANT
+    return f"{RESTAURANT} · ABN {abn}"
+
+
 def _customer_html(
     *,
     site,
@@ -126,7 +138,7 @@ def _customer_html(
             "address": site.address,
             "phone": site.phone,
             "phone_href": phone_href,
-            "abn": site.abn,
+            "abn": _abn_number(site),
         },
     )
 
@@ -299,7 +311,7 @@ def order_status_changed(order) -> bool:
             f"  Pickup:  {s.address}\n\n"
             "We'll email you the moment it's ready to collect.\n\n"
             f"Need help? Call {s.phone}; please don't reply to this automated email.\n\n"
-            f"{RESTAURANT} · {s.abn}"
+            + _business_signature(s)
         )
         return _send(
             order.email,
@@ -330,7 +342,7 @@ def order_status_changed(order) -> bool:
             f"  Where:   {s.address}\n\n"
             f"When you arrive, quote {reference}. Need help? Call {s.phone}. "
             "Please don't reply to this automated email.\n\n"
-            f"See you in a minute,\n{RESTAURANT} · {s.abn}"
+            f"See you in a minute,\n{_business_signature(s)}"
         )
         return _send(
             order.email,
@@ -374,7 +386,7 @@ def order_status_changed(order) -> bool:
             f"{payment_notice}\n\n"
             f"Please call us on {s.phone} if you'd like to sort something out. "
             "Please don't reply to this automated email.\n\n"
-            f"Apologies,\n{RESTAURANT} · {s.abn}"
+            f"Apologies,\n{_business_signature(s)}"
         )
         return _send(
             order.email,
@@ -444,8 +456,8 @@ def club_welcome(member) -> bool:
     ]
     body = (
         f"G'day {member.name},\n\n"
-        f"You're in! Welcome to {RESTAURANT} — Geelong West's home of fluffy "
-        "stacks, real maple, and good company.\n\n"
+        f"You're in! Welcome to {RESTAURANT} — a place for warm stacks and "
+        "good company in Geelong West.\n\n"
         "Here's what being a member means:\n"
         + "".join(f"  • {benefit}\n" for benefit in benefits)
         + "\nYour membership is active now. To update your details or leave the club, "
@@ -464,7 +476,7 @@ def club_welcome(member) -> bool:
             badge_background="#e7f5e8",
             badge_color="#24552b",
             title="Welcome to the club",
-            lead="You’re in — welcome to Geelong West’s home of fluffy stacks, real maple and good company.",
+            lead="You’re in — welcome to warm stacks and good company in Geelong West.",
             bullets_title="Your member privileges",
             bullets=benefits,
             action_url=f"{settings.FRONTEND_URL}/menu",

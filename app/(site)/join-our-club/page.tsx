@@ -23,7 +23,7 @@ export default async function JoinOurClubPage() {
   const bento1Badge = (site.club_bento_1_badge || "🥞 Fresh Off The Griddle").replace(/[✨✦]/g, "🥞").trim();
   const bento1Img = site.club_bento_1_img || "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&q=80";
   const bento1Title = site.club_bento_1_title || "Signature Stack";
-  const bento1Sub = site.club_bento_1_sub || "Whipped butter & maple";
+  const bento1Sub = site.club_bento_1_sub || "Warm from the griddle";
 
   const bento2Img = site.club_bento_2_img || "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=80";
   const bento2Badge = site.club_bento_2_badge || "🥞 Sunday Brunch";

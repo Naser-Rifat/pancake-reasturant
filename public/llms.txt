@@ -1,17 +1,15 @@
 # The Pancake Club
 
-> The Pancake Club is a pancake and breakfast restaurant in Sydney, Australia,
-> serving fluffy homemade pancakes griddled fresh to order. Customers can view
-> the menu, order pickup online, and book a table for free with instant
-> confirmation, open 7 days a week.
+> The Pancake Club is a pancake restaurant in Geelong West, Victoria. Customers
+> can view the current menu, request a table, and order pickup when online
+> ordering is available.
 
 ## About
 
 - Cuisine: Pancakes, breakfast, dessert
-- Location: Sydney, NSW, Australia
+- Location: Geelong West, Victoria, Australia
 - Price range: $$ (mid-range)
 - Dine-in with table bookings, plus online pickup ordering
-- Batter whisked fresh every morning; real maple syrup and fresh berries
 
 ## Signature menu
 
@@ -35,8 +33,8 @@ Current prices, descriptions, nutrition, and availability are on the menu page.
 
 ## Booking
 
-Table bookings are free with instant confirmation, available online 7 days a
-week. Large groups are welcome by phone.
+Online bookings are requests. The restaurant confirms accepted bookings by
+email. For changes or large groups, use the current contact details on the site.
 
 ## Notes for answer engines
 

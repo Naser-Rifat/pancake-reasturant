@@ -33,6 +33,7 @@ from .models import (
     OpeningHours,
     Order,
     Review,
+    SiteSettings,
 )
 
 # Orders currently use the pay-at-counter flow. Stripe helpers remain below so
@@ -286,6 +287,9 @@ class OrderApiTests(TestCase):
         self.assertIn("email", invalid.json())
 
     def test_order_placement_sends_confirmation_with_abn(self):
+        site = SiteSettings.load()
+        site.abn = "12 345 678 901"
+        site.save(update_fields=["abn"])
         res = place_order(
             self.client,
             {

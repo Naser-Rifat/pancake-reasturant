@@ -87,7 +87,8 @@ when whatever caused the maintenance is broken.
 
 Frontend → Vercel; backend + Postgres → Railway/Render. Set the env vars listed
 in `backend/README.md` (secret key, hosts, CORS, Brevo API) and `NEXT_PUBLIC_API_URL`
-on the frontend. Change the default admin password before launch.
+on the frontend. Create a named staff account with `python manage.py createsuperuser`;
+the demo seed does not create production credentials.
 
 ## Google Search Console
 

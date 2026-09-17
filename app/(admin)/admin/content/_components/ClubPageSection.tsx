@@ -176,7 +176,7 @@ function BentoPhotoEditor({
             className="h-8 text-xs border-zinc-200 rounded-lg min-w-0 bg-white"
             value={site[subKey] ?? ""}
             onChange={setS(subKey)}
-            placeholder="Sub-caption (e.g. Whipped butter & maple)"
+            placeholder="Sub-caption (e.g. Warm from the griddle)"
           />
         </div>
 

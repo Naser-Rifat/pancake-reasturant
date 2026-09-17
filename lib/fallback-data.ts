@@ -24,24 +24,8 @@ export const FALLBACK_CATEGORIES: ApiCategory[] = [
   { id: 8, name: "Kids", slug: "kids", icon: "🧒", description: "Mini stackers and treats for little clubbers", sort_order: 8, is_active: true, dish_count: 1 },
 ];
 
-export const FALLBACK_CAMPAIGNS: ApiAnnouncement[] = [
-  {
-    message: "New Special 20% off this weekend!",
-    details: "This weekend only · Dine-in & Takeaway in Geelong",
-    image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=1200&q=80",
-    link_text: "EXPLORE THE MENU",
-    link_url: "/menu",
-    ends_at: new Date(Date.now() + 6 * 86400000).toISOString(),
-  },
-  {
-    message: "Weekend Brunch Pass - 20% off all Stacks before 11Pm",
-    details: "Saturday & Sunday ` Early birds enjoy 20% discount",
-    image: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&q=80",
-    link_text: "EXPLORE MENU",
-    link_url: "/menu",
-    ends_at: new Date(Date.now() + 5 * 86400000).toISOString(),
-  },
-];
+// Never advertise an offer when the API cannot prove it is still active.
+export const FALLBACK_CAMPAIGNS: ApiAnnouncement[] = [];
 
 export const FALLBACK_MENU: ApiMenuItem[] = [
   { slug: "buttermilk", name: "Classic Buttermilk Stack", description: "Four fluffy buttermilk pancakes with pure maple syrup and whipped butter.", price: "14.00", tag: "sweet-favourites", category_name: "Sweet Favourites", category_slug: "sweet-favourites", category_icon: "🍯", heat: "none", kcal: 680, protein_g: 14, prep_time: "10–12 min", image: "/menu/buttermilk-stack.png", photo: "", photos: [], is_featured: true },
@@ -58,13 +42,9 @@ export const FALLBACK_MENU: ApiMenuItem[] = [
   { slug: "kids-mini-stack", name: "Little Stackers Mini Pancakes", description: "Three palm-sized fluffy pancakes, pure maple drizzle, fresh strawberries, and vanilla ice cream.", price: "10.00", tag: "kids", category_name: "Kids", category_slug: "kids", category_icon: "🧒", heat: "none", kcal: 390, protein_g: 8, prep_time: "7–9 min", image: "/menu/berry.png", photo: "", photos: [], is_featured: false },
 ];
 
-export const FALLBACK_REVIEWS: ApiReview[] = [
-  { name: "Sarah M.", suburb: "Geelong West", rating: 5, quote: "Best pancakes I've had in Geelong, hands down. The stack is cloud-fluffy and the warm maple butter is addictive.", avatar: "😀" },
-  { name: "Daniel K.", suburb: "Newtown", rating: 5, quote: "Booked online for a birthday brunch — table was ready on the dot, staff were lovely, and the Choc Overload is a monster. Our new Geelong favourite!", avatar: "🎉" },
-  { name: "Priya S.", suburb: "Belmont", rating: 4, quote: "Great vibe, colourful fit-out, quick service. The Lemon Ricotta is genuinely special — light as air and not too sweet.", avatar: "🌱" },
-  { name: "Tom B.", suburb: "East Geelong", rating: 5, quote: "Took the kids on a weekend for the special. Fast, friendly, and the banana caramel stack is dangerously good. Our new family regular.", avatar: "👨‍👧" },
-  { name: "Jess W.", suburb: "Highton", rating: 5, quote: "The Big Brekkie Stack lives up to its name. Loved the vibe on Pakington Street. We will definitely be back.", avatar: "🔥" },
-];
+// Reviews are trust claims. An outage must not publish demo testimonials or
+// generate an aggregateRating in structured data.
+export const FALLBACK_REVIEWS: ApiReview[] = [];
 
 export const FALLBACK_GALLERY: ApiGalleryPhoto[] = [
   { album: "food", focus: "center" as const, caption: "The Classic Buttermilk, fresh off the griddle", image: "https://images.unsplash.com/photo-1575853121743-60c24f0a7502?w=700&q=70", alt: "Classic buttermilk pancake stack" },
@@ -85,13 +65,9 @@ export const FALLBACK_GALLERY: ApiGalleryPhoto[] = [
   { album: "interior", focus: "center" as const, caption: "Room for the whole crew", image: "https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=700&q=70", alt: "Long communal tables in the cafe" },
 ];
 
-export const FALLBACK_CERTS: ApiCertification[] = [
-  { icon: "shield", title: "Food Safety Certified", subtitle: "Victorian Food Safety Standards" },
-  { icon: "star", title: "5-Star Hygiene Rating", subtitle: "City of Greater Geelong" },
-  { icon: "trophy", title: "Best Pancakes — Geelong 2025", subtitle: "Victorian Hospitality Awards" },
-  { icon: "check", title: "HACCP Compliant", subtitle: "Certified Kitchen" },
-  { icon: "leaf", title: "Local Produce Partner", subtitle: "Victorian Farmers' Network" },
-];
+// Certifications and awards are hidden until the backend returns records that
+// staff have verified and deliberately activated.
+export const FALLBACK_CERTS: ApiCertification[] = [];
 
 export const FALLBACK_HOME_STEPS: ApiHomeStep[] = [
   { id: 1, label: "Step 1", title: "Order online",
@@ -116,14 +92,14 @@ export const FALLBACK_SITE: ApiSiteSettings = {
   about_image_2: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=75",
   about_image_3: "https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&q=75",
   about_points:
-    "Batter whisked fresh every morning\n100% pure Canadian maple — never syrup-flavoured\nBerries & fruit from local Victorian growers\nCloud-light ricotta & buttermilk stacks",
+    "Made to order on the griddle\nSweet and savoury choices\nDine in or order pickup\nFind us in Geelong West",
   cta_heading: "HUNGRY",
   cta_script: "Book a table now!",
   cta_lead: "Brunch with friends, a family catch-up or a late-night craving",
   cta_button_label: "BOOK A TABLE",
   cta_button_url: "/booking",
-  marquee_words: "Fluffy Stacks\nReal Maple\nGeelong West\nFresh Berries\nZero Guilt\nGriddled Daily",
-  footer_tagline: "Fluffy stacks · real maple · Geelong West",
+  marquee_words: "Fluffy Stacks\nGeelong West\nSweet & Savoury\nMade to Order\nBrunch Together\nPickup Ready",
+  footer_tagline: "Fluffy stacks · made to order · Geelong West",
   menu_hero_heading: "Pick your",
   menu_hero_script: "Favourites",
   menu_hero_lead: "Freshly made and served with love",
@@ -142,7 +118,7 @@ export const FALLBACK_SITE: ApiSiteSettings = {
   club_bento_1_img: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&q=80",
   club_bento_1_badge: "🥞 Fresh Off The Griddle",
   club_bento_1_title: "Signature Stack",
-  club_bento_1_sub: "Whipped butter & maple",
+  club_bento_1_sub: "Warm from the griddle",
   club_bento_2_img: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=80",
   club_bento_2_badge: "🥞 Sunday Brunch",
   club_bento_2_title: "Brunch Club",
@@ -166,18 +142,18 @@ export const FALLBACK_SITE: ApiSiteSettings = {
   hero_image: "https://images.unsplash.com/photo-1620991565081-82743a5a499c?w=1200&q=80",
   hero_cutout: "/menu/hero-stack.png",
   about_text:
-    "G'day! Every pancake at The Pancake Club is ladled to order onto a buttered griddle, flipped at exactly the right bubble, and stacked warm with real maple. No shortcuts, no pre-mix — just food that feels good.",
+    "G'day! The Pancake Club is a place for warm stacks, relaxed catch-ups, and good food in Geelong West.",
   address: "18 Pakington Street, Geelong West VIC, Australia",
   phone: "+61 452 135 499",
-  whatsapp: "+61 400 000 000",
+  whatsapp: "",
   email: "hello@thepancakeclub.com.au",
-  abn: "ABN 00 000 000 000",
+  abn: "",
   map_embed: "https://www.google.com/maps?q=18%20Pakington%20Street%2C%20Geelong%20West%20VIC%20Australia&output=embed",
-  transit_badges: "3 min walk from Town hall\n2hr Street Parking\nStep free access",
-  show_transit_badges: true,
-  instagram_url: "https://www.instagram.com",
-  facebook_url: "https://www.facebook.com",
-  uber_eats_url: "https://www.ubereats.com",
+  transit_badges: "",
+  show_transit_badges: false,
+  instagram_url: "",
+  facebook_url: "",
+  uber_eats_url: "",
   online_ordering_enabled: true,
   online_ordering_disabled_message: "Online ordering is temporarily paused. Please visit us or call to place an order.",
   order_prep_time: "15–20 mins",

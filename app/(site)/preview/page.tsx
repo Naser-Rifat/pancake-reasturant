@@ -587,7 +587,7 @@ export default function PreviewPage() {
                 className="f-brand-logo"
               />
               <p className="f-brand-tag">
-                {site.footer_tagline || "Fluffy stacks · real maple · est. 1999"}
+                {site.footer_tagline || "Fluffy stacks · made to order · Geelong West"}
               </p>
             </div>
           </div>
@@ -696,7 +696,7 @@ export default function PreviewPage() {
                 </div>
                 <div className={clubStyles.bentoCaption}>
                   <span className={clubStyles.bentoCaptionTitle}>{site.club_bento_1_title || "Signature Stack"}</span>
-                  <span className={clubStyles.bentoCaptionSub}>{site.club_bento_1_sub || "Whipped butter & maple"}</span>
+                  <span className={clubStyles.bentoCaptionSub}>{site.club_bento_1_sub || "Warm from the griddle"}</span>
                 </div>
               </div>
 

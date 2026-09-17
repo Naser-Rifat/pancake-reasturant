@@ -15,7 +15,7 @@ export const DEFAULT_DEAL_PHOTO =
 export const DEFAULT_SITE: AdminSiteSettings = {
   hero_heading: "Stack Into",
   hero_script: "Happiness",
-  hero_lead: "We flip the best homemade pancakes in Geelong — griddled to order, stacked high, drowned in real maple.",
+  hero_lead: "Warm pancake stacks, made to order in Geelong West and served for relaxed catch-ups.",
   hero_image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=1400&q=85",
   hero_cutout: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=80",
   about_text: "",
@@ -31,10 +31,10 @@ export const DEFAULT_SITE: AdminSiteSettings = {
   cta_button_label: "Book a Table",
   cta_button_url: "/booking",
   marquee_words: "",
-  footer_tagline: "Fluffy stacks · real maple · est. 1999",
+  footer_tagline: "Fluffy stacks · made to order · Geelong West",
   menu_hero_heading: "Stacks On",
   menu_hero_script: "Stacks.",
-  menu_hero_lead: "Handcrafted pancakes made fresh with local dairy and authentic maple.",
+  menu_hero_lead: "Explore the current pancake menu and find your next favourite.",
   gallery_hero_kicker: "Feast Your Eyes",
   gallery_hero_heading: "The",
   gallery_hero_script: "Gallery.",
@@ -50,7 +50,7 @@ export const DEFAULT_SITE: AdminSiteSettings = {
   abn: "",
   map_embed: "",
   transit_badges: "",
-  show_transit_badges: true,
+  show_transit_badges: false,
   instagram_url: "",
   facebook_url: "",
   uber_eats_url: "",
@@ -67,7 +67,7 @@ export const DEFAULT_SITE: AdminSiteSettings = {
   club_bento_1_img: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&q=80",
   club_bento_1_badge: "🥞 Fresh Off The Griddle",
   club_bento_1_title: "Signature Stack",
-  club_bento_1_sub: "Whipped butter & maple",
+  club_bento_1_sub: "Warm from the griddle",
   club_bento_2_img: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=80",
   club_bento_2_badge: "🥞 Sunday Brunch",
   club_bento_2_title: "Brunch Club",
@@ -93,17 +93,13 @@ export const DEFAULT_ANNOUNCEMENT: AdminAnnouncement = {
   ends_at: null,
 };
 
-export const DEFAULT_CERTS: AdminCertification[] = [
-  { id: 1, icon: "medal", title: "100% Pure Canadian Maple", subtitle: "Grade A dark amber", is_active: true, sort_order: 0 },
-  { id: 2, icon: "leaf", title: "Free Range Eggs", subtitle: "Locally sourced", is_active: true, sort_order: 1 },
-  { id: 3, icon: "trophy", title: "Award Winning Stacks", subtitle: "Geelong recognition", is_active: true, sort_order: 2 },
-];
+export const DEFAULT_CERTS: AdminCertification[] = [];
 
 export const DEFAULT_PHOTOS: AdminGalleryPhoto[] = [];
 
 export const DEFAULT_STEPS: AdminHomeStep[] = [
   { id: 1, label: "01", title: "Order Online", text: "Pick your favourite stack and customizations.", image: "", sort_order: 0 },
-  { id: 2, label: "02", title: "We Griddle Fresh", text: "Made to order with real maple and fresh dairy.", image: "", sort_order: 1 },
+  { id: 2, label: "02", title: "We Griddle Fresh", text: "Your order is prepared for pickup.", image: "", sort_order: 1 },
   { id: 3, label: "03", title: "Pick Up Hot", text: "Grab your warm stack right on time.", image: "", sort_order: 2 },
 ];
 

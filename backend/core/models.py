@@ -469,8 +469,8 @@ class SiteSettings(models.Model):
     hero_heading = models.CharField(max_length=60, default="Stack Into")
     hero_script = models.CharField(max_length=60, default="Happiness")
     hero_lead = models.TextField(
-        default="We flip the best homemade pancakes in Geelong — griddled to order, "
-                "stacked high, drowned in real maple."
+        default="Warm pancake stacks, made to order in Geelong West and served "
+                "for relaxed catch-ups with your favourite people."
     )
     hero_image = models.CharField(
         max_length=300,
@@ -486,10 +486,10 @@ class SiteSettings(models.Model):
     about_image_3 = models.CharField(max_length=300, blank=True, default="")
     about_points = models.TextField(
         blank=True,
-        default="Batter whisked fresh every morning\n"
-                "100% pure Canadian maple — never syrup-flavoured\n"
-                "Berries & fruit from local Victorian growers\n"
-                "Cloud-light ricotta & buttermilk stacks",
+        default="Made to order on the griddle\n"
+                "Sweet and savoury choices\n"
+                "Dine in or order pickup\n"
+                "Find us in Geelong West",
         help_text="One tick per line. These are public claims — keep them true.",
     )
     # inner-page heroes: this copy was hard-coded in the pages
@@ -525,7 +525,7 @@ class SiteSettings(models.Model):
     )
     club_bento_1_badge = models.CharField(max_length=60, default="🥞 Fresh Off The Griddle")
     club_bento_1_title = models.CharField(max_length=60, default="Signature Stack")
-    club_bento_1_sub = models.CharField(max_length=80, default="Whipped butter & maple")
+    club_bento_1_sub = models.CharField(max_length=80, default="Warm from the griddle")
 
     club_bento_2_img = models.CharField(
         max_length=300,
@@ -579,8 +579,8 @@ class SiteSettings(models.Model):
     # footer strapline, next to the copyright line
     footer_tagline = models.CharField(
         max_length=120,
-        default="Fluffy stacks · real maple · est. 1999",
-        help_text="Shown in the footer. Contains a founding-year claim — confirm it.",
+        default="Fluffy stacks · made to order · Geelong West",
+        help_text="Shown in the footer.",
     )
     # closing call to action
     cta_heading = models.CharField(max_length=60, default="Hungry?")
@@ -594,13 +594,12 @@ class SiteSettings(models.Model):
     # ticker strip; one phrase per line, separated by ✦ on the site
     marquee_words = models.TextField(
         blank=True,
-        default="Fluffy Stacks\nReal Maple\nEst. 1999\nFresh Berries\nZero Guilt\nGriddled Daily",
-        help_text="One phrase per line. \"Est. 1999\" is a factual claim — confirm it.",
+        default="Fluffy Stacks\nGeelong West\nSweet & Savoury\nMade to Order\nBrunch Together\nPickup Ready",
+        help_text="One phrase per line.",
     )
     about_text = models.TextField(
-        default="G'day! Every pancake at The Pancake Club is ladled to order onto a buttered "
-                "griddle, flipped at exactly the right bubble, and stacked warm with "
-                "real maple. No shortcuts, no pre-mix — just food that feels good."
+        default="G'day! The Pancake Club is a place for warm stacks, relaxed catch-ups, "
+                "and good food in Geelong West."
     )
     address = models.CharField(
         max_length=200,
@@ -610,7 +609,7 @@ class SiteSettings(models.Model):
     # international format; blank hides the floating WhatsApp button
     whatsapp = models.CharField(max_length=30, blank=True, default="")
     email = models.EmailField(default="hello@thepancakeclub.com.au")
-    abn = models.CharField(max_length=40, default="ABN 00 000 000 000")
+    abn = models.CharField(max_length=40, blank=True, default="")
     map_embed = models.CharField(
         max_length=500,
         default="https://www.google.com/maps?q=18%20Pakington%20Street%2C%20Geelong%20West%20VIC%20Australia&output=embed",
@@ -620,16 +619,16 @@ class SiteSettings(models.Model):
     # unchanged after the migration.
     transit_badges = models.TextField(
         blank=True,
-        default="🚆 3 min walk from Town Hall\n🚗 2hr Street Parking\n♿ Step-Free Access",
+        default="",
         help_text="One transit/parking/access chip per line",
     )
-    show_transit_badges = models.BooleanField(default=True)
+    show_transit_badges = models.BooleanField(default=False)
     instagram_url = models.CharField(max_length=200, blank=True)
     facebook_url = models.CharField(max_length=200, blank=True)
     uber_eats_url = models.CharField(
         max_length=300,
         blank=True,
-        default="https://www.ubereats.com",
+        default="",
         help_text="Link to Uber Eats store",
     )
     online_ordering_enabled = models.BooleanField(
