@@ -1,0 +1,30 @@
+name: Production uptime
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-uptime
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check backend health
+        run: >-
+          curl --fail --silent --show-error
+          --max-time 15 --retry 2 --retry-delay 3 --retry-all-errors
+          https://web-production-db507.up.railway.app/api/health/
+
+      - name: Check public homepage
+        run: >-
+          curl --fail --silent --show-error --output /dev/null
+          --max-time 20 --retry 2 --retry-delay 3 --retry-all-errors
+          https://www.thepancakeclub.com.au/
