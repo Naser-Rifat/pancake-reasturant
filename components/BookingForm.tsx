@@ -86,6 +86,12 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
           {offer ? ` · Special Offer "${offer}" linked` : ""} — we&apos;ll
           email {form.email} as soon as it&apos;s confirmed.
         </span>
+        {booking.email_delivery === "failed" && (
+          <span className="form-error" role="alert">
+            Your request is saved, but we couldn&apos;t send the acknowledgement email.
+            Keep this page and call us if you need to confirm the request.
+          </span>
+        )}
       </div>
     );
   }

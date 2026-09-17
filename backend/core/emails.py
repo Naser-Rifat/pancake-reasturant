@@ -1,14 +1,15 @@
-"""Customer notification emails, sent when staff change a booking/order status.
+"""Transactional customer and staff notification emails.
 
 Sending must never break the status change itself — failures are logged and
 swallowed. The dev default (console backend) prints emails to the runserver
-terminal; production uses SMTP via the DJANGO_EMAIL_* env vars.
+terminal; production uses the Brevo HTTPS API through Django Anymail.
 """
 import logging
 
-from django.core.mail import send_mail
-from .models import SiteSettings
 from django.conf import settings
+from django.core.mail import send_mail
+
+from .models import SiteSettings
 
 logger = logging.getLogger(__name__)
 
@@ -25,16 +26,41 @@ def _send(to: str, subject: str, body: str) -> bool:
     if not to:
         logger.warning("Skipped email %r because no recipient was supplied", subject)
         return False
-    try:
-        sent = send_mail(subject, body, None, [to], fail_silently=False)
-    except Exception:
-        logger.exception("Could not send email %r to %s", subject, to)
-        return False
-    if sent != 1:
-        logger.error("Email backend accepted %s messages for %r to %s; expected 1", sent, subject, to)
-        return False
-    logger.info("Email accepted by backend: %r to %s", subject, to)
-    return True
+    attempts = getattr(settings, "EMAIL_SEND_ATTEMPTS", 2)
+    for attempt in range(1, attempts + 1):
+        try:
+            sent = send_mail(subject, body, None, [to], fail_silently=False)
+        except Exception as exc:
+            status_code = getattr(getattr(exc, "response", None), "status_code", None)
+            retryable = status_code == 429 or (
+                isinstance(status_code, int) and status_code >= 500
+            )
+            if retryable and attempt < attempts:
+                logger.warning(
+                    "Email provider returned HTTP %s for %r to %s; retrying (%s/%s)",
+                    status_code,
+                    subject,
+                    to,
+                    attempt,
+                    attempts,
+                )
+                continue
+            # Do not retry ambiguous network timeouts: the provider may have
+            # accepted the message before the response was lost, which could
+            # otherwise send customers duplicate confirmations.
+            logger.exception("Could not send email %r to %s", subject, to)
+            return False
+        if sent != 1:
+            logger.error(
+                "Email backend accepted %s messages for %r to %s; expected 1",
+                sent,
+                subject,
+                to,
+            )
+            return False
+        logger.info("Email accepted by backend: %r to %s", subject, to)
+        return True
+    return False
 
 
 def _nice_time(t) -> str:
@@ -45,13 +71,13 @@ def _nice_date(d) -> str:
     return d.strftime("%A %d %B %Y")
 
 
-def booking_status_changed(booking) -> None:
+def booking_status_changed(booking) -> bool:
     s = _info()
     when = f"{_nice_date(booking.date)} at {_nice_time(booking.time)}"
     guests = f"{booking.party_size} {'guest' if booking.party_size == 1 else 'guests'}"
 
     if booking.status == "confirmed":
-        _send(
+        return _send(
             booking.email,
             f"Your table is confirmed — {RESTAURANT} 🥞",
             f"G'day {booking.name},\n\n"
@@ -63,7 +89,7 @@ def booking_status_changed(booking) -> None:
             f"See you soon,\n{RESTAURANT}",
         )
     elif booking.status == "cancelled":
-        _send(
+        return _send(
             booking.email,
             f"About your booking — {RESTAURANT}",
             f"Hi {booking.name},\n\n"
@@ -72,14 +98,15 @@ def booking_status_changed(booking) -> None:
             f"another time that works.\n\n"
             f"Sorry for the trouble,\n{RESTAURANT}",
         )
+    return False
 
 
-def booking_request_received(booking) -> None:
+def booking_request_received(booking) -> bool:
     """Acknowledge a public request without implying that the table is confirmed."""
     s = _info()
     when = f"{_nice_date(booking.date)} at {_nice_time(booking.time)}"
     guests = f"{booking.party_size} {'guest' if booking.party_size == 1 else 'guests'}"
-    _send(
+    return _send(
         booking.email,
         f"We received your booking request — {RESTAURANT} 🥞",
         f"G'day {booking.name},\n\n"
@@ -93,12 +120,12 @@ def booking_request_received(booking) -> None:
     )
 
 
-def order_status_changed(order) -> None:
+def order_status_changed(order) -> bool:
     s = _info()
     items = ", ".join(f"{i.quantity}× {i.menu_item.name}" for i in order.items.all())
 
     if order.status == "received":
-        _send(
+        return _send(
             order.email,
             f"We've got your order — {RESTAURANT} 🥞",
             f"G'day {order.customer_name},\n\n"
@@ -110,7 +137,7 @@ def order_status_changed(order) -> None:
             f"{RESTAURANT} · {s.abn}",
         )
     elif order.status == "ready":
-        _send(
+        return _send(
             order.email,
             f"Your order is ready for pickup — {RESTAURANT} 🥞",
             f"G'day {order.customer_name},\n\n"
@@ -128,7 +155,7 @@ def order_status_changed(order) -> None:
             if order.payment_status == "refunded"
             else ""
         )
-        _send(
+        return _send(
             order.email,
             f"About your order — {RESTAURANT}",
             f"Hi {order.customer_name},\n\n"
@@ -138,15 +165,16 @@ def order_status_changed(order) -> None:
             f"Please call us on {s.phone} if you'd like to sort something out.\n\n"
             f"Apologies,\n{RESTAURANT} · {s.abn}",
         )
+    return False
 
 
-def staff_new_order(order) -> None:
+def staff_new_order(order) -> bool:
     """Heads-up to the restaurant's own inbox — the admin panel chime only helps
     while someone is actually looking at the Orders screen."""
     s = _info()
     items = ", ".join(f"{i.quantity}× {i.menu_item.name}" for i in order.items.all())
     contact = order.phone or order.email or "no contact given"
-    _send(
+    return _send(
         s.email,
         f"New pickup order — {items[:60]}",
         f"New order just came in:\n\n"
@@ -158,11 +186,11 @@ def staff_new_order(order) -> None:
     )
 
 
-def staff_new_booking(booking) -> None:
+def staff_new_booking(booking) -> bool:
     s = _info()
     when = f"{_nice_date(booking.date)} at {_nice_time(booking.time)}"
     contact = booking.phone or booking.email or "no contact given"
-    _send(
+    return _send(
         s.email,
         f"New booking request — {when}",
         f"New table request:\n\n"
@@ -175,10 +203,10 @@ def staff_new_booking(booking) -> None:
     )
 
 
-def club_welcome(member) -> None:
+def club_welcome(member) -> bool:
     """Warm welcome email for new club members."""
     s = _info()
-    _send(
+    return _send(
         member.email,
         f"Welcome to {RESTAURANT} 🥞",
         f"G'day {member.name},\n\n"
@@ -194,10 +222,10 @@ def club_welcome(member) -> None:
     )
 
 
-def club_already_registered(member) -> None:
+def club_already_registered(member) -> bool:
     """Confirm a repeat submission without changing consent or account state."""
     s = _info()
-    _send(
+    return _send(
         member.email,
         f"You're already in the club — {RESTAURANT} 🥞",
         f"G'day {member.name},\n\n"

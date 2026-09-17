@@ -103,10 +103,19 @@ class BookingViewSet(
     throttle_scope = "bookings"
     queryset = Booking.objects.all()
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         booking = serializer.save()
-        emails.booking_request_received(booking)
+        customer_email_accepted = emails.booking_request_received(booking)
         emails.staff_new_booking(booking)
+        data = serializer.data
+        data["email_delivery"] = "accepted" if customer_email_accepted else "failed"
+        return Response(
+            data,
+            status=http_status.HTTP_201_CREATED,
+            headers=self.get_success_headers(data),
+        )
 
 
 def _resolve_frontend_url(request):
@@ -164,7 +173,7 @@ class OrderViewSet(
         )
 
         # Send confirmation & kitchen alert emails immediately
-        emails.order_status_changed(order)
+        customer_email_accepted = emails.order_status_changed(order)
         emails.staff_new_order(order)
 
         # ----------------------------------------------------------------------
@@ -182,6 +191,7 @@ class OrderViewSet(
 
         frontend_url = _resolve_frontend_url(request)
         data = OrderSerializer(order).data
+        data["email_delivery"] = "accepted" if customer_email_accepted else "failed"
         data["checkout_url"] = f"{frontend_url}/order/success?order={order.public_id}"
         return Response(data, status=http_status.HTTP_201_CREATED)
 

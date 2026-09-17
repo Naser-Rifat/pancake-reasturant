@@ -67,6 +67,8 @@ class ClubRegistrationView(APIView):
         serializer = ClubRegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
+        # Keep the honeypot response indistinguishable from a real submission.
+        email_accepted = True
         # Quietly ignore the honeypot. Duplicates get the same response, never
         # reveal a membership record, and cannot overwrite an existing opt-out.
         if not data.get("website"):
@@ -82,11 +84,14 @@ class ClubRegistrationView(APIView):
                 },
             )
             if created:
-                emails.club_welcome(member)
+                email_accepted = emails.club_welcome(member)
             else:
-                emails.club_already_registered(member)
+                email_accepted = emails.club_already_registered(member)
         return Response(
-            {"detail": "Thanks for joining! If your email is already registered, we've kept your existing preferences."},
+            {
+                "detail": "Thanks for joining! If your email is already registered, we've kept your existing preferences.",
+                "email_delivery": "accepted" if email_accepted else "failed",
+            },
             status=status.HTTP_202_ACCEPTED,
         )
 

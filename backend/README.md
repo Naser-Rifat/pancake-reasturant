@@ -90,14 +90,17 @@ setup needed). On Railway, use Brevo's HTTPS API because outbound SMTP is not
 available on Free/Trial/Hobby plans:
 
 ```ini
+DJANGO_EMAIL_PROVIDER=brevo
 BREVO_API_KEY=xkeysib-your-v3-api-key
 DJANGO_FROM_EMAIL="The Pancake Club <hello@thepancakeclub.com.au>"
 ```
 
 The Django Anymail backend sends over HTTPS while preserving the standard
 `send_mail()` interface. Send failures are logged and never block the status
-change itself. SMTP remains an optional fallback on hosts that permit it; see
-`.env.example`.
+change itself. Customer-facing create responses report whether the provider
+accepted the confirmation. Explicit HTTP 429/5xx failures are retried once;
+ambiguous timeouts are not retried to avoid duplicate customer mail. SMTP
+remains an optional fallback on hosts that permit it; see `.env.example`.
 
 ## Tests
 

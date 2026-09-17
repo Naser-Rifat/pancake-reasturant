@@ -247,6 +247,10 @@ export default function CartDrawer({
         ...(coupon ? { coupon_code: coupon.code } : {}),
       });
 
+      if (order.email_delivery === "failed") {
+        sessionStorage.setItem(`order-email-delivery:${order.public_id}`, "failed");
+      }
+
       // Clear cart immediately upon direct order placement
       clear();
       setCouponCode("");

@@ -234,6 +234,8 @@ export interface ApiOrder {
   cancel_reason?: string;
   /** present only in the placeOrder response — where Stripe takes the payment */
   checkout_url?: string;
+  /** Whether the email provider accepted the initial customer confirmation. */
+  email_delivery?: "accepted" | "failed";
 }
 
 export interface ApiBooking {
@@ -243,6 +245,8 @@ export interface ApiBooking {
   time: string;
   party_size: number;
   preselected_dish?: string;
+  /** Whether the email provider accepted the booking acknowledgement. */
+  email_delivery?: "accepted" | "failed";
 }
 
 // ---------- display helpers ----------

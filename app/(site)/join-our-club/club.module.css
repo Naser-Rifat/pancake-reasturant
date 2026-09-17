@@ -720,6 +720,14 @@
   line-height: 1.65;
 }
 
+.success .deliveryWarning {
+  color: #7c2d12;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-radius: 10px;
+  padding: 11px 13px;
+}
+
 .spinner {
   animation: spin 1s linear infinite;
 }

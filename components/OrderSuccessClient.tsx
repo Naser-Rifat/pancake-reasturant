@@ -166,6 +166,7 @@ export default function OrderSuccessClient({
     orderQuery.error instanceof Error ? orderQuery.error.message : "";
   const [copied, setCopied] = useState(false);
   const [manualId, setManualId] = useState("");
+  const [emailDeliveryFailed, setEmailDeliveryFailed] = useState(false);
 
   const venueAddress = site?.address || "133 Ryrie St, Geelong VIC 3220";
   const venuePhone = site?.phone || "0499 123 456";
@@ -177,6 +178,12 @@ export default function OrderSuccessClient({
     clear();
     setCouponCode("");
   }, [clear, setCouponCode]);
+
+  useEffect(() => {
+    if (!publicId) return;
+    const key = `order-email-delivery:${publicId}`;
+    setEmailDeliveryFailed(sessionStorage.getItem(key) === "failed");
+  }, [publicId]);
 
   const times = formatOrderTimes(order?.created_at, site?.order_prep_time);
 
@@ -254,6 +261,12 @@ export default function OrderSuccessClient({
               "Enter your Order ID below to view your real-time status and pickup receipt."
             )}
           </p>
+          {order && emailDeliveryFailed && (
+            <p className="order-email-warning" role="alert">
+              Your order is saved, but we couldn&apos;t send the confirmation email.
+              Keep this page or your order reference, and call us if you need help.
+            </p>
+          )}
         </div>
       </section>
 

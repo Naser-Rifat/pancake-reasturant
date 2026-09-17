@@ -1787,6 +1787,18 @@ footer .logo {
   font-weight: 700;
 }
 
+.order-email-warning {
+  max-width: 660px;
+  margin: 1rem auto 0;
+  padding: 0.8rem 1rem;
+  color: #7c2d12;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
 .order-success-container {
   max-width: 1060px;
   padding-block: 1.5rem 4.5rem;

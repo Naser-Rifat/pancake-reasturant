@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.core.cache import cache
@@ -35,10 +37,19 @@ class ClubTests(TestCase):
         self.assertIsNotNone(member.privacy_accepted_at)
         self.assertNotIn("email", response.data)
         self.assertNotIn("id", response.data)
+        self.assertEqual(response.data["email_delivery"], "accepted")
         # Welcome email is sent for new registrations
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("Welcome", mail.outbox[0].subject)
         self.assertEqual(mail.outbox[0].to, ["alex@example.com"])
+
+    @patch("core.club.emails.club_welcome", return_value=False)
+    def test_registration_reports_welcome_failure_without_losing_member(self, _welcome):
+        response = self.join()
+
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.data["email_delivery"], "failed")
+        self.assertTrue(ClubMember.objects.filter(email="alex@example.com").exists())
 
     def test_explicit_marketing_consent_has_timestamp(self):
         self.assertEqual(self.join(marketing_consent=True).status_code, 202)

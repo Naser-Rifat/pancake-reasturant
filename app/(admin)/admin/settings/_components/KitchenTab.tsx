@@ -1,15 +1,13 @@
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { AlertCircle, Clock, Mail, Send } from "lucide-react";
+import { AlertCircle, Clock } from "lucide-react";
 import { SaveButton } from "@/components/admin/SaveButton";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/components/ui/toast";
-import { sendTestEmail, updateSiteSettings, type AdminSiteSettings } from "@/lib/admin-api";
+import { updateSiteSettings, type AdminSiteSettings } from "@/lib/admin-api";
 import type { RunSave } from "../_lib";
+import { EmailTestPanel } from "./EmailTestPanel";
 
 // Settings · Kitchen tab: online-ordering master toggle, pause notice, email test.
 export function KitchenTab({
@@ -23,31 +21,6 @@ export function KitchenTab({
   busy: string;
   run: RunSave;
 }) {
-  const { toast } = useToast();
-  const testEmail = useMutation({
-    mutationFn: async () => {
-      const response = await sendTestEmail(site.email);
-      if (!response.ok) throw new Error(response.detail);
-      return response;
-    },
-    onSuccess: (res) => {
-      toast({
-        variant: res.detail.includes("NOT") ? "info" : "success",
-        title: res.detail.includes("NOT")
-          ? "Email not configured yet"
-          : `Test email dispatched to ${res.to}`,
-        description: res.detail,
-      });
-    },
-    onError: (error) => {
-      toast({
-        variant: "error",
-        title: "Test email failed",
-        description: error instanceof Error ? error.message : undefined,
-      });
-    },
-  });
-
   return (
     <div className="space-y-6">
       {/* Main Hero Card for Ordering Status */}
@@ -253,39 +226,7 @@ export function KitchenTab({
         </div>
       </div>
 
-      {/* Email Diagnostics Card */}
-      <div className="bg-white p-6 sm:p-7 rounded-xl border border-zinc-200 shadow-sm space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
-          <div className="flex items-center gap-2">
-            <Mail className="h-5 w-5 text-blue-600" />
-            <div>
-              <h4 className="text-sm font-semibold text-[#211a14]">Email delivery</h4>
-              <p className="text-xs text-zinc-500">
-                Send a test email to check that confirmations and staff alerts are being delivered
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg border border-zinc-200 bg-white">
-          <div className="space-y-0.5">
-            <p className="text-xs font-semibold text-[#211a14]">Send a test email</p>
-            <p className="text-xs text-zinc-600">
-              Sends a test message to <strong>{site.email || "the configured staff inbox"}</strong>
-            </p>
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
-            className="font-bold text-xs border-zinc-300 text-[#763a12] bg-white hover:bg-zinc-50 rounded-xl shrink-0"
-            loading={testEmail.isPending}
-            disabled={testEmail.isPending}
-            onClick={() => testEmail.mutate()}
-          >
-            <Send className="h-3.5 w-3.5 mr-1.5" /> Send Test Email
-          </Button>
-        </div>
-      </div>
+      <EmailTestPanel defaultRecipient={site.email} />
     </div>
   );
 }

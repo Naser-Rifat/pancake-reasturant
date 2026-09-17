@@ -162,25 +162,39 @@ REST_FRAMEWORK = {
 
 # ---------- email ----------
 EMAIL_TIMEOUT = int(os.environ.get("DJANGO_EMAIL_TIMEOUT", "10"))
+EMAIL_SEND_ATTEMPTS = max(1, min(int(os.environ.get("DJANGO_EMAIL_SEND_ATTEMPTS", "2")), 3))
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "").strip()
+EMAIL_PROVIDER = os.environ.get("DJANGO_EMAIL_PROVIDER", "auto").strip().lower()
 
-# Railway blocks outbound SMTP on non-Pro plans. Prefer Brevo's HTTPS API
-# whenever its API key is configured, even if legacy SMTP variables are still
-# present in the environment. Local development falls back to the console.
-EMAIL_BACKEND = (
-    "anymail.backends.brevo.EmailBackend"
-    if BREVO_API_KEY
-    else os.environ.get(
-        "DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+# An explicit provider prevents a staging/test environment that happens to
+# inherit BREVO_API_KEY from unexpectedly sending real email. `auto` preserves
+# backwards compatibility: a legacy backend wins, then Brevo, then console.
+if EMAIL_PROVIDER == "brevo":
+    if not BREVO_API_KEY:
+        raise ImproperlyConfigured(
+            "BREVO_API_KEY is required when DJANGO_EMAIL_PROVIDER=brevo."
+        )
+    EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
+elif EMAIL_PROVIDER == "smtp":
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+elif EMAIL_PROVIDER == "console":
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+elif EMAIL_PROVIDER == "auto":
+    EMAIL_BACKEND = os.environ.get("DJANGO_EMAIL_BACKEND", "").strip() or (
+        "anymail.backends.brevo.EmailBackend"
+        if BREVO_API_KEY
+        else "django.core.mail.backends.console.EmailBackend"
     )
-)
+else:
+    raise ImproperlyConfigured(
+        "DJANGO_EMAIL_PROVIDER must be one of: auto, brevo, smtp, console."
+    )
 ANYMAIL = {
     "BREVO_API_KEY": BREVO_API_KEY,
     "REQUESTS_TIMEOUT": EMAIL_TIMEOUT,
 }
 
-# Kept as an optional fallback for deployments that deliberately use SMTP and
-# do not configure BREVO_API_KEY.
+# Optional fallback for deployments that deliberately select SMTP.
 EMAIL_HOST = os.environ.get("DJANGO_EMAIL_HOST", "")
 EMAIL_PORT = int(os.environ.get("DJANGO_EMAIL_PORT", "587"))
 EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_USER", "")

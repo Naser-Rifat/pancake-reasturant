@@ -1,45 +1,37 @@
 import hashlib
 import hmac
 import json
+import os
 import time
-from datetime import timedelta
+from datetime import time as datetime_time, timedelta
 from decimal import Decimal
-from unittest.mock import patch
-from django.core.cache import cache
-from django.contrib.auth.models import User
-from django.contrib.auth.models import User
-from django.contrib.auth.models import User
-from django.contrib.auth.models import User
-from .models import Category, MenuItem
-from .models import Category, MenuItem
+from io import BytesIO
+from unittest.mock import Mock, patch
 
 from django.contrib.auth.models import User
-from rest_framework.test import APIClient
-import os
-from io import BytesIO
-from unittest import skipUnless 
-from django.core import mail
-from django.contrib.auth.models import User
-from core.models import Certification
-from django.core import mail
 from django.core import mail
 from django.core.cache import cache
-from django.core import mail
-from core.models import Booking
+from django.core.mail import send_mail as django_send_mail
 from django.test import TestCase, override_settings
 from django.utils import timezone
-from rest_framework.test import APIClient
 from PIL import Image
+from rest_framework.test import APIClient
 
-from django.core.cache import cache
-from .emails import send_test
-from django.contrib.auth.models import User
-from django.core import mail
-from .models import Booking, Coupon, MenuItem, Order, Review
-from django.core import mail
-from django.contrib.auth.models import User
-from datetime import time
-from core.models import Announcement, GalleryPhoto, HomeStep, OpeningHours
+from .emails import _send, send_test
+from .models import (
+    Announcement,
+    Booking,
+    Category,
+    Certification,
+    Coupon,
+    GalleryPhoto,
+    HomeStep,
+    MenuItem,
+    OpeningHours,
+    Order,
+    Review,
+)
+
 # Orders currently use the pay-at-counter flow. Stripe helpers remain below so
 # webhook/refund behaviour can still be covered without touching the network.
 
@@ -118,6 +110,35 @@ class MenuApiTests(TestCase):
 
 
 class EmailDeliveryTests(TestCase):
+    @override_settings(
+        EMAIL_BACKEND="anymail.backends.brevo.EmailBackend",
+        ANYMAIL={"BREVO_API_KEY": "test-api-key", "REQUESTS_TIMEOUT": 7},
+        DEFAULT_FROM_EMAIL="The Pancake Club <hello@thepancakeclub.com.au>",
+    )
+    @patch("requests.Session.request")
+    def test_brevo_backend_builds_the_expected_https_request(self, request_mock):
+        response = Mock(status_code=201, content=b'{"messageId":"test-message"}')
+        response.json.return_value = {"messageId": "test-message"}
+        request_mock.return_value = response
+
+        sent = django_send_mail(
+            "Order received",
+            "Your order is in the kitchen.",
+            None,
+            ["customer@example.com"],
+            fail_silently=False,
+        )
+
+        self.assertEqual(sent, 1)
+        request = request_mock.call_args.kwargs
+        self.assertEqual(request["method"], "POST")
+        self.assertEqual(request["url"], "https://api.brevo.com/v3/smtp/email")
+        self.assertEqual(request["headers"]["api-key"], "test-api-key")
+        self.assertEqual(request["timeout"], 7)
+        payload = json.loads(request["data"])
+        self.assertEqual(payload["to"], [{"email": "customer@example.com"}])
+        self.assertEqual(payload["subject"], "Order received")
+
     @override_settings(EMAIL_BACKEND="anymail.backends.brevo.EmailBackend")
     @patch("core.emails.send_mail", return_value=1)
     def test_test_email_reports_brevo_api_acceptance(self, send_mail_mock):
@@ -130,19 +151,31 @@ class EmailDeliveryTests(TestCase):
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.console.EmailBackend")
     @patch("core.emails.send_mail", return_value=1)
     def test_console_backend_never_claims_real_delivery(self, _send_mail_mock):
-        from .emails import send_test
-
         ok, detail = send_test("customer@example.com")
         self.assertFalse(ok)
         self.assertIn("console only", detail)
 
     @patch("core.emails.send_mail", side_effect=TimeoutError("timed out"))
     def test_test_email_surfaces_provider_failure(self, _send_mail_mock):
-        from .emails import send_test
-
         ok, detail = send_test("customer@example.com")
         self.assertFalse(ok)
         self.assertEqual(detail, "Send failed: timed out")
+
+    @override_settings(EMAIL_SEND_ATTEMPTS=2)
+    @patch("core.emails.send_mail")
+    def test_transactional_email_retries_a_definitive_provider_5xx(self, send_mail_mock):
+        provider_error = RuntimeError("provider unavailable")
+        provider_error.response = Mock(status_code=503)
+        send_mail_mock.side_effect = [provider_error, 1]
+
+        self.assertTrue(_send("customer@example.com", "Order received", "Saved"))
+        self.assertEqual(send_mail_mock.call_count, 2)
+
+    @override_settings(EMAIL_SEND_ATTEMPTS=2)
+    @patch("core.emails.send_mail", side_effect=TimeoutError("timed out"))
+    def test_transactional_email_does_not_retry_an_ambiguous_timeout(self, send_mail_mock):
+        self.assertFalse(_send("customer@example.com", "Order received", "Saved"))
+        send_mail_mock.assert_called_once()
 
 
 class OrderApiTests(TestCase):
@@ -169,10 +202,28 @@ class OrderApiTests(TestCase):
         # pay-at-counter: the kitchen receives the order immediately
         self.assertEqual(body["status"], "received")
         self.assertEqual(body["payment_status"], "unpaid")
+        self.assertEqual(body["email_delivery"], "accepted")
         self.assertTrue(body["checkout_url"])
         # order is retrievable by public id
         res2 = self.client.get(f"/api/orders/{body['public_id']}/")
         self.assertEqual(res2.status_code, 200)
+
+    @patch("core.views.emails.staff_new_order", return_value=True)
+    @patch("core.views.emails.order_status_changed", return_value=False)
+    def test_create_order_reports_confirmation_failure_without_losing_order(
+        self, _customer_email, _staff_email
+    ):
+        response = place_order(
+            self.client,
+            {
+                "customer_name": "Alex",
+                "items": [{"slug": "berry", "quantity": 1}],
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json()["email_delivery"], "failed")
+        self.assertTrue(Order.objects.filter(public_id=response.json()["public_id"]).exists())
 
     def test_order_requires_a_contact_phone(self):
         res = self.client.post(
@@ -214,8 +265,6 @@ class OrderApiTests(TestCase):
         self.assertIn("email", invalid.json())
 
     def test_order_placement_sends_confirmation_with_abn(self):
-        from django.core import mail
-
         res = place_order(
             self.client,
             {
@@ -236,8 +285,6 @@ class OrderApiTests(TestCase):
         self.assertIn("New pickup order", staff_mail.subject)
 
     def test_cancel_with_reason_emails_customer(self):
-        
-
         order = place_order(
             self.client,
             {
@@ -321,7 +368,6 @@ class BookingApiTests(TestCase):
         self.assertEqual(res.status_code, 400)
 
     def test_creates_pending_booking(self):
-
         tomorrow = timezone.localdate() + timedelta(days=1)
         res = self.client.post(
             "/api/bookings/",
@@ -333,6 +379,7 @@ class BookingApiTests(TestCase):
         )
         self.assertEqual(res.status_code, 201, res.content)
         self.assertEqual(res.json()["status"], "pending")
+        self.assertEqual(res.json()["email_delivery"], "accepted")
         public_id = res.json()["public_id"]
         detail = self.client.get(f"/api/bookings/{public_id}/")
         self.assertEqual(detail.status_code, 200)
@@ -344,6 +391,28 @@ class BookingApiTests(TestCase):
         customer_mail = next(message for message in mail.outbox if message.to == ["a@b.co"])
         self.assertIn("received your booking request", customer_mail.subject.lower())
         self.assertIn("not confirmed", customer_mail.body.lower())
+
+    @patch("core.views.emails.staff_new_booking", return_value=True)
+    @patch("core.views.emails.booking_request_received", return_value=False)
+    def test_create_booking_reports_confirmation_failure_without_losing_booking(
+        self, _customer_email, _staff_email
+    ):
+        tomorrow = timezone.localdate() + timedelta(days=1)
+        response = self.client.post(
+            "/api/bookings/",
+            {
+                "name": "Alex",
+                "email": "a@b.co",
+                "date": str(tomorrow),
+                "time": "18:00",
+                "party_size": 4,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json()["email_delivery"], "failed")
+        self.assertTrue(Booking.objects.filter(public_id=response.json()["public_id"]).exists())
 
 
 class AdminApiTests(TestCase):
@@ -563,7 +632,7 @@ class SiteContentApiTests(TestCase):
         self.assertEqual([c["title"] for c in certs], ["Shown"])
 
     def test_public_content_endpoints_filter_and_order_live_content(self):
-       
+
 
         GalleryPhoto.objects.create(
             album="food", caption="Stack", image="/stack.jpg", alt="Pancake stack", sort_order=2
@@ -572,7 +641,7 @@ class SiteContentApiTests(TestCase):
             album="interior", caption="Room", image="/room.jpg", alt="Dining room", sort_order=1
         )
         OpeningHours.objects.create(
-            label="Monday", opens=time(8, 0), closes=time(17, 0), sort_order=1
+            label="Monday", opens=datetime_time(8, 0), closes=datetime_time(17, 0), sort_order=1
         )
         HomeStep.objects.create(
             label="Step 1", title="Choose", text="Pick a stack", image="/step.jpg", sort_order=1
@@ -602,7 +671,7 @@ class SiteContentApiTests(TestCase):
         self.assertEqual([campaign["message"] for campaign in campaigns.json()], ["Slider deal"])
 
     def test_admin_settings_patch_requires_staff_and_flows_into_emails(self):
-   
+
 
         # anonymous PATCH rejected
         self.assertEqual(
@@ -948,7 +1017,7 @@ class CouponTests(TestCase):
 
 class CategoryTests(TestCase):
     def setUp(self):
-       
+
 
         self.client = APIClient()
         self.staff_user = User.objects.create_user("staff", password="password123", is_staff=True)

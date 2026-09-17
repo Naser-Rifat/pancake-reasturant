@@ -23,7 +23,12 @@ const NAME_LETTERS_REGEX = /[a-zA-Z\u00C0-\u017F]/;
 
 type JoinError = Error & { fieldErrors?: Partial<Record<Field, string>> };
 
-async function joinClub(values: FormState) {
+interface ClubJoinResponse {
+  detail: string;
+  email_delivery?: "accepted" | "failed";
+}
+
+async function joinClub(values: FormState): Promise<ClubJoinResponse> {
   const res = await fetchWithTimeout(`${API_URL}/club/join/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -56,6 +61,7 @@ async function joinClub(values: FormState) {
 
 export default function ClubRegistrationForm({ contactEmail }: { contactEmail: string }) {
   const [success, setSuccess] = useState(false);
+  const [emailDeliveryFailed, setEmailDeliveryFailed] = useState(false);
   const [error, setError] = useState("");
 
   const [formValues, setFormValues] = useState<FormState>({
@@ -186,7 +192,8 @@ export default function ClubRegistrationForm({ contactEmail }: { contactEmail: s
     setError("");
 
     try {
-      await joinMutation.mutateAsync(formValues);
+      const result = await joinMutation.mutateAsync(formValues);
+      setEmailDeliveryFailed(result.email_delivery === "failed");
       setSuccess(true);
     } catch (e) {
       const serverErrors = (e as JoinError).fieldErrors;
@@ -213,9 +220,16 @@ export default function ClubRegistrationForm({ contactEmail }: { contactEmail: s
         </span>
         <h3>Thanks for joining!</h3>
         <p>There’s always room for another pancake person.</p>
-        <p>
-          We’ve sent an update to <strong>{formValues.email}</strong>. New members receive a welcome; existing members keep their saved preferences unchanged.
-        </p>
+        {emailDeliveryFailed ? (
+          <p className={styles.deliveryWarning} role="alert">
+            Your membership is saved, but we couldn&apos;t send the email update to{" "}
+            <strong>{formValues.email}</strong>. You do not need to submit the form again.
+          </p>
+        ) : (
+          <p>
+            We’ve sent an update to <strong>{formValues.email}</strong>. New members receive a welcome; existing members keep their saved preferences unchanged.
+          </p>
+        )}
         <p>
           To change them or leave the club anytime, <a href={`mailto:${contactEmail}`}>get in touch</a>.
         </p>

@@ -12,6 +12,7 @@ test("booking submission exposes pending state and renders the API result", asyn
         time: request.time,
         party_size: request.party_size,
         status: "pending",
+        email_delivery: "failed",
       },
     });
   });
@@ -26,6 +27,7 @@ test("booking submission exposes pending state and renders the API result", asyn
   const pending = page.getByRole("button", { name: "Sending…" });
   await expect(pending).toBeDisabled();
   await expect(page.getByText("Request received, Alex!")).toBeVisible();
+  await expect(page.getByText(/request is saved, but we couldn't send/i)).toBeVisible();
 });
 
 test("order checkout requires an email and sends it to the API", async ({ page }) => {
@@ -43,9 +45,26 @@ test("order checkout requires an email and sends it to the API", async ({ page }
         total: "17.00",
         items: [],
         checkout_url: "",
+        email_delivery: "failed",
       },
     });
   });
+  await page.route("**/api/orders/order-email-e2e/", (route) =>
+    route.fulfill({
+      status: 200,
+      json: {
+        public_id: "order-email-e2e",
+        customer_name: "Alex Guest",
+        status: "received",
+        payment_status: "unpaid",
+        subtotal: "17.00",
+        coupon_code: "",
+        discount_amount: "0.00",
+        total: "17.00",
+        items: [],
+      },
+    }),
+  );
 
   await page.goto("/menu");
   const firstDishHref = await page.locator(".diner-dish-row .dc-details").first().getAttribute("href");
@@ -70,6 +89,7 @@ test("order checkout requires an email and sends it to the API", async ({ page }
     email: "alex@example.com",
     phone: "0412 345 678",
   });
+  await expect(page.getByText(/order is saved, but we couldn't send/i)).toBeVisible();
 });
 
 test("review submission surfaces an API validation error", async ({ page }) => {
