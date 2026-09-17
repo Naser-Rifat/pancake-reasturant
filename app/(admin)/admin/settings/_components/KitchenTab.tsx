@@ -26,7 +26,7 @@ export function KitchenTab({
   const { toast } = useToast();
   const testEmail = useMutation({
     mutationFn: async () => {
-      const response = await sendTestEmail();
+      const response = await sendTestEmail(site.email);
       if (!response.ok) throw new Error(response.detail);
       return response;
     },

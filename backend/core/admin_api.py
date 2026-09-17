@@ -526,16 +526,17 @@ class AdminOpeningHoursViewSet(viewsets.ModelViewSet):
 
 
 class AdminTestEmailView(APIView):
-    """POST → send one test email to the restaurant's own address."""
+    """POST → send one test email to an explicit or configured address."""
 
     permission_classes = [IsAdminUser]
 
     def post(self, request):
-        from . import emails
-
         site = SiteSettings.load()
-        ok, detail = emails.send_test(site.email)
-        return Response({"ok": ok, "detail": detail, "to": site.email})
+        recipient = serializers.EmailField().run_validation(
+            request.data.get("to") or site.email
+        )
+        ok, detail = emails.send_test(recipient)
+        return Response({"ok": ok, "detail": detail, "to": recipient})
 
 
 class AdminSiteSettingsView(APIView):

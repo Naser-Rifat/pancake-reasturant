@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
+    "anymail",
     # local
     "core",
 ]
@@ -160,16 +161,31 @@ REST_FRAMEWORK = {
 }
 
 # ---------- email ----------
-EMAIL_BACKEND = os.environ.get(
-    "DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+EMAIL_TIMEOUT = int(os.environ.get("DJANGO_EMAIL_TIMEOUT", "10"))
+BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "").strip()
+
+# Railway blocks outbound SMTP on non-Pro plans. Prefer Brevo's HTTPS API
+# whenever its API key is configured, even if legacy SMTP variables are still
+# present in the environment. Local development falls back to the console.
+EMAIL_BACKEND = (
+    "anymail.backends.brevo.EmailBackend"
+    if BREVO_API_KEY
+    else os.environ.get(
+        "DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+    )
 )
+ANYMAIL = {
+    "BREVO_API_KEY": BREVO_API_KEY,
+    "REQUESTS_TIMEOUT": EMAIL_TIMEOUT,
+}
+
+# Kept as an optional fallback for deployments that deliberately use SMTP and
+# do not configure BREVO_API_KEY.
 EMAIL_HOST = os.environ.get("DJANGO_EMAIL_HOST", "")
 EMAIL_PORT = int(os.environ.get("DJANGO_EMAIL_PORT", "587"))
 EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_PASSWORD", "")
 EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_TLS", "1") == "1"
-# a slow SMTP server must never hang an order/booking request
-EMAIL_TIMEOUT = int(os.environ.get("DJANGO_EMAIL_TIMEOUT", "10"))
 DEFAULT_FROM_EMAIL = os.environ.get(
     "DJANGO_FROM_EMAIL", "The Pancake Club <hello@thepancakeclub.com.au>"
 )

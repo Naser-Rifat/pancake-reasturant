@@ -59,8 +59,8 @@ Everything editable lives in the admin panel: menu (CRUD + featured/availability
 orders (live alerts, status flow, cancel-with-reason), bookings (confirm/decline,
 phone bookings), review moderation, gallery, certifications, announcement bar,
 hero/about copy, contact details, opening hours, timezone. Customer emails
-(order/booking lifecycle) send automatically — console backend in dev, SMTP via
-env in production.
+(order/booking lifecycle) send automatically — console backend in development,
+Brevo's HTTPS API in production.
 
 ## Maintenance mode
 
@@ -85,5 +85,5 @@ when whatever caused the maintenance is broken.
 ## Deploying
 
 Frontend → Vercel; backend + Postgres → Railway/Render. Set the env vars listed
-in `backend/README.md` (secret key, hosts, CORS, SMTP) and `NEXT_PUBLIC_API_URL`
+in `backend/README.md` (secret key, hosts, CORS, Brevo API) and `NEXT_PUBLIC_API_URL`
 on the frontend. Change the default admin password before launch.

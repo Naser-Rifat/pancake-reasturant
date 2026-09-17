@@ -8,6 +8,7 @@ import logging
 
 from django.core.mail import send_mail
 from .models import SiteSettings
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -211,10 +212,8 @@ def club_already_registered(member) -> None:
 def send_test(to: str) -> tuple[bool, str]:
     """One verification email for the admin panel's "send test" button.
     Unlike the notification senders this surfaces the error, because its whole
-    job is telling staff whether the SMTP env vars actually work."""
-    from django.conf import settings
+    job is telling staff whether the configured delivery backend works."""
 
-    # the module path says which backend it is; the class name is always "EmailBackend"
     backend = settings.EMAIL_BACKEND
     try:
         send_mail(
@@ -228,9 +227,13 @@ def send_test(to: str) -> tuple[bool, str]:
         )
     except Exception as exc:  # noqa: BLE001 — the message IS the product here
         return False, f"Send failed: {exc}"
-    if "smtp" not in backend.lower():
-        return True, (
-            "Sent — but to the server console only. DJANGO_EMAIL_* environment "
-            "variables are not set, so real emails are NOT being delivered."
+    if "console" in backend.lower():
+        return False, (
+            "Printed to the server console only. Configure BREVO_API_KEY for "
+            "real email delivery."
         )
-    return True, f"Sent via SMTP to {to}. Check the inbox (and spam folder)."
+    if "brevo" in backend.lower():
+        return True, f"Accepted by Brevo API for {to}. Check the inbox and spam folder."
+    if "smtp" in backend.lower():
+        return True, f"Accepted by SMTP for {to}. Check the inbox and spam folder."
+    return True, f"Accepted by the email backend for {to}. Check the inbox and spam folder."

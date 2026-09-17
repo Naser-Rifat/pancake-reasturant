@@ -32,7 +32,7 @@ export function ContactTab({
   const { toast } = useToast();
   const testEmail = useMutation({
     mutationFn: async () => {
-      const response = await sendTestEmail();
+      const response = await sendTestEmail(site.email);
       if (!response.ok) throw new Error(response.detail);
       return response;
     },
@@ -139,10 +139,10 @@ export function ContactTab({
             <div className="space-y-1 sm:col-span-2 lg:col-span-3 p-3.5 rounded-xl border border-amber-200/80 bg-amber-50/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-0.5">
                 <p className="text-xs font-bold text-[#763a12] flex items-center gap-1.5">
-                  <Mail className="h-3.5 w-3.5" /> Test SMTP Email Delivery
+                  <Mail className="h-3.5 w-3.5" /> Test Email Delivery
                 </p>
                 <p className="text-[11px] text-zinc-600">
-                  Sends a live test message to <strong>{site.email || "the email above"}</strong> to verify Brevo SMTP credentials and delivery.
+                  Sends a live test message to <strong>{site.email || "the email above"}</strong> through the Brevo HTTPS API. You can type another working inbox above before testing.
                 </p>
               </div>
               <Button

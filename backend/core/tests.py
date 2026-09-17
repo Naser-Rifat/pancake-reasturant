@@ -5,13 +5,41 @@ import time
 from datetime import timedelta
 from decimal import Decimal
 from unittest.mock import patch
+from django.core.cache import cache
+from django.contrib.auth.models import User
+from django.contrib.auth.models import User
+from django.contrib.auth.models import User
+from django.contrib.auth.models import User
+from .models import Category, MenuItem
+from .models import Category, MenuItem
 
+from django.contrib.auth.models import User
+from rest_framework.test import APIClient
+import os
+from io import BytesIO
+from unittest import skipUnless 
+from django.core import mail
+from django.contrib.auth.models import User
+from core.models import Certification
+from django.core import mail
+from django.core import mail
+from django.core.cache import cache
+from django.core import mail
+from core.models import Booking
 from django.test import TestCase, override_settings
 from django.utils import timezone
 from rest_framework.test import APIClient
+from PIL import Image
 
+from django.core.cache import cache
+from .emails import send_test
+from django.contrib.auth.models import User
+from django.core import mail
 from .models import Booking, Coupon, MenuItem, Order, Review
-
+from django.core import mail
+from django.contrib.auth.models import User
+from datetime import time
+from core.models import Announcement, GalleryPhoto, HomeStep, OpeningHours
 # Orders currently use the pay-at-counter flow. Stripe helpers remain below so
 # webhook/refund behaviour can still be covered without touching the network.
 
@@ -87,6 +115,34 @@ class MenuApiTests(TestCase):
         make_item("choc")
         res = self.client.get("/api/menu/?featured=1")
         self.assertEqual([i["slug"] for i in res.json()], ["berry"])
+
+
+class EmailDeliveryTests(TestCase):
+    @override_settings(EMAIL_BACKEND="anymail.backends.brevo.EmailBackend")
+    @patch("core.emails.send_mail", return_value=1)
+    def test_test_email_reports_brevo_api_acceptance(self, send_mail_mock):
+
+        ok, detail = send_test("customer@example.com")
+        self.assertTrue(ok)
+        self.assertIn("Accepted by Brevo API", detail)
+        send_mail_mock.assert_called_once()
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.console.EmailBackend")
+    @patch("core.emails.send_mail", return_value=1)
+    def test_console_backend_never_claims_real_delivery(self, _send_mail_mock):
+        from .emails import send_test
+
+        ok, detail = send_test("customer@example.com")
+        self.assertFalse(ok)
+        self.assertIn("console only", detail)
+
+    @patch("core.emails.send_mail", side_effect=TimeoutError("timed out"))
+    def test_test_email_surfaces_provider_failure(self, _send_mail_mock):
+        from .emails import send_test
+
+        ok, detail = send_test("customer@example.com")
+        self.assertFalse(ok)
+        self.assertEqual(detail, "Send failed: timed out")
 
 
 class OrderApiTests(TestCase):
@@ -180,8 +236,7 @@ class OrderApiTests(TestCase):
         self.assertIn("New pickup order", staff_mail.subject)
 
     def test_cancel_with_reason_emails_customer(self):
-        from django.contrib.auth.models import User
-        from django.core import mail
+        
 
         order = place_order(
             self.client,
@@ -266,7 +321,6 @@ class BookingApiTests(TestCase):
         self.assertEqual(res.status_code, 400)
 
     def test_creates_pending_booking(self):
-        from django.core import mail
 
         tomorrow = timezone.localdate() + timedelta(days=1)
         res = self.client.post(
@@ -294,7 +348,6 @@ class BookingApiTests(TestCase):
 
 class AdminApiTests(TestCase):
     def setUp(self):
-        from django.contrib.auth.models import User
 
         self.client = APIClient()
         self.staff = User.objects.create_user("boss", password="pw", is_staff=True)
@@ -317,8 +370,27 @@ class AdminApiTests(TestCase):
         self.assertEqual(self.client.post("/api/admin/logout/").status_code, 204)
         self.assertEqual(self.client.get("/api/admin/stats/").status_code, 401)
 
+    @patch("core.admin_api.emails.send_test", return_value=(True, "Accepted by Brevo API"))
+    def test_staff_can_send_test_email_to_an_explicit_valid_address(self, send_test_mock):
+        token = self.login("boss").json()["token"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
+        response = self.client.post(
+            "/api/admin/test-email/", {"to": "owner@example.com"}, format="json"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["ok"])
+        self.assertEqual(response.json()["to"], "owner@example.com")
+        send_test_mock.assert_called_once_with("owner@example.com")
+
+    def test_test_email_rejects_an_invalid_recipient(self):
+        token = self.login("boss").json()["token"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
+        response = self.client.post(
+            "/api/admin/test-email/", {"to": "not-an-email"}, format="json"
+        )
+        self.assertEqual(response.status_code, 400)
+
     def test_login_is_throttled_against_brute_force(self):
-        from django.core.cache import cache
 
         cache.clear()  # isolate the throttle bucket from other tests
         self.addCleanup(cache.clear)
@@ -352,7 +424,6 @@ class AdminApiTests(TestCase):
         self.assertEqual(res.json()["status"], "preparing")
 
     def test_confirming_booking_emails_the_customer(self):
-        from django.core import mail
 
         booking = Booking.objects.create(
             name="Sam", email="sam@example.com", date="2030-01-15",
@@ -374,7 +445,6 @@ class AdminApiTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_order_ready_emails_customer_when_email_given(self):
-        from django.core import mail
 
         order = place_order(
             self.client,
@@ -396,7 +466,6 @@ class AdminApiTests(TestCase):
         self.assertIn("ready", mail.outbox[0].subject.lower())
 
     def test_phone_booking_with_email_sends_confirmation(self):
-        from django.core import mail
 
         token = self.login("boss").json()["token"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
@@ -474,7 +543,6 @@ class AdminApiTests(TestCase):
 
 class SiteContentApiTests(TestCase):
     def setUp(self):
-        from django.contrib.auth.models import User
 
         self.client = APIClient()
         User.objects.create_user("boss", password="pw", is_staff=True)
@@ -486,7 +554,6 @@ class SiteContentApiTests(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
 
     def test_public_site_settings_and_certifications(self):
-        from core.models import Certification
 
         Certification.objects.create(title="Shown", icon="⭐")
         Certification.objects.create(title="Hidden", icon="⭐", is_active=False)
@@ -496,8 +563,7 @@ class SiteContentApiTests(TestCase):
         self.assertEqual([c["title"] for c in certs], ["Shown"])
 
     def test_public_content_endpoints_filter_and_order_live_content(self):
-        from datetime import time
-        from core.models import Announcement, GalleryPhoto, HomeStep, OpeningHours
+       
 
         GalleryPhoto.objects.create(
             album="food", caption="Stack", image="/stack.jpg", alt="Pancake stack", sort_order=2
@@ -536,8 +602,7 @@ class SiteContentApiTests(TestCase):
         self.assertEqual([campaign["message"] for campaign in campaigns.json()], ["Slider deal"])
 
     def test_admin_settings_patch_requires_staff_and_flows_into_emails(self):
-        from django.core import mail
-        from core.models import Booking
+   
 
         # anonymous PATCH rejected
         self.assertEqual(
@@ -566,7 +631,6 @@ class SiteContentApiTests(TestCase):
         self.assertEqual(res.status_code, 200)
         # the public endpoint is behind a 30s shared cache now — drop it so the
         # roundtrip reads the fresh value (in production the delay is intended)
-        from django.core.cache import cache
 
         cache.clear()
         self.assertEqual(self.client.get("/api/site/").json()["theme"], "berry")
@@ -575,9 +639,7 @@ class SiteContentApiTests(TestCase):
         self.assertEqual(res.status_code, 400)
 
     def test_remove_bg_requires_staff_and_returns_png(self):
-        import os
-        from io import BytesIO
-        from unittest import skipUnless  # noqa: F401  (env-gated below)
+        # noqa: F401  (env-gated below)
 
         # anonymous is rejected outright
         res = self.client.post("/api/admin/remove-bg/")
@@ -586,7 +648,6 @@ class SiteContentApiTests(TestCase):
         if not os.environ.get("RUN_REMBG_TESTS"):
             return  # inference test is opt-in: the model is a 179 MB download
 
-        from PIL import Image
 
         buf = BytesIO()
         Image.new("RGB", (64, 64), (200, 40, 40)).save(buf, format="PNG")
@@ -660,7 +721,6 @@ class CouponTests(TestCase):
     def setUp(self):
         # DRF keeps throttle counters in the cache, which outlives a test case —
         # without this the suite throttles itself and fails by running order
-        from django.core.cache import cache
 
         cache.clear()
         self.client = APIClient()
@@ -793,7 +853,6 @@ class CouponTests(TestCase):
 
     def test_staff_cancelling_an_unpaid_order_releases_the_code(self):
         """Cancelling a direct unpaid order releases its reserved coupon."""
-        from django.contrib.auth.models import User
 
         coupon = Coupon.objects.create(
             code="LIMIT", kind="fixed", value=Decimal("5"), usage_limit=1
@@ -818,7 +877,6 @@ class CouponTests(TestCase):
     # ---------- the sales record is not editable ----------
 
     def test_staff_cannot_rewrite_the_money_on_an_order(self):
-        from django.contrib.auth.models import User
 
         Coupon.objects.create(code="PC20", kind="percent", value=Decimal("20"))
         order = place_order(
@@ -843,7 +901,6 @@ class CouponTests(TestCase):
     def test_redeemed_coupon_cannot_be_deleted_but_unused_can(self):
         """PROTECT is right — a redeemed code is part of the sales record — but
         the panel used to get a 500 instead of a sentence it could show."""
-        from django.contrib.auth.models import User
 
         used = Coupon.objects.create(code="PC20", kind="percent", value=Decimal("20"))
         spare = Coupon.objects.create(code="SPARE", kind="fixed", value=Decimal("2"))
@@ -865,7 +922,6 @@ class CouponTests(TestCase):
         )
 
     def test_admin_rejects_a_percent_over_100_and_a_backwards_date_window(self):
-        from django.contrib.auth.models import User
 
         User.objects.create_user("chef", password="pw", is_staff=True)
         token = self.client.post(
@@ -892,8 +948,7 @@ class CouponTests(TestCase):
 
 class CategoryTests(TestCase):
     def setUp(self):
-        from django.contrib.auth.models import User
-        from rest_framework.test import APIClient
+       
 
         self.client = APIClient()
         self.staff_user = User.objects.create_user("staff", password="password123", is_staff=True)
@@ -903,7 +958,6 @@ class CategoryTests(TestCase):
         self.token = login_res.json()["token"]
 
     def test_public_categories_list_and_dish_count(self):
-        from .models import Category, MenuItem
 
         cat = Category.objects.create(name="Beverages", slug="beverages", icon="☕", sort_order=10)
         MenuItem.objects.create(
@@ -924,7 +978,6 @@ class CategoryTests(TestCase):
         self.assertEqual(bev["icon"], "☕")
 
     def test_admin_category_crud_and_delete_protection(self):
-        from .models import Category, MenuItem
 
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token}")
 

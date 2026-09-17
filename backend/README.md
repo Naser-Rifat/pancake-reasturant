@@ -84,20 +84,20 @@ reviews 5/h, staff login 20/h).
 
 ## Customer emails
 
-Changing a booking to **confirmed/cancelled**, or an order to **ready/cancelled**,
-automatically emails the customer. In development the email is printed to the
-`runserver` console (no setup needed). For production, set:
+Booking requests and order/club lifecycle events automatically email the
+customer. In development the email is printed to the `runserver` console (no
+setup needed). On Railway, use Brevo's HTTPS API because outbound SMTP is not
+available on Free/Trial/Hobby plans:
 
 ```ini
-DJANGO_EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-DJANGO_EMAIL_HOST=smtp.gmail.com        # or Resend/Brevo SMTP host
-DJANGO_EMAIL_PORT=587
-DJANGO_EMAIL_USER=you@gmail.com
-DJANGO_EMAIL_PASSWORD=your-app-password
-DJANGO_FROM_EMAIL="KRUSH Pancakes <hello@krushpancakes.com.au>"
+BREVO_API_KEY=xkeysib-your-v3-api-key
+DJANGO_FROM_EMAIL="The Pancake Club <hello@thepancakeclub.com.au>"
 ```
 
-Send failures are logged and never block the status change itself.
+The Django Anymail backend sends over HTTPS while preserving the standard
+`send_mail()` interface. Send failures are logged and never block the status
+change itself. SMTP remains an optional fallback on hosts that permit it; see
+`.env.example`.
 
 ## Tests
 

@@ -526,8 +526,11 @@ export const updateHomeStep = (id: number, d: Partial<AdminHomeStep>) =>
 export const deleteHomeStep = (id: number) =>
   adminFetch<void>(`/home-steps/${id}/`, { method: "DELETE" });
 
-export const sendTestEmail = () =>
-  adminFetch<{ ok: boolean; detail: string; to: string }>("/test-email/", { method: "POST" });
+export const sendTestEmail = (to: string) =>
+  adminFetch<{ ok: boolean; detail: string; to: string }>("/test-email/", {
+    method: "POST",
+    body: JSON.stringify({ to }),
+  });
 
 export const listGalleryAdmin = () => adminFetch<AdminGalleryPhoto[]>("/gallery/");
 export const createGalleryPhoto = (d: Partial<AdminGalleryPhoto>) =>
