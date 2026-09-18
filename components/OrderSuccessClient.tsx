@@ -1,13 +1,44 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Phone, MessageCircle, Printer, PlusCircle } from "lucide-react";
+import {
+  MapPin,
+  Phone,
+  MessageCircle,
+  Printer,
+  PlusCircle,
+  Copy,
+  Check,
+  Clock,
+  ChefHat,
+  BellRing,
+  UtensilsCrossed,
+  Info,
+  CreditCard,
+  CheckCircle2,
+  AlertCircle,
+  Coffee,
+  Calendar,
+  Tag,
+  Search,
+  Sparkles,
+} from "lucide-react";
 import { getOrder, money, type ApiOrder, type ApiSiteSettings } from "@/lib/api";
 import { formatOrderRef } from "@/lib/order-utils";
 import { useCart } from "@/lib/cart";
+
+function InstagramIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+  );
+}
 
 interface OrderSuccessClientProps {
   publicId: string;
@@ -53,99 +84,29 @@ function formatOrderTimes(createdAt?: string, prepDurationStr?: string) {
   };
 }
 
-// Simple floating confetti animation
-function ConfettiCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
-
-    const colors = ["#efbf38", "#e08600", "#763a12", "#b382d6", "#f26d85", "#10b981", "#3b82f6"];
-    const pieces: {
-      x: number;
-      y: number;
-      size: number;
-      color: string;
-      speedY: number;
-      speedX: number;
-      rotation: number;
-      rotSpeed: number;
-    }[] = [];
-
-    for (let i = 0; i < 45; i++) {
-      pieces.push({
-        x: Math.random() * width,
-        y: Math.random() * (height * 0.5) - height * 0.2,
-        size: Math.random() * 8 + 6,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        speedY: Math.random() * 2.5 + 1.2,
-        speedX: (Math.random() - 0.5) * 1.5,
-        rotation: Math.random() * 360,
-        rotSpeed: (Math.random() - 0.5) * 6,
-      });
-    }
-
-    let animationId: number;
-    let startTime = Date.now();
-
-    function render() {
-      if (!ctx || !canvas) return;
-      ctx.clearRect(0, 0, width, height);
-
-      const elapsed = Date.now() - startTime;
-      // Fade out after 4.5 seconds
-      const globalAlpha = Math.max(0, 1 - elapsed / 5000);
-      ctx.globalAlpha = globalAlpha;
-
-      if (globalAlpha > 0) {
-        pieces.forEach((p) => {
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate((p.rotation * Math.PI) / 180);
-          ctx.fillStyle = p.color;
-          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
-          ctx.restore();
-
-          p.y += p.speedY;
-          p.x += p.speedX;
-          p.rotation += p.rotSpeed;
-        });
-
-        animationId = requestAnimationFrame(render);
-      }
-    }
-
-    render();
-
-    const handleResize = () => {
-      if (!canvas) return;
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    };
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      cancelAnimationFrame(animationId);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
+/**
+ * Triple-chevron directional arrow indicator matching user's reference (Image 2),
+ * signaling progressive motion from one kitchen status to the next.
+ */
+function FlowTripleChevrons({
+  status = "pending",
+  label = "Next status",
+}: {
+  status?: "active" | "completed" | "pending";
+  label?: string;
+}) {
   return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: "fixed",
-        inset: 0,
-        pointerEvents: "none",
-        zIndex: 999,
-      }}
-    />
+    <div className={`flow-triple-chevrons ${status}`} aria-label={label}>
+      <svg className="flow-ch ch-1" viewBox="0 0 10 16" fill="none" aria-hidden="true">
+        <path d="M2 2.5L7.5 8L2 13.5" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <svg className="flow-ch ch-2" viewBox="0 0 10 16" fill="none" aria-hidden="true">
+        <path d="M2 2.5L7.5 8L2 13.5" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <svg className="flow-ch ch-3" viewBox="0 0 10 16" fill="none" aria-hidden="true">
+        <path d="M2 2.5L7.5 8L2 13.5" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </div>
   );
 }
 
@@ -225,14 +186,12 @@ export default function OrderSuccessClient({
 
   return (
     <>
-      <ConfettiCanvas />
-
       {/* Page Hero */}
       <section className="page-hero order-success-hero">
         <div className="container" style={{ textAlign: "center" }}>
           <div className="order-hero-pill-badge">
             <span className="order-hero-badge-dot" />
-            <span>🥞 Freshly Griddled to Order</span>
+            <span>Order Confirmed · Kitchen Live</span>
           </div>
 
           <h1 className="order-success-title">
@@ -254,7 +213,7 @@ export default function OrderSuccessClient({
           <p className="order-success-sub">
             {order ? (
               <>
-                Thank you <b>{order.customer_name || "there"}</b>! The kitchen has received your ticket and will griddle it fresh.
+                Thank you, <b>{order.customer_name || "Guest"}</b>. The kitchen has received your ticket and is preparing your order fresh.
               </>
             ) : loading ? (
               "Retrieving the latest updates directly from our kitchen…"
@@ -292,13 +251,13 @@ export default function OrderSuccessClient({
                 >
                   {copied ? (
                     <>
-                      <span className="icon">✓</span>
+                      <Check size={14} className="icon" aria-hidden="true" />
                       <span>Copied!</span>
                     </>
                   ) : (
                     <>
-                      <span className="icon">📋</span>
-                      <span>Copy ID</span>
+                      <Copy size={14} className="icon" aria-hidden="true" />
+                      <span>Copy Ref</span>
                     </>
                   )}
                 </button>
@@ -307,22 +266,24 @@ export default function OrderSuccessClient({
               {/* Live Kitchen Status Card */}
               <div className={`order-live-card ${isReady ? "ready-glow" : ""}`}>
                 <div className="order-live-header">
-                  <div className="order-live-badge">
+                  <div className={`order-live-badge ${isCancelled ? "cancelled" : isReady ? "ready" : ""}`}>
                     <span
                       className={`order-pulse-dot ${
                         isCancelled ? "cancelled" : isReady || isCompleted ? "green" : "amber"
                       }`}
                     />
                     <span>
-                      {isCancelled
-                        ? "Order Cancelled"
-                        : isCompleted
-                        ? "Order Collected"
-                        : isReady
-                        ? "🛎️ Ready for Pickup!"
-                        : isPreparing
-                        ? "🍳 Sizzling on the Griddle"
-                        : "📋 Received in Kitchen"}
+                      {isCancelled ? (
+                        <>Order Cancelled</>
+                      ) : isCompleted ? (
+                        <>Order Collected</>
+                      ) : isReady ? (
+                        <>Ready for Pickup</>
+                      ) : isPreparing ? (
+                        <>Preparing on Griddle</>
+                      ) : (
+                        <>Received in Kitchen</>
+                      )}
                     </span>
                   </div>
 
@@ -340,10 +301,10 @@ export default function OrderSuccessClient({
                     </div>
                     <div className="order-eta-subtext">
                       {isReady ? (
-                        <span>✨ Your warm pancakes are packed and waiting at the counter.</span>
+                        <span>Your warm pancakes are packed and waiting at the counter.</span>
                       ) : (
                         <span>
-                          Standard prep time is <b>{times.prepWindow}</b>. Griddled fresh from scratch!
+                          Standard prep time is <b>{times.prepWindow}</b> · Griddled fresh from scratch.
                         </span>
                       )}
                     </div>
@@ -352,22 +313,27 @@ export default function OrderSuccessClient({
 
                 {/* 4-Step Visual Kitchen Stepper */}
                 {!isCancelled && (
-                  <div className="order-flow-stepper">
+                  <div className="order-flow-stepper" aria-label="Order Progress Stepper">
                     {/* Step 1: Placed */}
-                    <div className={`flow-step ${activeStepIndex >= 1 ? "completed" : "pending"}`}>
+                    <div className={`flow-step ${activeStepIndex >= 1 ? (activeStepIndex === 1 ? "active" : "completed") : "pending"}`}>
                       <div className="flow-step-circle">
-                        {activeStepIndex > 1 ? "✓" : "📋"}
+                        {activeStepIndex > 1 ? (
+                          <Check size={18} strokeWidth={2.8} aria-hidden="true" />
+                        ) : (
+                          <Clock size={18} strokeWidth={2.2} aria-hidden="true" />
+                        )}
                       </div>
                       <div className="flow-step-name">Placed</div>
                       <div className="flow-step-time">{times.placedTime}</div>
                     </div>
 
-                    <div
-                      className={`flow-step-line ${
-                        activeStepIndex >= 2 ? "active" : activeStepIndex === 1 ? "next" : ""
-                      }`}
-                      aria-hidden="true"
-                    />
+                    {/* Connector 1 -> 2 */}
+                    <div className="flow-step-line" aria-hidden="true">
+                      <FlowTripleChevrons
+                        status={activeStepIndex > 1 ? "completed" : activeStepIndex === 1 ? "active" : "pending"}
+                        label="Moving to Griddling"
+                      />
+                    </div>
 
                     {/* Step 2: Preparing */}
                     <div
@@ -376,18 +342,23 @@ export default function OrderSuccessClient({
                       }`}
                     >
                       <div className="flow-step-circle">
-                        {activeStepIndex > 2 ? "✓" : "🥞"}
+                        {activeStepIndex > 2 ? (
+                          <Check size={18} strokeWidth={2.8} aria-hidden="true" />
+                        ) : (
+                          <ChefHat size={18} strokeWidth={2.2} aria-hidden="true" />
+                        )}
                       </div>
                       <div className="flow-step-name">Griddling</div>
                       <div className="flow-step-time">{activeStepIndex >= 2 ? "In Kitchen" : "Next"}</div>
                     </div>
 
-                    <div
-                      className={`flow-step-line ${
-                        activeStepIndex >= 3 ? "active" : activeStepIndex === 2 ? "next" : ""
-                      }`}
-                      aria-hidden="true"
-                    />
+                    {/* Connector 2 -> 3 */}
+                    <div className="flow-step-line" aria-hidden="true">
+                      <FlowTripleChevrons
+                        status={activeStepIndex > 2 ? "completed" : activeStepIndex === 2 ? "active" : "pending"}
+                        label="Moving to Ready"
+                      />
+                    </div>
 
                     {/* Step 3: Ready */}
                     <div
@@ -396,23 +367,32 @@ export default function OrderSuccessClient({
                       }`}
                     >
                       <div className="flow-step-circle">
-                        {activeStepIndex > 3 ? "✓" : "🛎️"}
+                        {activeStepIndex > 3 ? (
+                          <Check size={18} strokeWidth={2.8} aria-hidden="true" />
+                        ) : (
+                          <BellRing size={18} strokeWidth={2.2} aria-hidden="true" />
+                        )}
                       </div>
                       <div className="flow-step-name">Ready</div>
                       <div className="flow-step-time">Counter</div>
                     </div>
 
-                    <div
-                      className={`flow-step-line ${
-                        activeStepIndex >= 4 ? "active" : activeStepIndex === 3 ? "next" : ""
-                      }`}
-                      aria-hidden="true"
-                    />
+                    {/* Connector 3 -> 4 */}
+                    <div className="flow-step-line" aria-hidden="true">
+                      <FlowTripleChevrons
+                        status={activeStepIndex >= 4 ? "completed" : activeStepIndex === 3 ? "active" : "pending"}
+                        label="Moving to Pickup"
+                      />
+                    </div>
 
                     {/* Step 4: Enjoy */}
-                    <div className={`flow-step ${activeStepIndex >= 4 ? "completed" : "pending"}`}>
+                    <div className={`flow-step ${activeStepIndex >= 4 ? "completed active" : "pending"}`}>
                       <div className="flow-step-circle">
-                        {activeStepIndex >= 4 ? "✓" : "😋"}
+                        {activeStepIndex >= 4 ? (
+                          <Check size={18} strokeWidth={2.8} aria-hidden="true" />
+                        ) : (
+                          <UtensilsCrossed size={18} strokeWidth={2.2} aria-hidden="true" />
+                        )}
                       </div>
                       <div className="flow-step-name">Enjoy</div>
                       <div className="flow-step-time">Stack Up!</div>
@@ -437,7 +417,9 @@ export default function OrderSuccessClient({
               {/* Pickup Counter Location & Quick Actions */}
               <div className="order-pickup-card">
                 <div className="pickup-card-head">
-                  <div className="pickup-icon-bubble">📍</div>
+                  <div className="pickup-icon-bubble">
+                    <MapPin size={20} aria-hidden="true" />
+                  </div>
                   <div>
                     <h3 className="pickup-card-title">Pickup & Collection Counter</h3>
                     <p className="pickup-card-address">{venueAddress}</p>
@@ -445,7 +427,7 @@ export default function OrderSuccessClient({
                 </div>
 
                 <div className="pickup-instruction-pill">
-                  <span className="pill-icon">💡</span>
+                  <Info size={16} className="pill-icon" aria-hidden="true" />
                   <span>
                     When you arrive, quote your name <b>{order.customer_name || "Guest"}</b> or Order <b>#{formatOrderRef(order.public_id)}</b>.
                   </span>
@@ -483,14 +465,14 @@ export default function OrderSuccessClient({
                 </div>
               </div>
 
-              {/* Engagement & While-You-Wait Card */}
+              {/* Engagement & Counter Hospitality Note */}
               <div className="while-you-wait-card">
                 <div className="wait-card-header">
-                  <span className="wait-emoji">☕</span>
-                  <h4>While You Wait</h4>
+                  <Coffee size={16} aria-hidden="true" />
+                  <h4>Hospitality & Counter Note</h4>
                 </div>
                 <p className="wait-card-text">
-                  Craving our signature iced maple latte, thickshakes, or extra maple syrup? Just ask our counter team when you arrive!
+                  Craving our signature iced maple latte, thickshakes, or extra maple syrup? Just let our counter team know when you collect your order.
                 </p>
                 <div className="wait-card-links">
                   <a
@@ -499,11 +481,13 @@ export default function OrderSuccessClient({
                     rel="noopener noreferrer"
                     className="wait-link"
                   >
-                    <span>📸</span> Tag us on Instagram
+                    <InstagramIcon size={14} />
+                    <span>Follow @thepancakeclub</span>
                   </a>
                   <span className="dot-sep">·</span>
                   <Link href="/book" className="wait-link">
-                    <span>📅</span> Book a Table for Next Time
+                    <Calendar size={14} aria-hidden="true" />
+                    <span>Book a Table Next Time</span>
                   </Link>
                 </div>
               </div>
@@ -566,7 +550,7 @@ export default function OrderSuccessClient({
                   {parseFloat(order.discount_amount || "0") > 0 && (
                     <div className="receipt-row discount">
                       <span className="coupon-chip">
-                        🏷️ {order.coupon_code || "Discount"}
+                        <Tag size={12} aria-hidden="true" /> {order.coupon_code || "Discount"}
                       </span>
                       <span>&minus;{money(order.discount_amount)}</span>
                     </div>
@@ -589,7 +573,7 @@ export default function OrderSuccessClient({
                 <div className={`receipt-payment-badge ${order.payment_status === "paid" ? "paid" : "unpaid"}`}>
                   {order.payment_status === "paid" ? (
                     <>
-                      <span className="badge-icon">✅</span>
+                      <CheckCircle2 size={18} className="badge-icon" aria-hidden="true" />
                       <div>
                         <b>Paid Online (Stripe)</b>
                         <div className="badge-sub">Card payment confirmed</div>
@@ -597,10 +581,10 @@ export default function OrderSuccessClient({
                     </>
                   ) : (
                     <>
-                      <span className="badge-icon">💳</span>
+                      <CreditCard size={18} className="badge-icon" aria-hidden="true" />
                       <div>
                         <b>Pay at Counter on Collection</b>
-                        <div className="badge-sub">Cash, EFTPOS & Tap-to-Pay accepted</div>
+                        <div className="badge-sub">Cash, EFTPOS &amp; Tap-to-Pay accepted</div>
                       </div>
                     </>
                   )}
@@ -618,12 +602,13 @@ export default function OrderSuccessClient({
                   </Link>
                 </div>
                 <div className="receipt-download-hint no-print">
-                  💡 Select <b>&ldquo;Save as PDF&rdquo;</b> in print dialog to download
+                  <Info size={12} aria-hidden="true" style={{ display: "inline", verticalAlign: "text-bottom", marginRight: 4 }} />
+                  Select <b>&ldquo;Save as PDF&rdquo;</b> in print dialog to download
                 </div>
 
                 <div className="receipt-footer-wrap">
                   <div className="receipt-footer-badge">
-                    <span>🥞</span>
+                    <Sparkles size={12} aria-hidden="true" />
                     <span>Freshly Griddled · Geelong West</span>
                   </div>
                   <div className="receipt-footer-text">
@@ -636,7 +621,7 @@ export default function OrderSuccessClient({
         ) : (
           /* Missing or Custom Lookup Screen */
           <div className="order-not-found-card">
-            <div className="not-found-icon">{orderError ? "⚠️" : "🥞❓"}</div>
+            <div className="not-found-icon">{orderError ? <AlertCircle size={32} /> : <Search size={32} />}</div>
             <h2>{orderError ? "Status temporarily unavailable" : "Order Lookup"}</h2>
             <p>
               {orderError

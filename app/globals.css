@@ -1835,16 +1835,16 @@ footer .logo {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.4rem 1.1rem;
+  padding: 0.35rem 1rem;
   background: #ffffff;
-  border: 1.5px solid rgba(239, 191, 56, 0.6);
+  border: 1.5px solid rgba(118, 58, 18, 0.16);
   border-radius: 999px;
   font-family: var(--font-round), sans-serif;
-  font-size: 0.82rem;
-  font-weight: 800;
+  font-size: 0.78rem;
+  font-weight: 700;
   color: #78350f;
-  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.1);
-  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(33, 26, 20, 0.04);
+  margin-bottom: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -1854,25 +1854,43 @@ footer .logo {
   height: 8px;
   border-radius: 50%;
   background: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.22);
   animation: pulse-dot 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
 }
 
+.order-success-hero h1.order-success-title,
 .order-success-title {
-  font-family: var(--font-serif);
-  font-size: clamp(2.2rem, 5vw, 3.4rem);
-  font-weight: 900;
-  color: #211a14;
-  line-height: 1.1;
-  margin-bottom: 0.75rem;
+  font-family: var(--font-display), var(--font-serif), serif !important;
+  font-size: clamp(2.4rem, 5.5vw, 3.8rem) !important;
+  font-weight: 400 !important;
+  color: var(--ink, #211a14) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.01em !important;
+  line-height: 0.98 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.order-success-hero h1.order-success-title .accent,
+.order-success-title .accent {
+  display: block !important;
+  font-family: var(--font-script), cursive !important;
+  text-transform: none !important;
+  font-size: 0.72em !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  color: var(--berry, #763a12) !important;
+  transform: rotate(-2deg) !important;
+  margin-top: 0.35rem !important;
+  line-height: 1.25 !important;
 }
 
 .order-success-sub {
+  font-family: var(--font-body), sans-serif !important;
   font-size: 1.05rem;
-  color: #614a38;
+  color: var(--muted, #614a38);
   max-width: 620px;
-  margin: 0 auto;
-  line-height: 1.5;
+  margin: 0.9rem auto 0;
+  line-height: 1.55;
 }
 
 .order-success-sub b {
@@ -2115,7 +2133,7 @@ footer .logo {
 /* 4-Step Visual Stepper */
 .order-flow-stepper {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   position: relative;
 }
@@ -2127,43 +2145,43 @@ footer .logo {
   text-align: center;
   z-index: 2;
   position: relative;
-  min-width: 55px;
+  min-width: 58px;
 }
 
 .flow-step-circle {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: #f4f4f5;
-  border: 2px solid #e4e4e7;
-  color: #71717a;
+  background: #f8f5f0;
+  border: 2px solid #e7dfd3;
+  color: #8c8273;
   display: grid;
   place-items: center;
-  font-size: 1.05rem;
-  font-weight: 800;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(33, 26, 20, 0.04);
 }
 
 .flow-step.completed .flow-step-circle {
-  background: #10b981;
-  border-color: #10b981;
+  background: #059669;
+  border-color: #059669;
   color: #ffffff;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
 }
 
 .flow-step.active .flow-step-circle {
   background: #fef3c7;
   border-color: #f59e0b;
   color: #92400e;
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
-  transform: scale(1.08);
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2), 0 6px 16px rgba(217, 119, 6, 0.22);
+  transform: scale(1.06);
 }
 
 .flow-step-name {
   font-family: var(--font-round), sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: #71717a;
-  margin-top: 0.45rem;
+  margin-top: 0.5rem;
 }
 
 .flow-step.completed .flow-step-name {
@@ -2177,128 +2195,104 @@ footer .logo {
 }
 
 .flow-step-time {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   color: #a1a1aa;
-  margin-top: 1px;
+  margin-top: 2px;
+  font-weight: 600;
 }
 
 .flow-step.completed .flow-step-time {
   color: #059669;
 }
 
+.flow-step.active .flow-step-time {
+  color: #b45309;
+}
+
+/* Stepper Connector: Vertically centered with circles (height 44px), NO background lines */
 .flow-step-line {
   flex: 1;
-  height: 3px;
-  background: #e4e4e7;
-  margin: 0 0.3rem;
-  margin-bottom: 1.4rem;
-  border-radius: 999px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0.4rem;
+  background: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   position: relative;
-  transition: background 0.4s ease;
 }
 
-.flow-step-line.active {
-  background: linear-gradient(90deg, #10b981, #f59e0b);
+/* Triple-chevron directional flow indicator (matching Image 2) */
+.flow-triple-chevrons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  pointer-events: none;
+  user-select: none;
+  transition: all 0.3s ease;
 }
 
-.flow-step-line.next {
-  background: linear-gradient(
-    90deg,
-    rgba(16, 185, 129, 0.55) 0%,
-    rgba(245, 158, 11, 0.42) 48%,
-    rgba(245, 158, 11, 0.12) 100%
-  );
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.12);
+.flow-triple-chevrons .flow-ch {
+  width: 9px;
+  height: 14px;
+  display: block;
 }
 
-.flow-step-line.next::before {
-  content: "";
-  position: absolute;
-  inset: -4px 0;
-  border-radius: inherit;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.78) 48%,
-    transparent 68%
-  );
-  background-size: 45% 100%;
-  background-repeat: no-repeat;
-  animation: flow-line-shimmer 1.8s ease-in-out infinite;
+/* Active transition: animated chasing forward wave */
+.flow-triple-chevrons.active {
+  color: #b45309;
 }
 
-.flow-step-line.next::after {
-  content: "›";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 22px;
-  height: 22px;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(180, 83, 9, 0.2);
-  border-radius: 999px;
-  background: linear-gradient(145deg, #fde68a, #fbbf24);
-  color: #78350f;
-  box-shadow:
-    0 3px 10px rgba(180, 83, 9, 0.2),
-    0 0 0 4px rgba(254, 243, 199, 0.65);
-  font-family: Arial, sans-serif;
-  font-size: 1.25rem;
-  font-weight: 800;
-  line-height: 1;
-  transform: translate(-1px, -50%);
-  animation: flow-next-arrow 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+.flow-triple-chevrons.active .flow-ch.ch-1 {
+  animation: flow-ch-wave 1.4s ease-in-out infinite;
+  animation-delay: 0s;
 }
 
-@keyframes flow-next-arrow {
-  0% {
-    left: 0;
-    opacity: 0;
-    transform: translate(-1px, -50%) scale(0.82);
+.flow-triple-chevrons.active .flow-ch.ch-2 {
+  animation: flow-ch-wave 1.4s ease-in-out infinite;
+  animation-delay: 0.22s;
+}
+
+.flow-triple-chevrons.active .flow-ch.ch-3 {
+  animation: flow-ch-wave 1.4s ease-in-out infinite;
+  animation-delay: 0.44s;
+}
+
+@keyframes flow-ch-wave {
+  0%, 100% {
+    opacity: 0.25;
+    color: #d97706;
+    transform: translateX(-2px) scale(0.92);
   }
-  18% {
+  40% {
     opacity: 1;
-  }
-  72% {
-    opacity: 1;
-  }
-  100% {
-    left: calc(100% - 20px);
-    opacity: 0;
-    transform: translate(1px, -50%) scale(0.96);
+    color: #78350f;
+    transform: translateX(2px) scale(1.15);
   }
 }
 
-@keyframes flow-line-shimmer {
-  0% {
-    background-position: -55% 0;
-    opacity: 0;
-  }
-  25%,
-  72% {
-    opacity: 0.75;
-  }
-  100% {
-    background-position: 155% 0;
-    opacity: 0;
-  }
+/* Completed connector */
+.flow-triple-chevrons.completed {
+  color: #059669;
+  opacity: 0.7;
+}
+
+/* Pending connector: subtle faint chevrons */
+.flow-triple-chevrons.pending {
+  color: #c4bcaf;
+  opacity: 0.35;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .flow-step-line.next::before,
-  .flow-step-line.next::after {
+  .flow-triple-chevrons.active .flow-ch.ch-1,
+  .flow-triple-chevrons.active .flow-ch.ch-2,
+  .flow-triple-chevrons.active .flow-ch.ch-3 {
     animation: none;
-  }
-
-  .flow-step-line.next::before {
-    display: none;
-  }
-
-  .flow-step-line.next::after {
-    left: calc(100% - 20px);
     opacity: 1;
-    transform: translate(1px, -50%);
+    transform: none;
   }
 }
 
@@ -2428,10 +2422,10 @@ footer .logo {
   color: #065f46;
 }
 
-/* While You Wait Card */
+/* While You Wait / Counter Hospitality Note */
 .while-you-wait-card {
-  background: linear-gradient(135deg, rgba(239, 191, 56, 0.12) 0%, rgba(248, 242, 224, 0.8) 100%);
-  border: 1.5px solid rgba(239, 191, 56, 0.45);
+  background: #faf7f2;
+  border: 1.5px solid rgba(118, 58, 18, 0.12);
   border-radius: 20px;
   padding: 1.25rem 1.4rem;
 }
@@ -2440,12 +2434,13 @@ footer .logo {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.45rem;
+  color: #78350f;
 }
 
 .wait-card-header h4 {
   font-family: var(--font-round), sans-serif;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 800;
   color: #78350f;
   text-transform: uppercase;
@@ -2456,7 +2451,7 @@ footer .logo {
 .wait-card-text {
   font-size: 0.84rem;
   color: #614a38;
-  line-height: 1.45;
+  line-height: 1.5;
   margin-bottom: 0.75rem;
 }
 
@@ -2471,14 +2466,20 @@ footer .logo {
 
 .wait-link {
   color: #763a12;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.4rem;
+  padding: 0.28rem 0.6rem;
+  border-radius: 8px;
+  background: rgba(118, 58, 18, 0.06);
+  border: 1px solid rgba(118, 58, 18, 0.1);
+  transition: all 0.2s ease;
 }
 
 .wait-link:hover {
+  background: #efbf38;
+  border-color: #763a12;
   color: #211a14;
 }
 
