@@ -74,6 +74,9 @@ export default function BookingsPage() {
     queryKey: ["admin", "bookings", filter],
     queryFn: () => listBookingsPage(1, filter === "all" ? undefined : filter),
     refetchInterval: POLL_MS,
+    // Admin queues must reconcile with the server whenever staff return to
+    // this screen, even if React Query still has a fresh cached response.
+    refetchOnMount: "always",
   });
   useEffect(() => {
     const result = bookingsQuery.data;
@@ -127,12 +130,17 @@ export default function BookingsPage() {
     }
   };
 
-  useEffect(() => {
+  const changeFilter = (nextFilter: (typeof FILTERS)[number]) => {
+    if (nextFilter === filter) return;
+    // Reset the accumulated pagination state before switching query keys.
+    // Doing this in a mount effect used to erase an already-cached first page
+    // after client-side navigation, leaving the table empty until a reload.
     setBookings([]);
     nextPage.current = 2;
     setHasMore(false);
     knownIds.current = null;
-  }, [filter]);
+    setFilter(nextFilter);
+  };
 
   // the booking whose status change is in flight — locks that row's buttons
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -451,7 +459,7 @@ export default function BookingsPage() {
               <button
                 key={f}
                 type="button"
-                onClick={() => setFilter(f)}
+                onClick={() => changeFilter(f)}
                 className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
                   isSelected
                     ? "bg-[#763a12] text-white shadow-xs"
