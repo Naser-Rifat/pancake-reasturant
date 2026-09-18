@@ -11,7 +11,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { Clock } from "lucide-react";
+import { ChevronRight, Clock } from "lucide-react";
 import { money, placeOrder, validateCoupon, type ApiCouponPreview, type ApiMenuItem } from "@/lib/api";
 import { useCart } from "@/lib/cart";
 import { validatePhoneNumber } from "@/lib/format";
@@ -513,8 +513,28 @@ export default function CartDrawer({
                   <b>${total.toFixed(2)}</b>
                 </div>
 
-                <button className="btn btn-primary" onClick={checkout} disabled={placing}>
-                  {placing ? "Placing your order…" : "Place order (Pay at counter) →"}
+                <p className="cart-payment-note">
+                  <span aria-hidden="true" />
+                  Pay at the counter when you collect
+                </p>
+
+                <button
+                  className="btn btn-primary cart-checkout-button"
+                  onClick={checkout}
+                  disabled={placing}
+                  aria-label={placing ? "Placing your order" : "Place order — pay at counter"}
+                >
+                  <span className="cart-checkout-label">
+                    {placing ? "Placing your order…" : "Place pickup order"}
+                    {!placing && (
+                      <ChevronRight
+                        className="arrow-icon cart-checkout-arrow"
+                        size={18}
+                        strokeWidth={2.75}
+                        aria-hidden="true"
+                      />
+                    )}
+                  </span>
                 </button>
               </>
             ) : (
@@ -530,22 +550,13 @@ export default function CartDrawer({
             )}
 
             {uberEatsUrl && (
-              <a
-                href={uberEatsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "block",
-                  textAlign: "center",
-                  marginTop: "0.55rem",
-                  fontSize: "0.85rem",
-                  fontWeight: 700,
-                  color: "#06C167",
-                  textDecoration: "underline",
-                }}
-              >
-                Prefer delivery? Order on Uber Eats 🛵
-              </a>
+              <div className="cart-delivery-option">
+                <span>Prefer delivery?</span>
+                <a href={uberEatsUrl} target="_blank" rel="noopener noreferrer">
+                  Order on Uber Eats
+                  <ChevronRight size={14} strokeWidth={2.75} aria-hidden="true" />
+                </a>
+              </div>
             )}
           </div>
         )}
