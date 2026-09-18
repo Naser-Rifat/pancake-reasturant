@@ -12,7 +12,7 @@ jobs:
       run:
         working-directory: backend
     env:
-      DJANGO_DEBUG: "0"
+      DJANGO_DEBUG: "1"
       DJANGO_SECRET_KEY: ci-only-not-used-in-production
       DJANGO_EMAIL_PROVIDER: console
     steps:
