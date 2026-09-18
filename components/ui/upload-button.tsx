@@ -142,6 +142,7 @@ export function UploadButton({
       <input
         ref={fileRef}
         type="file"
+        aria-label={`${label} image file`}
         accept="image/*"
         className="hidden"
         multiple={multiple}

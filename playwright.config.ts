@@ -8,6 +8,8 @@ const externalApi = process.env.E2E_API_URL;
 const localSite = "http://127.0.0.1:3100";
 const localApi = "http://127.0.0.1:8100/api";
 const localAdminGateSecret = "e2e-admin-gate";
+const localCloudinaryCloud = "e2e-cloud";
+const localCloudinaryPreset = "e2e-preset";
 
 if (externalSite && !externalApi) {
   throw new Error("E2E_API_URL is required when E2E_BASE_URL targets a deployed site.");
@@ -90,6 +92,11 @@ export default defineConfig({
         NEXT_PUBLIC_API_URL: localApi,
         NEXT_DIST_DIR: ".next-e2e",
         ADMIN_GATE_SECRET: localAdminGateSecret,
+        // The upload component is hidden when Cloudinary is unconfigured.
+        // Browser tests only exercise pre-upload validation, so non-secret
+        // placeholders make that UI deterministic without making a network call.
+        NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: localCloudinaryCloud,
+        NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: localCloudinaryPreset,
       },
     },
   ],

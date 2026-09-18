@@ -80,7 +80,10 @@ test("club bento upload explains the required crop and blocks the wrong ratio", 
   await expect(page.getByText(/manager is the exact public bento layout/)).toBeVisible();
   await expect(page.getByText("Recommended 1200×1500px", { exact: false })).toBeVisible();
 
-  await page.locator('input[type="file"]').first().setInputFiles("public/menu/pancake-logo.png");
+  await page
+    .getByLabel("Replace image file")
+    .first()
+    .setInputFiles("public/menu/pancake-logo.png");
   await expect(page.getByText(/uses a fixed 4:5 portrait frame/).first()).toBeVisible();
   await expect(page.getByText("Upload Blocked by Validation", { exact: false })).toBeVisible();
 });
