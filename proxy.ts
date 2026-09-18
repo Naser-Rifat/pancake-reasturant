@@ -19,6 +19,12 @@ const BYPASS_COOKIE = "pc_bypass";
 const BYPASS_QUERY = "preview";
 const BYPASS_MAX_AGE = 60 * 60 * 24 * 7; // a week of previewing, then re-auth
 
+const ADMIN_ENTRY_PATH = "/tpc-staff-portal";
+const ADMIN_GATE_COOKIE = "pc_admin_gate";
+const ADMIN_GATE_VALUE =
+  process.env.ADMIN_GATE_SECRET ?? "tpc-admin-gate-2026";
+const ADMIN_GATE_MAX_AGE = 60 * 60 * 24 * 7;
+
 const VERCEL_DEPLOYMENT_SUFFIX = ".vercel.app";
 const PRIVATE_PATHS = ["/admin", "/preview"];
 
@@ -40,6 +46,8 @@ function isDirectVercelDeployment(request: NextRequest) {
 }
 
 export function proxy(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+
   // Cloudflare Access protects these routes on the canonical production host.
   // Vercel's stable `*.vercel.app` production alias remains directly reachable
   // under Standard Protection, so deny private UI routes there to prevent that
@@ -47,7 +55,7 @@ export function proxy(request: NextRequest) {
   // Django authentication independently.
   if (
     isDirectVercelDeployment(request) &&
-    isPrivatePath(request.nextUrl.pathname)
+    (isPrivatePath(path) || path === ADMIN_ENTRY_PATH)
   ) {
     return new NextResponse("Not Found", {
       status: 404,
@@ -59,9 +67,44 @@ export function proxy(request: NextRequest) {
     });
   }
 
+  // The staff UI still lives at /admin internally, but the public entry point
+  // is an unlinked staff URL. This is not a replacement for real staff auth;
+  // it hides the login surface until Cloudflare Access/2FA is enabled.
+  if (path === ADMIN_ENTRY_PATH) {
+    const login = request.nextUrl.clone();
+    login.pathname = "/admin/login";
+    login.search = "";
+    const response = NextResponse.redirect(login);
+    response.cookies.set(ADMIN_GATE_COOKIE, ADMIN_GATE_VALUE, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: request.nextUrl.protocol === "https:",
+      path: "/",
+      maxAge: ADMIN_GATE_MAX_AGE,
+    });
+    return response;
+  }
+
+  if (
+    path === "/admin" ||
+    path.startsWith("/admin/") ||
+    path === "/preview" ||
+    path.startsWith("/preview/")
+  ) {
+    if (request.cookies.get(ADMIN_GATE_COOKIE)?.value !== ADMIN_GATE_VALUE) {
+      return new NextResponse("Not Found", {
+        status: 404,
+        headers: {
+          "Cache-Control": "no-store, must-revalidate",
+          "Content-Type": "text/plain; charset=utf-8",
+          "X-Robots-Tag": "noindex, nofollow, noarchive",
+        },
+      });
+    }
+  }
+
   if (process.env.MAINTENANCE_MODE !== "1") return NextResponse.next();
 
-  const path = request.nextUrl.pathname;
   if (ALWAYS_OPEN.some((open) => path === open || path.startsWith(`${open}/`))) {
     return NextResponse.next();
   }
