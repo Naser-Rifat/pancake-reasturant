@@ -84,7 +84,7 @@ jobs:
       - name: Prepare deterministic test data
         run: |
           python backend/manage.py migrate --noinput
-          python backend/manage.py seed_demo
+          python backend/manage.py seed_demo --force
 
       - name: Install browser
         run: npx playwright install --with-deps chromium
