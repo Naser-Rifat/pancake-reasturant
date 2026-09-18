@@ -68,6 +68,53 @@ test("every admin screen loads through its TanStack query without an API error",
   }
 });
 
+test("bookings appear after client-side admin navigation without a page reload", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("krush-admin-token", "admin-e2e-token"));
+  let bookingRequests = 0;
+  const booking = {
+    public_id: "9fd31df4-3f43-4d4f-8e17-c8921b346459",
+    name: "Navigation Test Guest",
+    email: "navigation@example.com",
+    phone: "0412 345 678",
+    date: "2026-09-26",
+    time: "19:30:00",
+    party_size: 2,
+    preselected_dish: "",
+    notes: "Window table",
+    status: "pending",
+    created_at: "2026-09-19T08:00:00Z",
+  };
+
+  await page.route("**/api/admin/**", async (route) => {
+    const { pathname } = new URL(route.request().url());
+    if (pathname.endsWith("/admin/stats/")) {
+      return route.fulfill({
+        json: { ...stats, pending_bookings: 1, total_bookings: 1 },
+      });
+    }
+    if (pathname.endsWith("/admin/site/")) {
+      return route.fulfill({ json: FALLBACK_SITE });
+    }
+    if (pathname.endsWith("/admin/bookings/")) {
+      bookingRequests += 1;
+      return route.fulfill({
+        json: { count: 1, next: null, previous: null, results: [booking] },
+      });
+    }
+    return route.fulfill({ json: [] });
+  });
+
+  await page.goto("/admin");
+  await expect(page.getByRole("heading", { name: "Dashboard", exact: true })).toBeVisible();
+  await expect(page.getByText("Navigation Test Guest", { exact: true })).toBeVisible();
+  await page.locator('aside a[href="/admin/bookings"]').click();
+  await expect(page).toHaveURL(/\/admin\/bookings$/);
+  await expect(
+    page.locator("tbody").getByText("Navigation Test Guest", { exact: true }),
+  ).toBeVisible();
+  expect(bookingRequests).toBeGreaterThanOrEqual(2);
+});
+
 test("logout has a pending state, calls the revoke endpoint, and clears admin access", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("krush-admin-token", "admin-e2e-token"));
   let logoutCalls = 0;

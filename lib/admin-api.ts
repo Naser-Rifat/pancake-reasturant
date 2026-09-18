@@ -145,6 +145,10 @@ async function adminFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   try {
     res = await fetchWithTimeout(`${API_URL}/admin${path}`, {
       ...init,
+      // Operational admin data changes continuously. Never let the browser's
+      // HTTP cache serve an older empty/list response when staff navigate
+      // between screens; TanStack Query already owns the intentional cache.
+      cache: "no-store",
       headers: {
         // only meaningful on requests that actually carry a JSON body
         ...(init.body ? { "Content-Type": "application/json" } : {}),

@@ -2,9 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  useIsFetching,
+  useInfiniteQuery,
   useMutation,
-  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import {
@@ -37,7 +36,6 @@ import { matchesBookingRef } from "@/lib/order-utils";
 import {
   EMPTY_PHONE_BOOKING,
   FILTERS,
-  PAGE_SIZE,
   POLL_MS,
   newBookingChime,
 } from "./_lib";
@@ -52,41 +50,49 @@ const BOOKING_COLUMNS: AdminTableColumn<AdminBooking>[] = [
 ];
 
 export default function BookingsPage() {
-  const [bookings, setBookings] = useState<AdminBooking[]>([]);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [hasMore, setHasMore] = useState(false);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState(EMPTY_PHONE_BOOKING);
   const { toast } = useToast();
   const { confirm: confirmDialog } = useConfirm();
   const queryClient = useQueryClient();
-  const refreshBookings = () =>
-    queryClient.invalidateQueries({ queryKey: ["admin"] });
+  const refreshBookings = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["admin", "bookings"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "stats"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "dashboard"] }),
+    ]);
+  };
 
   const tableRef = useRef<HTMLDivElement>(null);
   const knownIds = useRef<Set<string> | null>(null);
-  const nextPage = useRef(2);
 
-  const bookingsQuery = useQuery({
+  const bookingsQuery = useInfiniteQuery({
     queryKey: ["admin", "bookings", filter],
-    queryFn: () => listBookingsPage(1, filter === "all" ? undefined : filter),
+    queryFn: ({ pageParam }) =>
+      listBookingsPage(pageParam, filter === "all" ? undefined : filter),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, pages) =>
+      lastPage.hasMore ? pages.length + 1 : undefined,
     refetchInterval: POLL_MS,
     // Admin queues must reconcile with the server whenever staff return to
     // this screen, even if React Query still has a fresh cached response.
     refetchOnMount: "always",
   });
   useEffect(() => {
-    const result = bookingsQuery.data;
-    if (!result) return;
+    // Only the newest page can contain a newly arrived request. Loading older
+    // pages must not play the new-booking chime for historical pending rows.
+    const newest = bookingsQuery.data?.pages[0]?.results;
+    if (!newest) return;
     const fresh = knownIds.current
-      ? result.results.filter(
+      ? newest.filter(
           (booking) => booking.status === "pending" && !knownIds.current!.has(booking.public_id),
         )
       : [];
-    if (fresh.length > 0) {
+    if (filter === "all" && fresh.length > 0) {
       newBookingChime();
       toast({
         variant: "info",
@@ -95,49 +101,30 @@ export default function BookingsPage() {
       });
     }
     if (knownIds.current === null) knownIds.current = new Set();
-    result.results.forEach((booking) => knownIds.current!.add(booking.public_id));
-    setBookings((previous) => mergeRows(previous, result.results));
-    if (nextPage.current === 2) setHasMore(result.hasMore);
-  }, [bookingsQuery.data, toast]);
+    newest.forEach((booking) => knownIds.current!.add(booking.public_id));
+  }, [bookingsQuery.data, filter, toast]);
+
+  const bookings = useMemo(
+    () =>
+      mergeRows(
+        [],
+        bookingsQuery.data?.pages.flatMap((pageResult) => pageResult.results) ?? [],
+      ),
+    [bookingsQuery.data],
+  );
   const loading = bookingsQuery.isPending;
   const error = bookingsQuery.error instanceof Error ? bookingsQuery.error.message : "";
   const load = () => void bookingsQuery.refetch();
-  const loadingMore =
-    useIsFetching({ queryKey: ["admin", "bookings", "page"] }) > 0;
-
-  const loadMore = async () => {
-    try {
-      const pageNumber = nextPage.current;
-      const page = await queryClient.fetchQuery({
-        queryKey: ["admin", "bookings", "page", filter, pageNumber],
-        queryFn: () =>
-          listBookingsPage(
-            pageNumber,
-            filter === "all" ? undefined : filter,
-          ),
-        staleTime: 0,
-      });
-      nextPage.current += 1;
-      page.results.forEach((b) => knownIds.current?.add(b.public_id));
-      setBookings((prev) => mergeRows(prev, page.results));
-      setHasMore(page.hasMore);
-    } catch (e) {
-      toast({
-        variant: "error",
-        title: "Could not load older bookings",
-        description: e instanceof Error ? e.message : undefined,
-      });
-    }
-  };
+  const loadingMore = bookingsQuery.isFetchingNextPage;
+  const hasMore = bookingsQuery.hasNextPage;
+  const fetchNextPage = bookingsQuery.fetchNextPage;
+  const loadMore = useCallback(() => {
+    if (!hasMore || loadingMore) return;
+    void fetchNextPage();
+  }, [fetchNextPage, hasMore, loadingMore]);
 
   const changeFilter = (nextFilter: (typeof FILTERS)[number]) => {
     if (nextFilter === filter) return;
-    // Reset the accumulated pagination state before switching query keys.
-    // Doing this in a mount effect used to erase an already-cached first page
-    // after client-side navigation, leaving the table empty until a reload.
-    setBookings([]);
-    nextPage.current = 2;
-    setHasMore(false);
     knownIds.current = null;
     setFilter(nextFilter);
   };
@@ -186,9 +173,7 @@ export default function BookingsPage() {
     );
     if (!ok) return;
 
-    const prev = bookings;
     setPendingId(b.public_id);
-    setBookings((bs) => bs.map((x) => (x.public_id === b.public_id ? { ...x, status } : x)));
     try {
       await statusMutation.mutateAsync({ id: b.public_id, patch: { status } });
       toast({
@@ -202,7 +187,6 @@ export default function BookingsPage() {
           : "No email on file — call the guest to let them know",
       });
     } catch (e) {
-      setBookings(prev);
       toast({
         variant: "error",
         title: "Update failed",
@@ -232,7 +216,6 @@ export default function BookingsPage() {
       });
       setAdding(false);
       setForm(EMPTY_PHONE_BOOKING);
-      load();
       toast({
         variant: "success",
         title: `Phone booking saved for ${form.name}`,
