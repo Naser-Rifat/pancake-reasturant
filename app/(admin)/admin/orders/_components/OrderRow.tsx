@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Select } from "@/components/ui/select";
 import type { AdminOrder } from "@/lib/admin-api";
+import { formatOrderRef } from "@/lib/order-utils";
 import { ORDER_STATUSES } from "../../status";
 
 // One order row in the kitchen orders table.
@@ -19,7 +20,7 @@ export function OrderRow({
   onSetStatus: (o: AdminOrder, status: AdminOrder["status"]) => void;
 }) {
   const placedDate = new Date(o.created_at);
-  const orderRef = o.public_id ? o.public_id.slice(0, 8).toUpperCase() : "";
+  const orderRef = formatOrderRef(o.public_id);
 
   return (
     <tr
@@ -31,7 +32,10 @@ export function OrderRow({
         <div className="space-y-1">
           <div className="flex items-center gap-2 whitespace-nowrap">
             {orderRef && (
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200">
+              <span
+                className="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-amber-50 text-[#763a12] border border-amber-200 shadow-2xs select-all"
+                title={`Customer Order Reference: #${orderRef}`}
+              >
                 #{orderRef}
               </span>
             )}

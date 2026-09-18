@@ -97,13 +97,15 @@ class BookingSerializer(serializers.ModelSerializer):
         },
     )
 
+    reference = serializers.CharField(read_only=True)
+
     class Meta:
         model = Booking
         fields = [
-            "public_id", "name", "email", "phone", "date", "time",
+            "public_id", "reference", "name", "email", "phone", "date", "time",
             "party_size", "preselected_dish", "notes", "status", "created_at",
         ]
-        read_only_fields = ["public_id", "status", "created_at"]
+        read_only_fields = ["public_id", "reference", "status", "created_at"]
         extra_kwargs = {
             "name": {"write_only": True},
             "preselected_dish": {"write_only": True},
@@ -148,15 +150,16 @@ class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     subtotal = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
     total = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
+    reference = serializers.CharField(read_only=True)
 
     class Meta:
         model = Order
         fields = [
-            "public_id", "customer_name",
+            "public_id", "reference", "customer_name",
             "status", "payment_status", "cancel_reason", "items",
             "subtotal", "coupon_code", "discount_amount", "total", "created_at",
         ]
-        read_only_fields = ["public_id", "status", "payment_status", "cancel_reason", "created_at"]
+        read_only_fields = ["public_id", "reference", "status", "payment_status", "cancel_reason", "created_at"]
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):

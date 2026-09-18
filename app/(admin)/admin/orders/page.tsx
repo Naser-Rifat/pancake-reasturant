@@ -25,6 +25,7 @@ import { useRowFocus } from "@/components/admin/use-row-focus";
 
 import { FILTERS, PAGE_SIZE, POLL_MS, newOrderChime } from "./_lib";
 import { OrderRow } from "./_components/OrderRow";
+import { matchesOrderRef } from "@/lib/order-utils";
 
 const ORDER_COLUMNS: AdminTableColumn<AdminOrder>[] = [
   { id: "customer", header: "Order & Customer", headerClassName: "py-3.5 px-4" },
@@ -177,7 +178,7 @@ export default function OrdersPage() {
         o.customer_name.toLowerCase().includes(q) ||
         (o.phone && o.phone.includes(q)) ||
         (o.email && o.email.toLowerCase().includes(q)) ||
-        o.public_id.toLowerCase().includes(q) ||
+        matchesOrderRef(o.public_id, q) ||
         o.total.includes(q) ||
         itemsMatch
       );

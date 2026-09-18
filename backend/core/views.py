@@ -1,4 +1,7 @@
+import re
+import uuid
 from decimal import Decimal
+from django.http import Http404
 
 from django.conf import settings
 from django.db import DatabaseError, connection
@@ -148,6 +151,34 @@ class OrderViewSet(
 
     def get_serializer_class(self):
         return OrderCreateSerializer if self.action == "create" else OrderSerializer
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        raw_val = self.kwargs.get(lookup_url_kwarg, "")
+        val = str(raw_val).strip()
+
+        # 1. Try standard UUID lookup
+        try:
+            parsed_uuid = uuid.UUID(val)
+            obj = queryset.filter(public_id=parsed_uuid).first()
+            if obj:
+                self.check_object_permissions(self.request, obj)
+                return obj
+        except (ValueError, AttributeError):
+            pass
+
+        # 2. Try customer reference format: "TPC-XXXXXX", "#TPC-XXXXXX", or hex suffix
+        clean = re.sub(r"[^a-zA-Z0-9]", "", val).upper()
+        if clean.startswith("TPC"):
+            clean = clean[3:]
+        if len(clean) >= 6:
+            for order in queryset.order_by("-created_at")[:200]:
+                if str(order.public_id).replace("-", "").upper().endswith(clean):
+                    self.check_object_permissions(self.request, order)
+                    return order
+
+        raise Http404("No Order matches the given query.")
 
     def create(self, request, *args, **kwargs):
         """Create the order.

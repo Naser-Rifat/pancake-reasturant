@@ -95,13 +95,15 @@ class AdminOrderSerializer(OrderSerializer):
 
 
 class AdminBookingSerializer(serializers.ModelSerializer):
+    reference = serializers.CharField(read_only=True)
+
     class Meta:
         model = Booking
         fields = [
-            "public_id", "name", "email", "phone", "date", "time",
+            "public_id", "reference", "name", "email", "phone", "date", "time",
             "party_size", "preselected_dish", "notes", "status", "created_at",
         ]
-        read_only_fields = ["public_id", "created_at"]
+        read_only_fields = ["public_id", "reference", "created_at"]
 
 
 class AdminReviewSerializer(serializers.ModelSerializer):

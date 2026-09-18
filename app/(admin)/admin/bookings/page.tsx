@@ -33,6 +33,7 @@ import { useRowFocus } from "@/components/admin/use-row-focus";
 import { BookingRow } from "./_components/BookingRow";
 import { formatTime12h } from "./_lib";
 import { PhoneBookingModal } from "./_components/PhoneBookingModal";
+import { matchesBookingRef } from "@/lib/order-utils";
 import {
   EMPTY_PHONE_BOOKING,
   FILTERS,
@@ -247,6 +248,7 @@ export default function BookingsPage() {
         b.name.toLowerCase().includes(q) ||
         (b.email && b.email.toLowerCase().includes(q)) ||
         (b.phone && b.phone.includes(q)) ||
+        matchesBookingRef(b.public_id, q) ||
         b.date.includes(q) ||
         (b.notes && b.notes.toLowerCase().includes(q)) ||
         (b.preselected_dish && b.preselected_dish.toLowerCase().includes(q))

@@ -2193,11 +2193,113 @@ footer .logo {
   margin: 0 0.3rem;
   margin-bottom: 1.4rem;
   border-radius: 999px;
+  position: relative;
   transition: background 0.4s ease;
 }
 
 .flow-step-line.active {
   background: linear-gradient(90deg, #10b981, #f59e0b);
+}
+
+.flow-step-line.next {
+  background: linear-gradient(
+    90deg,
+    rgba(16, 185, 129, 0.55) 0%,
+    rgba(245, 158, 11, 0.42) 48%,
+    rgba(245, 158, 11, 0.12) 100%
+  );
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.12);
+}
+
+.flow-step-line.next::before {
+  content: "";
+  position: absolute;
+  inset: -4px 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.78) 48%,
+    transparent 68%
+  );
+  background-size: 45% 100%;
+  background-repeat: no-repeat;
+  animation: flow-line-shimmer 1.8s ease-in-out infinite;
+}
+
+.flow-step-line.next::after {
+  content: "›";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(180, 83, 9, 0.2);
+  border-radius: 999px;
+  background: linear-gradient(145deg, #fde68a, #fbbf24);
+  color: #78350f;
+  box-shadow:
+    0 3px 10px rgba(180, 83, 9, 0.2),
+    0 0 0 4px rgba(254, 243, 199, 0.65);
+  font-family: Arial, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1;
+  transform: translate(-1px, -50%);
+  animation: flow-next-arrow 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes flow-next-arrow {
+  0% {
+    left: 0;
+    opacity: 0;
+    transform: translate(-1px, -50%) scale(0.82);
+  }
+  18% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% - 20px);
+    opacity: 0;
+    transform: translate(1px, -50%) scale(0.96);
+  }
+}
+
+@keyframes flow-line-shimmer {
+  0% {
+    background-position: -55% 0;
+    opacity: 0;
+  }
+  25%,
+  72% {
+    opacity: 0.75;
+  }
+  100% {
+    background-position: 155% 0;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-step-line.next::before,
+  .flow-step-line.next::after {
+    animation: none;
+  }
+
+  .flow-step-line.next::before {
+    display: none;
+  }
+
+  .flow-step-line.next::after {
+    left: calc(100% - 20px);
+    opacity: 1;
+    transform: translate(1px, -50%);
+  }
 }
 
 .order-cancelled-box {

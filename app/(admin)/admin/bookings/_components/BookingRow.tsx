@@ -2,6 +2,7 @@ import { Ban, Check, Mail, Phone, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import type { AdminBooking } from "@/lib/admin-api";
+import { formatBookingRef } from "@/lib/order-utils";
 import { formatTime12h, parseBookingOffer } from "../_lib";
 
 // One reservation row in the bookings table.
@@ -18,6 +19,7 @@ export function BookingRow({
   onSetStatus: (b: AdminBooking, status: AdminBooking["status"]) => void;
 }) {
   const { offer, cleanNotes } = parseBookingOffer(b.notes);
+  const bookingRef = formatBookingRef(b.public_id);
   return (
     <tr
       id={`row-${b.public_id}`}
@@ -25,8 +27,18 @@ export function BookingRow({
     >
       {/* Guest Name & Contact */}
       <td className="py-3.5 px-4 min-w-[200px]">
-        <div className="space-y-0.5">
-          <div className="font-semibold text-sm text-[#211a14] whitespace-nowrap">{b.name}</div>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 whitespace-nowrap">
+            {bookingRef && (
+              <span
+                className="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-amber-50 text-[#763a12] border border-amber-200 shadow-2xs select-all"
+                title={`Customer Reservation Reference: #${bookingRef}`}
+              >
+                #{bookingRef}
+              </span>
+            )}
+            <span className="font-semibold text-sm text-[#211a14]">{b.name}</span>
+          </div>
           <div className="flex flex-wrap items-center gap-2 text-[11px] text-zinc-500">
             {b.email && (
               <span className="flex items-center gap-1 text-zinc-600">

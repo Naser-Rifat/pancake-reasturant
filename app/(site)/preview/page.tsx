@@ -682,14 +682,18 @@ export default function PreviewPage() {
               {/* Slot 1: Tall Feature Image */}
               <div className={clubStyles.bentoSlotTall}>
                 <div className={clubStyles.bentoImgFrame}>
-                  <Image
-                    src={site.club_bento_1_img || "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&q=80"}
-                    alt={site.club_bento_1_title || "Signature Stack"}
-                    fill
-                    sizes="(max-width: 640px) 55vw, (max-width: 1024px) 50vw, 460px"
-                    priority
-                    className={clubStyles.bentoImg}
-                  />
+                  {site.club_bento_1_img ? (
+                    <Image
+                      src={site.club_bento_1_img}
+                      alt={site.club_bento_1_title || "Signature Stack"}
+                      fill
+                      sizes="(max-width: 640px) 55vw, (max-width: 1024px) 50vw, 460px"
+                      priority
+                      className={clubStyles.bentoImg}
+                    />
+                  ) : (
+                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#fffbeb", fontSize: "2rem" }}>🥞</div>
+                  )}
                 </div>
                 <div className={clubStyles.bentoBadge}>
                   <span>{site.club_bento_1_badge || "🥞 Fresh Off The Griddle"}</span>
@@ -703,14 +707,18 @@ export default function PreviewPage() {
               {/* Slot 2: Top Right */}
               <div className={clubStyles.bentoSlotTopRight}>
                 <div className={clubStyles.bentoImgFrame}>
-                  <Image
-                    src={site.club_bento_2_img || "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=80"}
-                    alt={site.club_bento_2_title || "Brunch Club"}
-                    fill
-                    sizes="(max-width: 640px) 45vw, (max-width: 1024px) 40vw, 320px"
-                    priority
-                    className={clubStyles.bentoImg}
-                  />
+                  {site.club_bento_2_img ? (
+                    <Image
+                      src={site.club_bento_2_img}
+                      alt={site.club_bento_2_title || "Brunch Club"}
+                      fill
+                      sizes="(max-width: 640px) 45vw, (max-width: 1024px) 40vw, 320px"
+                      priority
+                      className={clubStyles.bentoImg}
+                    />
+                  ) : (
+                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#fffbeb", fontSize: "2rem" }}>🥞</div>
+                  )}
                 </div>
                 <div className={clubStyles.bentoBadge}>
                   <span>{site.club_bento_2_badge || "🥞 Sunday Brunch"}</span>
@@ -724,14 +732,18 @@ export default function PreviewPage() {
               {/* Slot 3: Bottom Right */}
               <div className={clubStyles.bentoSlotBottomRight}>
                 <div className={clubStyles.bentoImgFrame}>
-                  <Image
-                    src={site.club_bento_3_img || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80"}
-                    alt={site.club_bento_3_title || "Our Parlour"}
-                    fill
-                    sizes="(max-width: 640px) 45vw, (max-width: 1024px) 40vw, 320px"
-                    priority
-                    className={clubStyles.bentoImg}
-                  />
+                  {site.club_bento_3_img ? (
+                    <Image
+                      src={site.club_bento_3_img}
+                      alt={site.club_bento_3_title || "Our Parlour"}
+                      fill
+                      sizes="(max-width: 640px) 45vw, (max-width: 1024px) 40vw, 320px"
+                      priority
+                      className={clubStyles.bentoImg}
+                    />
+                  ) : (
+                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#fffbeb", fontSize: "2rem" }}>☕</div>
+                  )}
                 </div>
                 <div className={clubStyles.bentoBadge}>
                   <span>{site.club_bento_3_badge || "☕ Geelong West"}</span>

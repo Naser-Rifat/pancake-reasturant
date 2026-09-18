@@ -21,16 +21,16 @@ export default async function JoinOurClubPage() {
   const lead = site.club_hero_lead || "Fluffy homemade stacks, secret tasting invites, and a table always saved for you.";
 
   const bento1Badge = (site.club_bento_1_badge || "🥞 Fresh Off The Griddle").replace(/[✨✦]/g, "🥞").trim();
-  const bento1Img = site.club_bento_1_img || "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&q=80";
+  const bento1Img = site.club_bento_1_img !== undefined ? site.club_bento_1_img : "https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&q=80";
   const bento1Title = site.club_bento_1_title || "Signature Stack";
   const bento1Sub = site.club_bento_1_sub || "Warm from the griddle";
 
-  const bento2Img = site.club_bento_2_img || "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=80";
+  const bento2Img = site.club_bento_2_img !== undefined ? site.club_bento_2_img : "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=80";
   const bento2Badge = site.club_bento_2_badge || "🥞 Sunday Brunch";
   const bento2Title = site.club_bento_2_title || "Brunch Club";
   const bento2Sub = site.club_bento_2_sub || "Weekend Table";
 
-  const bento3Img = site.club_bento_3_img || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80";
+  const bento3Img = site.club_bento_3_img !== undefined ? site.club_bento_3_img : "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80";
   const bento3Badge = site.club_bento_3_badge || "☕ Geelong West";
   const bento3Title = site.club_bento_3_title || "Our Parlour";
   const bento3Sub = site.club_bento_3_sub || "Open 7 days";
@@ -78,14 +78,18 @@ export default async function JoinOurClubPage() {
             {/* Slot 1: Grand Tall Feature Image (Signature Stack) */}
             <div className={styles.bentoSlotTall}>
               <div className={styles.bentoImgFrame}>
-                <Image
-                  src={bento1Img}
-                  alt="Golden buttermilk pancake stack topped with fresh berries, banana and dripping maple syrup"
-                  fill
-                  sizes="(max-width: 760px) 55vw, (max-width: 1200px) 55vw, 460px"
-                  priority
-                  className={styles.bentoImg}
-                />
+                {bento1Img ? (
+                  <Image
+                    src={bento1Img}
+                    alt="Golden buttermilk pancake stack topped with fresh berries, banana and dripping maple syrup"
+                    fill
+                    sizes="(max-width: 760px) 55vw, (max-width: 1200px) 55vw, 460px"
+                    priority
+                    className={styles.bentoImg}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-amber-50/50 text-3xl">🥞</div>
+                )}
               </div>
               <div className={styles.bentoBadge}>
                 <span>{bento1Badge}</span>
@@ -99,14 +103,18 @@ export default async function JoinOurClubPage() {
             {/* Slot 2: Top Right (Sunday Brunch) */}
             <div className={styles.bentoSlotTopRight}>
               <div className={styles.bentoImgFrame}>
-                <Image
-                  src={bento2Img}
-                  alt="Friends sharing breakfast with fluffy pancakes, eggs and coffee at a wooden café table"
-                  fill
-                  sizes="(max-width: 760px) 45vw, (max-width: 1200px) 40vw, 320px"
-                  priority
-                  className={styles.bentoImg}
-                />
+                {bento2Img ? (
+                  <Image
+                    src={bento2Img}
+                    alt="Friends sharing breakfast with fluffy pancakes, eggs and coffee at a wooden café table"
+                    fill
+                    sizes="(max-width: 760px) 45vw, (max-width: 1200px) 40vw, 320px"
+                    priority
+                    className={styles.bentoImg}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-amber-50/50 text-3xl">🥞</div>
+                )}
               </div>
               <div className={styles.bentoBadge}>
                 <span>{bento2Badge}</span>
@@ -120,14 +128,18 @@ export default async function JoinOurClubPage() {
             {/* Slot 3: Bottom Right (Geelong West Parlour) */}
             <div className={styles.bentoSlotBottomRight}>
               <div className={styles.bentoImgFrame}>
-                <Image
-                  src={bento3Img}
-                  alt="Warm atmospheric interior of The Pancake Club dining room with wooden tables and warm lighting"
-                  fill
-                  sizes="(max-width: 760px) 45vw, (max-width: 1200px) 40vw, 320px"
-                  priority
-                  className={styles.bentoImg}
-                />
+                {bento3Img ? (
+                  <Image
+                    src={bento3Img}
+                    alt="Warm atmospheric interior of The Pancake Club dining room with wooden tables and warm lighting"
+                    fill
+                    sizes="(max-width: 760px) 45vw, (max-width: 1200px) 40vw, 320px"
+                    priority
+                    className={styles.bentoImg}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-amber-50/50 text-3xl">☕</div>
+                )}
               </div>
               <div className={styles.bentoBadge}>
                 <span>{bento3Badge}</span>

@@ -30,6 +30,7 @@ import { Skeleton, TableSkeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { formatTime12h, parseBookingOffer } from "@/lib/format";
+import { formatOrderRef, formatBookingRef } from "@/lib/order-utils";
 
 export default function DashboardPage() {
   const dashboardQuery = useQuery({
@@ -225,7 +226,7 @@ export default function DashboardPage() {
             <div className="space-y-3">
               {recentOrders.map((o) => {
                 const placedDate = new Date(o.created_at);
-                const orderRef = o.public_id ? o.public_id.slice(0, 6).toUpperCase() : "";
+                const orderRef = formatOrderRef(o.public_id);
                 return (
                   <Link
                     key={o.public_id}
@@ -236,7 +237,7 @@ export default function DashboardPage() {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         {orderRef && (
-                          <span className="px-1.5 py-0.2 rounded-md text-[10px] font-mono font-semibold bg-zinc-100 text-zinc-700">
+                          <span className="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-50 text-[#763a12] border border-amber-200 shadow-2xs">
                             #{orderRef}
                           </span>
                         )}
@@ -295,6 +296,7 @@ export default function DashboardPage() {
             <div className="space-y-3">
               {recentBookings.map((b) => {
                 const { offer } = parseBookingOffer(b.notes);
+                const bookingRef = formatBookingRef(b.public_id);
                 return (
                   <Link
                     key={b.public_id}
@@ -304,6 +306,11 @@ export default function DashboardPage() {
                   >
                     <div className="space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
+                        {bookingRef && (
+                          <span className="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-50 text-[#763a12] border border-amber-200 shadow-2xs">
+                            #{bookingRef}
+                          </span>
+                        )}
                         <span className="font-semibold text-xs text-[#211a14]">{b.name}</span>
                         <span className="px-2 py-0.2 rounded-full text-[10px] font-semibold bg-amber-50 text-[#763a12] border border-amber-200">
                           {b.party_size} {b.party_size === 1 ? "Guest" : "Guests"}

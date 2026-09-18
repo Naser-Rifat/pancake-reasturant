@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Phone, MessageCircle, Printer, PlusCircle } from "lucide-react";
 import { getOrder, money, type ApiOrder, type ApiSiteSettings } from "@/lib/api";
+import { formatOrderRef } from "@/lib/order-utils";
 import { useCart } from "@/lib/cart";
 
 interface OrderSuccessClientProps {
@@ -189,7 +190,7 @@ export default function OrderSuccessClient({
 
   const copyOrderId = () => {
     if (!order) return;
-    const formattedId = `TPC-${order.public_id.slice(-6).toUpperCase()}`;
+    const formattedId = formatOrderRef(order.public_id);
     navigator.clipboard.writeText(formattedId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2200);
@@ -280,7 +281,7 @@ export default function OrderSuccessClient({
                 <div className="order-ref-left">
                   <div className="order-ref-label">Order Reference</div>
                   <div className="order-ref-number">
-                    #TPC-{order.public_id.slice(-6).toUpperCase()}
+                    #{formatOrderRef(order.public_id)}
                   </div>
                 </div>
                 <button
@@ -361,7 +362,12 @@ export default function OrderSuccessClient({
                       <div className="flow-step-time">{times.placedTime}</div>
                     </div>
 
-                    <div className={`flow-step-line ${activeStepIndex >= 2 ? "active" : ""}`} />
+                    <div
+                      className={`flow-step-line ${
+                        activeStepIndex >= 2 ? "active" : activeStepIndex === 1 ? "next" : ""
+                      }`}
+                      aria-hidden="true"
+                    />
 
                     {/* Step 2: Preparing */}
                     <div
@@ -376,7 +382,12 @@ export default function OrderSuccessClient({
                       <div className="flow-step-time">{activeStepIndex >= 2 ? "In Kitchen" : "Next"}</div>
                     </div>
 
-                    <div className={`flow-step-line ${activeStepIndex >= 3 ? "active" : ""}`} />
+                    <div
+                      className={`flow-step-line ${
+                        activeStepIndex >= 3 ? "active" : activeStepIndex === 2 ? "next" : ""
+                      }`}
+                      aria-hidden="true"
+                    />
 
                     {/* Step 3: Ready */}
                     <div
@@ -391,7 +402,12 @@ export default function OrderSuccessClient({
                       <div className="flow-step-time">Counter</div>
                     </div>
 
-                    <div className={`flow-step-line ${activeStepIndex >= 4 ? "active" : ""}`} />
+                    <div
+                      className={`flow-step-line ${
+                        activeStepIndex >= 4 ? "active" : activeStepIndex === 3 ? "next" : ""
+                      }`}
+                      aria-hidden="true"
+                    />
 
                     {/* Step 4: Enjoy */}
                     <div className={`flow-step ${activeStepIndex >= 4 ? "completed" : "pending"}`}>
@@ -431,7 +447,7 @@ export default function OrderSuccessClient({
                 <div className="pickup-instruction-pill">
                   <span className="pill-icon">💡</span>
                   <span>
-                    When you arrive, quote your name <b>{order.customer_name || "Guest"}</b> or Order <b>#TPC-{order.public_id.slice(-6).toUpperCase()}</b>.
+                    When you arrive, quote your name <b>{order.customer_name || "Guest"}</b> or Order <b>#{formatOrderRef(order.public_id)}</b>.
                   </span>
                 </div>
 
@@ -454,7 +470,7 @@ export default function OrderSuccessClient({
                   {venueWhatsapp && (
                     <a
                       href={`https://wa.me/${venueWhatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-                        `Hi The Pancake Club! I'm checking on my pickup order #TPC-${order.public_id.slice(-6).toUpperCase()}`
+                        `Hi The Pancake Club! I'm checking on my pickup order #${formatOrderRef(order.public_id)}`
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -505,7 +521,7 @@ export default function OrderSuccessClient({
                     <span>{new Date(order.created_at || Date.now()).toLocaleDateString("en-AU")}</span>
                   </div>
                   <div className="receipt-meta-row">
-                    <span>Order: <b>#TPC-{order.public_id.slice(-6).toUpperCase()}</b></span>
+                    <span>Order: <b>#{formatOrderRef(order.public_id)}</b></span>
                     <span>{times.placedTime}</span>
                   </div>
                 </div>

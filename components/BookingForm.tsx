@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { createBooking, type ApiBooking } from "@/lib/api";
+import { formatBookingRef } from "@/lib/order-utils";
 import { validatePhoneNumber } from "@/lib/format";
 
 interface BookingFormProps {
@@ -85,6 +86,9 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
       <div className="widget-slot" role="status">
         <span className="big">✅</span>
         <b>Request received, {form.name.split(" ")[0]}!</b>
+        <div style={{ margin: "4px 0", fontSize: "0.85rem", fontWeight: 700, color: "#763a12", letterSpacing: "0.02em" }}>
+          Reservation Reference: <span style={{ background: "#fef3c7", border: "1px solid #fcd34d", padding: "2px 8px", borderRadius: "6px", fontFamily: "monospace" }}>#{formatBookingRef(booking.public_id)}</span>
+        </div>
         <span>
           {booking.date} at {booking.time.slice(0, 5)} for {booking.party_size}
           {dishes.length > 0 ? ` (${dishes.join(", ")})` : ""}
