@@ -7,6 +7,7 @@ const externalSite = process.env.E2E_BASE_URL;
 const externalApi = process.env.E2E_API_URL;
 const localSite = "http://127.0.0.1:3100";
 const localApi = "http://127.0.0.1:8100/api";
+const localAdminGateSecret = "e2e-admin-gate";
 
 if (externalSite && !externalApi) {
   throw new Error("E2E_API_URL is required when E2E_BASE_URL targets a deployed site.");
@@ -38,6 +39,28 @@ export default defineConfig({
     baseURL: externalSite ?? localSite,
     channel: isCI ? undefined : "chrome",
     viewport: { width: 1280, height: 900 },
+    // Production intentionally returns 404 for private UI routes until the
+    // unlisted staff entry point has minted this cookie. Browser regression
+    // tests exercise the admin application itself, so their isolated local
+    // context starts behind the gate with a test-only value. The local Next
+    // server receives the same value below; deployed-site runs remain untouched.
+    storageState: externalSite
+      ? undefined
+      : {
+          cookies: [
+            {
+              name: "pc_admin_gate",
+              value: localAdminGateSecret,
+              domain: "127.0.0.1",
+              path: "/",
+              expires: -1,
+              httpOnly: true,
+              secure: false,
+              sameSite: "Lax",
+            },
+          ],
+          origins: [],
+        },
   },
   webServer: externalSite ? undefined : [
     {
@@ -66,6 +89,7 @@ export default defineConfig({
         ...process.env,
         NEXT_PUBLIC_API_URL: localApi,
         NEXT_DIST_DIR: ".next-e2e",
+        ADMIN_GATE_SECRET: localAdminGateSecret,
       },
     },
   ],
