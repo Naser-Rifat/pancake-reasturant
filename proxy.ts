@@ -19,7 +19,46 @@ const BYPASS_COOKIE = "pc_bypass";
 const BYPASS_QUERY = "preview";
 const BYPASS_MAX_AGE = 60 * 60 * 24 * 7; // a week of previewing, then re-auth
 
+const VERCEL_DEPLOYMENT_SUFFIX = ".vercel.app";
+const PRIVATE_PATHS = ["/admin", "/preview"];
+
+function isPrivatePath(pathname: string) {
+  return PRIVATE_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`),
+  );
+}
+
+function isDirectVercelDeployment(request: NextRequest) {
+  const requestHost = request.headers
+    .get("host")
+    ?.split(":", 1)[0]
+    .toLowerCase();
+
+  return [request.nextUrl.hostname.toLowerCase(), requestHost].some((hostname) =>
+    hostname?.endsWith(VERCEL_DEPLOYMENT_SUFFIX),
+  );
+}
+
 export function proxy(request: NextRequest) {
+  // Cloudflare Access protects these routes on the canonical production host.
+  // Vercel's stable `*.vercel.app` production alias remains directly reachable
+  // under Standard Protection, so deny private UI routes there to prevent that
+  // alias from becoming an Access bypass. Backend staff APIs still enforce
+  // Django authentication independently.
+  if (
+    isDirectVercelDeployment(request) &&
+    isPrivatePath(request.nextUrl.pathname)
+  ) {
+    return new NextResponse("Not Found", {
+      status: 404,
+      headers: {
+        "Cache-Control": "no-store, must-revalidate",
+        "Content-Type": "text/plain; charset=utf-8",
+        "X-Robots-Tag": "noindex, nofollow, noarchive",
+      },
+    });
+  }
+
   if (process.env.MAINTENANCE_MODE !== "1") return NextResponse.next();
 
   const path = request.nextUrl.pathname;

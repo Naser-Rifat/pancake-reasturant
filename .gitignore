@@ -59,6 +59,9 @@ next-env.d.ts
 # internal business documents — never ship to client or public repo
 docs/PROJECT_PROPOSAL.md
 
+PROJECT_AUDIT.md
+PROJECT_DOCUMENTATION.md
+
 # playwright
 /test-results/
 /playwright-report/
