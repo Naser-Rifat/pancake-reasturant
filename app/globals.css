@@ -7814,9 +7814,9 @@ body:has(.cart-fab) .wa-float {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 0.75rem;
-    padding: 1.25rem 1.1rem;
-    border-radius: 14px;
+    gap: 0.85rem;
+    padding: 1.25rem 1rem;
+    border-radius: 16px;
     border-width: 2px;
     text-align: left;
     position: relative;
@@ -7829,18 +7829,18 @@ body:has(.cart-fab) .wa-float {
     top: 0.85rem;
     right: 0.85rem;
     left: auto;
-    width: 54px;
-    height: 54px;
+    width: 58px;
+    height: 58px;
     margin: 0;
   }
   .starburst-center {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-width: 1.5px;
   }
-  .starburst-icon { font-size: 0.58rem; }
-  .starburst-big { font-size: 0.54rem; }
-  .starburst-small { font-size: 0.32rem; letter-spacing: 0.04em; }
+  .starburst-icon { font-size: 0.62rem; }
+  .starburst-big { font-size: 0.56rem; }
+  .starburst-small { font-size: 0.34rem; letter-spacing: 0.04em; }
   .starburst-rotate-svg {
     font-size: 5.6px;
     letter-spacing: 0.1em;
@@ -7849,18 +7849,19 @@ body:has(.cart-fab) .wa-float {
 
   .promo-main {
     width: 100%;
-    padding-right: 58px; /* avoid starburst badge at top-right */
+    padding-right: 64px; /* avoid starburst badge at top-right */
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.35rem;
   }
   .promo-kicker {
-    font-size: 0.65rem;
+    font-size: 0.72rem;
     letter-spacing: 0.12em;
     line-height: 1.3;
+    font-weight: 800;
   }
   .promo-head {
-    font-size: clamp(1.2rem, 5vw, 1.45rem);
+    font-size: clamp(1.25rem, 5.2vw, 1.55rem);
     line-height: 1.15;
     text-wrap: balance;
   }
@@ -7871,7 +7872,7 @@ body:has(.cart-fab) .wa-float {
     color: rgba(248, 242, 224, 0.9) !important;
   }
   .promo-action {
-    margin-top: 0.2rem !important;
+    margin-top: 0.3rem !important;
     width: 100%;
   }
   .promo-cta-btn {
@@ -7880,69 +7881,118 @@ body:has(.cart-fab) .wa-float {
     justify-content: center;
     width: 100%;
     margin-top: 0.2rem;
-    min-height: 42px;
-    padding: 0.6rem 1.25rem;
-    font-size: 0.78rem;
+    min-height: 44px;
+    padding: 0.65rem 1.25rem;
+    font-size: 0.82rem;
     background: var(--cream-card);
     border-color: var(--ink);
-    box-shadow: 0 3px 10px rgba(26, 17, 9, 0.35);
+    box-shadow: 0 4px 12px rgba(26, 17, 9, 0.35);
     white-space: nowrap;
+    border-radius: 999px;
   }
 
   .promo-cards {
-    display: block;
-    width: 100%;
-    margin: 0.2rem 0 0;
-    padding: 0;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.65rem !important;
+    width: 100% !important;
+    margin: 0.35rem 0 0 !important;
+    padding: 0 !important;
   }
+
   .promo-ticket-card {
     display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 0.75rem !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.45rem !important;
     width: 100% !important;
     max-width: 100% !important;
     height: auto !important;
-    padding: 0.5rem 0.65rem !important;
+    padding: 0.6rem !important;
     border-radius: 12px !important;
     background: #ffffff !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
     transform: none !important;
+    text-decoration: none !important;
   }
+
+  .promo-ticket-card.tilt-card {
+    transform: rotate(1.2deg) !important;
+  }
+
   .promo-ticket-card + .promo-ticket-card {
-    display: none !important;
+    display: flex !important;
   }
+
   .ticket-top-tag {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.68rem;
-    font-weight: 800;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    font-size: 0.68rem !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    color: var(--ink) !important;
+    line-height: 1 !important;
   }
   .ticket-open-icon {
     display: inline-block !important;
-    color: var(--pink-deep);
+    color: var(--pink-deep) !important;
+    font-weight: 800 !important;
   }
   .ticket-img-frame {
-    width: 60px !important;
-    height: 60px !important;
-    min-width: 60px !important;
-    max-width: 60px !important;
-    aspect-ratio: 1 / 1 !important;
+    width: 100% !important;
+    aspect-ratio: 16 / 11 !important;
+    height: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
     border-radius: 8px !important;
     overflow: hidden !important;
     flex-shrink: 0 !important;
+    position: relative !important;
   }
   .ticket-dish-title {
     display: block !important;
-    font-size: 0.8rem !important;
+    font-size: 0.78rem !important;
     font-weight: 800 !important;
     color: var(--ink) !important;
-    text-align: left !important;
+    text-align: center !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+    line-height: 1.2 !important;
+  }
+
+  /* When only 1 card is present on mobile, render it as a wide horizontal card */
+  .promo-cards:has(.promo-ticket-card:only-child) {
+    grid-template-columns: 1fr !important;
+  }
+  .promo-cards:has(.promo-ticket-card:only-child) .promo-ticket-card {
+    display: grid !important;
+    grid-template-columns: 68px 1fr !important;
+    grid-template-rows: auto 1fr !important;
+    align-items: center !important;
+    gap: 0.2rem 0.75rem !important;
+    padding: 0.55rem 0.75rem !important;
+  }
+  .promo-cards:has(.promo-ticket-card:only-child) .ticket-img-frame {
+    grid-row: 1 / 3 !important;
+    grid-column: 1 !important;
+    width: 68px !important;
+    height: 68px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 8px !important;
+  }
+  .promo-cards:has(.promo-ticket-card:only-child) .ticket-top-tag {
+    grid-row: 1 !important;
+    grid-column: 2 !important;
+    font-size: 0.72rem !important;
+  }
+  .promo-cards:has(.promo-ticket-card:only-child) .ticket-dish-title {
+    grid-row: 2 !important;
+    grid-column: 2 !important;
+    font-size: 0.88rem !important;
+    text-align: left !important;
   }
 }
 

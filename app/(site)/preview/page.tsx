@@ -45,28 +45,72 @@ function DealStatusNote({
           minute: "2-digit",
         })
       : "";
-  const text =
+  const config =
     status === "scheduled"
-      ? `Scheduled — visitors will start seeing this from ${nice(announcement?.starts_at)}`
+      ? {
+          icon: "⏳",
+          badge: "SCHEDULED",
+          text: `Visitors will see this from ${nice(announcement?.starts_at)}`,
+          style: {
+            background: "rgba(254, 243, 199, 0.92)",
+            border: "1px solid #fcd34d",
+            color: "#78350f",
+          },
+        }
       : status === "expired"
-      ? `Ended ${nice(announcement?.ends_at)} — visitors no longer see this deal`
-      : "Hidden — “Show on the Website” is OFF, visitors don't see this deal";
+      ? {
+          icon: "🕰️",
+          badge: "ENDED",
+          text: `Ended ${nice(announcement?.ends_at)} — hidden from visitors`,
+          style: {
+            background: "rgba(244, 244, 245, 0.95)",
+            border: "1px solid #d4d4d8",
+            color: "#3f3f46",
+          },
+        }
+      : {
+          icon: "🙈",
+          badge: "DRAFT / HIDDEN",
+          text: "“Show on Website” is OFF — visitors don't see this deal",
+          style: {
+            background: "rgba(255, 251, 235, 0.95)",
+            border: "1px solid #fde68a",
+            color: "#92400e",
+          },
+        };
+
   return (
     <div
       style={{
         margin: "0 0 10px",
-        padding: "8px 14px",
-        borderRadius: "10px",
-        background: status === "scheduled" ? "#fef3c7" : "#f4f4f5",
-        border: `1px solid ${status === "scheduled" ? "#fcd34d" : "#d4d4d8"}`,
-        color: "#211a14",
-        fontSize: "0.75rem",
-        fontWeight: 700,
+        padding: "6px 12px",
+        borderRadius: "999px",
+        fontSize: "0.72rem",
+        fontWeight: 600,
         textAlign: "center",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "6px",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
+        ...config.style,
       }}
     >
-      {status === "scheduled" ? "⏳ " : status === "expired" ? "🕰️ " : "🙈 "}
-      {text} — the design below is your work-in-progress preview.
+      <span>{config.icon}</span>
+      <span
+        style={{
+          textTransform: "uppercase",
+          fontSize: "0.62rem",
+          fontWeight: 800,
+          letterSpacing: "0.05em",
+          background: "rgba(0,0,0,0.06)",
+          padding: "1px 6px",
+          borderRadius: "4px",
+        }}
+      >
+        {config.badge}
+      </span>
+      <span>{config.text}</span>
     </div>
   );
 }
@@ -244,10 +288,15 @@ export default function PreviewPage() {
         }
 
         .preview-container .promo-band {
-          padding: 1.5rem 2.2rem !important;
           margin: 0.25rem auto !important;
-          border-radius: 24px !important;
+          border-radius: 20px !important;
           box-shadow: 0 10px 30px rgba(33, 26, 20, 0.18) !important;
+        }
+
+        @media (min-width: 640px) {
+          .preview-container .promo-band {
+            padding: 1.5rem 2.2rem !important;
+          }
         }
 
         .preview-container .promo-head {
