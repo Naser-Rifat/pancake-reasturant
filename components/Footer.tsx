@@ -25,10 +25,10 @@ export default async function Footer() {
           {/* Column 1: Brand & Actions */}
           <div className="f-col f-col-brand">
             <Image
-              src="/logo.png"
+              src="/logo-white.png"
               alt="The Pancake Club"
-              width={529}
-              height={226}
+              width={377}
+              height={166}
               className="f-brand-logo"
             />
             <p className="f-brand-tag">

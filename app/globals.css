@@ -13178,8 +13178,15 @@ body:has(.top-ribbon).has-announce .top-ribbon {
 
 .f-col-brand .f-brand-logo,
 .f-brand-logo {
-  width: min(100%, 235px);
-  margin-bottom: 1rem;
+  width: min(100%, 215px);
+  height: auto;
+  aspect-ratio: 377 / 166;
+  object-fit: contain;
+  object-position: left center;
+  display: block;
+  margin-left: 0;
+  margin-right: auto;
+  margin-bottom: 1.1rem;
   filter: none;
 }
 
