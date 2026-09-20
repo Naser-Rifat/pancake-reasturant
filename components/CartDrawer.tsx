@@ -11,7 +11,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { ChevronRight, Clock } from "lucide-react";
+import { ChevronRight, Clock, Mail, Phone, Tag, User } from "lucide-react";
 import { money, placeOrder, validateCoupon, type ApiCouponPreview, type ApiMenuItem } from "@/lib/api";
 import { useCart } from "@/lib/cart";
 import { validatePhoneNumber } from "@/lib/format";
@@ -322,17 +322,22 @@ export default function CartDrawer({
                   <h4 className="cart-section-title">Pickup Details</h4>
                   <div className="cart-form">
                     <div>
-                      <input
-                        id="cart-customer-name"
-                        className={`input${nameError ? " error" : ""}`}
-                        style={nameError ? { borderColor: "#ef4444", backgroundColor: "#fef2f2" } : undefined}
-                        placeholder="Your name *"
-                        value={name}
-                        autoComplete="name"
-                        aria-invalid={!!nameError}
-                        onChange={(e) => handleNameChange(e.target.value)}
-                        onBlur={handleNameBlur}
-                      />
+                      <div className={`float-field ${name ? "is-floated" : ""} ${nameError ? "has-error" : ""}`}>
+                        <input
+                          id="cart-customer-name"
+                          className={`float-input${nameError ? " error" : ""}`}
+                          placeholder=" "
+                          value={name}
+                          autoComplete="name"
+                          aria-invalid={!!nameError}
+                          onChange={(e) => handleNameChange(e.target.value)}
+                          onBlur={handleNameBlur}
+                        />
+                        <label htmlFor="cart-customer-name" className="float-label">
+                          Your Name *
+                        </label>
+                        <User size={18} className="float-icon" aria-hidden="true" />
+                      </div>
                       {nameError && (
                         <p
                           className="cart-name-error"
@@ -350,22 +355,28 @@ export default function CartDrawer({
                         </p>
                       )}
                     </div>
+
                     <div>
-                      <input
-                        id="cart-customer-email"
-                        className={`input${emailError ? " error" : ""}`}
-                        style={emailError ? { borderColor: "#ef4444", backgroundColor: "#fef2f2" } : undefined}
-                        type="email"
-                        placeholder="Email address *"
-                        value={email}
-                        autoComplete="email"
-                        inputMode="email"
-                        required
-                        aria-invalid={!!emailError}
-                        aria-describedby={emailError ? "cart-customer-email-error" : undefined}
-                        onChange={(e) => handleEmailChange(e.target.value)}
-                        onBlur={handleEmailBlur}
-                      />
+                      <div className={`float-field ${email ? "is-floated" : ""} ${emailError ? "has-error" : ""}`}>
+                        <input
+                          id="cart-customer-email"
+                          className={`float-input${emailError ? " error" : ""}`}
+                          type="email"
+                          placeholder=" "
+                          value={email}
+                          autoComplete="email"
+                          inputMode="email"
+                          required
+                          aria-invalid={!!emailError}
+                          aria-describedby={emailError ? "cart-customer-email-error" : undefined}
+                          onChange={(e) => handleEmailChange(e.target.value)}
+                          onBlur={handleEmailBlur}
+                        />
+                        <label htmlFor="cart-customer-email" className="float-label">
+                          Email Address *
+                        </label>
+                        <Mail size={18} className="float-icon" aria-hidden="true" />
+                      </div>
                       {emailError && (
                         <p
                           id="cart-customer-email-error"
@@ -384,19 +395,26 @@ export default function CartDrawer({
                         </p>
                       )}
                     </div>
+
                     <div>
-                      <input
-                        id="cart-customer-phone"
-                        className={`input${phoneError ? " error" : ""}`}
-                        style={phoneError ? { borderColor: "#ef4444", backgroundColor: "#fef2f2" } : undefined}
-                        placeholder="Phone number * (e.g. 0412 345 678)"
-                        value={phone}
-                        autoComplete="tel"
-                        inputMode="tel"
-                        aria-invalid={!!phoneError}
-                        onChange={(e) => handlePhoneChange(e.target.value)}
-                        onBlur={handlePhoneBlur}
-                      />
+                      <div className={`float-field ${phone ? "is-floated" : ""} ${phoneError ? "has-error" : ""}`}>
+                        <input
+                          id="cart-customer-phone"
+                          className={`float-input${phoneError ? " error" : ""}`}
+                          type="tel"
+                          placeholder=" "
+                          value={phone}
+                          autoComplete="tel"
+                          inputMode="tel"
+                          aria-invalid={!!phoneError}
+                          onChange={(e) => handlePhoneChange(e.target.value)}
+                          onBlur={handlePhoneBlur}
+                        />
+                        <label htmlFor="cart-customer-phone" className="float-label">
+                          Phone Number *
+                        </label>
+                        <Phone size={18} className="float-icon" aria-hidden="true" />
+                      </div>
                       {phoneError && (
                         <p
                           className="cart-phone-error"
@@ -440,17 +458,24 @@ export default function CartDrawer({
                     </div>
                   ) : (
                     <div className="cart-coupon">
-                      <input
-                        className="input"
-                        placeholder="Coupon code"
-                        aria-label="Coupon code"
-                        autoCapitalize="characters"
-                        autoComplete="off"
-                        style={{ textTransform: "uppercase" }}
-                        value={couponDraft}
-                        onChange={(e) => setCouponDraft(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && applyCoupon()}
-                      />
+                      <div className={`float-field ${couponDraft ? "is-floated" : ""}`} style={{ flex: 1 }}>
+                        <input
+                          id="cart-coupon-input"
+                          className="float-input"
+                          placeholder=" "
+                          aria-label="Coupon code"
+                          autoCapitalize="characters"
+                          autoComplete="off"
+                          style={{ textTransform: "uppercase" }}
+                          value={couponDraft}
+                          onChange={(e) => setCouponDraft(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && applyCoupon()}
+                        />
+                        <label htmlFor="cart-coupon-input" className="float-label">
+                          Coupon code
+                        </label>
+                        <Tag size={16} className="float-icon" aria-hidden="true" />
+                      </div>
                       <button
                         type="button"
                         className="cart-coupon-apply"

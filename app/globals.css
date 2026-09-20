@@ -4766,8 +4766,163 @@ textarea.input {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 0.9rem;
 }
-.bk-row .input {
+.bk-row .input,
+.bk-row .bk-float-field {
   min-width: 0;
+}
+
+/* ---------- Floating Label Form Fields (.bk-form, .cart-form, .rev-form) ---------- */
+.float-field,
+.bk-float-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.float-input,
+.bk-float-input {
+  width: 100%;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.96rem;
+  font-weight: 600;
+  color: var(--ink, #211a14);
+  background: #ffffff;
+  border: 2px solid rgba(118, 58, 18, 0.16);
+  border-radius: 14px;
+  padding: 1.35rem 2.6rem 0.45rem 1rem;
+  height: 56px;
+  line-height: 1.2;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.float-input:hover,
+.bk-float-input:hover {
+  border-color: rgba(118, 58, 18, 0.32);
+}
+
+.float-input:focus,
+.bk-float-input:focus {
+  border-color: #763a12;
+  background: #fffdfa;
+  box-shadow: 0 0 0 3.5px rgba(118, 58, 18, 0.12);
+}
+
+/* Error states */
+.float-field.has-error .float-input,
+.bk-float-field.has-error .bk-float-input,
+.float-input.error,
+.bk-float-input.error {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+}
+
+.float-field.has-error .float-label,
+.bk-float-field.has-error .bk-float-label {
+  color: #dc2626 !important;
+}
+
+.float-field.has-error .float-icon,
+.bk-float-field.has-error .bk-float-icon {
+  color: #ef4444 !important;
+}
+
+/* Floating label */
+.float-label,
+.bk-float-label {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #8c7361;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left top;
+  user-select: none;
+  z-index: 1;
+}
+
+/* When field is focused or has value: label floats up */
+.float-field.is-floated .float-label,
+.bk-float-field.is-floated .bk-float-label,
+.float-field:focus-within .float-label,
+.bk-float-field:focus-within .bk-float-label {
+  top: 0.42rem;
+  transform: translateY(0);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #763a12;
+  letter-spacing: 0.02em;
+}
+
+/* Trailing field icon */
+.float-icon,
+.bk-float-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a8988b;
+  pointer-events: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+  z-index: 2;
+}
+
+.float-field:focus-within .float-icon,
+.bk-float-field:focus-within .bk-float-icon {
+  color: #763a12;
+  transform: translateY(-50%) scale(1.08);
+}
+
+/* Native WebKit date/time picker indicator overlaid across the whole input */
+.float-input[type="date"]::-webkit-calendar-picker-indicator,
+.bk-float-input[type="date"]::-webkit-calendar-picker-indicator,
+.float-input[type="time"]::-webkit-calendar-picker-indicator,
+.bk-float-input[type="time"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Select specific styling */
+select.float-input,
+select.bk-float-input {
+  appearance: none;
+  cursor: pointer;
+  padding-right: 2.5rem;
+}
+
+/* Textarea specific styling */
+textarea.float-input,
+textarea.bk-float-input {
+  height: auto;
+  min-height: 86px;
+  padding-top: 1.55rem;
+  padding-bottom: 0.65rem;
+  resize: vertical;
+}
+
+.float-field.textarea-field .float-label,
+.bk-float-field.textarea-field .bk-float-label {
+  top: 1.05rem;
+  transform: none;
+}
+
+.float-field.textarea-field.is-floated .float-label,
+.bk-float-field.textarea-field.is-floated .bk-float-label,
+.float-field.textarea-field:focus-within .float-label,
+.bk-float-field.textarea-field:focus-within .bk-float-label {
+  top: 0.42rem;
 }
 .form-error {
   color: #cf3050;

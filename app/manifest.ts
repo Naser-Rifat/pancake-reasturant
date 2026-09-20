@@ -20,6 +20,8 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#f8f2e0",
     categories: ["food", "shopping"],
     icons: [
+      { src: "/icons/icon-48.png", sizes: "48x48", type: "image/png", purpose: "any" },
+      { src: "/icons/icon-96.png", sizes: "96x96", type: "image/png", purpose: "any" },
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
       // Android crops icons to its own shape; the maskable variant keeps the

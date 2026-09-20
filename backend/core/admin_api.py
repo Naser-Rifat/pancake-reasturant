@@ -164,13 +164,19 @@ class AdminMenuItemSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source="category.name", read_only=True, default="")
     category_slug = serializers.CharField(source="category.slug", read_only=True, default="")
     category_icon = serializers.CharField(source="category.icon", read_only=True, default="🥞")
+    photos_count = serializers.SerializerMethodField()
+
+    def get_photos_count(self, obj):
+        if hasattr(obj, "photos_count"):
+            return obj.photos_count
+        return obj.photos.count()
 
     class Meta:
         model = MenuItem
         fields = [
             "slug", "name", "description", "price", "tag", "category",
             "category_name", "category_slug", "category_icon", "heat", "kcal",
-            "protein_g", "prep_time", "image", "photo", "is_featured",
+            "protein_g", "prep_time", "image", "photo", "photos_count", "is_featured",
             "is_available", "sort_order",
         ]
 

@@ -55,8 +55,17 @@ export const metadata: Metadata = {
     : undefined,
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/icons/icon-192.png",
-    apple: "/icons/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icons/icon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/icons/icon-96.png", sizes: "96x96", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   // iOS reads these, not the manifest, to launch standalone from the home screen
   appleWebApp: {
@@ -120,6 +129,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     name: "The Pancake Club",
     url: SITE_URL,
     image: site.hero_image || `${SITE_URL}/logo.png`,
+    logo: `${SITE_URL}/logo.png`,
     servesCuisine: "Pancakes, Breakfast, Dessert",
     priceRange: "$$",
     telephone: site.phone,

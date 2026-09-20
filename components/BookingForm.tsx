@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createBooking, type ApiBooking } from "@/lib/api";
 import { formatBookingRef } from "@/lib/order-utils";
 import { validatePhoneNumber } from "@/lib/format";
+import { Calendar, Clock, Mail, Phone, User, Users } from "lucide-react";
 
 interface BookingFormProps {
   menuItems?: { slug: string; name: string; price: string }[];
@@ -21,6 +22,8 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
     notes: "",
   });
   const [offer, setOffer] = useState<string>("");
+  const [dateFocused, setDateFocused] = useState(false);
+  const [timeFocused, setTimeFocused] = useState(false);
 
   useEffect(() => {
     try {
@@ -51,6 +54,31 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
   const set = (key: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
       setForm((f) => ({ ...f, [key]: e.target.value }));
+
+  const handleDateFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setDateFocused(true);
+    try {
+      e.target.showPicker?.();
+    } catch { /* ignore */ }
+  };
+  const handleDateClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    setDateFocused(true);
+    try {
+      (e.target as HTMLInputElement).showPicker?.();
+    } catch { /* ignore */ }
+  };
+  const handleTimeFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setTimeFocused(true);
+    try {
+      e.target.showPicker?.();
+    } catch { /* ignore */ }
+  };
+  const handleTimeClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    setTimeFocused(true);
+    try {
+      (e.target as HTMLInputElement).showPicker?.();
+    } catch { /* ignore */ }
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,29 +145,126 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
           <span className="bk-offer-chip">Offer Linked ✓</span>
         </div>
       )}
-      <input className="input" placeholder="Your name *" required value={form.name} autoComplete="name" onChange={set("name")} />
-      <input className="input" type="email" placeholder="Email *" required value={form.email} autoComplete="email" onChange={set("email")} />
-      <input
-        id="booking-phone"
-        className="input"
-        type="tel"
-        placeholder="Phone *"
-        required
-        aria-required="true"
-        value={form.phone}
-        autoComplete="tel"
-        inputMode="tel"
-        onChange={set("phone")}
-      />
-      <div className="bk-row">
-        <input className="input" type="date" required min={new Date().toISOString().split("T")[0]} value={form.date} onChange={set("date")} aria-label="Date" />
-        <input className="input" type="time" required value={form.time} onChange={set("time")} aria-label="Time" />
+      {/* Name Field */}
+      <div className={`bk-float-field ${form.name ? "is-floated" : ""}`}>
+        <input
+          id="booking-name"
+          className="bk-float-input"
+          placeholder=" "
+          required
+          value={form.name}
+          autoComplete="name"
+          onChange={set("name")}
+        />
+        <label htmlFor="booking-name" className="bk-float-label">
+          Your Name *
+        </label>
+        <User size={18} className="bk-float-icon" aria-hidden="true" />
       </div>
-      <select className="input" value={form.party_size} onChange={set("party_size")} aria-label="Party size">
-        {Array.from({ length: 9 }, (_, i) => i + 1).map((n) => (
-          <option key={n} value={n}>{n} {n === 1 ? "guest" : "guests"}</option>
-        ))}
-      </select>
+
+      {/* Email Field */}
+      <div className={`bk-float-field ${form.email ? "is-floated" : ""}`}>
+        <input
+          id="booking-email"
+          className="bk-float-input"
+          type="email"
+          placeholder=" "
+          required
+          value={form.email}
+          autoComplete="email"
+          onChange={set("email")}
+        />
+        <label htmlFor="booking-email" className="bk-float-label">
+          Email Address *
+        </label>
+        <Mail size={18} className="bk-float-icon" aria-hidden="true" />
+      </div>
+
+      {/* Phone Field */}
+      <div className={`bk-float-field ${form.phone ? "is-floated" : ""}`}>
+        <input
+          id="booking-phone"
+          className="bk-float-input"
+          type="tel"
+          placeholder=" "
+          required
+          aria-required="true"
+          value={form.phone}
+          autoComplete="tel"
+          inputMode="tel"
+          onChange={set("phone")}
+        />
+        <label htmlFor="booking-phone" className="bk-float-label">
+          Phone Number *
+        </label>
+        <Phone size={18} className="bk-float-icon" aria-hidden="true" />
+      </div>
+
+      {/* Date & Time Row */}
+      <div className="bk-row">
+        {/* Date Field */}
+        <div className={`bk-float-field ${form.date || dateFocused ? "is-floated" : ""}`}>
+          <input
+            id="booking-date"
+            className="bk-float-input"
+            type={dateFocused || form.date ? "date" : "text"}
+            required
+            min={new Date().toISOString().split("T")[0]}
+            value={form.date}
+            placeholder=" "
+            onFocus={handleDateFocus}
+            onClick={handleDateClick}
+            onBlur={() => setDateFocused(false)}
+            onChange={set("date")}
+          />
+          <label htmlFor="booking-date" className="bk-float-label">
+            Date *
+          </label>
+          <Calendar size={18} className="bk-float-icon" aria-hidden="true" />
+        </div>
+
+        {/* Time Field */}
+        <div className={`bk-float-field ${form.time || timeFocused ? "is-floated" : ""}`}>
+          <input
+            id="booking-time"
+            className="bk-float-input"
+            type={timeFocused || form.time ? "time" : "text"}
+            required
+            value={form.time}
+            placeholder=" "
+            onFocus={handleTimeFocus}
+            onClick={handleTimeClick}
+            onBlur={() => setTimeFocused(false)}
+            onChange={set("time")}
+          />
+          <label htmlFor="booking-time" className="bk-float-label">
+            Time *
+          </label>
+          <Clock size={18} className="bk-float-icon" aria-hidden="true" />
+        </div>
+      </div>
+
+      {/* Party Size Select */}
+      <div className="bk-float-field is-floated">
+        <select
+          id="booking-party-size"
+          className="bk-float-input"
+          value={form.party_size}
+          onChange={set("party_size")}
+          aria-label="Party size"
+        >
+          {Array.from({ length: 9 }, (_, i) => i + 1).map((n) => (
+            <option key={n} value={n}>
+              {n} {n === 1 ? "guest (Solo)" : "guests"}
+            </option>
+          ))}
+        </select>
+        <label htmlFor="booking-party-size" className="bk-float-label">
+          Party Size (Guests) *
+        </label>
+        <Users size={18} className="bk-float-icon" aria-hidden="true" />
+      </div>
+
       {menuItems.length > 0 && (
         <fieldset className="bk-dishes">
           {/* toggle chips, not a multiple <select>: several favourites should be
@@ -174,7 +299,21 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
           </div>
         </fieldset>
       )}
-      <textarea className="input" rows={2} placeholder="Anything we should know? Special requests or dietary needs (optional)" value={form.notes} onChange={set("notes")} />
+
+      {/* Special Requests / Notes */}
+      <div className={`bk-float-field textarea-field ${form.notes ? "is-floated" : ""}`}>
+        <textarea
+          id="booking-notes"
+          className="bk-float-input"
+          rows={2}
+          placeholder=" "
+          value={form.notes}
+          onChange={set("notes")}
+        />
+        <label htmlFor="booking-notes" className="bk-float-label">
+          Special requests or dietary needs (optional)
+        </label>
+      </div>
       {error && <p className="form-error" role="alert">{error}</p>}
       <button className="btn btn-primary" type="submit" disabled={bookingMutation.isPending}>
         {bookingMutation.isPending ? "Sending…" : "Request a Table"}

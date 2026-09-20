@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@source "../../app";
+@source "../../components";
+@source "../../lib";
 
 /* shadcn/ui design tokens — slate theme, scoped to the admin root layout */
 :root {
