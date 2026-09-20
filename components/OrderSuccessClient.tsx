@@ -649,14 +649,21 @@ export default function OrderSuccessClient({
               }}
               className="order-lookup-form"
             >
-              <input
-                type="text"
-                className="input"
-                placeholder="e.g. TPC-A1B2C3 or order UUID"
-                value={manualId}
-                onChange={(e) => setManualId(e.target.value)}
-              />
-              <button type="submit" className="btn btn-primary">
+              <div className={`float-field ${manualId ? "is-floated" : ""}`} style={{ flex: 1 }}>
+                <input
+                  id="order-search-input"
+                  type="text"
+                  className="float-input"
+                  placeholder=" "
+                  value={manualId}
+                  onChange={(e) => setManualId(e.target.value)}
+                />
+                <label htmlFor="order-search-input" className="float-label">
+                  Order Reference (e.g. #TPC-123456)
+                </label>
+                <Search size={18} className="float-icon" aria-hidden="true" />
+              </div>
+              <button type="submit" className="btn btn-primary" style={{ minHeight: "56px" }}>
                 Search Order →
               </button>
             </form>

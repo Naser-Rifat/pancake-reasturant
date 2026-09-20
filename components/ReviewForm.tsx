@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { PenLine, Sparkles, Send, X } from "lucide-react";
+import { PenLine, Sparkles, Send, X, User, MapPin } from "lucide-react";
 import { submitReview } from "@/lib/api";
 
 export default function ReviewForm() {
@@ -71,20 +71,35 @@ export default function ReviewForm() {
           </div>
 
           <div className="rev-form-row">
-            <input
-              className="input"
-              placeholder="Your name *"
-              required
-              value={name}
-              autoComplete="name"
-              onChange={(e) => setName(e.target.value)}
-            />
-            <input
-              className="input"
-              placeholder="Suburb / Area (e.g. Surry Hills)"
-              value={suburb}
-              onChange={(e) => setSuburb(e.target.value)}
-            />
+            <div className={`float-field ${name ? "is-floated" : ""}`}>
+              <input
+                id="rev-name"
+                className="float-input"
+                placeholder=" "
+                required
+                value={name}
+                autoComplete="name"
+                onChange={(e) => setName(e.target.value)}
+              />
+              <label htmlFor="rev-name" className="float-label">
+                Your Name *
+              </label>
+              <User size={16} className="float-icon" aria-hidden="true" />
+            </div>
+
+            <div className={`float-field ${suburb ? "is-floated" : ""}`}>
+              <input
+                id="rev-suburb"
+                className="float-input"
+                placeholder=" "
+                value={suburb}
+                onChange={(e) => setSuburb(e.target.value)}
+              />
+              <label htmlFor="rev-suburb" className="float-label">
+                Suburb / Area (e.g. Geelong)
+              </label>
+              <MapPin size={16} className="float-icon" aria-hidden="true" />
+            </div>
           </div>
 
           <div className="star-picker-wrap">
@@ -106,14 +121,20 @@ export default function ReviewForm() {
             </div>
           </div>
 
-          <textarea
-            className="input rev-textarea"
-            rows={3}
-            placeholder="Tell us about your favorite stack, coffee, or brunch vibes… *"
-            required
-            value={quote}
-            onChange={(e) => setQuote(e.target.value)}
-          />
+          <div className={`float-field textarea-field ${quote ? "is-floated" : ""}`}>
+            <textarea
+              id="rev-quote"
+              className="float-input rev-textarea"
+              rows={3}
+              placeholder=" "
+              required
+              value={quote}
+              onChange={(e) => setQuote(e.target.value)}
+            />
+            <label htmlFor="rev-quote" className="float-label">
+              Tell us about your favorite stack, coffee, or brunch vibes… *
+            </label>
+          </div>
 
           {error && (
             <p className="form-error" role="alert">

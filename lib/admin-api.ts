@@ -126,6 +126,7 @@ export interface AdminMenuItem {
   photo: string;
   is_featured: boolean;
   is_available: boolean;
+  photos_count?: number;
   sort_order: number;
 }
 

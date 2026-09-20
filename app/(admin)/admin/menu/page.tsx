@@ -107,21 +107,20 @@ export default function MenuAdminPage() {
     queryKey: ["admin", "menu"],
     queryFn: async () => {
       const [items, categories] = await Promise.all([listMenu(), listCategories().catch(() => [])]);
-      const counts = await Promise.all(
-        items.map((item) =>
-          listMenuItemPhotos(item.slug)
-            .then((photos) => [item.slug, photos.length] as const)
-            .catch(() => [item.slug, 0] as const),
-        ),
-      );
-      return { items, categories, photoCounts: Object.fromEntries(counts) };
+      const photoCounts: Record<string, number> = {};
+      for (const item of items) {
+        if (typeof item.photos_count === "number") {
+          photoCounts[item.slug] = item.photos_count;
+        }
+      }
+      return { items, categories, photoCounts };
     },
   });
   useEffect(() => {
     if (!menuQuery.data) return;
     setItems(menuQuery.data.items);
     setCategories(menuQuery.data.categories);
-    setPhotoCounts(menuQuery.data.photoCounts);
+    setPhotoCounts((prev) => ({ ...menuQuery.data.photoCounts, ...prev }));
   }, [menuQuery.data]);
   const loading = menuQuery.isPending;
   const queryError = menuQuery.error instanceof Error ? menuQuery.error.message : "";
@@ -234,47 +233,87 @@ export default function MenuAdminPage() {
       is_available: form.is_available,
       is_featured: form.is_featured,
     };
-    try {
-      if (editing) {
-        await saveMutation.mutateAsync({ slug: editing, payload });
-        pristine.current = form;
-        toast({ variant: "success", title: `${form.name} updated` });
-        setEditing(null);
-      } else {
-        const created = await saveMutation.mutateAsync({ payload });
-        // The dish now exists. Switch to edit mode *before* attaching photos so a
-        // failed photo upload can't strand the form in create mode — a retry would
-        // otherwise re-POST the same slug and be rejected as a duplicate.
-        pristine.current = form;
-        setEditing(created.slug);
-        const failed: string[] = [];
-        for (const [i, url] of pendingPhotos.entries()) {
-          try {
-            await photoMutation.mutateAsync({
-              menu_item: created.slug,
-              image: url,
-              alt: `${created.name} photo`,
-              sort_order: i,
+    if (editing) {
+      const targetSlug = editing;
+      const prevItems = items;
+      const matchedCat = form.category
+        ? categories.find((c) => c.id === form.category)
+        : categoriesMap.get(form.tag);
+
+      // 1. Optimistic Update: Update the table row in state immediately (0ms)
+      setItems((prev) =>
+        prev.map((it) =>
+          it.slug === targetSlug
+            ? {
+                ...it,
+                ...payload,
+                category: form.category ?? it.category,
+                category_name: matchedCat?.name ?? it.category_name,
+                category_slug: matchedCat?.slug ?? it.category_slug,
+                category_icon: matchedCat?.icon ?? it.category_icon,
+              }
+            : it
+        )
+      );
+
+      // 2. Close the editor and show confirmation immediately
+      pristine.current = form;
+      setEditing(null);
+      toast({ variant: "success", title: `${form.name} updated` });
+
+      // 3. Persist to backend in the background with automatic rollback on error
+      saveMutation.mutate(
+        { slug: targetSlug, payload },
+        {
+          onError: (err) => {
+            setItems(prevItems);
+            toast({
+              variant: "error",
+              title: "Save failed",
+              description: err instanceof Error ? err.message : undefined,
             });
-          } catch {
-            failed.push(url); // keep it queued and visible instead of losing it
-          }
+          },
         }
-        setPendingPhotos(failed);
-        setPhotoCounts((c) => ({ ...c, [created.slug]: pendingPhotos.length - failed.length }));
-        if (failed.length) {
-          toast({
-            variant: "error",
-            title: `${created.name} saved — but ${failed.length} photo(s) didn't upload`,
-            description: "They're still shown below; try adding them again.",
+      );
+      return;
+    }
+
+    try {
+      const created = await saveMutation.mutateAsync({ payload });
+      // Add newly created dish to items list immediately
+      setItems((prev) => [created, ...prev.filter((i) => i.slug !== created.slug)]);
+      // The dish now exists. Switch to edit mode *before* attaching photos so a
+      // failed photo upload can't strand the form in create mode — a retry would
+      // otherwise re-POST the same slug and be rejected as a duplicate.
+      pristine.current = form;
+      setEditing(created.slug);
+      const failed: string[] = [];
+      for (const [i, url] of pendingPhotos.entries()) {
+        try {
+          await photoMutation.mutateAsync({
+            menu_item: created.slug,
+            image: url,
+            alt: `${created.name} photo`,
+            sort_order: i,
           });
-        } else {
-          toast({
-            variant: "success",
-            title: `${created.name} added to the menu`,
-            description: "You can add extra photos now.",
-          });
+        } catch {
+          failed.push(url); // keep it queued and visible instead of losing it
         }
+      }
+      setPendingPhotos(failed);
+      setPhotoCounts((c) => ({ ...c, [created.slug]: pendingPhotos.length - failed.length }));
+      if (failed.length) {
+        toast({
+          variant: "error",
+          title: `${created.name} saved — but ${failed.length} photo(s) didn't upload`,
+          description: "They're still shown below; try adding them again.",
+        });
+      } else {
+        toast({
+          variant: "success",
+          title: `${created.name} added to the menu`,
+          description: "You can add extra photos now.",
+        });
       }
       load();
     } catch (err) {

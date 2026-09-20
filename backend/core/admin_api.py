@@ -324,9 +324,15 @@ class AdminMenuItemPhotoViewSet(
 class AdminMenuItemViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
     serializer_class = AdminMenuItemSerializer
-    queryset = MenuItem.objects.all()
     lookup_field = "slug"
     pagination_class = None
+
+    def get_queryset(self):
+        return (
+            MenuItem.objects.annotate(photos_count=Count("photos"))
+            .select_related("category")
+            .order_by("sort_order", "name")
+        )
 
     def destroy(self, request, *args, **kwargs):
         try:
