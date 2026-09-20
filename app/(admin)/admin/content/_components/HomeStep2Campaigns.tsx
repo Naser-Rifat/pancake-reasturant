@@ -560,23 +560,23 @@ export function HomeStep2Campaigns({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 pt-4 border-t border-zinc-200">
         <Button
           type="button"
           variant="outline"
-          className="gap-2 text-xs font-bold border-zinc-300 text-[#763a12] rounded-xl whitespace-normal h-auto"
+          className="gap-1.5 sm:gap-2 text-xs font-bold border-zinc-300 text-[#763a12] rounded-xl w-full justify-center h-10 px-2 sm:px-4"
           onClick={() => setHomeStepIndex(1)}
         >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Previous: Step 1 (Hero)</span>
+          <ArrowLeft className="h-4 w-4 shrink-0" />
+          <span className="truncate">Previous: Step 1</span>
         </Button>
         <Button
           type="button"
-          className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-2 rounded-xl whitespace-normal h-auto"
+          className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs gap-1.5 sm:gap-2 rounded-xl w-full justify-center h-10 px-2 sm:px-4"
           onClick={() => setHomeStepIndex(3)}
         >
-          <span>Next: Step 3 (Photo Mosaic)</span>
-          <ArrowRight className="h-4 w-4" />
+          <span className="truncate">Next: Step 3</span>
+          <ArrowRight className="h-4 w-4 shrink-0" />
         </Button>
       </div>
     </div>
