@@ -7,7 +7,7 @@ import { Award, ChevronRight, Ticket } from "lucide-react";
 import CertIcon from "@/components/CertIcon";
 import HeroShowcase from "@/components/HeroShowcase";
 import MenuClient from "@/components/MenuClient";
-import type { ApiMenuItem } from "@/lib/api";
+import { countdownBadge, type ApiMenuItem } from "@/lib/api";
 import clubStyles from "@/app/(site)/join-our-club/club.module.css";
 import {
   type AdminSiteSettings,
@@ -305,11 +305,18 @@ export default function PreviewPage() {
                     </textPath>
                   </text>
                 </svg>
-                <div className="starburst-center">
-                  <span className="starburst-icon">🔥</span>
-                  <b className="starburst-big">DEAL</b>
-                  <span className="starburst-small">TODAY</span>
-                </div>
+                {(() => {
+                  const badge = countdownBadge(announcement?.ends_at || null);
+                  const bigText = badge.big === "ON" ? "DEAL" : badge.big;
+                  const smallText = badge.small === "now" ? "TODAY" : badge.small;
+                  return (
+                    <div className="starburst-center">
+                      <span className="starburst-icon">🔥</span>
+                      <b className="starburst-big">{bigText}</b>
+                      <span className="starburst-small">{smallText}</span>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Middle: Headline, Kicker & CTA Button */}
