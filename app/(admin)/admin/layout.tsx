@@ -85,7 +85,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   if (!ready) {
     return (
       <div className="flex min-h-screen bg-white">
-        <aside className="hidden md:flex w-56 flex-col bg-[#211a14] p-4 space-y-4">
+        <aside className="hidden md:flex w-64 flex-col bg-[#211a14] p-4 space-y-4">
           <div className="flex items-center gap-2 px-2 py-3">
             <div className="h-6 w-6 rounded-full bg-white/20" />
             <div className="h-4 w-28 bg-white/20 rounded" />
@@ -114,99 +114,122 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
   return (
     <ToastProvider>
-        <ConfirmProvider>
-          <div className="flex min-h-screen">
-            {/* phone top bar */}
-            <header className="fixed inset-x-0 top-0 z-30 flex h-12 items-center gap-3 bg-sidebar px-4 text-white md:hidden">
+      <ConfirmProvider>
+        <div className="flex min-h-screen bg-[#faf8f5]">
+          {/* phone top bar */}
+          <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center justify-between bg-sidebar/95 backdrop-blur-md px-4 text-white border-b border-white/10 md:hidden">
+            <div className="flex items-center gap-2.5">
               <button
                 aria-label="Open navigation"
                 aria-expanded={navOpen}
-                className="-ml-2 p-2"
+                className="-ml-1.5 rounded-lg p-2 text-white/80 hover:bg-white/10 hover:text-white transition-colors"
                 onClick={() => setNavOpen(true)}
               >
                 <MenuIcon className="h-5 w-5" />
               </button>
               <span className="flex items-center gap-2 text-sm font-bold">
-                <LogoMark size={18} /> Pancake Club admin
+                <LogoMark size={20} />
+                <span>Pancake Club</span>
+                <span className="rounded bg-amber-400/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
+                  admin
+                </span>
               </span>
-            </header>
-            {navOpen && (
-              <div
-                className="fixed inset-0 z-30 bg-black/50 md:hidden"
-                onClick={() => setNavOpen(false)}
-                aria-hidden="true"
-              />
+            </div>
+          </header>
+
+          {/* mobile drawer backdrop */}
+          {navOpen && (
+            <div
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs transition-opacity md:hidden"
+              onClick={() => setNavOpen(false)}
+              aria-hidden="true"
+            />
+          )}
+
+          {/* sidebar (fixed drawer on mobile, static column on desktop) */}
+          <aside
+            className={cn(
+              "fixed inset-y-0 left-0 z-50 flex w-64 max-w-[85vw] flex-col bg-sidebar text-sidebar-foreground shadow-2xl transition-transform duration-250 ease-out md:z-20 md:w-64 md:shadow-none md:translate-x-0",
+              navOpen ? "translate-x-0" : "-translate-x-full",
             )}
-            <aside
-              className={cn(
-                "fixed inset-y-0 left-0 z-40 flex w-56 flex-col bg-sidebar text-sidebar-foreground transition-transform duration-200 md:z-20 md:translate-x-0",
-                navOpen ? "translate-x-0" : "-translate-x-full",
-              )}
-            >
+          >
+            {/* sidebar brand & close button header */}
+            <div className="flex h-14 md:h-16 shrink-0 items-center justify-between border-b border-white/10 px-4">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <LogoMark size={22} />
+                <span className="text-base font-bold tracking-tight text-white whitespace-nowrap">
+                  Pancake Club
+                </span>
+                <span className="rounded bg-amber-400/20 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-amber-300 uppercase">
+                  admin
+                </span>
+              </div>
               <button
                 aria-label="Close navigation"
-                className="absolute right-1.5 top-2.5 p-2 text-white/70 hover:text-white md:hidden"
+                className="rounded-lg p-1.5 text-white/70 hover:bg-white/10 hover:text-white transition-colors md:hidden -mr-1"
                 onClick={() => setNavOpen(false)}
               >
                 <X className="h-5 w-5" />
               </button>
-              <div className="flex h-14 items-center gap-2 px-5 pr-12 text-lg font-bold tracking-tight md:pr-5">
-                <LogoMark size={22} /> Pancake Club{" "}
-                <span className="text-xs font-medium opacity-60">admin</span>
-              </div>
-              <nav className="flex flex-1 flex-col gap-1 px-3 py-2">
-                {NAV.map(({ href, label, icon: Icon }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    className={cn(
-                      "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                      pathname === href
-                        ? "bg-white/15 text-white"
-                        : "text-white/70 hover:bg-white/10 hover:text-white",
-                    )}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {label}
-                    {href === "/admin/orders" && counts.orders > 0 && (
-                      <span className="ml-auto rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-black">
-                        {counts.orders}
-                      </span>
-                    )}
-                    {href === "/admin/bookings" && counts.bookings > 0 && (
-                      <span className="ml-auto rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-black">
-                        {counts.bookings}
-                      </span>
-                    )}
-                  </Link>
-                ))}
-              </nav>
-              <div className="flex flex-col gap-1 px-3 pb-4">
-                <a
-                  href="/"
-                  target="_blank"
-                  className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+            </div>
+
+            {/* nav links */}
+            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-3">
+              {NAV.map(({ href, label, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all",
+                    pathname === href
+                      ? "bg-amber-500/15 text-amber-300 shadow-xs border border-amber-500/20 font-bold"
+                      : "text-white/70 hover:bg-white/10 hover:text-white",
+                  )}
                 >
-                  <ExternalLink className="h-4 w-4" />
-                  View site
-                </a>
-                <button
-                  onClick={() => logoutMutation.mutate()}
-                  disabled={logoutMutation.isPending}
-                  className="flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <LogOut className={cn("h-4 w-4", logoutMutation.isPending && "animate-pulse")} />
-                  {logoutMutation.isPending ? "Logging out…" : "Log out"}
-                </button>
-              </div>
-            </aside>
-            {/* min-w-0: as a flex item, main's default min-width:auto let wide tables
-          set the page width instead of scrolling inside their own wrapper */}
-            <main className="min-w-0 flex-1 bg-white p-4 pt-16 md:ml-56 md:p-8 md:pt-8">
-              {children}
-            </main>
-          </div>
-        </ConfirmProvider>
+                  <Icon className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{label}</span>
+                  {href === "/admin/orders" && counts.orders > 0 && (
+                    <span className="ml-auto rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-black shadow-xs">
+                      {counts.orders}
+                    </span>
+                  )}
+                  {href === "/admin/bookings" && counts.bookings > 0 && (
+                    <span className="ml-auto rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-black shadow-xs">
+                      {counts.bookings}
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </nav>
+
+            {/* sidebar bottom footer actions */}
+            <div className="flex flex-col gap-1 border-t border-white/10 px-3 py-3">
+              <a
+                href="/"
+                target="_blank"
+                className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                <ExternalLink className="h-4 w-4 shrink-0" />
+                <span className="truncate">View site</span>
+              </a>
+              <button
+                onClick={() => logoutMutation.mutate()}
+                disabled={logoutMutation.isPending}
+                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <LogOut className={cn("h-4 w-4 shrink-0", logoutMutation.isPending && "animate-pulse")} />
+                <span className="truncate">{logoutMutation.isPending ? "Logging out…" : "Log out"}</span>
+              </button>
+            </div>
+          </aside>
+
+          {/* min-w-0: as a flex item, main's default min-width:auto let wide tables
+              set the page width instead of scrolling inside their own wrapper */}
+          <main className="min-w-0 flex-1 bg-white p-4 pt-18 md:ml-64 md:p-8 md:pt-8">
+            {children}
+          </main>
+        </div>
+      </ConfirmProvider>
     </ToastProvider>
   );
 }
