@@ -351,16 +351,15 @@ export default function PreviewPage() {
                     <div
                       key={c.label + i}
                       className={`promo-ticket-card ${i === 1 ? "tilt-card" : ""}`}
-                      style={{ width: "160px", minWidth: "150px" }}
                     >
                       <div className="ticket-top-tag">
                         <span>{c.tag}</span>
                         <span className="ticket-open-icon">↗</span>
                       </div>
-                      <div className="ticket-img-frame" style={{ position: "relative", width: "100%", height: "115px" }}>
-                        <Image src={c.img} alt={c.label} fill sizes="160px" className="ticket-img object-cover" />
+                      <div className="ticket-img-frame">
+                        <Image src={c.img} alt={c.label} fill sizes="(min-width: 1024px) 220px, 45vw" className="ticket-img object-cover" />
                       </div>
-                      <span className="ticket-dish-title" style={{ fontSize: "0.8rem", fontWeight: 800 }}>
+                      <span className="ticket-dish-title">
                         {c.label}
                       </span>
                     </div>

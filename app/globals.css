@@ -7704,6 +7704,8 @@ body:has(.cart-fab) .wa-float {
   border: 1.5px solid var(--ink);
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
   text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .promo-cta-btn:hover {
@@ -7806,50 +7808,40 @@ body:has(.cart-fab) .wa-float {
    It reads as a banner now: copy on the left, one dish bleeding off the right
    edge, everything on one line of sight. Same brown ground, same dashed coupon
    edge, same doodle wash — only the arrangement changed. */
-@media (max-width: 1023px), (max-width: 1366px) and (pointer: coarse) {
+/* ---------- MOBILE (< 640px): Slim, Balanced Promo Banner ---------- */
+@media (max-width: 639px) {
   .promo-band {
-    grid-template-columns: 1fr 36%;
-    /* stretch, not center: the dish fills the band's full height and is cut by
-       its edges, which is what makes this read as a banner and not a card with
-       a photo parked inside it */
-    align-items: stretch;
-    gap: 0.75rem;
-    padding: 1.15rem 1.1rem;
-    border-radius: 6px;
+    grid-template-columns: 1fr 125px;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1.15rem 1rem;
+    border-radius: 12px;
     border-width: 2px;
     text-align: left;
+    position: relative;
+    overflow: hidden;
   }
-  /* The starburst is the band's one brand element, and the slim layout has no
-     row to give it. It becomes a corner sticker instead: absolute, so it costs
-     the banner zero height, sitting on the seam between the copy and the dish
-     the way a price sticker sits on a package. */
   .promo-starburst-badge {
     display: flex;
     position: absolute;
     z-index: 3;
-    top: 0.3rem;
-    /* on the ticket's corner, not on the seam: at the seam it ate the kicker's
-       last word, and the copy column is only 64% of a 359px band — there is no
-       width to give back. The ring's shadow below keeps the gold readable
-       across the card's white edge and the brown ground behind it. */
-    right: 0.3rem;
+    top: 0.35rem;
+    right: 0.35rem;
     left: auto;
-    width: 62px;
-    height: 62px;
+    width: 50px;
+    height: 50px;
     margin: 0;
   }
   .starburst-center {
-    width: 46px;
-    height: 46px;
+    width: 38px;
+    height: 38px;
     border-width: 1.5px;
   }
-  .starburst-icon { font-size: 0.62rem; }
-  .starburst-big { font-size: 0.62rem; }
-  .starburst-small { font-size: 0.4rem; letter-spacing: 0.05em; }
-  /* gold on cream pancake is ~1.4:1 — the ring simply disappeared over the
-     photo and read as a half-drawn circle. The shadow carries it on both. */
+  .starburst-icon { font-size: 0.55rem; }
+  .starburst-big { font-size: 0.52rem; }
+  .starburst-small { font-size: 0.32rem; letter-spacing: 0.04em; }
   .starburst-rotate-svg {
-    font-size: 6.4px;
+    font-size: 5.4px;
     letter-spacing: 0.1em;
     filter: drop-shadow(0 1px 1.5px rgba(26, 17, 9, 0.95));
   }
@@ -7859,6 +7851,7 @@ body:has(.cart-fab) .wa-float {
     justify-content: center;
     text-align: left;
     gap: 0.25rem;
+    min-width: 0;
   }
   .promo-kicker {
     font-size: 0.6rem;
@@ -7866,32 +7859,27 @@ body:has(.cart-fab) .wa-float {
     line-height: 1.3;
   }
   .promo-head {
-    font-size: clamp(1.15rem, 5.4vw, 1.5rem);
-    line-height: 1.08;
+    font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+    line-height: 1.15;
     text-wrap: balance;
   }
   .promo-cta-btn {
     align-self: flex-start;
-    margin-top: 0.7rem;
-    /* slimming the band took this to 36px tall — under the 44pt touch minimum,
-       on the banner's only call to action */
-    min-height: 44px;
-    padding: 0.5rem 1.15rem;
+    margin-top: 0.5rem;
+    min-height: 38px;
+    padding: 0.45rem 1.05rem;
     font-size: 0.72rem;
-    /* cream, not gold: on a warm dark ground the gold pill and the gold kicker
-       were the same value, so neither read as the thing to press */
     background: var(--cream-card);
     border-color: var(--ink);
     box-shadow: 0 3px 10px rgba(26, 17, 9, 0.35);
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
-  /* One voucher card, not two. The card framing stays — it is the band's own
-     visual language and the reason the offer reads as a coupon — but a second
-     one costs 120px in a banner the client asked to make thinner, and with no
-     card1/card2 dish picked in the admin both tickets show the same dish. */
   .promo-cards {
     display: block;
-    max-width: none;
+    width: 125px;
+    flex-shrink: 0;
     margin: 0;
     padding: 0;
   }
@@ -7899,49 +7887,124 @@ body:has(.cart-fab) .wa-float {
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
-    width: 100%;
-    height: 100%;
+    width: 125px;
+    max-width: 125px;
+    height: auto;
     min-width: 0;
-    padding: 0.45rem;
-    border-radius: 16px;
+    padding: 0.4rem;
+    border-radius: 12px;
     background: #ffffff;
     border: 1.5px solid rgba(255, 255, 255, 0.4);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
     transform: none;
   }
-  /* the second voucher has nowhere to go in a banner; its dish is one tap away
-     on the page it links to */
   .promo-ticket-card + .promo-ticket-card {
     display: none;
   }
   .ticket-top-tag {
-    font-size: 0.56rem;
+    font-size: 0.55rem;
     letter-spacing: 0.02em;
-    gap: 0.25rem;
+    gap: 0.2rem;
+    padding: 0 0.1rem;
   }
-  /* the deal badge sits on this exact corner, so the arrow was drawn under it.
-     The whole ticket is a link — the arrow was only ever a hint. */
   .ticket-open-icon {
     display: none;
   }
-  /* the dish name is what the card links to; in a 121px ticket it costs a row
-     the photo needs more, and the headline above already names the offer */
   .ticket-dish-title {
     display: none;
   }
-  /* a tablet's band is ~1100px wide and the headline rarely fills it, so the
-     copy column was three-quarters empty brown — give the dish more of it */
-  @media (min-width: 640px) {
-    .promo-band { grid-template-columns: 1fr 42%; }
+  .ticket-img-frame {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    min-height: 90px;
+    max-height: 110px;
+    border-radius: 9px;
+    overflow: hidden;
+  }
+}
+
+/* ---------- TABLET (640px - 1023px): Dual-Card Balanced Banner ---------- */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .promo-band {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.6rem 1.8rem;
+    border-radius: 12px;
+    border-width: 2px;
+    text-align: left;
+    position: relative;
+  }
+  .promo-starburst-badge {
+    display: flex;
+    position: absolute;
+    z-index: 3;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 58px;
+    height: 58px;
+  }
+  .starburst-center {
+    width: 42px;
+    height: 42px;
+  }
+  .starburst-icon { font-size: 0.6rem; }
+  .starburst-big { font-size: 0.58rem; }
+  .starburst-small { font-size: 0.36rem; }
+  .starburst-rotate-svg {
+    font-size: 6px;
+    filter: drop-shadow(0 1px 1.5px rgba(26, 17, 9, 0.95));
+  }
+
+  .promo-main {
+    min-width: 0;
+    gap: 0.35rem;
+  }
+  .promo-head {
+    font-size: clamp(1.25rem, 2.8vw, 1.65rem);
+    line-height: 1.15;
+  }
+  .promo-cta-btn {
+    white-space: nowrap;
+    padding: 0.55rem 1.25rem;
+    font-size: 0.78rem;
+  }
+
+  .promo-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 130px);
+    gap: 0.75rem;
+    flex-shrink: 0;
+  }
+  .promo-ticket-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    width: 130px;
+    height: auto;
+    padding: 0.5rem;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+  .promo-ticket-card + .promo-ticket-card {
+    display: flex !important;
   }
   .ticket-img-frame {
-    /* fills whatever the card has left after the tag row — a fixed square ratio
-       made a tablet's 395px-wide column 395px tall and the banner became a block */
-    flex: 1;
-    aspect-ratio: auto;
+    width: 100%;
+    aspect-ratio: 1 / 1;
     height: auto;
-    min-height: 0;
-    border-radius: 11px;
+    border-radius: 9px;
+  }
+  .ticket-dish-title {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
