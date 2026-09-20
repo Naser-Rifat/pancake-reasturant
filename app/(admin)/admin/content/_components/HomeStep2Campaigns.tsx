@@ -343,47 +343,88 @@ export function HomeStep2Campaigns({
                 </label>
               </div>
 
-              {campaignChannel === "channel1" && (
-                <div className="p-4 rounded-lg border border-zinc-200 bg-white space-y-2.5">
-                  <span className="text-xs font-semibold text-[#211a14] block">Right-side Voucher Cards</span>
-                  <p className="text-[10px] text-zinc-500 -mt-1">
-                    The two little ticket cards on the band&apos;s right — pick any dish, or keep the
-                    defaults. Saved with &ldquo;Save Deal&rdquo;.
-                  </p>
-                  <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0">
-                    <div className="space-y-1">
-                      <Label className="text-xs font-semibold text-[#211a14]">Card 1 (left)</Label>
-                      <Select
-                        className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
-                        value={activeDeal.card1_dish ?? ""}
-                        onChange={(e) =>
-                          setActiveDeal((a) => (a ? { ...a, card1_dish: e.target.value } : a))
-                        }
-                      >
-                        <option value="">The Offer photo (default)</option>
-                        {menuItems.map((m) => (
-                          <option key={m.slug} value={m.slug}>{m.name}</option>
-                        ))}
-                      </Select>
+              {campaignChannel === "channel1" && (() => {
+                const autoFeaturedDish = menuItems.find((m) => m.is_featured && (m.photo || m.image));
+                return (
+                  <div className="p-4 rounded-xl border border-amber-200/80 bg-[#fffdf9] space-y-3 shadow-2xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#211a14] flex items-center gap-1.5">
+                        <span>🎟️</span>
+                        <span>Promo Banner Tickets (Right Side Cards)</span>
+                      </span>
+                      <span className="text-[10px] font-semibold text-amber-900 bg-amber-100/90 px-2 py-0.5 rounded-md">
+                        Desktop &amp; Tablet
+                      </span>
                     </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs font-semibold text-[#211a14]">Card 2 (right)</Label>
-                      <Select
-                        className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
-                        value={activeDeal.card2_dish ?? ""}
-                        onChange={(e) =>
-                          setActiveDeal((a) => (a ? { ...a, card2_dish: e.target.value } : a))
-                        }
-                      >
-                        <option value="">Auto — first hero-featured dish</option>
-                        {menuItems.map((m) => (
-                          <option key={m.slug} value={m.slug}>{m.name}</option>
-                        ))}
-                      </Select>
+                    <p className="text-[11px] text-zinc-600 leading-relaxed -mt-1">
+                      These two ticket cards appear on the right of your promo hero banner. Customize them here or keep the automatic defaults:
+                    </p>
+
+                    <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0 pt-0.5">
+                      {/* Left Ticket: Special Offer */}
+                      <div className="space-y-1.5 p-3 rounded-lg bg-white border border-zinc-200/90">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs font-bold text-[#211a14] flex items-center gap-1">
+                            <span>✨</span>
+                            <span>Left Ticket · Special</span>
+                          </Label>
+                        </div>
+                        <p className="text-[10px] text-zinc-500">
+                          Highlights this deal. Defaults to the deal photo.
+                        </p>
+                        <Select
+                          className="h-10 text-xs border-zinc-300 font-medium rounded-xl"
+                          value={activeDeal.card1_dish ?? ""}
+                          onChange={(e) =>
+                            setActiveDeal((a) => (a ? { ...a, card1_dish: e.target.value } : a))
+                          }
+                        >
+                          <option value="">Default: The Offer photo</option>
+                          {menuItems.map((m) => (
+                            <option key={m.slug} value={m.slug}>{m.name}</option>
+                          ))}
+                        </Select>
+                      </div>
+
+                      {/* Right Ticket: Popular Dish */}
+                      <div className="space-y-1.5 p-3 rounded-lg bg-white border border-zinc-200/90">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs font-bold text-[#211a14] flex items-center gap-1">
+                            <span>🥞</span>
+                            <span>Right Ticket · Popular</span>
+                          </Label>
+                          {!activeDeal.card2_dish && (
+                            <span className="text-[9px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded">
+                              Auto-syncing
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-zinc-500">
+                          Displays the &ldquo;🥞 POPULAR&rdquo; badge to cross-promote.
+                        </p>
+                        <Select
+                          className="h-10 text-xs border-zinc-300 font-medium rounded-xl"
+                          value={activeDeal.card2_dish ?? ""}
+                          onChange={(e) =>
+                            setActiveDeal((a) => (a ? { ...a, card2_dish: e.target.value } : a))
+                          }
+                        >
+                          <option value="">
+                            {autoFeaturedDish
+                              ? `Auto: ${autoFeaturedDish.name} (from Menu Featured)`
+                              : "Auto: First Featured dish in Menu"}
+                          </option>
+                          {menuItems.map((m) => (
+                            <option key={m.slug} value={m.slug}>
+                              {m.name} {m.is_featured ? "⭐ (Featured)" : ""}
+                            </option>
+                          ))}
+                        </Select>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               <div className="grid gap-4">
                 <div className="space-y-1">
