@@ -75,7 +75,7 @@ export default function ReviewForm() {
               <input
                 id="rev-name"
                 className="float-input"
-                placeholder=" "
+                placeholder="Your name *"
                 required
                 value={name}
                 autoComplete="name"
@@ -91,7 +91,7 @@ export default function ReviewForm() {
               <input
                 id="rev-suburb"
                 className="float-input"
-                placeholder=" "
+                placeholder="Suburb / Area (e.g. Geelong)"
                 value={suburb}
                 onChange={(e) => setSuburb(e.target.value)}
               />
@@ -126,7 +126,7 @@ export default function ReviewForm() {
               id="rev-quote"
               className="float-input rev-textarea"
               rows={3}
-              placeholder=" "
+              placeholder="Tell us about your favorite stack, coffee, or brunch vibes… *"
               required
               value={quote}
               onChange={(e) => setQuote(e.target.value)}

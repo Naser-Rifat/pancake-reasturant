@@ -150,7 +150,7 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
         <input
           id="booking-name"
           className="bk-float-input"
-          placeholder=" "
+          placeholder="Your name *"
           required
           value={form.name}
           autoComplete="name"
@@ -168,7 +168,7 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
           id="booking-email"
           className="bk-float-input"
           type="email"
-          placeholder=" "
+          placeholder="Email *"
           required
           value={form.email}
           autoComplete="email"
@@ -186,7 +186,7 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
           id="booking-phone"
           className="bk-float-input"
           type="tel"
-          placeholder=" "
+          placeholder="Phone *"
           required
           aria-required="true"
           value={form.phone}

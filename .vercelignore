@@ -1,0 +1,8 @@
+backend
+.next
+.next-e2e
+playwright-report
+test-results
+scratch
+legacy-static
+*.tsbuildinfo
