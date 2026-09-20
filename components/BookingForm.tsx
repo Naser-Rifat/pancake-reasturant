@@ -207,7 +207,7 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
           <input
             id="booking-date"
             className="bk-float-input"
-            type={dateFocused || form.date ? "date" : "text"}
+            type="date"
             required
             min={new Date().toISOString().split("T")[0]}
             value={form.date}
@@ -228,7 +228,7 @@ export default function BookingForm({ menuItems = [] }: BookingFormProps) {
           <input
             id="booking-time"
             className="bk-float-input"
-            type={timeFocused || form.time ? "time" : "text"}
+            type="time"
             required
             value={form.time}
             placeholder=" "

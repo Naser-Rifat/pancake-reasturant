@@ -4899,6 +4899,12 @@ textarea.input {
   cursor: pointer;
 }
 
+/* Hide native browser date/time placeholder text until user focuses or selects a value */
+.bk-float-field:not(.is-floated):not(:focus-within) input[type="date"]::-webkit-datetime-edit,
+.bk-float-field:not(.is-floated):not(:focus-within) input[type="time"]::-webkit-datetime-edit {
+  color: transparent;
+}
+
 /* Select specific styling */
 select.float-input,
 select.bk-float-input {
