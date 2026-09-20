@@ -362,7 +362,7 @@ export function HomeStep2Campaigns({
 
                     <div className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0 pt-0.5">
                       {/* Left Ticket: Special Offer */}
-                      <div className="space-y-1.5 p-3 rounded-lg bg-white border border-zinc-200/90">
+                      <div className="space-y-1.5 p-3 rounded-lg bg-white border border-zinc-200/90 min-w-0 overflow-hidden">
                         <div className="flex items-center justify-between">
                           <Label className="text-xs font-bold text-[#211a14] flex items-center gap-1">
                             <span>✨</span>
@@ -373,7 +373,7 @@ export function HomeStep2Campaigns({
                           Highlights this deal. Defaults to the deal photo.
                         </p>
                         <Select
-                          className="h-10 text-xs border-zinc-300 font-medium rounded-xl"
+                          className="w-full max-w-full h-10 text-xs border-zinc-300 font-medium rounded-xl truncate"
                           value={activeDeal.card1_dish ?? ""}
                           onChange={(e) =>
                             setActiveDeal((a) => (a ? { ...a, card1_dish: e.target.value } : a))
@@ -387,14 +387,14 @@ export function HomeStep2Campaigns({
                       </div>
 
                       {/* Right Ticket: Popular Dish */}
-                      <div className="space-y-1.5 p-3 rounded-lg bg-white border border-zinc-200/90">
+                      <div className="space-y-1.5 p-3 rounded-lg bg-white border border-zinc-200/90 min-w-0 overflow-hidden">
                         <div className="flex items-center justify-between">
                           <Label className="text-xs font-bold text-[#211a14] flex items-center gap-1">
                             <span>🥞</span>
                             <span>Right Ticket · Popular</span>
                           </Label>
                           {!activeDeal.card2_dish && (
-                            <span className="text-[9px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded">
+                            <span className="text-[9px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded shrink-0">
                               Auto-syncing
                             </span>
                           )}
@@ -403,7 +403,7 @@ export function HomeStep2Campaigns({
                           Displays the &ldquo;🥞 POPULAR&rdquo; badge to cross-promote.
                         </p>
                         <Select
-                          className="h-10 text-xs border-zinc-300 font-medium rounded-xl"
+                          className="w-full max-w-full h-10 text-xs border-zinc-300 font-medium rounded-xl truncate"
                           value={activeDeal.card2_dish ?? ""}
                           onChange={(e) =>
                             setActiveDeal((a) => (a ? { ...a, card2_dish: e.target.value } : a))

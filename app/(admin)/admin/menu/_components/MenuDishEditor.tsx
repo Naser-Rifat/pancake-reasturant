@@ -385,8 +385,8 @@ export function MenuDishEditor({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex items-center justify-between p-4 rounded-lg border border-zinc-200 bg-white">
               <div>
-                <div className="text-xs font-semibold text-[#211a14]">Takeaway Available</div>
-                <div className="text-[11px] text-zinc-500">Customers can order this dish online</div>
+                <div className="text-xs font-semibold text-[#211a14]">Available on Menu</div>
+                <div className="text-[11px] text-zinc-500">Visible to customers &amp; open for online ordering</div>
               </div>
               <Switch
                 checked={form.is_available}
