@@ -238,7 +238,7 @@ export function ClubPageSection({
               className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
               value={site.club_hero_kicker ?? ""}
               onChange={setS("club_hero_kicker")}
-              placeholder="The Pancake Club · Geelong West"
+              placeholder="The Pancake Club"
             />
           </div>
           <div className="space-y-1">

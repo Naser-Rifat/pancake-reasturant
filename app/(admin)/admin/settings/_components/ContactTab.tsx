@@ -13,7 +13,7 @@ import { AU_TIMEZONES, type RunSave, type SetSiteField } from "../_lib";
 import { EmailTestPanel } from "./EmailTestPanel";
 import { FacebookIcon, InstagramIcon } from "./SocialIcons";
 
-// Settings · Contact tab: business/legal details, socials, and the maps embed.
+// Settings · Contact tab: business/legal details, socials, and location details.
 export function ContactTab({
   site,
   setS,
@@ -54,7 +54,7 @@ export function ContactTab({
               <Input
                 id="s-address"
                 className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
-                placeholder="e.g. 18 Pakington Street, Geelong West VIC"
+                placeholder="Street, suburb, state and postcode"
                 value={site.address}
                 onChange={setS("address")}
               />
@@ -189,26 +189,14 @@ export function ContactTab({
           </div>
         </div>
 
-        {/* SECTION C: Google Maps Embed URL */}
+        {/* SECTION C: The public map follows the address above. */}
         <div className="pt-4 border-t border-zinc-200 space-y-3">
           <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5" /> Interactive Location Map (Google Maps Embed):
+            <MapPin className="h-3.5 w-3.5" /> Interactive Location Map
           </span>
-          <div className="space-y-1">
-            <Label htmlFor="s-map" className="text-xs font-semibold text-[#211a14]">
-              Google Maps Embed iFrame Source URL (src=&quot;...&quot;)
-            </Label>
-            <Input
-              id="s-map"
-              className="border-zinc-300 text-[#211a14] font-mono text-xs h-10 rounded-xl"
-              placeholder="https://www.google.com/maps/embed?pb=..."
-              value={site.map_embed}
-              onChange={setS("map_embed")}
-            />
-            <p className="text-[10px] text-zinc-500">
-              Tip: On Google Maps, click Share → Embed a map → Copy HTML and paste the URL from <code>src=&quot;...&quot;</code> here.
-            </p>
-          </div>
+          <p className="text-xs text-zinc-500">
+            The website map and directions update automatically from the street address.
+          </p>
         </div>
 
         {/* SECTION D: Info chips under the address ("Find Us" box) */}
@@ -258,7 +246,6 @@ export function ContactTab({
                   email: site.email,
                   abn: site.abn,
                   timezone: site.timezone,
-                  map_embed: site.map_embed,
                   transit_badges: site.transit_badges,
                   show_transit_badges: site.show_transit_badges,
                   instagram_url: site.instagram_url,

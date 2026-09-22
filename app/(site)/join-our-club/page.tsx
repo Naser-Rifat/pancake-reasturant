@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { Award, Coffee, Heart, Ticket, Utensils } from "lucide-react";
 import { getSite } from "@/lib/api";
+import { addressLocality } from "@/lib/format";
 import ClubRegistrationForm from "@/components/ClubRegistrationForm";
 import styles from "./club.module.css";
 
@@ -14,8 +15,9 @@ export const metadata: Metadata = {
 
 export default async function JoinOurClubPage() {
   const site = await getSite();
+  const locality = addressLocality(site.address);
 
-  const kicker = site.club_hero_kicker || "The Pancake Club · Geelong West";
+  const kicker = site.club_hero_kicker || (locality ? `The Pancake Club · ${locality}` : "The Pancake Club");
   const heading = site.club_hero_heading || "Good food.";
   const script = site.club_hero_script || "Better company.";
   const lead = site.club_hero_lead || "Fluffy homemade stacks, secret tasting invites, and a table always saved for you.";
@@ -31,7 +33,7 @@ export default async function JoinOurClubPage() {
   const bento2Sub = site.club_bento_2_sub || "Weekend Table";
 
   const bento3Img = site.club_bento_3_img !== undefined ? site.club_bento_3_img : "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80";
-  const bento3Badge = site.club_bento_3_badge || "☕ Geelong West";
+  const bento3Badge = site.club_bento_3_badge || (locality ? `☕ ${locality}` : "☕ Our local parlour");
   const bento3Title = site.club_bento_3_title || "Our Parlour";
   const bento3Sub = site.club_bento_3_sub || "Open 7 days";
 
@@ -45,7 +47,7 @@ export default async function JoinOurClubPage() {
 
   const b2Badge = (site.club_benefit_2_badge || "☕ PARLOUR PERKS").replace(/[✨✦]/g, "☕").trim();
   const b2Title = site.club_benefit_2_title || "Secret Parlour Drops";
-  const b2Desc = site.club_benefit_2_desc || "Occasional unlisted griddle specials, birthday stack treats, and intimate tasting invites for Geelong regulars.";
+  const b2Desc = site.club_benefit_2_desc || "Occasional unlisted griddle specials, birthday stack treats, and intimate tasting invites for local regulars.";
 
   const b3Badge = site.club_benefit_3_badge || "💛 ZERO STRINGS";
   const b3Title = site.club_benefit_3_title || "Always Your Choice";
@@ -125,7 +127,7 @@ export default async function JoinOurClubPage() {
               </div>
             </div>
 
-            {/* Slot 3: Bottom Right (Geelong West Parlour) */}
+            {/* Slot 3: Bottom-right parlour photo */}
             <div className={styles.bentoSlotBottomRight}>
               <div className={styles.bentoImgFrame}>
                 {bento3Img ? (

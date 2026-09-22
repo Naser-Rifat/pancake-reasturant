@@ -20,7 +20,7 @@ from django.utils import timezone
 from PIL import Image
 from rest_framework.test import APIClient
 
-from .emails import _send, booking_request_received, send_test
+from .emails import _address_locality, _send, booking_request_received, send_test
 from .models import (
     Announcement,
     Booking,
@@ -114,6 +114,10 @@ class MenuApiTests(TestCase):
 
 
 class EmailDeliveryTests(TestCase):
+    def test_address_locality_supports_common_australian_formats(self):
+        self.assertEqual(_address_locality("10 Main Road, Carlton VIC 3053, Australia"), "Carlton")
+        self.assertEqual(_address_locality("10 Main Road, Carlton, VIC 3053, Australia"), "Carlton")
+
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_customer_html_template_escapes_customer_supplied_content(self):
         booking = Booking.objects.create(
@@ -131,6 +135,7 @@ class EmailDeliveryTests(TestCase):
         self.assertIn("&lt;b&gt;Alex&lt;/b&gt;", html)
         self.assertIn("&lt;script&gt;", html)
         self.assertNotIn("<script>", html)
+        self.assertNotIn("Location</td><td", html)
 
     @override_settings(
         EMAIL_BACKEND="anymail.backends.brevo.EmailBackend",
@@ -714,7 +719,7 @@ class SiteContentApiTests(TestCase):
         Certification.objects.create(title="Shown", icon="⭐")
         Certification.objects.create(title="Hidden", icon="⭐", is_active=False)
         site = self.client.get("/api/site/").json()
-        self.assertIn("Pakington Street", site["address"])
+        self.assertIn("address", site)
         self.assertEqual(site["timezone"], "Australia/Melbourne")
         certs = self.client.get("/api/certifications/").json()
         self.assertEqual([c["title"] for c in certs], ["Shown"])
@@ -819,6 +824,16 @@ class SiteContentApiTests(TestCase):
         # unknown palettes are rejected, so the frontend can trust the value
         res = self.client.patch("/api/admin/site/", {"theme": "neon"}, format="json")
         self.assertEqual(res.status_code, 400)
+
+    def test_address_update_is_immediately_public(self):
+        self.auth()
+        address = "42 Example Road, Sampletown NSW 2000, Australia"
+
+        response = self.client.patch("/api/admin/site/", {"address": address}, format="json")
+
+        self.assertEqual(response.status_code, 200)
+        self.client.credentials()
+        self.assertEqual(self.client.get("/api/site/").json()["address"], address)
 
     def test_remove_bg_requires_staff_and_returns_png(self):
         # noqa: F401  (env-gated below)

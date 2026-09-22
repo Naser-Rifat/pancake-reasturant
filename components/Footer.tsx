@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import { formatTime, getHours, getSite, telHref } from "@/lib/api";
+import { addressLocality } from "@/lib/format";
 import BackToTop from "@/components/BackToTop";
 
 const LINKS = [
@@ -16,6 +17,7 @@ const LINKS = [
 export default async function Footer() {
   const [site, hours] = await Promise.all([getSite(), getHours()]);
   const directions = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address)}`;
+  const locality = addressLocality(site.address);
 
   return (
     <footer className="site-footer">
@@ -32,7 +34,9 @@ export default async function Footer() {
               className="f-brand-logo"
             />
             <p className="f-brand-tag">
-              {site.footer_tagline || "Fluffy stacks · made to order · Geelong West"}
+              {site.footer_tagline || (site.address
+                ? `Fluffy stacks · made to order · ${locality}`
+                : "Fluffy stacks · made to order")}
             </p>
 
             <div className="f-actions">
@@ -56,17 +60,19 @@ export default async function Footer() {
           <div className="f-col f-col-visit">
             <h2 className="f-col-title">Visit</h2>
             <address className="f-address-block">
-              <span className="f-address-text">{site.address}</span>
-              <a
-                href={directions}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="f-directions-link"
-              >
-                <MapPin size={15} strokeWidth={2.2} aria-hidden="true" />
-                <span>Get directions</span>
-                <span aria-hidden="true">→</span>
-              </a>
+              {site.address && <span className="f-address-text">{site.address}</span>}
+              {site.address && (
+                <a
+                  href={directions}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="f-directions-link"
+                >
+                  <MapPin size={15} strokeWidth={2.2} aria-hidden="true" />
+                  <span>Get directions</span>
+                  <span aria-hidden="true">→</span>
+                </a>
+              )}
               <a href={telHref(site.phone)} className="f-contact-link">
                 <Phone size={15} strokeWidth={2.2} aria-hidden="true" />
                 <span>{site.phone}</span>

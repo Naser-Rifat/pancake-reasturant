@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MapPin, ExternalLink } from "lucide-react";
+import { addressLocality, cleanAddress } from "@/lib/format";
 
 function FacebookIcon({ size = 13 }: { size?: number }) {
   return (
@@ -23,7 +24,7 @@ function InstagramIcon({ size = 13 }: { size?: number }) {
 }
 
 export default function TopRibbon({
-  address = "18 Pakington Street, Geelong West",
+  address = "",
   facebookUrl,
   instagramUrl,
   uberEatsUrl,
@@ -40,8 +41,8 @@ export default function TopRibbon({
     return null;
   }
 
-  // Shorten address for compact displays
-  const cleanAddress = address.replace(/,\s*Australia$/i, "").trim();
+  const displayAddress = cleanAddress(address);
+  const shortAddress = addressLocality(address);
 
   return (
     <aside className="top-ribbon" aria-label="Store Information and Online Ordering">
@@ -49,10 +50,10 @@ export default function TopRibbon({
         {/* Left: Store Location & Operating Note */}
         <div className="top-ribbon-left">
           <Link href="/#contact" className="top-ribbon-loc">
-            <MapPin size={13} className="top-ribbon-pin" aria-hidden="true" />
-            <span className="top-ribbon-addr-full">{cleanAddress}</span>
-            <span className="top-ribbon-addr-short">Geelong West</span>
-            <span className="top-ribbon-dot" aria-hidden="true">·</span>
+            {displayAddress && <MapPin size={13} className="top-ribbon-pin" aria-hidden="true" />}
+            {displayAddress && <span className="top-ribbon-addr-full">{displayAddress}</span>}
+            {displayAddress && <span className="top-ribbon-addr-short">{shortAddress}</span>}
+            {displayAddress && <span className="top-ribbon-dot" aria-hidden="true">·</span>}
             <span className="top-ribbon-hours">Open Daily 11am – 9pm</span>
           </Link>
         </div>

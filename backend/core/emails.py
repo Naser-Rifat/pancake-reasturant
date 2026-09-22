@@ -5,6 +5,7 @@ swallowed. The dev default (console backend) prints emails to the runserver
 terminal; production uses the Brevo HTTPS API through Django Anymail.
 """
 import logging
+import re
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -95,6 +96,26 @@ def _business_signature(site) -> str:
     return f"{RESTAURANT} · ABN {abn}"
 
 
+def _address_locality(address: str) -> str:
+    cleaned = re.sub(r",?\s*Australia\s*$", "", address or "", flags=re.I).strip()
+    parts = [part.strip() for part in cleaned.split(",") if part.strip()]
+    if not parts:
+        return "your neighbourhood"
+
+    state_pattern = re.compile(r"\b(VIC|NSW|QLD|SA|WA|TAS|ACT|NT)\b", re.I)
+    for index, part in enumerate(parts):
+        if not state_pattern.search(part):
+            continue
+        locality = state_pattern.sub("", part)
+        locality = re.sub(r"\b\d{4}\b", "", locality).strip()
+        if locality:
+            return locality
+        if index > 0:
+            return parts[index - 1]
+
+    return parts[-1]
+
+
 def _customer_html(
     *,
     site,
@@ -136,6 +157,7 @@ def _customer_html(
             "support_text": support_text,
             "closing": closing,
             "address": site.address,
+            "tagline": site.footer_tagline or "Fluffy stacks · made to order",
             "phone": site.phone,
             "phone_href": phone_href,
             "abn": _abn_number(site),
@@ -162,7 +184,8 @@ def booking_status_changed(booking) -> bool:
     selection = (booking.preselected_dish or "").strip()
     if selection:
         details.append(("Favourites", selection))
-    details.append(("Location", s.address))
+    if s.address:
+        details.append(("Location", s.address))
 
     if booking.status == "confirmed":
         subject = f"Booking confirmed · {reference} | {RESTAURANT}"
@@ -173,7 +196,8 @@ def booking_status_changed(booking) -> bool:
             f"  When:     {when}\n"
             f"  Party:    {guests}\n"
             f"{_booking_menu_selection(booking)}"
-            f"  Where:    {s.address}\n\n"
+            + (f"  Where:    {s.address}\n" if s.address else "")
+            + "\n"
             f"Running late or need to change plans? Call us on {s.phone}. "
             "Please don't reply to this automated email.\n\n"
             f"See you soon,\n{RESTAURANT}"
@@ -242,7 +266,8 @@ def booking_request_received(booking) -> bool:
     details = [("Reference", reference), ("Requested", when), ("Party", guests)]
     if selection:
         details.append(("Favourites", selection))
-    details.append(("Location", s.address))
+    if s.address:
+        details.append(("Location", s.address))
     subject = f"Booking request received · {reference} | {RESTAURANT}"
     body = (
         f"G'day {booking.name},\n\n"
@@ -252,7 +277,8 @@ def booking_request_received(booking) -> bool:
         f"  When:     {when}\n"
         f"  Party:    {guests}\n"
         f"{_booking_menu_selection(booking)}"
-        f"  Where:    {s.address}\n\n"
+        + (f"  Where:    {s.address}\n" if s.address else "")
+        + "\n"
         f"Need to change anything? Call us on {s.phone}. "
         "Please don't reply to this automated email.\n\n"
         f"Thanks,\n{RESTAURANT}"
@@ -296,8 +322,9 @@ def order_status_changed(order) -> bool:
         ("Items", items),
         ("Total", f"${order.total} incl. GST"),
         ("Payment", payment),
-        ("Pickup", s.address),
     ]
+    if s.address:
+        details.append(("Pickup", s.address))
 
     if order.status == "received":
         subject = f"Order received · {reference} | {RESTAURANT}"
@@ -308,7 +335,8 @@ def order_status_changed(order) -> bool:
             f"  Items:   {items}\n"
             f"  Total:   ${order.total} (incl. GST)\n"
             f"  Payment: {payment}\n"
-            f"  Pickup:  {s.address}\n\n"
+            + (f"  Pickup:  {s.address}\n" if s.address else "")
+            + "\n"
             "We'll email you the moment it's ready to collect.\n\n"
             f"Need help? Call {s.phone}; please don't reply to this automated email.\n\n"
             + _business_signature(s)
@@ -339,7 +367,8 @@ def order_status_changed(order) -> bool:
             f"  Items:   {items}\n"
             f"  Total:   ${order.total} (incl. GST)\n"
             f"  Payment: {payment}\n"
-            f"  Where:   {s.address}\n\n"
+            + (f"  Where:   {s.address}\n" if s.address else "")
+            + "\n"
             f"When you arrive, quote {reference}. Need help? Call {s.phone}. "
             "Please don't reply to this automated email.\n\n"
             f"See you in a minute,\n{_business_signature(s)}"
@@ -454,15 +483,17 @@ def club_welcome(member) -> bool:
         "Secret parlour drops and birthday treats",
         "Always free — no fees or passwords, and you can leave anytime",
     ]
+    locality = _address_locality(s.address)
     body = (
         f"G'day {member.name},\n\n"
         f"You're in! Welcome to {RESTAURANT} — a place for warm stacks and "
-        "good company in Geelong West.\n\n"
+        f"good company in {locality}.\n\n"
         "Here's what being a member means:\n"
         + "".join(f"  • {benefit}\n" for benefit in benefits)
         + "\nYour membership is active now. To update your details or leave the club, "
         f"call us on {s.phone}. Please don't reply to this automated email.\n\n"
-        f"See you at the griddle,\n{RESTAURANT}\n{s.address}"
+        f"See you at the griddle,\n{RESTAURANT}"
+        + (f"\n{s.address}" if s.address else "")
     )
     return _send(
         member.email,
@@ -476,7 +507,7 @@ def club_welcome(member) -> bool:
             badge_background="#e7f5e8",
             badge_color="#24552b",
             title="Welcome to the club",
-            lead="You’re in — welcome to warm stacks and good company in Geelong West.",
+            lead=f"You’re in — welcome to warm stacks and good company in {locality}.",
             bullets_title="Your member privileges",
             bullets=benefits,
             action_url=f"{settings.FRONTEND_URL}/menu",

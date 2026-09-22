@@ -5,7 +5,7 @@ import { getSite } from "@/lib/api";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Order Confirmed — The Pancake Club Geelong",
+  title: "Order Confirmed — The Pancake Club",
   description: "Your Pancake Club pickup order confirmation and real-time status tracker.",
   robots: { index: false },
 };

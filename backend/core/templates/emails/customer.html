@@ -18,7 +18,7 @@
               <td style="background:#21170f;padding:24px 28px;border-bottom:4px solid #f2b91f;">
                 <div style="font-size:11px;line-height:16px;letter-spacing:3px;color:#f2b91f;font-weight:700;">THE</div>
                 <div style="font-size:25px;line-height:30px;letter-spacing:2px;color:#fffaf0;font-weight:800;">PANCAKE CLUB</div>
-                <div style="margin-top:5px;font-size:12px;line-height:18px;color:#cdbda9;">Fluffy stacks · made to order · Geelong West</div>
+                <div style="margin-top:5px;font-size:12px;line-height:18px;color:#cdbda9;">{{ tagline }}</div>
               </td>
             </tr>
             <tr>
@@ -82,7 +82,7 @@
             </tr>
             <tr>
               <td style="padding:18px 28px;background:#21170f;color:#cdbda9;font-size:12px;line-height:19px;">
-                {{ address }}<br>
+                {% if address %}{{ address }}<br>{% endif %}
                 <a href="tel:{{ phone_href }}" style="color:#f2c044;text-decoration:none;">{{ phone }}</a>
                 {% if abn %}<span style="color:#756657;"> · </span>ABN {{ abn }}{% endif %}
                 <div style="margin-top:8px;color:#8f806f;">This is a service email about your booking, order or membership.</div>

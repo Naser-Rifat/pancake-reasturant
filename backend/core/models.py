@@ -477,8 +477,8 @@ class SiteSettings(models.Model):
     hero_heading = models.CharField(max_length=60, default="Stack Into")
     hero_script = models.CharField(max_length=60, default="Happiness")
     hero_lead = models.TextField(
-        default="Warm pancake stacks, made to order in Geelong West and served "
-                "for relaxed catch-ups with your favourite people."
+        default="Warm pancake stacks, made to order and served for relaxed "
+                "catch-ups with your favourite people."
     )
     hero_image = models.CharField(
         max_length=300,
@@ -497,7 +497,7 @@ class SiteSettings(models.Model):
         default="Made to order on the griddle\n"
                 "Sweet and savoury choices\n"
                 "Dine in or order pickup\n"
-                "Find us in Geelong West",
+                "Freshly prepared for every guest",
         help_text="One tick per line. These are public claims — keep them true.",
     )
     # inner-page heroes: this copy was hard-coded in the pages
@@ -520,7 +520,7 @@ class SiteSettings(models.Model):
         default="Pick a date, pick a time — we'll have the griddle hot when you arrive.",
     )
     # Join Our Club page content (Hero, 3 Bento cards, Member Pass, 3 Privileges)
-    club_hero_kicker = models.CharField(max_length=80, default="The Pancake Club · Geelong West")
+    club_hero_kicker = models.CharField(max_length=80, default="The Pancake Club")
     club_hero_heading = models.CharField(max_length=60, default="Good food.")
     club_hero_script = models.CharField(max_length=60, default="Better company.")
     club_hero_lead = models.CharField(
@@ -550,7 +550,7 @@ class SiteSettings(models.Model):
         blank=True,
         default="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80",
     )
-    club_bento_3_badge = models.CharField(max_length=60, blank=True, default="☕ Geelong West")
+    club_bento_3_badge = models.CharField(max_length=60, blank=True, default="☕ Our local parlour")
     club_bento_3_title = models.CharField(max_length=60, blank=True, default="Our Parlour")
     club_bento_3_sub = models.CharField(max_length=80, blank=True, default="Open 7 days")
 
@@ -569,7 +569,7 @@ class SiteSettings(models.Model):
     club_benefit_2_title = models.CharField(max_length=80, blank=True, default="Secret Parlour Drops")
     club_benefit_2_desc = models.TextField(
         blank=True,
-        default="Occasional unlisted griddle specials, birthday stack treats, and intimate tasting invites for Geelong regulars."
+        default="Occasional unlisted griddle specials, birthday stack treats, and intimate tasting invites for local regulars."
     )
 
     club_benefit_3_badge = models.CharField(max_length=60, blank=True, default="💛 ZERO STRINGS")
@@ -593,7 +593,7 @@ class SiteSettings(models.Model):
     # footer strapline, next to the copyright line
     footer_tagline = models.CharField(
         max_length=120,
-        default="Fluffy stacks · made to order · Geelong West",
+        default="Fluffy stacks · made to order",
         help_text="Shown in the footer.",
     )
     # closing call to action
@@ -608,16 +608,17 @@ class SiteSettings(models.Model):
     # ticker strip; one phrase per line, separated by ✦ on the site
     marquee_words = models.TextField(
         blank=True,
-        default="Fluffy Stacks\nGeelong West\nSweet & Savoury\nMade to Order\nBrunch Together\nPickup Ready",
+        default="Fluffy Stacks\nSweet & Savoury\nMade to Order\nBrunch Together\nPickup Ready",
         help_text="One phrase per line.",
     )
     about_text = models.TextField(
         default="G'day! The Pancake Club is a place for warm stacks, relaxed catch-ups, "
-                "and good food in Geelong West."
+                "and good food."
     )
     address = models.CharField(
         max_length=200,
-        default="18 Pakington Street, Geelong West VIC, Australia",
+        blank=True,
+        default="",
     )
     phone = models.CharField(max_length=30, default="+61 452 135 499")
     # international format; blank hides the floating WhatsApp button
@@ -626,7 +627,8 @@ class SiteSettings(models.Model):
     abn = models.CharField(max_length=40, blank=True, default="")
     map_embed = models.CharField(
         max_length=500,
-        default="https://www.google.com/maps?q=18%20Pakington%20Street%2C%20Geelong%20West%20VIC%20Australia&output=embed",
+        blank=True,
+        default="",
     )
     # "Find Us" info chips shown under the address — one chip per line.
     # Defaults mirror the previously hardcoded chips so existing sites look

@@ -27,6 +27,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { getOrder, money, type ApiOrder, type ApiSiteSettings } from "@/lib/api";
+import { addressLocality, cleanAddress } from "@/lib/format";
 import { formatOrderRef } from "@/lib/order-utils";
 import { useCart } from "@/lib/cart";
 
@@ -130,7 +131,9 @@ export default function OrderSuccessClient({
   const [manualId, setManualId] = useState("");
   const [emailDeliveryFailed, setEmailDeliveryFailed] = useState(false);
 
-  const venueAddress = site?.address || "133 Ryrie St, Geelong VIC 3220";
+  const venueAddress = site?.address || "";
+  const venueDisplayAddress = cleanAddress(venueAddress);
+  const venueLocality = addressLocality(venueAddress);
   const venuePhone = site?.phone || "0499 123 456";
   const venueWhatsapp = site?.whatsapp || "";
   const venueInstagram = site?.instagram_url || "https://instagram.com";
@@ -422,7 +425,7 @@ export default function OrderSuccessClient({
                   </div>
                   <div>
                     <h3 className="pickup-card-title">Pickup & Collection Counter</h3>
-                    <p className="pickup-card-address">{venueAddress}</p>
+                    {venueAddress && <p className="pickup-card-address">{venueAddress}</p>}
                   </div>
                 </div>
 
@@ -434,15 +437,17 @@ export default function OrderSuccessClient({
                 </div>
 
                 <div className="pickup-actions-grid">
-                  <a
-                    href={mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="pickup-action-btn"
-                  >
-                    <MapPin size={15} className="action-icon" aria-hidden="true" />
-                    <span>Get Directions</span>
-                  </a>
+                  {venueAddress && (
+                    <a
+                      href={mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="pickup-action-btn"
+                    >
+                      <MapPin size={15} className="action-icon" aria-hidden="true" />
+                      <span>Get Directions</span>
+                    </a>
+                  )}
 
                   <a href={`tel:${venuePhone.replace(/[^+\d]/g, "")}`} className="pickup-action-btn">
                     <Phone size={15} className="action-icon" aria-hidden="true" />
@@ -498,7 +503,7 @@ export default function OrderSuccessClient({
               <div className="order-receipt-paper">
                 <div className="receipt-header">
                   <div className="receipt-logo">THE PANCAKE CLUB</div>
-                  <div className="receipt-sub">133 Ryrie St, Geelong · Australia</div>
+                  {venueDisplayAddress && <div className="receipt-sub">{venueDisplayAddress}</div>}
                   <div className="receipt-divider" />
                   <div className="receipt-meta-row">
                     <span>Customer: <b>{order.customer_name}</b></span>
@@ -609,7 +614,7 @@ export default function OrderSuccessClient({
                 <div className="receipt-footer-wrap">
                   <div className="receipt-footer-badge">
                     <Sparkles size={12} aria-hidden="true" />
-                    <span>Freshly Griddled · Geelong West</span>
+                    <span>{venueAddress ? `Freshly Griddled · ${venueLocality}` : "Freshly Griddled"}</span>
                   </div>
                   <div className="receipt-footer-text">
                     Thank you for dining with The Pancake Club!

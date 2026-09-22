@@ -8,11 +8,11 @@ const DINER_TAGS = [
   { text: "Verified Diner", icon: "🥞" },
   { text: "Brunch Regular", icon: "☕" },
   { text: "Sweet Tooth", icon: "🍓" },
-  { text: "Geelong Local", icon: "✨" },
+  { text: "Local Favourite", icon: "✨" },
   { text: "Weekend Feast", icon: "💛" },
 ];
 
-export default function ReviewsCarousel({ reviews }: { reviews: ApiReview[] }) {
+export default function ReviewsCarousel({ reviews, location }: { reviews: ApiReview[]; location: string }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(false);
 
@@ -92,7 +92,9 @@ export default function ReviewsCarousel({ reviews }: { reviews: ApiReview[] }) {
                 <span className="avatar">{r.avatar || "🥞"}</span>
                 <div className="who-info">
                   <span className="who-name">{r.name}</span>
-                  {r.suburb && <span className="who-suburb">📍 {r.suburb}, Geelong</span>}
+                  {r.suburb && (
+                    <span className="who-suburb">📍 {r.suburb}{location ? ` · ${location}` : ""}</span>
+                  )}
                 </div>
               </div>
             </article>

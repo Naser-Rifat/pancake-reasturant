@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import GalleryClient from "@/components/GalleryClient";
 import Sticker from "@/components/Sticker";
 import { getGallery, getSite } from "@/lib/api";
+import { addressLocality } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -46,7 +47,7 @@ export default async function GalleryPage() {
           </p>
         </div>
       </section>
-      <GalleryClient photos={photos} />
+      <GalleryClient photos={photos} location={addressLocality(site.address)} />
     </div>
   );
 }

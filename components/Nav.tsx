@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { X, ArrowRight, ExternalLink } from "lucide-react";
 import CartButton from "@/components/CartButton";
 import { TOGGLE_MENU_EVENT } from "@/components/BottomBar";
+import { cleanAddress } from "@/lib/format";
 
 function FacebookIcon({ size = 15 }: { size?: number }) {
   return (
@@ -94,7 +95,7 @@ const LINKS = [
   { href: "/menu", label: "Menu", subtitle: "Fresh stacks & drinks", Icon: DrawerPancakeIcon },
   { href: "/gallery", label: "Gallery", subtitle: "Vibes & diner moments", Icon: DrawerGalleryIcon },
   { href: "/join-our-club", label: "Join Our Club", subtitle: "Good food, better company", Icon: DrawerReviewsIcon },
-  { href: "/#reviews", label: "Reviews", subtitle: "Loved by Geelong locals", Icon: DrawerReviewsIcon },
+  { href: "/#reviews", label: "Reviews", subtitle: "Loved by locals", Icon: DrawerReviewsIcon },
   { href: "/#contact", label: "Contact", subtitle: "Location & opening hours", Icon: DrawerContactIcon },
 ];
 
@@ -104,7 +105,7 @@ export default function Nav({
   instagramUrl,
   uberEatsUrl,
   whatsapp,
-  address = "18 Pakington Street, Geelong West",
+  address = "",
 }: {
   live?: boolean;
   facebookUrl?: string;
@@ -204,7 +205,7 @@ export default function Nav({
     return null;
   }
 
-  const cleanAddress = address.replace(/,\s*Australia$/i, "").trim();
+  const displayAddress = cleanAddress(address);
   const whatsappDigits = whatsapp ? whatsapp.replace(/\D/g, "") : "";
 
   const handleHomeClick = (e: React.MouseEvent) => {
@@ -463,10 +464,12 @@ export default function Nav({
 
             {/* Store Location & Hours Footer */}
             <div className="mobile-nav-store-footer">
-              <div className="mobile-nav-store-item">
-                <span className="m-store-icon">📍</span>
-                <span className="m-store-text">{cleanAddress}</span>
-              </div>
+              {displayAddress && (
+                <div className="mobile-nav-store-item">
+                  <span className="m-store-icon">📍</span>
+                  <span className="m-store-text">{displayAddress}</span>
+                </div>
+              )}
               <div className="mobile-nav-store-item">
                 <span className="m-store-icon">⏰</span>
                 <span className="m-store-text">Open Daily · 11:00 AM – 9:00 PM</span>

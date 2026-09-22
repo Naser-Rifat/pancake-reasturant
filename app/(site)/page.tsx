@@ -23,6 +23,7 @@ import {
   getSite,
   telHref,
 } from "@/lib/api";
+import { addressLocality, mapEmbedForAddress } from "@/lib/format";
 import { safeEmbedUrl, safeHref } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -43,6 +44,8 @@ export default async function Home() {
 
   // slider heading is one editable string; the last word carries the accent colour
   const offersTitleWords = (site?.offers_title || "This Week's Offers").trim().split(" ");
+  const locality = addressLocality(site.address);
+  const hasAddress = Boolean(site.address.trim());
 
   return (
     <main>
@@ -220,6 +223,7 @@ export default async function Home() {
           <div className="container">
             <CampaignSlider
               items={campaigns}
+              location={locality}
               title={
                 <div className="reveal" style={{ textAlign: "center" }}>
                   <p className="kicker">{site?.offers_kicker || "On right now"}</p>
@@ -264,7 +268,7 @@ export default async function Home() {
             {gallery.slice(0, 6).map((p, i) => {
               const tapes = ["tape-left", "tape-right", "tape-center", "tape-left", "tape-pin", "tape-right"];
               const tape = tapes[i % tapes.length];
-              const stamps = ["🥞 100% Fluffy", "✨ Geelong Vibe", "☕ Fresh Brew", "🍓 Berry Sweet", "💛 Café Mood", "🍯 Golden Maple"];
+              const stamps = ["🥞 100% Fluffy", locality ? `✨ ${locality} Vibe` : "✨ Local Vibe", "☕ Fresh Brew", "🍓 Berry Sweet", "💛 Café Mood", "🍯 Golden Maple"];
               const stamp = stamps[i % stamps.length];
               const isHero = i === 0;
 
@@ -306,7 +310,7 @@ export default async function Home() {
                   {isHero && p.caption && (
                     <div className="mosaic-hero-chin">
                       <p className="mosaic-hero-caption">{p.caption}</p>
-                      <span className="mosaic-hero-tag">📍 Geelong, Victoria</span>
+                      {locality && <span className="mosaic-hero-tag">📍 {locality}</span>}
                     </div>
                   )}
                 </Link>
@@ -336,7 +340,7 @@ export default async function Home() {
               What our <span className="accent">guests say</span>
             </h2>
           </div>
-          <ReviewsCarousel reviews={reviews} />
+          <ReviewsCarousel reviews={reviews} location={locality} />
           <ReviewForm />
         </div>
       </section>
@@ -362,7 +366,9 @@ export default async function Home() {
               Hours &amp; <span className="accent">Location</span>
             </h2>
             <p className="section-lead" style={{ margin: "0.5rem auto 0", maxWidth: "540px" }}>
-              Drop by for brunch or an afternoon pancake fix in the heart of Geelong
+              {hasAddress
+                ? `Drop by for brunch or an afternoon pancake fix near ${locality}`
+                : "Drop by for brunch or an afternoon pancake fix"}
             </p>
           </div>
 
@@ -385,11 +391,13 @@ export default async function Home() {
               </ul>
 
               <div className="diner-find-box">
-                <h4 className="find-title">📍 Find us in Geelong, Victoria</h4>
+                <h4 className="find-title">📍 {hasAddress ? `Find us in ${locality}` : "Visit The Pancake Club"}</h4>
                 <div className="contact-lines">
-                  <span className="contact-item">
-                    <strong>Address:</strong> {site.address}
-                  </span>
+                  {hasAddress && (
+                    <span className="contact-item">
+                      <strong>Address:</strong> {site.address}
+                    </span>
+                  )}
                   <span className="contact-item">
                     <strong>Phone:</strong>{" "}
                     <a href={telHref(site.phone)} className="contact-link">
@@ -413,19 +421,19 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* Geelong Map Card */}
-            <div className="map-card diner-map-card">
+            {/* Location Map Card */}
+            {hasAddress && <div className="map-card diner-map-card">
               <div className="map-frame">
                 <iframe
                   title="The Pancake Club location map"
-                  src={safeEmbedUrl(site.map_embed)}
+                  src={safeEmbedUrl(mapEmbedForAddress(site.address))}
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                 />
               </div>
               <div className="map-action-bar">
                 <div className="map-location-info">
-                  <span className="map-spot-name">Pancake Club Geelong</span>
+                  <span className="map-spot-name">The Pancake Club</span>
                   <span className="map-spot-addr">{site.address}</span>
                 </div>
                 <a
@@ -437,7 +445,7 @@ export default async function Home() {
                   GET DIRECTIONS ↗
                 </a>
               </div>
-            </div>
+            </div>}
           </div>
         </div>
       </section>

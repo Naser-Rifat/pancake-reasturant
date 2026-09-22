@@ -8,6 +8,7 @@ import CertIcon from "@/components/CertIcon";
 import HeroShowcase from "@/components/HeroShowcase";
 import MenuClient from "@/components/MenuClient";
 import { countdownBadge, type ApiMenuItem } from "@/lib/api";
+import { addressLocality } from "@/lib/format";
 import clubStyles from "@/app/(site)/join-our-club/club.module.css";
 import {
   type AdminSiteSettings,
@@ -139,6 +140,7 @@ export default function PreviewPage() {
   const [dishes, setDishes] = useState<AdminMenuItem[]>(DEFAULT_DISHES);
 
   const featuredDishes = dishes.filter((dish) => dish.is_featured);
+  const locality = addressLocality(site.address);
   const previewMenuItems: ApiMenuItem[] = dishes.map((dish) => ({
     ...dish,
     category: null,
@@ -508,7 +510,7 @@ export default function PreviewPage() {
                   <div className="camp-vintage-stamp" aria-hidden="true">
                     <span>FLUFFY</span>
                     <b>{displayBadgeTag.toUpperCase()}</b>
-                    <small>GEELONG</small>
+                    <small>{locality ? locality.toUpperCase() : "THE CLUB"}</small>
                   </div>
 
                   <span className="camp-botanical" aria-hidden="true" />
@@ -538,7 +540,7 @@ export default function PreviewPage() {
               {photos.slice(0, 6).map((p, i) => {
                 const tapes = ["tape-left", "tape-right", "tape-center", "tape-left", "tape-pin", "tape-right"];
                 const tape = tapes[i % tapes.length];
-                const stamps = ["🥞 100% Fluffy", "✨ Geelong Vibe", "☕ Fresh Brew", "🍓 Berry Sweet", "💛 Café Mood", "🍯 Golden Maple"];
+                const stamps = ["🥞 100% Fluffy", locality ? `✨ ${locality} Vibe` : "✨ Local Vibe", "☕ Fresh Brew", "🍓 Berry Sweet", "💛 Café Mood", "🍯 Golden Maple"];
                 const stamp = stamps[i % stamps.length];
                 const isHero = i === 0;
                 return (
@@ -561,7 +563,7 @@ export default function PreviewPage() {
                     {isHero && p.caption && (
                       <div className="mosaic-hero-chin">
                         <p className="mosaic-hero-caption">{p.caption}</p>
-                        <span className="mosaic-hero-tag">📍 Geelong, Victoria</span>
+                        {locality && <span className="mosaic-hero-tag">📍 {locality}</span>}
                       </div>
                     )}
                   </div>
@@ -642,7 +644,7 @@ export default function PreviewPage() {
                 className="f-brand-logo"
               />
               <p className="f-brand-tag">
-                {site.footer_tagline || "Fluffy stacks · made to order · Geelong West"}
+                {site.footer_tagline || `Fluffy stacks · made to order · ${locality}`}
               </p>
             </div>
           </div>
@@ -718,7 +720,7 @@ export default function PreviewPage() {
               <div className={clubStyles.heroBadgeWrap}>
                 <span className={clubStyles.heroBadge}>
                   <span className={clubStyles.heroBadgeDot} aria-hidden="true">🥞</span>
-                  <span>{site.club_hero_kicker || "The Pancake Club · Geelong West"}</span>
+                  <span>{site.club_hero_kicker || (locality ? `The Pancake Club · ${locality}` : "The Pancake Club")}</span>
                 </span>
               </div>
               <h1 className={clubStyles.heroHeading}>
@@ -801,7 +803,7 @@ export default function PreviewPage() {
                   )}
                 </div>
                 <div className={clubStyles.bentoBadge}>
-                  <span>{site.club_bento_3_badge || "☕ Geelong West"}</span>
+                  <span>{site.club_bento_3_badge || (locality ? `☕ ${locality}` : "☕ Our local parlour")}</span>
                 </div>
                 <div className={clubStyles.bentoCaption}>
                   <span className={clubStyles.bentoCaptionTitle}>{site.club_bento_3_title || "Our Parlour"}</span>

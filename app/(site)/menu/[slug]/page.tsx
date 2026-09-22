@@ -8,6 +8,7 @@ import DishCard, { TAG_ICONS } from "@/components/DishCard";
 import QtyAdd from "@/components/QtyAdd";
 import CartButton from "@/components/CartButton";
 import { TAG_LABEL, getMenuWithStatus, getReviews, getSite, money, type ApiMenuItem } from "@/lib/api";
+import { addressPrimaryLine } from "@/lib/format";
 import { jsonLd } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -198,7 +199,10 @@ export default async function DishPage({ params }: Props) {
               )}
 
               <p className="dish-note">
-                Pickup from {site.address.split(",")[0]} — griddled when you order, never before.{" "}
+                {addressPrimaryLine(site.address)
+                  ? `Pickup from ${addressPrimaryLine(site.address)} — `
+                  : "Pickup available — "}
+                griddled when you order, never before.{" "}
                 <Link href="/booking">Or book a table →</Link>
               </p>
             </div>

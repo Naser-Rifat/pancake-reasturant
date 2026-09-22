@@ -43,7 +43,7 @@ export function HomeStep6Footer({
           className="border-zinc-300 text-[#211a14] font-bold text-sm h-11 rounded-xl"
           value={site.footer_tagline}
           onChange={setS("footer_tagline")}
-          placeholder="e.g. Fluffy stacks · made to order · Geelong West"
+          placeholder="e.g. Fluffy stacks · made to order"
         />
       </div>
 

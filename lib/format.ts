@@ -11,6 +11,41 @@ export function formatTime12h(t: string): string {
   return `${h12}:${mStr || "00"} ${ampm}`;
 }
 
+export function cleanAddress(address: string | null | undefined): string {
+  return (address || "").replace(/,?\s*Australia\s*$/i, "").trim();
+}
+
+export function addressPrimaryLine(address: string | null | undefined): string {
+  return cleanAddress(address).split(",")[0]?.trim() || "";
+}
+
+export function addressLocality(address: string | null | undefined): string {
+  const cleaned = cleanAddress(address);
+  const parts = cleaned.split(",").map((part) => part.trim()).filter(Boolean);
+  if (!parts.length) return "";
+
+  const statePattern = /\b(VIC|NSW|QLD|SA|WA|TAS|ACT|NT)\b/i;
+  const stateIndex = parts.findIndex((part) => statePattern.test(part));
+  if (stateIndex >= 0) {
+    const localityInStatePart = parts[stateIndex].replace(statePattern, "").replace(/\b\d{4}\b/g, "").trim();
+    if (localityInStatePart) return localityInStatePart;
+    if (stateIndex > 0) return parts[stateIndex - 1];
+  }
+
+  return parts.length > 1 ? parts[parts.length - 1] : parts[0];
+}
+
+export function addressRegion(address: string | null | undefined): string {
+  const cleaned = cleanAddress(address);
+  const regionMatch = cleaned.match(/\b(VIC|NSW|QLD|SA|WA|TAS|ACT|NT)\b/i);
+  return regionMatch?.[1].toUpperCase() || "";
+}
+
+export function mapEmbedForAddress(address: string | null | undefined): string {
+  const cleaned = address?.trim();
+  return cleaned ? `https://www.google.com/maps?q=${encodeURIComponent(cleaned)}&output=embed` : "";
+}
+
 /**
  * Validates international and local phone numbers.
  * Supports:
@@ -114,4 +149,3 @@ export function parseBookingOffer(notes?: string | null): { offer: string | null
 
   return { offer: null, cleanNotes: trimmed };
 }
-

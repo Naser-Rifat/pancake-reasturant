@@ -91,12 +91,12 @@ export default function ReviewForm() {
               <input
                 id="rev-suburb"
                 className="float-input"
-                placeholder="Suburb / Area (e.g. Geelong)"
+                placeholder="Suburb / Area"
                 value={suburb}
                 onChange={(e) => setSuburb(e.target.value)}
               />
               <label htmlFor="rev-suburb" className="float-label">
-                Suburb / Area (e.g. Geelong)
+                Suburb / Area
               </label>
               <MapPin size={16} className="float-icon" aria-hidden="true" />
             </div>

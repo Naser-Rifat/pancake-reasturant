@@ -41,7 +41,7 @@ export default async function BookingPage() {
           </p>
           <a className="phone" href={telHref(site.phone)}>{site.phone}</a>
           <p style={{ marginTop: "1.2rem", marginBottom: 0 }}>
-            Open 7 days · {site.address}<br />
+            Open 7 days{site.address ? ` · ${site.address}` : ""}<br />
             <a href={`mailto:${site.email}`}>{site.email}</a>
           </p>
         </aside>

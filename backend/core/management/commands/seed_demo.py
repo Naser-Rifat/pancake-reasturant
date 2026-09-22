@@ -41,11 +41,11 @@ MENU = [
 ]
 
 REVIEWS = [
-    ("Sarah M.", "Geelong West", 5, "Best pancakes I've had in Geelong, hands down. The stack is cloud-fluffy and the warm maple butter is addictive.", "😀"),
-    ("Daniel K.", "Newtown", 5, "Booked online for a birthday brunch — table was ready on the dot, staff were lovely, and the Choc Overload is a monster. Our new Geelong favourite!", "🎉"),
-    ("Priya S.", "Belmont", 4, "Great vibe, colourful fit-out, quick service. The Lemon Ricotta is genuinely special — light as air and not too sweet.", "🌱"),
-    ("Tom B.", "East Geelong", 5, "Took the kids on a weekend for the special. Fast, friendly, and the banana caramel stack is dangerously good. Our new family regular.", "👨‍👧"),
-    ("Jess W.", "Highton", 5, "The Big Brekkie Stack lives up to its name. Loved the vibe on Pakington Street. We will definitely be back.", "🔥"),
+    ("Sarah M.", "Local diner", 5, "The stack is cloud-fluffy and the warm maple butter is addictive.", "😀"),
+    ("Daniel K.", "Nearby", 5, "Booked online for a birthday brunch — the table was ready and the staff were lovely.", "🎉"),
+    ("Priya S.", "Local diner", 4, "Great vibe, colourful fit-out, quick service. The Lemon Ricotta is light as air.", "🌱"),
+    ("Tom B.", "Nearby", 5, "Fast, friendly, and the banana caramel stack is dangerously good.", "👨‍👧"),
+    ("Jess W.", "Local diner", 5, "The Big Brekkie Stack lives up to its name. We will definitely be back.", "🔥"),
 ]
 
 GALLERY = [
@@ -69,8 +69,8 @@ GALLERY = [
 
 CERTS = [
     ("shield", "Food Safety Certified", "Victorian Food Safety Standards"),
-    ("star", "5-Star Hygiene Rating", "City of Greater Geelong"),
-    ("trophy", "Best Pancakes — Geelong 2025", "Victorian Hospitality Awards"),
+    ("star", "5-Star Hygiene Rating", "Local council inspection"),
+    ("trophy", "Guest Favourite", "Hospitality Awards"),
     ("check", "HACCP Compliant", "Certified Kitchen"),
     ("leaf", "Local Produce Partner", "Victorian Farmers' Network"),
 ]
@@ -91,6 +91,11 @@ class Command(BaseCommand):
             "--force",
             action="store_true",
             help="Overwrite/recreate seeded content in a non-empty database.",
+        )
+        parser.add_argument(
+            "--address",
+            default="",
+            help="Business address to show in the demo storefront.",
         )
 
     def handle(self, *args, **options):
@@ -154,7 +159,7 @@ class Command(BaseCommand):
         site = SiteSettings.load()
         site.hero_heading = "Welcome to"
         site.hero_script = "The Club"
-        site.hero_lead = "We pour our hearts into every stack, so you can enjoy Geelong’s best pancakes with the people you love."
+        site.hero_lead = "We pour our hearts into every stack, so you can enjoy fresh pancakes with the people you love."
         site.menu_hero_heading = "Pick your"
         site.menu_hero_script = "Favourites"
         site.menu_hero_lead = "Freshly made and served with love"
@@ -166,10 +171,10 @@ class Command(BaseCommand):
         site.cta_lead = "Brunch with friends, a family catch-up or a late-night craving"
         site.cta_button_label = "BOOK A TABLE"
         site.cta_button_url = "/booking"
-        site.address = "18 Pakington Street, Geelong West VIC, Australia"
+        site.address = options["address"].strip()
         site.phone = "+61 452 135 499"
         site.email = "hello@thepancakeclub.com.au"
-        site.map_embed = "https://www.google.com/maps?q=18%20Pakington%20Street%2C%20Geelong%20West%20VIC%20Australia&output=embed"
+        site.map_embed = ""
         site.transit_badges = "3 min walk from Town hall\n2hr Street Parking\nStep free access"
         site.instagram_url = "https://www.instagram.com"
         site.facebook_url = "https://www.facebook.com"
@@ -181,7 +186,7 @@ class Command(BaseCommand):
             (
                 "New Special 20% off this weekend!",
                 "band",
-                "This weekend only · Dine-in & Takeaway in Geelong",
+                "This weekend only · Dine-in & Takeaway",
                 "EXPLORE THE MENU",
                 "/menu",
                 "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=1200&q=80",

@@ -17,7 +17,7 @@ const ALBUMS: { key: Album | "all"; label: string; icon: string }[] = [
 const STAMPS = [
   { text: "100% Fluffy", icon: "🥞", color: "var(--yellow-deep)" },
   { text: "Fresh Brew", icon: "☕", color: "var(--brown)" },
-  { text: "Geelong Vibes", icon: "✨", color: "var(--pink)" },
+  { text: "Local Vibes", icon: "✨", color: "var(--pink)" },
   { text: "Café Mood", icon: "💛", color: "var(--yellow-deep)" },
   { text: "Sweet Moments", icon: "🍓", color: "var(--pink-deep)" },
   { text: "Golden Maple", icon: "🍯", color: "var(--yellow-deep)" },
@@ -26,7 +26,7 @@ const STAMPS = [
 
 const TAPES = ["tape-center", "tape-left", "tape-right", "tape-pin"];
 
-export default function GalleryClient({ photos }: { photos: ApiGalleryPhoto[] }) {
+export default function GalleryClient({ photos, location }: { photos: ApiGalleryPhoto[]; location: string }) {
   const [album, setAlbum] = useState<Album | "all">("all");
   const [current, setCurrent] = useState<number | null>(null); // index into `visible`, or null
   const [touchX, setTouchX] = useState<number | null>(null);
@@ -145,7 +145,9 @@ export default function GalleryClient({ photos }: { photos: ApiGalleryPhoto[] })
                   <div className="polaroid-chin">
                     <p className="polaroid-caption">{captionText}</p>
                     <div className="polaroid-meta">
-                      <span className="polaroid-location">📍 The Pancake Club, Geelong</span>
+                      {location && (
+                        <span className="polaroid-location">📍 The Pancake Club, {location}</span>
+                      )}
                       <span className="polaroid-album-badge">{p.album}</span>
                     </div>
                   </div>

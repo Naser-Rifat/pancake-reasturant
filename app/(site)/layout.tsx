@@ -14,6 +14,7 @@ import BottomBar from "@/components/BottomBar";
 import { CartProvider } from "@/lib/cart";
 import { QueryProvider } from "@/components/QueryProvider";
 import { getAnnouncement, getHours, getMenuWithStatus, getReviews, getSite } from "@/lib/api";
+import { addressLocality, addressRegion } from "@/lib/format";
 import { customThemeStyle } from "@/lib/theme";
 import { jsonLd } from "@/lib/utils";
 import { aggregateRating, openingHoursSpec } from "@/lib/seo";
@@ -30,71 +31,51 @@ const SITE_URL = (
 ).replace(/\/$/, "");
 const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION?.trim();
 
-const SITE_TITLE = "The Pancake Club | Geelong's Best Pancakes";
-const SITE_DESC =
-  "Fluffy homemade pancakes in Geelong. Explore our menu, book a table, or visit us in Geelong West.";
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  const locality = addressLocality(site.address);
+  const hasLocation = Boolean(site.address.trim());
+  const locationSuffix = hasLocation ? ` in ${locality}` : "";
+  const title = `The Pancake Club | Fresh Pancakes${locationSuffix}`;
+  const description = `Fluffy homemade pancakes${locationSuffix}. Explore our menu, book a table, or visit The Pancake Club.`;
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: SITE_TITLE,
-    template: "%s | The Pancake Club",
-  },
-  description: SITE_DESC,
-  applicationName: "The Pancake Club",
-  keywords: [
-    "pancakes Geelong",
-    "breakfast Geelong",
-    "pancake restaurant Geelong",
-    "book a table Geelong",
-    "The Pancake Club",
-  ],
-  alternates: { canonical: "/" },
-  verification: GOOGLE_SITE_VERIFICATION
-    ? { google: GOOGLE_SITE_VERIFICATION }
-    : undefined,
-  manifest: "/manifest.webmanifest",
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icons/icon-48.png", sizes: "48x48", type: "image/png" },
-      { url: "/icons/icon-96.png", sizes: "96x96", type: "image/png" },
-      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: { default: title, template: "%s | The Pancake Club" },
+    description,
+    applicationName: "The Pancake Club",
+    keywords: [
+      `pancakes${locationSuffix}`,
+      `breakfast${locationSuffix}`,
+      `pancake restaurant${locationSuffix}`,
+      `book a table${locationSuffix}`,
+      "The Pancake Club",
     ],
-    shortcut: "/favicon.ico",
-    apple: [
-      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
-  },
-  // iOS reads these, not the manifest, to launch standalone from the home screen
-  appleWebApp: {
-    capable: true,
-    title: "Pancake Club",
-    statusBarStyle: "default",
-  },
-  // Next emits the standardised mobile-web-app-capable; Safari before 16.4 only
-  // launches standalone off the apple- prefixed one
-  other: { "apple-mobile-web-app-capable": "yes" },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large" },
-  },
-  openGraph: {
-    type: "website",
-    siteName: "The Pancake Club",
-    locale: "en_AU",
-    url: SITE_URL,
-    title: SITE_TITLE,
-    description: SITE_DESC,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: SITE_TITLE,
-    description: SITE_DESC,
-  },
-};
+    alternates: { canonical: "/" },
+    verification: GOOGLE_SITE_VERIFICATION ? { google: GOOGLE_SITE_VERIFICATION } : undefined,
+    manifest: "/manifest.webmanifest",
+    icons: {
+      icon: [
+        { url: "/favicon.ico", sizes: "any" },
+        { url: "/icons/icon-48.png", sizes: "48x48", type: "image/png" },
+        { url: "/icons/icon-96.png", sizes: "96x96", type: "image/png" },
+        { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+        { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+      ],
+      shortcut: "/favicon.ico",
+      apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    },
+    appleWebApp: { capable: true, title: "Pancake Club", statusBarStyle: "default" },
+    other: { "apple-mobile-web-app-capable": "yes" },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large" },
+    },
+    openGraph: { type: "website", siteName: "The Pancake Club", locale: "en_AU", url: SITE_URL, title, description },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 // viewport-fit=cover is what makes env(safe-area-inset-*) resolve to anything
 // other than 0 — the hero's bottom CTA and the tab bar both budget for it
@@ -134,13 +115,16 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     priceRange: "$$",
     telephone: site.phone,
     email: site.email,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: site.address,
-      addressLocality: "Geelong West",
-      addressRegion: "VIC",
-      addressCountry: "AU",
-    },
+    ...(site.address.trim()
+      ? {
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: site.address,
+            addressLocality: addressLocality(site.address),
+            ...(addressRegion(site.address) ? { addressRegion: addressRegion(site.address) } : {}),
+          },
+        }
+      : {}),
     hasMenu: `${SITE_URL}/menu`,
     acceptsReservations: `${SITE_URL}/booking`,
     ...(openingHours.length ? { openingHoursSpecification: openingHours } : {}),

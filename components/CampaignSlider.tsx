@@ -19,9 +19,11 @@ const DEFAULT_IMAGE =
 export default function CampaignSlider({
   items,
   title,
+  location,
 }: {
   items: ApiAnnouncement[];
   title?: React.ReactNode;
+  location: string;
 }) {
   const swiperRef = useRef<SwiperType | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -227,7 +229,7 @@ export default function CampaignSlider({
                       <div className="camp-vintage-stamp" aria-hidden="true">
                         <span>FLUFFY</span>
                         <b>SPECIAL</b>
-                        <small>GEELONG</small>
+                        <small>{location ? location.toUpperCase() : "THE CLUB"}</small>
                       </div>
 
                       <span className="camp-botanical" aria-hidden="true" />
