@@ -1,4 +1,7 @@
+"use client";
+
 import { useEffect, useState, type ChangeEvent, type Dispatch, type FormEvent, type RefObject, type SetStateAction } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Image as ImageIcon, Plus, Save, UtensilsCrossed, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -50,6 +53,11 @@ export function MenuDishEditor({
   categories?: AdminCategory[];
 }) {
   const [cachedPhoto, setCachedPhoto] = useState<string>("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (form.photo && form.photo !== form.image && !form.photo.includes("-cutout") && !form.photo.includes("cutout.png")) {
@@ -63,29 +71,31 @@ export function MenuDishEditor({
     (form.photo && (form.photo.includes("-cutout") || form.photo.includes("cutout.png")))
   );
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 md:p-6 overflow-hidden animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex flex-col bg-white sm:bg-black/60 sm:backdrop-blur-xs sm:justify-center sm:items-center p-0 sm:p-4 md:p-6 overflow-hidden"
       role="dialog"
       aria-modal="true"
     >
-      {/* Backdrop overlay dismiss */}
-      <div className="fixed inset-0 -z-10 cursor-pointer" onClick={closeForm} />
+      {/* Desktop backdrop overlay dismiss */}
+      <div
+        className="hidden sm:block fixed inset-0 -z-10 cursor-pointer"
+        onClick={closeForm}
+      />
 
-      {/* Adaptive Sheet Modal */}
+      {/* Adaptive Sheet Modal: 100% full-screen on mobile, centered card on tablet/desktop */}
       <div
         ref={formRef}
-        className="relative w-full sm:max-w-2xl lg:max-w-3xl h-[92dvh] sm:h-auto sm:max-h-[90vh] bg-white rounded-t-2xl sm:rounded-2xl border border-zinc-200 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-300"
+        className="relative w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-2xl lg:max-w-3xl bg-white rounded-none sm:rounded-2xl border-0 sm:border sm:border-zinc-200 shadow-none sm:shadow-2xl flex flex-col overflow-hidden"
       >
-        {/* Mobile Drag Indicator */}
-        <div className="mx-auto w-10 h-1.5 rounded-full bg-zinc-300 my-2 sm:hidden shrink-0" />
-
         {/* Sticky Top Navigation Bar */}
         <div className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-3 bg-white/95 backdrop-blur-md border-b border-zinc-200 shrink-0">
           <button
             type="button"
             onClick={closeForm}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-600 hover:text-zinc-900 py-1.5 px-2 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-600 hover:text-zinc-900 py-2 px-2.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer"
           >
             <X className="h-4 w-4" />
             <span>Cancel</span>
@@ -445,18 +455,21 @@ export function MenuDishEditor({
         </form>
 
         {/* Sticky Bottom Action Bar */}
-        <div className="sticky bottom-0 z-20 flex items-center justify-between gap-3 px-4 sm:px-6 py-3 bg-white/95 backdrop-blur-md border-t border-zinc-200 pb-safe shrink-0 shadow-lg">
+        <div
+          className="sticky bottom-0 z-20 flex items-center justify-between gap-3 px-4 sm:px-6 py-3 bg-white/95 backdrop-blur-md border-t border-zinc-200 shrink-0 shadow-lg"
+          style={{ paddingBottom: "max(14px, env(safe-area-inset-bottom, 14px))" }}
+        >
           <div className="text-xs text-zinc-500 font-medium hidden sm:block">
             {!editing ? `Step ${step} of 2` : "All changes save to live menu"}
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
             {!editing && step === 2 && (
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                className="border-zinc-300 text-[#763a12] text-xs font-bold rounded-xl h-10 px-3 cursor-pointer"
+                className="border-zinc-300 text-[#763a12] text-xs font-bold rounded-xl h-11 sm:h-10 px-4 cursor-pointer"
                 onClick={() => setStep(1)}
               >
                 <ArrowLeft className="h-3.5 w-3.5 mr-1" /> Back
@@ -466,7 +479,7 @@ export function MenuDishEditor({
               type="button"
               variant="ghost"
               size="sm"
-              className="text-xs font-bold text-zinc-600 rounded-xl h-10 px-3 cursor-pointer"
+              className="text-xs font-bold text-zinc-600 rounded-xl h-10 px-3 cursor-pointer hidden sm:inline-flex"
               onClick={closeForm}
             >
               Cancel
@@ -474,22 +487,22 @@ export function MenuDishEditor({
             <Button
               type="button"
               loading={saving}
-              className="flex-1 sm:flex-none bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs h-10 px-5 cursor-pointer"
+              className="w-full sm:w-auto bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-sm sm:text-xs rounded-xl shadow-xs h-11 sm:h-10 px-6 cursor-pointer"
               onClick={() => (!editing && step === 1 ? goToPhotos() : submit())}
             >
               {!editing && step === 1 ? (
                 <>
                   <span>Next: Upload Photos</span>
-                  <ArrowRight className="h-3.5 w-3.5 ml-1" />
+                  <ArrowRight className="h-4 w-4 ml-1.5" />
                 </>
               ) : editing ? (
                 <>
-                  <Save className="h-3.5 w-3.5 mr-1.5" />
+                  <Save className="h-4 w-4 mr-1.5" />
                   <span>{saving ? "Saving Changes..." : "Save Changes"}</span>
                 </>
               ) : (
                 <>
-                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  <Plus className="h-4 w-4 mr-1.5" />
                   <span>{saving ? "Adding to Menu..." : "Add to Menu"}</span>
                 </>
               )}
@@ -497,6 +510,7 @@ export function MenuDishEditor({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
