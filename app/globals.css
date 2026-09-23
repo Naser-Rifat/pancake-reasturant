@@ -6419,52 +6419,47 @@ body:has(.cart-fab) .wa-float {
   .dish-card.dc-row .dc-body {
     grid-area: body;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: minmax(auto, max-content) 1fr auto;
     grid-template-areas:
       "name dots price"
-      "desc desc desc"
-      "chips chips chips";
+      "desc desc desc";
     align-items: center;
-    column-gap: 0.6rem;
+    column-gap: 0.65rem;
     padding-right: 0;
   }
   .dish-card.dc-row .dc-head { display: contents; }
   .dish-card.dc-row .dc-head-legacy { display: contents; }
-  .dish-card.dc-row .dc-name { grid-area: name; }
-  .dish-card.dc-row .dc-dots { grid-area: dots; }
+  .dish-card.dc-row .dc-name {
+    grid-area: name;
+    max-width: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.05rem;
+    line-height: 1.25;
+  }
+  .dish-card.dc-row .dc-dots {
+    grid-area: dots;
+    display: block;
+    min-width: 1.25rem;
+    height: 0;
+    border-bottom: 1px dotted rgba(33, 26, 20, 0.28);
+  }
   .dish-card.dc-row .dc-price { grid-area: price; margin-left: 0; }
   .dish-card.dc-row .dc-price-head { display: inline-block; }
-  .dish-card.dc-row .dc-desc { grid-area: desc; }
-  .dish-card.dc-row .dc-chips { grid-area: chips; }
-  .dish-card.dc-row .dc-badge { display: none; }
-  .dish-card.dc-row .dc-dots {
-    display: block;
-    flex: 1;
-    height: 0;
-    border-bottom: 1px dotted rgba(33, 26, 20, 0.3);
-  }
-  .dish-card.dc-row .dc-price {
-    padding: 0.28rem 0.75rem;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--yellow) 34%, var(--cream-card));
-  }
-  .dish-card.dc-row .dc-name { -webkit-line-clamp: 1; font-size: 1.05rem; }
   .dish-card.dc-row .dc-desc {
+    grid-area: desc;
     display: block;
-    margin: 0.45rem 0 0;
+    margin: 0.35rem 0 0;
     color: var(--muted);
     font-size: 0.92rem;
     line-height: 1.5;
   }
-  .dish-card.dc-row .dc-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.55rem; }
-  .dish-card.dc-row .dc-chip {
-    padding: 0.22rem 0.6rem;
+  .dish-card.dc-row .dc-badge { display: none; }
+  .dish-card.dc-row .dc-price {
+    padding: 0.28rem 0.75rem;
     border-radius: 999px;
-    border: 1px solid rgba(33, 26, 20, 0.1);
-    background: rgba(253, 249, 238, 0.8);
-    font-size: 0.76rem;
-    font-weight: 600;
-    color: var(--muted);
+    background: color-mix(in srgb, var(--yellow) 34%, var(--cream-card));
   }
   .dish-card.dc-row .dc-actions {
     position: static;
@@ -10517,172 +10512,6 @@ body:has(.hero-nav) .hero-find {
     transform: none;
     box-shadow: 0 -3px 14px rgba(33, 26, 20, 0.1);
   }
-
-  /* Admin live preview containers: phone, tablet, desktop */
-  .preview-phone-card .dish-card,
-  .preview-tablet-card .dish-card,
-  .preview-desktop-card .dish-card {
-    position: relative !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    min-height: 216px !important;
-    height: auto !important;
-    border-radius: 14px 14px 2px 2px !important;
-    padding: 0.85rem 1rem 0 !important;
-    overflow: hidden !important;
-    border: 1.5px solid rgba(118, 58, 18, 0.12) !important;
-    box-shadow: 0 8px 24px rgba(33, 26, 20, 0.07) !important;
-    background: linear-gradient(150deg, #fdf8f0 0%, #faefe0 60%, #f6e6d0 100%) !important;
-  }
-  .preview-phone-card .dish-card .dc-body,
-  .preview-tablet-card .dish-card .dc-body,
-  .preview-desktop-card .dish-card .dc-body {
-    position: relative !important;
-    z-index: 5 !important;
-    max-width: calc(100% - 56px) !important;
-    padding: 0 !important;
-    margin-bottom: 0.65rem !important;
-  }
-  .preview-phone-card .dish-card .dc-head,
-  .preview-tablet-card .dish-card .dc-head,
-  .preview-desktop-card .dish-card .dc-head {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.5rem !important;
-    min-height: 28px !important;
-    margin-bottom: 0.32rem !important;
-  }
-  .preview-phone-card .dish-card .dc-name,
-  .preview-tablet-card .dish-card .dc-name,
-  .preview-desktop-card .dish-card .dc-name {
-    font-family: var(--font-round), sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 1.18rem !important;
-    line-height: 1.2 !important;
-    color: var(--ink) !important;
-    margin: 0 0 0.18rem !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2 !important;
-    -webkit-box-orient: vertical !important;
-    overflow: hidden !important;
-  }
-  .preview-phone-card .dish-card .dc-desc,
-  .preview-tablet-card .dish-card .dc-desc,
-  .preview-desktop-card .dish-card .dc-desc {
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2 !important;
-    -webkit-box-orient: vertical !important;
-    overflow: hidden !important;
-    font-size: 0.72rem !important;
-    line-height: 1.35 !important;
-    color: var(--muted) !important;
-    margin: 0.18rem 0 0.15rem !important;
-    position: relative !important;
-    z-index: 5 !important;
-  }
-  .preview-phone-card .dish-card .dc-chips,
-  .preview-tablet-card .dish-card .dc-chips,
-  .preview-desktop-card .dish-card .dc-chips {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 0.25rem !important;
-    margin: 0.25rem 0 !important;
-    position: relative !important;
-    z-index: 5 !important;
-  }
-  .preview-phone-card .dish-card .dc-chip,
-  .preview-tablet-card .dish-card .dc-chip,
-  .preview-desktop-card .dish-card .dc-chip {
-    font-size: 0.62rem !important;
-    padding: 1px 6px !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    border-radius: 999px !important;
-    border: 1px solid rgba(118, 58, 18, 0.12) !important;
-    color: #763a12 !important;
-    font-weight: 600 !important;
-  }
-  .preview-phone-card .dish-card .dc-foot,
-  .preview-tablet-card .dish-card .dc-foot,
-  .preview-desktop-card .dish-card .dc-foot,
-  .preview-phone-card .dish-card .dc-details,
-  .preview-tablet-card .dish-card .dc-details,
-  .preview-desktop-card .dish-card .dc-details {
-    display: none !important;
-  }
-  .preview-phone-card .dish-card .dc-actions,
-  .preview-tablet-card .dish-card .dc-actions,
-  .preview-desktop-card .dish-card .dc-actions {
-    position: absolute !important;
-    top: 1.25rem !important;
-    right: 1.25rem !important;
-    z-index: 6 !important;
-    display: block !important;
-  }
-  .preview-phone-card .dish-card .dc-media,
-  .preview-tablet-card .dish-card .dc-media,
-  .preview-desktop-card .dish-card .dc-media {
-    position: relative !important;
-    inset: auto !important;
-    width: 100% !important;
-    height: 144px !important;
-    margin-top: auto !important;
-    z-index: 2 !important;
-    pointer-events: none !important;
-    display: flex !important;
-    align-items: flex-end !important;
-    justify-content: center !important;
-    overflow: hidden !important;
-  }
-  .preview-phone-card .dish-card .dc-photo,
-  .preview-tablet-card .dish-card .dc-photo,
-  .preview-desktop-card .dish-card .dc-photo {
-    position: static !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 100% !important;
-    display: flex !important;
-    align-items: flex-end !important;
-    justify-content: center !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    overflow: hidden !important;
-  }
-  .preview-phone-card .dish-card .dc-img,
-  .preview-tablet-card .dish-card .dc-img,
-  .preview-desktop-card .dish-card .dc-img {
-    position: relative !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-  .preview-phone-card .dish-card .dc-img:not(.is-cutout),
-  .preview-tablet-card .dish-card .dc-img:not(.is-cutout),
-  .preview-desktop-card .dish-card .dc-img:not(.is-cutout) {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    object-position: center center !important;
-    border-radius: 10px 10px 0 0 !important;
-    transform: none !important;
-    box-shadow: 0 -3px 14px rgba(33, 26, 20, 0.1) !important;
-  }
-  .preview-phone-card .dish-card .dc-img.is-cutout,
-  .preview-tablet-card .dish-card .dc-img.is-cutout,
-  .preview-desktop-card .dish-card .dc-img.is-cutout {
-    object-fit: contain !important;
-    transform: scale(1.15) !important;
-    transform-origin: center bottom !important;
-    filter:
-      drop-shadow(0 -2px 0 #ffffff)
-      drop-shadow(0 2px 0 #ffffff)
-      drop-shadow(-2px 0 0 #ffffff)
-      drop-shadow(2px 0 0 #ffffff)
-      drop-shadow(0 0 3px #ffffff)
-      drop-shadow(0 14px 24px rgba(33, 26, 20, 0.16)) !important;
-  }
-
   /* the category chips wrapped to two rows and ate 170px before the first dish,
      the same trap the home grid had */
   .menu-filter-bar {
