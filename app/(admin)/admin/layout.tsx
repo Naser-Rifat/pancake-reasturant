@@ -225,7 +225,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
           {/* min-w-0: as a flex item, main's default min-width:auto let wide tables
               set the page width instead of scrolling inside their own wrapper */}
-          <main className="min-w-0 flex-1 bg-white p-4 pt-18 md:ml-64 md:p-8 md:pt-8">
+          <main className="min-w-0 flex-1 bg-white p-4 pt-18 sm:p-5 md:ml-64 md:p-6 lg:p-8 md:pt-6 lg:pt-8">
             {children}
           </main>
         </div>
