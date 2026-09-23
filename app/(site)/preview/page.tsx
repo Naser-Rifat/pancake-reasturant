@@ -577,9 +577,6 @@ export default function PreviewPage() {
       {/* ========================================================================= */}
       {/* 4. TRUST BADGES PREVIEW                                                   */}
       {/* ========================================================================= */}
-      {/* ========================================================================= */}
-      {/* 4. TRUST BADGES PREVIEW                                                   */}
-      {/* ========================================================================= */}
       {section === "certs" && (
         <section className="certs-strip-sec" style={{ padding: "1.6rem 0 2.2rem" }}>
           <div className="container" style={{ padding: "0 1rem" }}>
@@ -670,33 +667,14 @@ export default function PreviewPage() {
                         className="cert-badge quality-seal-badge"
                         style={{
                           position: "relative",
-                          opacity: isHidden ? 0.72 : 1,
+                          opacity: isHidden ? 0.78 : 1,
                           borderStyle: isHidden ? "dashed" : "solid",
                           borderColor: isHidden ? "rgba(217, 119, 6, 0.45)" : "rgba(118, 58, 18, 0.1)",
-                          background: isHidden ? "rgba(255, 255, 255, 0.85)" : "#ffffff",
+                          background: isHidden ? "rgba(255, 255, 255, 0.88)" : "#ffffff",
+                          flex: "1 1 280px",
+                          maxWidth: "340px",
                         }}
                       >
-                        {/* Status watermark pill in admin preview */}
-                        {isHidden && (
-                          <span
-                            style={{
-                              position: "absolute",
-                              top: "8px",
-                              right: "12px",
-                              fontSize: "0.62rem",
-                              fontWeight: 800,
-                              textTransform: "uppercase",
-                              background: "rgba(245, 158, 11, 0.2)",
-                              color: "#b45309",
-                              padding: "2px 6px",
-                              borderRadius: "6px",
-                              letterSpacing: "0.04em",
-                            }}
-                          >
-                            ⏸ Hidden
-                          </span>
-                        )}
-
                         <span className={`ic${c.image ? " cert-real-logo" : ""}`}>
                           {c.image ? (
                             <Image
@@ -710,7 +688,29 @@ export default function PreviewPage() {
                             <CertIcon name={c.icon} />
                           )}
                         </span>
-                        <div className="cert-info">
+                        <div className="cert-info" style={{ minWidth: 0, flex: 1 }}>
+                          {isHidden && (
+                            <span
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "3px",
+                                fontSize: "0.6rem",
+                                fontWeight: 800,
+                                textTransform: "uppercase",
+                                background: "#fef3c7",
+                                border: "1px solid #fde68a",
+                                color: "#92400e",
+                                padding: "1px 6px",
+                                borderRadius: "4px",
+                                letterSpacing: "0.04em",
+                                width: "fit-content",
+                                marginBottom: "3px",
+                              }}
+                            >
+                              ⏸ Hidden
+                            </span>
+                          )}
                           <b>{c.title}</b>
                           <small>{c.subtitle}</small>
                         </div>
