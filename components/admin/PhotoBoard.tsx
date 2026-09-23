@@ -277,55 +277,60 @@ export default function PhotoBoard({
   return (
     <div className="space-y-4">
       {/* Upload Specifications & Quality Guide Bar */}
-      <div className="rounded-xl border border-amber-300/80 bg-linear-to-r from-amber-50/90 via-amber-50/60 to-orange-50/40 p-3.5 space-y-2.5 shadow-2xs">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-xs font-bold text-amber-950">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-200 text-amber-900 text-xs">📷</span>
-            <span>Upload Guide: Sizing, Ratio &amp; Quality Specifications</span>
+      <details className="group rounded-xl border border-amber-300/80 bg-linear-to-r from-amber-50/90 via-amber-50/60 to-orange-50/40 p-3 shadow-2xs">
+        <summary className="flex items-center justify-between gap-2 cursor-pointer list-none select-none text-xs font-bold text-amber-950">
+          <div className="flex items-center gap-2">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-200 text-amber-900 text-xs shrink-0">📷</span>
+            <span className="text-xs font-bold">Photo Sizing &amp; Ratio Guide</span>
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300/60 flex items-center gap-1">
-            ✓ Auto Cloudinary Optimization
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300/60 hidden sm:inline-flex">
+              ✓ Auto Optimized
+            </span>
+            <span className="text-xs text-amber-800 font-bold group-open:rotate-180 transition-transform">▼</span>
+          </div>
+        </summary>
+
+        <div className="mt-3 space-y-2.5 pt-2 border-t border-amber-200/60">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <div className="bg-white/90 rounded-lg p-2.5 border border-amber-200/80 shadow-2xs flex flex-col">
+              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide flex items-center gap-1">
+                📐 Aspect Ratio
+              </span>
+              <span className="text-xs font-extrabold text-zinc-900 mt-0.5">4:3 or 1:1</span>
+              <span className="text-[10px] text-emerald-700 font-medium">✓ Validated on upload</span>
+            </div>
+
+            <div className="bg-white/90 rounded-lg p-2.5 border border-amber-200/80 shadow-2xs flex flex-col">
+              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide flex items-center gap-1">
+                🎯 Resolution
+              </span>
+              <span className="text-xs font-extrabold text-zinc-900 mt-0.5">1200 × 900 px</span>
+              <span className="text-[10px] text-emerald-700 font-medium">✓ Min 500×400px enforced</span>
+            </div>
+
+            <div className="bg-white/90 rounded-lg p-2.5 border border-amber-200/80 shadow-2xs flex flex-col">
+              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide flex items-center gap-1">
+                ⚖️ Max File Size
+              </span>
+              <span className="text-xs font-extrabold text-amber-700 mt-0.5">Max 5 MB</span>
+              <span className="text-[10px] text-emerald-700 font-medium">✓ Strictly checked</span>
+            </div>
+
+            <div className="bg-white/90 rounded-lg p-2.5 border border-amber-200/80 shadow-2xs flex flex-col">
+              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide flex items-center gap-1">
+                📁 File Formats
+              </span>
+              <span className="text-xs font-extrabold text-zinc-900 mt-0.5">JPG, WebP, PNG</span>
+              <span className="text-[10px] text-emerald-700 font-medium">✓ Pre-screened</span>
+            </div>
+          </div>
+
+          <div className="text-[11px] text-amber-950/90 font-medium flex items-center gap-1.5 pt-0.5">
+            <span>💡 <strong>Composition rule:</strong> Shoot at a 30°–45° diner angle with 10% breathing margin around the plate so circular cards don&apos;t clip the edges.</span>
+          </div>
         </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-          <div className="bg-white/90 rounded-lg p-2.5 border border-amber-200/80 shadow-2xs flex flex-col">
-            <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide flex items-center gap-1">
-              📐 Aspect Ratio
-            </span>
-            <span className="text-xs font-extrabold text-zinc-900 mt-0.5">4:3 or 1:1</span>
-            <span className="text-[10px] text-emerald-700 font-medium">✓ Validated on upload</span>
-          </div>
-
-          <div className="bg-white/90 rounded-lg p-2.5 border border-amber-200/80 shadow-2xs flex flex-col">
-            <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide flex items-center gap-1">
-              🎯 Resolution
-            </span>
-            <span className="text-xs font-extrabold text-zinc-900 mt-0.5">1200 × 900 px</span>
-            <span className="text-[10px] text-emerald-700 font-medium">✓ Min 500×400px enforced</span>
-          </div>
-
-          <div className="bg-white/90 rounded-lg p-2.5 border border-amber-200/80 shadow-2xs flex flex-col">
-            <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide flex items-center gap-1">
-              ⚖️ Max File Size
-            </span>
-            <span className="text-xs font-extrabold text-amber-700 mt-0.5">Max 5 MB</span>
-            <span className="text-[10px] text-emerald-700 font-medium">✓ Strictly checked</span>
-          </div>
-
-          <div className="bg-white/90 rounded-lg p-2.5 border border-amber-200/80 shadow-2xs flex flex-col">
-            <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide flex items-center gap-1">
-              📁 File Formats
-            </span>
-            <span className="text-xs font-extrabold text-zinc-900 mt-0.5">JPG, WebP, PNG</span>
-            <span className="text-[10px] text-emerald-700 font-medium">✓ Pre-screened</span>
-          </div>
-        </div>
-
-        <div className="text-[11px] text-amber-950/90 font-medium flex items-center gap-1.5 pt-0.5">
-          <span>💡 <strong>Composition rule:</strong> Shoot at a 30°–45° diner angle with 10% breathing margin around the plate so circular cards don&apos;t clip the edges.</span>
-        </div>
-      </div>
+      </details>
 
       <div
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
@@ -419,7 +424,7 @@ export default function PhotoBoard({
                   <div className="border-t border-zinc-200">
                     <button
                       type="button"
-                      className={`w-full flex items-center justify-center gap-1.5 py-2 px-2 text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+                      className={`w-full min-h-[36px] flex items-center justify-center gap-1.5 py-2 px-2 text-xs font-semibold transition-colors cursor-pointer ${
                         isCut
                           ? isMain
                             ? "bg-emerald-700 text-white font-bold"
@@ -453,7 +458,7 @@ export default function PhotoBoard({
                     <div className="border-t border-zinc-200 text-[11px] bg-zinc-50/60">
                       <button
                         type="button"
-                        className="w-full flex items-center justify-center gap-1 py-1.5 px-2 font-medium text-red-600 hover:bg-red-50 hover:text-red-700 whitespace-nowrap transition-colors cursor-pointer"
+                        className="w-full min-h-[34px] flex items-center justify-center gap-1 py-1.5 px-2 font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer"
                         onClick={() => {
                           onSetCutout("");
                           if (t.url === mainUrl) onSetMain("");
@@ -463,23 +468,23 @@ export default function PhotoBoard({
                         title="Remove this cutout"
                       >
                         <Trash2 className="h-3 w-3 shrink-0 text-red-500" />
-                        <span>Remove Cutout</span>
+                        <span className="truncate">Remove Cutout</span>
                       </button>
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 divide-x divide-zinc-200 border-t border-zinc-200 text-[11px] bg-zinc-50/60">
                       <button
                         type="button"
-                        className="flex items-center justify-center gap-1 py-1.5 px-2 font-medium text-emerald-800 hover:bg-emerald-50 hover:text-emerald-950 whitespace-nowrap transition-colors cursor-pointer"
+                        className="min-h-[34px] flex items-center justify-center gap-1 py-1.5 px-1.5 font-medium text-emerald-800 hover:bg-emerald-50 hover:text-emerald-950 transition-colors cursor-pointer overflow-hidden"
                         onClick={() => makeCutout(t.url)}
                         title="Remove the background of this photo to create a transparent sticker"
                       >
                         <Scissors className="h-3 w-3 shrink-0 text-emerald-600" />
-                        <span>Make Cutout</span>
+                        <span className="truncate"><span className="hidden sm:inline">Make </span>Cutout</span>
                       </button>
                       <button
                         type="button"
-                        className="flex items-center justify-center gap-1 py-1.5 px-2 font-medium text-red-600 hover:bg-red-50 hover:text-red-700 whitespace-nowrap transition-colors disabled:opacity-40 cursor-pointer"
+                        className="min-h-[34px] flex items-center justify-center gap-1 py-1.5 px-1.5 font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors disabled:opacity-40 cursor-pointer overflow-hidden"
                         onClick={() => {
                           if (t.photo) return remove(t.photo);
                           if (pending.includes(t.url)) {
@@ -495,7 +500,7 @@ export default function PhotoBoard({
                         title="Delete this photo"
                       >
                         <Trash2 className="h-3 w-3 shrink-0 text-red-500" />
-                        <span>Delete</span>
+                        <span className="truncate">Delete</span>
                       </button>
                     </div>
                   )}

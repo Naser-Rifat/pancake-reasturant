@@ -162,101 +162,131 @@ export function DishPreviewAndGuide({
     [form, currentCategory]
   );
 
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth >= 1024) {
+      setIsExpanded(true);
+    }
+  }, []);
+
   return (
-    <div className="rounded-2xl border border-amber-300/80 bg-linear-to-b from-amber-50/50 via-white to-amber-50/30 p-4 sm:p-5 shadow-xs space-y-4">
-      {/* Header Strip & View Switcher */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-amber-200/60">
-        <div className="flex items-center gap-2">
-          <span className="flex h-2 w-2 relative">
+    <div className="rounded-2xl border border-amber-300/80 bg-linear-to-b from-amber-50/50 via-white to-amber-50/30 p-3.5 sm:p-5 shadow-xs space-y-3">
+      {/* Header Strip & Collapsible Toggle */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => setIsExpanded((prev) => !prev)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setIsExpanded((prev) => !prev);
+          }
+        }}
+        className="flex items-center justify-between gap-3 cursor-pointer select-none"
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="flex h-2 w-2 relative shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
           </span>
-          <h4 className="text-xs font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-amber-600" />
-            Multi-Device Live Preview &amp; Sizing Matrix
+          <h4 className="text-xs font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1.5 truncate">
+            <Sparkles className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+            <span className="truncate">Live Storefront Preview &amp; Sizing</span>
           </h4>
         </div>
 
-        {/* View mode toggle tabs: Mobile, Tablet (iPad), Desktop, Guide */}
-        <div className="inline-flex rounded-xl bg-amber-100/70 p-1 border border-amber-300/60">
-          <button
-            type="button"
-            onClick={() => setViewMode("mobile")}
-            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-              viewMode === "mobile"
-                ? "bg-white text-amber-950 shadow-xs"
-                : "text-amber-800/80 hover:text-amber-950"
-            }`}
-          >
-            <Smartphone className="h-3.5 w-3.5" />
-            <span>Mobile</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("tablet")}
-            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-              viewMode === "tablet"
-                ? "bg-white text-amber-950 shadow-xs"
-                : "text-amber-800/80 hover:text-amber-950"
-            }`}
-          >
-            <Tablet className="h-3.5 w-3.5" />
-            <span>Tablet (iPad)</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("desktop")}
-            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-              viewMode === "desktop"
-                ? "bg-white text-amber-950 shadow-xs"
-                : "text-amber-800/80 hover:text-amber-950"
-            }`}
-          >
-            <Monitor className="h-3.5 w-3.5" />
-            <span>Desktop</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("guide")}
-            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-              viewMode === "guide"
-                ? "bg-white text-amber-950 shadow-xs"
-                : "text-amber-800/80 hover:text-amber-950"
-            }`}
-          >
-            <Info className="h-3.5 w-3.5" />
-            <span>Device Matrix</span>
-          </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[10px] font-bold text-amber-800 bg-amber-100/90 px-2 py-0.5 rounded-full border border-amber-300/60 hidden sm:inline-block">
+            {isExpanded ? "Tap to minimize" : "Tap to inspect"}
+          </span>
+          <span className={`text-xs text-amber-800 font-bold transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>
+            ▼
+          </span>
         </div>
       </div>
 
-      {/* Sizing & Aspect Ratio Quick Cheatsheet Banner (Always Visible) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] bg-white p-2.5 rounded-xl border border-amber-200/80 shadow-2xs">
-        <div className="flex items-center gap-1.5 text-zinc-700">
-          <span className="font-bold text-amber-900">📱 Mobile:</span>
-          <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-            4:3 / 1:1 (375px)
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5 text-zinc-700">
-          <span className="font-bold text-amber-900">📱 Tablet:</span>
-          <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-            2-Col Grid (768px)
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5 text-zinc-700">
-          <span className="font-bold text-amber-900">💻 Desktop:</span>
-          <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-            4-Col Grid (1200px)
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5 text-zinc-700">
-          <span className="font-bold text-amber-900">🎯 Retina Standard:</span>
-          <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-            1200×900 px (≤5MB)
-          </span>
-        </div>
-      </div>
+      {isExpanded && (
+        <div className="space-y-4 pt-3 border-t border-amber-200/60">
+          {/* View mode toggle tabs: Mobile, Tablet (iPad), Desktop, Guide */}
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 max-w-full rounded-xl bg-amber-100/70 p-1 border border-amber-300/60">
+            <button
+              type="button"
+              onClick={() => setViewMode("mobile")}
+              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg transition-all shrink-0 cursor-pointer ${
+                viewMode === "mobile"
+                  ? "bg-white text-amber-950 shadow-xs"
+                  : "text-amber-800/80 hover:text-amber-950"
+              }`}
+            >
+              <Smartphone className="h-3.5 w-3.5" />
+              <span>Mobile</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("tablet")}
+              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg transition-all shrink-0 cursor-pointer ${
+                viewMode === "tablet"
+                  ? "bg-white text-amber-950 shadow-xs"
+                  : "text-amber-800/80 hover:text-amber-950"
+              }`}
+            >
+              <Tablet className="h-3.5 w-3.5" />
+              <span>Tablet<span className="hidden sm:inline"> (iPad)</span></span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("desktop")}
+              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg transition-all shrink-0 cursor-pointer ${
+                viewMode === "desktop"
+                  ? "bg-white text-amber-950 shadow-xs"
+                  : "text-amber-800/80 hover:text-amber-950"
+              }`}
+            >
+              <Monitor className="h-3.5 w-3.5" />
+              <span>Desktop</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("guide")}
+              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg transition-all shrink-0 cursor-pointer ${
+                viewMode === "guide"
+                  ? "bg-white text-amber-950 shadow-xs"
+                  : "text-amber-800/80 hover:text-amber-950"
+              }`}
+            >
+              <Info className="h-3.5 w-3.5" />
+              <span><span className="hidden sm:inline">Device </span>Matrix</span>
+            </button>
+          </div>
+
+          {/* Sizing & Aspect Ratio Quick Cheatsheet Banner */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] bg-white p-2.5 rounded-xl border border-amber-200/80 shadow-2xs">
+            <div className="flex items-center gap-1.5 text-zinc-700 min-w-0">
+              <span className="font-bold text-amber-900 shrink-0">📱 Mobile:</span>
+              <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 truncate">
+                4:3 / 1:1
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 text-zinc-700 min-w-0">
+              <span className="font-bold text-amber-900 shrink-0">📱 Tablet:</span>
+              <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 truncate">
+                2-Col Grid
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 text-zinc-700 min-w-0">
+              <span className="font-bold text-amber-900 shrink-0">💻 Desktop:</span>
+              <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 truncate">
+                4-Col Grid
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 text-zinc-700 min-w-0">
+              <span className="font-bold text-amber-900 shrink-0">🎯 Standard:</span>
+              <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 truncate">
+                1200×900 px
+              </span>
+            </div>
+          </div>
 
       {/* Real-time Live Card Previews for Mobile, Tablet, Desktop */}
       {viewMode !== "guide" && (
@@ -615,6 +645,8 @@ export function DishPreviewAndGuide({
               When capturing food with your camera or phone, take the shot from a <strong>30°–45° angle</strong> and ensure the plate sits comfortably in the middle. Because our mobile and desktop cards feature a <strong>142px hero window</strong>, centered shots fill the entire card width (90%) with maximum appetite appeal and zero awkward cropping!
             </p>
           </div>
+        </div>
+      )}
         </div>
       )}
     </div>

@@ -64,29 +64,64 @@ export function MenuDishEditor({
   );
 
   return (
-    <div ref={formRef} className="scroll-mt-6 bg-white p-6 sm:p-8 rounded-xl border border-[#763a12] shadow-sm space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-zinc-200">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#763a12] text-white uppercase tracking-wide">
-            {editing ? "EDITING DISH" : `NEW DISH — STEP ${step} OF 2`}
-          </div>
-          <h3 className="text-lg font-semibold text-[#211a14]">
-            {editing ? form.name || "Edit Dish Details" : step === 1 ? "Step 1: Dish Details & Pricing" : "Step 2: Dish Photo Gallery"}
-          </h3>
-          <p className="text-xs text-zinc-500">
-            {editing
-              ? "Changes save instantly to the live public menu and ordering system."
-              : step === 1
-              ? "Enter the dish name, price, category tag, and culinary description."
-              : "Upload photos and designate the main thumbnail and background-free cutout."}
-          </p>
-        </div>
-        <Button variant="ghost" size="icon" onClick={closeForm} aria-label="Close form" className="rounded-xl hover:bg-zinc-100">
-          <X className="h-5 w-5 text-zinc-500" />
-        </Button>
-      </div>
+    <div
+      className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 md:p-6 overflow-hidden animate-in fade-in duration-200"
+      role="dialog"
+      aria-modal="true"
+    >
+      {/* Backdrop overlay dismiss */}
+      <div className="fixed inset-0 -z-10 cursor-pointer" onClick={closeForm} />
 
-      <form onSubmit={submit} className="space-y-6">
+      {/* Adaptive Sheet Modal */}
+      <div
+        ref={formRef}
+        className="relative w-full sm:max-w-2xl lg:max-w-3xl h-[92dvh] sm:h-auto sm:max-h-[90vh] bg-white rounded-t-2xl sm:rounded-2xl border border-zinc-200 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-300"
+      >
+        {/* Mobile Drag Indicator */}
+        <div className="mx-auto w-10 h-1.5 rounded-full bg-zinc-300 my-2 sm:hidden shrink-0" />
+
+        {/* Sticky Top Navigation Bar */}
+        <div className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-3 bg-white/95 backdrop-blur-md border-b border-zinc-200 shrink-0">
+          <button
+            type="button"
+            onClick={closeForm}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-600 hover:text-zinc-900 py-1.5 px-2 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer"
+          >
+            <X className="h-4 w-4" />
+            <span>Cancel</span>
+          </button>
+
+          <div className="text-center min-w-0 px-2 flex-1">
+            <h3 className="text-sm sm:text-base font-bold text-[#211a14] truncate">
+              {editing ? form.name || "Edit Dish" : step === 1 ? "New Dish — Details" : "New Dish — Photos"}
+            </h3>
+            <div className="text-[10px] font-semibold text-zinc-500 flex items-center justify-center gap-1.5">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-600" />
+              <span>{editing ? "Catalog Item" : `Step ${step} of 2`}</span>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            size="sm"
+            loading={saving}
+            className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs px-3.5 h-8.5 cursor-pointer shrink-0"
+            onClick={() => (!editing && step === 1 ? goToPhotos() : submit())}
+          >
+            {!editing && step === 1 ? (
+              <span>Next →</span>
+            ) : (
+              <span className="flex items-center gap-1"><Save className="h-3.5 w-3.5" /> Save</span>
+            )}
+          </Button>
+        </div>
+
+        {/* Scrollable Form Body */}
+        <form
+          id="menu-dish-editor-form"
+          onSubmit={submit}
+          className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-6"
+        >
         {/* Step 1: Core Details */}
         <div className={`space-y-5 ${!editing && step !== 1 ? "hidden" : ""}`}>
           <div className="space-y-3">
@@ -407,26 +442,31 @@ export function MenuDishEditor({
           </div>
         </div>
 
-        {/* Sticky Form Action Footer */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-zinc-200">
-          <span className="text-xs font-bold text-zinc-500">
-            {!editing ? `Step ${step} of 2` : "Editing item in catalog"}
-          </span>
-          <div className="flex items-center gap-2">
+        </form>
+
+        {/* Sticky Bottom Action Bar */}
+        <div className="sticky bottom-0 z-20 flex items-center justify-between gap-3 px-4 sm:px-6 py-3 bg-white/95 backdrop-blur-md border-t border-zinc-200 pb-safe shrink-0 shadow-lg">
+          <div className="text-xs text-zinc-500 font-medium hidden sm:block">
+            {!editing ? `Step ${step} of 2` : "All changes save to live menu"}
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             {!editing && step === 2 && (
               <Button
                 type="button"
                 variant="outline"
-                className="border-zinc-300 text-[#763a12] text-xs font-bold rounded-xl"
+                size="sm"
+                className="border-zinc-300 text-[#763a12] text-xs font-bold rounded-xl h-10 px-3 cursor-pointer"
                 onClick={() => setStep(1)}
               >
-                <ArrowLeft className="h-3.5 w-3.5 mr-1" /> Back to Details
+                <ArrowLeft className="h-3.5 w-3.5 mr-1" /> Back
               </Button>
             )}
             <Button
               type="button"
               variant="ghost"
-              className="text-xs font-bold text-zinc-600 rounded-xl"
+              size="sm"
+              className="text-xs font-bold text-zinc-600 rounded-xl h-10 px-3 cursor-pointer"
               onClick={closeForm}
             >
               Cancel
@@ -434,7 +474,7 @@ export function MenuDishEditor({
             <Button
               type="button"
               loading={saving}
-              className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs"
+              className="flex-1 sm:flex-none bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs h-10 px-5 cursor-pointer"
               onClick={() => (!editing && step === 1 ? goToPhotos() : submit())}
             >
               {!editing && step === 1 ? (
@@ -445,18 +485,18 @@ export function MenuDishEditor({
               ) : editing ? (
                 <>
                   <Save className="h-3.5 w-3.5 mr-1.5" />
-                  <span>Save Changes</span>
+                  <span>{saving ? "Saving Changes..." : "Save Changes"}</span>
                 </>
               ) : (
                 <>
                   <Plus className="h-3.5 w-3.5 mr-1" />
-                  <span>Add to Menu</span>
+                  <span>{saving ? "Adding to Menu..." : "Add to Menu"}</span>
                 </>
               )}
             </Button>
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 }

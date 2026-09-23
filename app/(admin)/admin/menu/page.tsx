@@ -63,6 +63,7 @@ export default function MenuAdminPage() {
   const tableRef = useRef<HTMLDivElement>(null);
   // null = form closed, "" = adding new, slug = editing that item
   const [editing, setEditing] = useState<string | null>(null);
+  const [savedSlug, setSavedSlug] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   // photo counts per slug so the list can show them without opening anything
   const [photoCounts, setPhotoCounts] = useState<Record<string, number>>({});
@@ -80,11 +81,23 @@ export default function MenuAdminPage() {
   const refreshMenu = () =>
     queryClient.invalidateQueries({ queryKey: ["admin"] });
 
-  // the form opens above a long table — bring it into view smoothly
+  // Lock body scroll when editor modal sheet is open
+  useEffect(() => {
+    if (editing !== null) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [editing]);
+
   useEffect(() => {
     if (editing === null) return;
-    const target = jumpTo.current === "photos" ? photosRef.current : formRef.current;
-    target?.scrollIntoView({ behavior: "smooth", block: jumpTo.current === "photos" ? "center" : "start" });
+    if (jumpTo.current === "photos") {
+      photosRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   }, [editing]);
 
   const closeForm = async () => {
@@ -259,6 +272,8 @@ export default function MenuAdminPage() {
       // 2. Close the editor and show confirmation immediately
       pristine.current = form;
       setEditing(null);
+      setSavedSlug(targetSlug);
+      setTimeout(() => setSavedSlug(null), 2500);
       toast({ variant: "success", title: `${form.name} updated` });
 
       // 3. Persist to backend in the background with automatic rollback on error
@@ -282,6 +297,8 @@ export default function MenuAdminPage() {
       const created = await saveMutation.mutateAsync({ payload });
       // Add newly created dish to items list immediately
       setItems((prev) => [created, ...prev.filter((i) => i.slug !== created.slug)]);
+      setSavedSlug(created.slug);
+      setTimeout(() => setSavedSlug(null), 2500);
       // The dish now exists. Switch to edit mode *before* attaching photos so a
       // failed photo upload can't strand the form in create mode — a retry would
       // otherwise re-POST the same slug and be rejected as a duplicate.
@@ -658,7 +675,11 @@ export default function MenuAdminPage() {
                   const photoCount = photoCounts[item.slug] ?? 0;
                   return (
                     <tr
-                      className="hover:bg-zinc-50 transition-colors group"
+                      className={`hover:bg-zinc-50 transition-all duration-300 group ${
+                        savedSlug === item.slug
+                          ? "bg-amber-100/90 ring-2 ring-amber-500 shadow-sm"
+                          : ""
+                      }`}
                     >
                       {/* Dish & Image */}
                       <td className="py-3.5 px-4">
