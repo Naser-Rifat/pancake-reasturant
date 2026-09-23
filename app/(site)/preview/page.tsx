@@ -577,33 +577,149 @@ export default function PreviewPage() {
       {/* ========================================================================= */}
       {/* 4. TRUST BADGES PREVIEW                                                   */}
       {/* ========================================================================= */}
+      {/* ========================================================================= */}
+      {/* 4. TRUST BADGES PREVIEW                                                   */}
+      {/* ========================================================================= */}
       {section === "certs" && (
-        <section style={{ padding: "8px 0" }}>
-          <div className="container" style={{ padding: "0" }}>
-            {/* same badge markup as the live homepage */}
-            <ul className="cert-strip" aria-label="Food standards and recognition">
-              {certs.filter((c) => c.is_active).map((c) => (
-                <li key={c.id} className="cert-badge quality-seal-badge">
-                  <span className={`ic${c.image ? " cert-real-logo" : ""}`}>
-                    {c.image ? (
-                      <Image
-                        src={c.image}
-                        alt={c.title}
-                        width={72}
-                        height={52}
-                        style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                      />
-                    ) : (
-                      <CertIcon name={c.icon} />
-                    )}
-                  </span>
-                  <div className="cert-info">
-                    <b>{c.title}</b>
-                    <small>{c.subtitle}</small>
+        <section className="certs-strip-sec" style={{ padding: "1.6rem 0 2.2rem" }}>
+          <div className="container" style={{ padding: "0 1rem" }}>
+            <div style={{ textAlign: "center", marginBottom: "0.6rem" }}>
+              <p
+                className="kicker"
+                style={{
+                  color: "var(--pink-deep)",
+                  fontWeight: 800,
+                  textTransform: "uppercase",
+                  fontSize: "0.75rem",
+                  letterSpacing: "0.08em",
+                  margin: "0 0 0.2rem 0",
+                }}
+              >
+                FEEL GOOD ABOUT EVERY BITE
+              </p>
+              <h2 className="cert-section-heading" style={{ margin: 0 }}>
+                Our standards &amp; recognition
+              </h2>
+            </div>
+
+            {certs.length === 0 ? (
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "2.5rem 1rem",
+                  background: "rgba(255, 255, 255, 0.75)",
+                  borderRadius: "16px",
+                  border: "1.5px dashed rgba(118, 58, 18, 0.25)",
+                  marginTop: "1.2rem",
+                }}
+              >
+                <Award size={36} style={{ margin: "0 auto 0.5rem", color: "var(--ink)", opacity: 0.35 }} />
+                <p style={{ fontWeight: 700, fontSize: "1rem", color: "var(--ink)", margin: 0 }}>
+                  No Trust Badges Configured
+                </p>
+                <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: "0.35rem" }}>
+                  Add your food standards, organic seals, or certifications in the form below.
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Notice if ALL badges are hidden */}
+                {certs.every((c) => !c.is_active) && (
+                  <div
+                    style={{
+                      margin: "0.8rem auto 1.2rem",
+                      maxWidth: "580px",
+                      padding: "0.65rem 1rem",
+                      background: "rgba(245, 158, 11, 0.12)",
+                      border: "1px dashed rgba(217, 119, 6, 0.45)",
+                      borderRadius: "12px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0.5rem",
+                      fontSize: "0.78rem",
+                      color: "#92400e",
+                      fontWeight: 600,
+                    }}
+                  >
+                    <span>⏸️</span>
+                    <span>
+                      All trust badges are currently set to <strong>Hidden</strong>. Displaying draft preview below (they are hidden on the public site):
+                    </span>
                   </div>
-                </li>
-              ))}
-            </ul>
+                )}
+
+                <ul
+                  className="cert-strip"
+                  aria-label="Food standards and recognition"
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    justifyContent: "center",
+                    gap: "1.2rem",
+                    padding: "0.6rem 0.2rem 1rem",
+                    margin: "0.5rem 0 0",
+                    listStyle: "none",
+                  }}
+                >
+                  {certs.map((c) => {
+                    const isHidden = !c.is_active;
+                    return (
+                      <li
+                        key={c.id}
+                        className="cert-badge quality-seal-badge"
+                        style={{
+                          position: "relative",
+                          opacity: isHidden ? 0.72 : 1,
+                          borderStyle: isHidden ? "dashed" : "solid",
+                          borderColor: isHidden ? "rgba(217, 119, 6, 0.45)" : "rgba(118, 58, 18, 0.1)",
+                          background: isHidden ? "rgba(255, 255, 255, 0.85)" : "#ffffff",
+                        }}
+                      >
+                        {/* Status watermark pill in admin preview */}
+                        {isHidden && (
+                          <span
+                            style={{
+                              position: "absolute",
+                              top: "8px",
+                              right: "12px",
+                              fontSize: "0.62rem",
+                              fontWeight: 800,
+                              textTransform: "uppercase",
+                              background: "rgba(245, 158, 11, 0.2)",
+                              color: "#b45309",
+                              padding: "2px 6px",
+                              borderRadius: "6px",
+                              letterSpacing: "0.04em",
+                            }}
+                          >
+                            ⏸ Hidden
+                          </span>
+                        )}
+
+                        <span className={`ic${c.image ? " cert-real-logo" : ""}`}>
+                          {c.image ? (
+                            <Image
+                              src={c.image}
+                              alt={c.title}
+                              width={72}
+                              height={52}
+                              style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                            />
+                          ) : (
+                            <CertIcon name={c.icon} />
+                          )}
+                        </span>
+                        <div className="cert-info">
+                          <b>{c.title}</b>
+                          <small>{c.subtitle}</small>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            )}
           </div>
         </section>
       )}

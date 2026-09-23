@@ -157,13 +157,18 @@ export function HomeStep4Badges({
                 <Switch
                   checked={c.is_active}
                   disabled={mutations.isPending}
-                  onCheckedChange={(isActive) =>
+                  onCheckedChange={(isActive) => {
+                    setCerts((xs) =>
+                      xs.map((x) =>
+                        x.id === c.id ? { ...x, is_active: isActive } : x,
+                      ),
+                    );
                     mutations.update.mutate({
                       id: c.id,
                       patch: { is_active: isActive },
                       successTitle: isActive ? "Badge shown" : "Badge hidden",
-                    })
-                  }
+                    });
+                  }}
                 />
                 <span className="text-[#763a12]">
                   {c.is_active ? "Shown" : "Hidden"}
