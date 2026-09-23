@@ -109,10 +109,22 @@ export default function DishCard({
         </div>
 
         <h3 className="dc-name">
-          <Link href={href}>{item.name}</Link>
+          <Link href={href}>
+            {item.name}
+            {item.heat === "medium" && <span className="ml-1 text-xs" title="Medium Heat">🌶️</span>}
+            {item.heat === "hot" && <span className="ml-1 text-xs" title="Hot &amp; Spicy">🔥</span>}
+          </Link>
         </h3>
 
         {item.description && <p className="dc-desc">{item.description}</p>}
+
+        {(item.prep_time || item.kcal || item.protein_g) && (
+          <div className="dc-chips">
+            {item.prep_time && <span className="dc-chip">⏱️ {item.prep_time}</span>}
+            {item.kcal && <span className="dc-chip">🔥 {item.kcal} kcal</span>}
+            {item.protein_g && <span className="dc-chip">💪 {item.protein_g}g</span>}
+          </div>
+        )}
       </div>
 
       <div className="dc-media">

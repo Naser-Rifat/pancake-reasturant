@@ -10569,7 +10569,39 @@ body:has(.hero-nav) .hero-find {
   }
   .preview-phone-card .dish-card .dc-desc,
   .preview-tablet-card .dish-card .dc-desc,
-  .preview-desktop-card .dish-card .dc-desc,
+  .preview-desktop-card .dish-card .dc-desc {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    font-size: 0.72rem !important;
+    line-height: 1.35 !important;
+    color: var(--muted) !important;
+    margin: 0.18rem 0 0.15rem !important;
+    position: relative !important;
+    z-index: 5 !important;
+  }
+  .preview-phone-card .dish-card .dc-chips,
+  .preview-tablet-card .dish-card .dc-chips,
+  .preview-desktop-card .dish-card .dc-chips {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.25rem !important;
+    margin: 0.25rem 0 !important;
+    position: relative !important;
+    z-index: 5 !important;
+  }
+  .preview-phone-card .dish-card .dc-chip,
+  .preview-tablet-card .dish-card .dc-chip,
+  .preview-desktop-card .dish-card .dc-chip {
+    font-size: 0.62rem !important;
+    padding: 1px 6px !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(118, 58, 18, 0.12) !important;
+    color: #763a12 !important;
+    font-weight: 600 !important;
+  }
   .preview-phone-card .dish-card .dc-foot,
   .preview-tablet-card .dish-card .dc-foot,
   .preview-desktop-card .dish-card .dc-foot,

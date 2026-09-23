@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ChangeEvent, type Dispatch, type FormEvent, type RefObject, type SetStateAction } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Eye, Image as ImageIcon, Plus, Save, Scissors, Sparkles, UtensilsCrossed } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock, Eye, FileText, Flame, Image as ImageIcon, Plus, Save, Scissors, Sparkles, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Modal, ModalHeader, ModalFooter } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
@@ -73,6 +73,11 @@ export function MenuDishEditor({
     (c) => String(c.id) === String(form.category) || c.slug === form.tag
   );
 
+  // Word and character count computations
+  const charCount = form.description.length;
+  const wordCount = form.description.trim() ? form.description.trim().split(/\s+/).length : 0;
+  const nameCharCount = form.name.length;
+
   // Synthetic item for customer live preview
   const previewItem: ApiMenuItem = {
     slug: editing || "preview-dish",
@@ -86,9 +91,9 @@ export function MenuDishEditor({
     category_slug: activeCategory?.slug || form.tag || "sweet",
     category_icon: activeCategory?.icon || "🥞",
     heat: (form.heat as "none" | "medium" | "hot") || "none",
-    kcal: null,
-    protein_g: null,
-    prep_time: "",
+    kcal: form.kcal ? Number(form.kcal) : null,
+    protein_g: form.protein_g ? Number(form.protein_g) : null,
+    prep_time: form.prep_time || "",
     image: form.image || "",
     photo: form.photo || "",
     photos: [],
@@ -184,33 +189,57 @@ export function MenuDishEditor({
                     <UtensilsCrossed className="h-3.5 w-3.5" /> Menu Dish Essentials:
                   </span>
                   <div className="grid gap-4 sm:grid-cols-2">
+                    {/* Dish Name with live character counter */}
                     <div className="space-y-1.5 sm:col-span-2">
-                      <Label htmlFor="mi-name" className="text-xs font-semibold text-[#211a14]">
-                        Dish Name *
-                      </Label>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="mi-name" className="text-xs font-semibold text-[#211a14]">
+                          Dish Name *
+                        </Label>
+                        <span className={`text-[10px] font-bold ${nameCharCount > 50 ? "text-amber-700" : "text-zinc-400"}`}>
+                          {nameCharCount} / 60
+                        </span>
+                      </div>
                       <Input
                         id="mi-name"
                         required
+                        maxLength={60}
                         className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
                         placeholder="e.g. Classic Golden Buttermilk Stack"
                         value={form.name}
                         onChange={set("name")}
                       />
+                      {nameCharCount > 45 && (
+                        <p className="text-[10px] text-amber-700 font-medium">
+                          💡 Tip: Concise dish names (&lt;40 chars) display cleanly on one line across mobile screens.
+                        </p>
+                      )}
                     </div>
+
+                    {/* Price with Currency Adornment */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="mi-price" className="text-xs font-semibold text-[#211a14]">
-                        Price ($ AUD) *
-                      </Label>
-                      <Input
-                        id="mi-price"
-                        required
-                        inputMode="decimal"
-                        className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
-                        placeholder="e.g. 18.50"
-                        value={form.price}
-                        onChange={set("price")}
-                      />
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="mi-price" className="text-xs font-semibold text-[#211a14]">
+                          Price ($ AUD) *
+                        </Label>
+                        <span className="text-[10px] text-zinc-400 font-medium">Incl. GST</span>
+                      </div>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 pointer-events-none">
+                          $
+                        </span>
+                        <Input
+                          id="mi-price"
+                          required
+                          inputMode="decimal"
+                          className="pl-7 border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                          placeholder="18.50"
+                          value={form.price}
+                          onChange={set("price")}
+                        />
+                      </div>
                     </div>
+
+                    {/* Spice / Heat Badge */}
                     <div className="space-y-1.5">
                       <Label htmlFor="mi-heat" className="text-xs font-semibold text-[#211a14]">
                         Spice / Heat Badge
@@ -222,14 +251,16 @@ export function MenuDishEditor({
                         onChange={set("heat")}
                       >
                         <option value="none">Mild / No Heat</option>
-                        <option value="medium">Medium Heat</option>
-                        <option value="hot">Hot &amp; Spicy</option>
+                        <option value="medium">🌶️ Medium Heat</option>
+                        <option value="hot">🔥 Hot &amp; Spicy</option>
                       </Select>
                     </div>
+
+                    {/* Category Selector */}
                     <div className="space-y-1.5 sm:col-span-2">
                       <div className="flex items-center justify-between">
                         <Label htmlFor="mi-tag" className="text-xs font-semibold text-[#211a14]">
-                          Category
+                          Category *
                         </Label>
                         <Link
                           href="/admin/categories"
@@ -268,18 +299,104 @@ export function MenuDishEditor({
                         )}
                       </Select>
                     </div>
+
+                    {/* Description & Ingredients with live Word & Character limit counters */}
                     <div className="space-y-1.5 sm:col-span-2">
-                      <Label htmlFor="mi-desc" className="text-xs font-semibold text-[#211a14]">
-                        Description &amp; Ingredients *
-                      </Label>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="mi-desc" className="text-xs font-semibold text-[#211a14]">
+                          Description &amp; Ingredients *
+                        </Label>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] text-zinc-500 font-medium">
+                            {wordCount} {wordCount === 1 ? "word" : "words"}
+                          </span>
+                          <span
+                            className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                              charCount > 250
+                                ? "bg-amber-100 text-amber-800"
+                                : charCount > 200
+                                ? "bg-yellow-50 text-yellow-800"
+                                : "bg-zinc-100 text-zinc-600"
+                            }`}
+                          >
+                            {charCount} / 280
+                          </span>
+                        </div>
+                      </div>
                       <Textarea
                         id="mi-desc"
                         required
+                        maxLength={280}
                         rows={3}
-                        className="border-zinc-300 text-[#211a14] font-medium text-xs rounded-xl"
+                        className="border-zinc-300 text-[#211a14] font-medium text-xs rounded-xl focus:border-[#763a12]"
                         placeholder="e.g. Three fluffy buttermilk pancakes layered with whipped vanilla butter, warm organic maple syrup, and seasonal berries."
                         value={form.description}
                         onChange={set("description")}
+                      />
+                      <div className="flex items-center justify-between text-[11px] text-zinc-400 px-0.5">
+                        <span>
+                          {charCount < 40 && "💡 Add key toppings, batter flavor, or allergen notes for diners."}
+                          {charCount >= 40 && charCount <= 200 && "✓ Optimal description length for diner menus & cards."}
+                          {charCount > 200 && "⚠️ Long descriptions will be clamped to 2 lines on compact cards."}
+                        </span>
+                        <span className="text-[10px] text-zinc-400">Max 280 chars</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Kitchen & Nutrition Specs (Standard Restaurant Fields) */}
+                <div className="pt-4 border-t border-zinc-200/80 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-[#763a12] uppercase tracking-wide flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5" /> Kitchen &amp; Nutrition Specs (Optional):
+                    </span>
+                    <span className="text-[10px] text-zinc-400">Diner menu badges</span>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <div className="space-y-1">
+                      <Label htmlFor="mi-prep" className="text-[11px] font-semibold text-zinc-600">
+                        Prep Time
+                      </Label>
+                      <Input
+                        id="mi-prep"
+                        className="border-zinc-300 text-xs h-9 rounded-xl"
+                        placeholder="e.g. 10-15 mins"
+                        value={form.prep_time}
+                        onChange={set("prep_time")}
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label htmlFor="mi-kcal" className="text-[11px] font-semibold text-zinc-600">
+                        Calories (kcal)
+                      </Label>
+                      <Input
+                        id="mi-kcal"
+                        type="number"
+                        min="0"
+                        max="9999"
+                        className="border-zinc-300 text-xs h-9 rounded-xl"
+                        placeholder="e.g. 520"
+                        value={form.kcal}
+                        onChange={set("kcal")}
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label htmlFor="mi-protein" className="text-[11px] font-semibold text-zinc-600">
+                        Protein (grams)
+                      </Label>
+                      <Input
+                        id="mi-protein"
+                        type="number"
+                        min="0"
+                        max="999"
+                        className="border-zinc-300 text-xs h-9 rounded-xl"
+                        placeholder="e.g. 14"
+                        value={form.protein_g}
+                        onChange={set("protein_g")}
                       />
                     </div>
                   </div>
@@ -448,19 +565,46 @@ export function MenuDishEditor({
                 </div>
               </div>
 
-              {/* Live Status Matrix */}
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-100 text-[11px]">
-                <div className="bg-white rounded-lg p-2.5 border border-zinc-100 shadow-2xs flex flex-col">
-                  <span className="text-[10px] text-zinc-400 uppercase font-semibold">Storefront Asset</span>
-                  <span className="font-bold text-zinc-800 truncate mt-0.5">
-                    {isCutoutActive ? "✂️ Cutout Sticker" : "📷 Full Photo"}
-                  </span>
+              {/* Live Status & Nutritional Matrix */}
+              <div className="space-y-2 pt-2 border-t border-zinc-200/80">
+                {/* Live Description Inspector Box */}
+                <div className="bg-white rounded-xl p-3 border border-zinc-200/90 shadow-2xs space-y-1">
+                  <div className="flex items-center justify-between text-[11px] text-zinc-500 font-semibold">
+                    <span className="flex items-center gap-1 text-[#763a12]">
+                      <FileText className="h-3 w-3" /> Full Menu Description:
+                    </span>
+                    <span className="text-[10px] text-zinc-400 font-medium">{wordCount} words</span>
+                  </div>
+                  <p className="text-xs text-zinc-700 leading-relaxed italic line-clamp-3">
+                    &ldquo;{form.description.trim() || "Three fluffy buttermilk pancakes layered with whipped vanilla butter, warm organic maple syrup, and seasonal berries."}&rdquo;
+                  </p>
                 </div>
-                <div className="bg-white rounded-lg p-2.5 border border-zinc-100 shadow-2xs flex flex-col">
-                  <span className="text-[10px] text-zinc-400 uppercase font-semibold">Ordering Status</span>
-                  <span className={`font-bold mt-0.5 truncate ${form.is_available ? "text-emerald-700" : "text-amber-700"}`}>
-                    {form.is_available ? "✓ Open for Orders" : "⏸ Paused / Hidden"}
-                  </span>
+
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div className="bg-white rounded-lg p-2.5 border border-zinc-100 shadow-2xs flex flex-col">
+                    <span className="text-[10px] text-zinc-400 uppercase font-semibold">Storefront Asset</span>
+                    <span className="font-bold text-zinc-800 truncate mt-0.5">
+                      {isCutoutActive ? "✂️ Cutout Sticker" : "📷 Full Photo"}
+                    </span>
+                  </div>
+                  <div className="bg-white rounded-lg p-2.5 border border-zinc-100 shadow-2xs flex flex-col">
+                    <span className="text-[10px] text-zinc-400 uppercase font-semibold">Ordering Status</span>
+                    <span className={`font-bold mt-0.5 truncate ${form.is_available ? "text-emerald-700" : "text-amber-700"}`}>
+                      {form.is_available ? "✓ Open for Orders" : "⏸ Paused / Hidden"}
+                    </span>
+                  </div>
+                  <div className="bg-white rounded-lg p-2.5 border border-zinc-100 shadow-2xs flex flex-col">
+                    <span className="text-[10px] text-zinc-400 uppercase font-semibold">Kitchen &amp; Spice</span>
+                    <span className="font-bold text-zinc-800 truncate mt-0.5">
+                      {form.heat === "hot" ? "🔥 Spicy" : form.heat === "medium" ? "🌶️ Medium" : "Mild"} · {form.prep_time || "10-15m"}
+                    </span>
+                  </div>
+                  <div className="bg-white rounded-lg p-2.5 border border-zinc-100 shadow-2xs flex flex-col">
+                    <span className="text-[10px] text-zinc-400 uppercase font-semibold">Nutrition</span>
+                    <span className="font-bold text-zinc-800 truncate mt-0.5">
+                      {form.kcal ? `${form.kcal} kcal` : "No kcal"} · {form.protein_g ? `${form.protein_g}g` : "No prot."}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
