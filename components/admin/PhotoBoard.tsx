@@ -353,7 +353,7 @@ export default function PhotoBoard({
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 xl:grid-cols-4">
             {tiles.map((t) => {
               const isCut = t.url === cutoutUrl || t.url.includes("-cutout") || t.url.includes("cutout.png");
               const isMain = t.url === mainUrl;
@@ -375,7 +375,7 @@ export default function PhotoBoard({
                       src={t.url}
                       alt=""
                       fill
-                      sizes="200px"
+                      sizes="250px"
                       className={isCut ? "object-contain p-2.5" : "object-cover"}
                       onLoad={(e) => {
                         const img = e.currentTarget;
@@ -424,31 +424,31 @@ export default function PhotoBoard({
                   <div className="border-t border-zinc-200">
                     <button
                       type="button"
-                      className={`w-full min-h-[36px] flex items-center justify-center gap-1.5 py-2 px-2 text-xs font-semibold transition-colors cursor-pointer ${
+                      className={`w-full min-h-[36px] flex items-center justify-center gap-1.5 py-2 px-2.5 text-xs font-bold transition-colors cursor-pointer ${
                         isCut
                           ? isMain
-                            ? "bg-emerald-700 text-white font-bold"
-                            : "bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-semibold"
+                            ? "bg-emerald-700 text-white"
+                            : "bg-emerald-50 hover:bg-emerald-100 text-emerald-900"
                           : isMain
-                          ? "bg-zinc-900 text-white font-bold"
-                          : "bg-white hover:bg-amber-50/80 text-zinc-700 hover:text-amber-950 font-medium"
+                          ? "bg-zinc-900 text-white"
+                          : "bg-white hover:bg-amber-50/80 text-zinc-700 hover:text-amber-950"
                       }`}
                       onClick={() => onSetMain(isMain ? "" : t.url)}
-                      title={isMain ? "Active on public menu — click to unset" : "Click to display this image on the public site"}
+                      title={isMain ? "Currently displayed on public site — click to toggle" : `Click to display this ${isCut ? "transparent cutout" : "photo"} on the public site`}
                     >
                       {isCut ? (
                         <Scissors className={`h-3.5 w-3.5 shrink-0 ${isMain ? "text-white" : "text-emerald-700"}`} />
                       ) : (
                         <Star className={`h-3.5 w-3.5 shrink-0 ${isMain ? "fill-amber-400 text-amber-400" : "text-zinc-400"}`} />
                       )}
-                      <span className="truncate">
+                      <span className="whitespace-nowrap">
                         {isCut
                           ? isMain
-                            ? "Active as Cutout"
-                            : "Show Cutout on Site"
+                            ? "Active Cutout"
+                            : "Show Cutout"
                           : isMain
-                          ? "Active as Photo"
-                          : "Show Photo on Site"}
+                          ? "Active Photo"
+                          : "Show Photo"}
                       </span>
                     </button>
                   </div>
@@ -458,33 +458,33 @@ export default function PhotoBoard({
                     <div className="border-t border-zinc-200 text-[11px] bg-zinc-50/60">
                       <button
                         type="button"
-                        className="w-full min-h-[34px] flex items-center justify-center gap-1 py-1.5 px-2 font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer"
+                        className="w-full min-h-[34px] flex items-center justify-center gap-1.5 py-1.5 px-2 font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer"
                         onClick={() => {
                           onSetCutout("");
                           if (t.url === mainUrl) onSetMain("");
                           setPreservedUrls((prev) => prev.filter((u) => u !== t.url));
                           toast({ variant: "info", title: "Cutout removed" });
                         }}
-                        title="Remove this cutout"
+                        title="Remove this cutout sticker"
                       >
-                        <Trash2 className="h-3 w-3 shrink-0 text-red-500" />
-                        <span className="truncate">Remove Cutout</span>
+                        <Trash2 className="h-3.5 w-3.5 shrink-0 text-red-500" />
+                        <span className="whitespace-nowrap">Remove Cutout</span>
                       </button>
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 divide-x divide-zinc-200 border-t border-zinc-200 text-[11px] bg-zinc-50/60">
                       <button
                         type="button"
-                        className="min-h-[34px] flex items-center justify-center gap-1 py-1.5 px-1.5 font-medium text-emerald-800 hover:bg-emerald-50 hover:text-emerald-950 transition-colors cursor-pointer overflow-hidden"
+                        className="min-h-[34px] flex items-center justify-center gap-1 py-1.5 px-1 font-semibold text-emerald-800 hover:bg-emerald-50 hover:text-emerald-950 transition-colors cursor-pointer"
                         onClick={() => makeCutout(t.url)}
-                        title="Remove the background of this photo to create a transparent sticker"
+                        title="Remove background of this photo to create a transparent sticker"
                       >
-                        <Scissors className="h-3 w-3 shrink-0 text-emerald-600" />
-                        <span className="truncate"><span className="hidden sm:inline">Make </span>Cutout</span>
+                        <Scissors className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+                        <span className="whitespace-nowrap">Make Cutout</span>
                       </button>
                       <button
                         type="button"
-                        className="min-h-[34px] flex items-center justify-center gap-1 py-1.5 px-1.5 font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors disabled:opacity-40 cursor-pointer overflow-hidden"
+                        className="min-h-[34px] flex items-center justify-center gap-1 py-1.5 px-1 font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors disabled:opacity-40 cursor-pointer"
                         onClick={() => {
                           if (t.photo) return remove(t.photo);
                           if (pending.includes(t.url)) {
@@ -499,8 +499,8 @@ export default function PhotoBoard({
                         }}
                         title="Delete this photo"
                       >
-                        <Trash2 className="h-3 w-3 shrink-0 text-red-500" />
-                        <span className="truncate">Delete</span>
+                        <Trash2 className="h-3.5 w-3.5 shrink-0 text-red-500" />
+                        <span className="whitespace-nowrap">Delete</span>
                       </button>
                     </div>
                   )}

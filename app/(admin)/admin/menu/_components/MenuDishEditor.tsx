@@ -71,7 +71,7 @@ export function MenuDishEditor({
       open={true}
       onClose={closeForm}
       variant="adaptive"
-      size="2xl"
+      size="3xl"
       containerRef={formRef}
       ariaLabel={editing ? form.name || "Edit Dish" : "Create Dish"}
     >
