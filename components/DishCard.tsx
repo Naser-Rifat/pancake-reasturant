@@ -19,6 +19,7 @@
 // Everything below the name is optional and only the row skin asks for it, so
 // the phone card is the same object everywhere.
 
+import { memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Plus } from "lucide-react";
@@ -57,7 +58,7 @@ function BagPlusIcon({ className }: { className?: string }) {
   );
 }
 
-export default function DishCard({
+const DishCard = memo(function DishCard({
   item,
   variant = "tile",
   onAdd,
@@ -183,4 +184,6 @@ export default function DishCard({
       </div>
     </article>
   );
-}
+});
+
+export default DishCard;

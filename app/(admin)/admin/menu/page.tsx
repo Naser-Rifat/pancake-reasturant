@@ -226,32 +226,45 @@ export default function MenuAdminPage() {
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
       setForm((f) => ({ ...f, [key]: e.target.value }));
 
-  const submit = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    // edit save skips the wizard, so guard both paths here before hitting the API
-    if (!validate()) return;
+  const submit = async (savedForm?: FormState, photosList?: string[]) => {
+    const currentForm = savedForm || form;
+    const currentPendingPhotos = photosList || pendingPhotos;
+    const missing = (["name", "price", "description"] as const).find((k) => !currentForm[k].trim());
+    if (missing) {
+      const el = document.getElementById(`mi-${missing === "description" ? "desc" : missing}`);
+      el?.focus();
+      toast({ variant: "error", title: `Add the ${missing === "description" ? "description" : missing} first` });
+      return;
+    }
+    const price = Number(currentForm.price);
+    if (!Number.isFinite(price) || price < 0) {
+      document.getElementById("mi-price")?.focus();
+      toast({ variant: "error", title: "Enter a valid price", description: "Numbers only, e.g. 18.50" });
+      return;
+    }
+
     const payload: Partial<AdminMenuItem> = {
-      slug: editing || form.slug || slugify(form.name),
-      name: form.name,
-      description: form.description,
-      price: form.price,
-      tag: form.tag,
-      category: form.category,
-      heat: form.heat,
-      kcal: numOrNull(form.kcal),
-      protein_g: numOrNull(form.protein_g),
-      prep_time: form.prep_time,
-      image: form.image,
-      photo: form.photo,
-      is_available: form.is_available,
-      is_featured: form.is_featured,
+      slug: editing || currentForm.slug || slugify(currentForm.name),
+      name: currentForm.name,
+      description: currentForm.description,
+      price: currentForm.price,
+      tag: currentForm.tag,
+      category: currentForm.category,
+      heat: currentForm.heat,
+      kcal: numOrNull(currentForm.kcal),
+      protein_g: numOrNull(currentForm.protein_g),
+      prep_time: currentForm.prep_time,
+      image: currentForm.image,
+      photo: currentForm.photo,
+      is_available: currentForm.is_available,
+      is_featured: currentForm.is_featured,
     };
     if (editing) {
       const targetSlug = editing;
       const prevItems = items;
-      const matchedCat = form.category
-        ? categories.find((c) => c.id === form.category)
-        : categoriesMap.get(form.tag);
+      const matchedCat = currentForm.category
+        ? categories.find((c) => c.id === currentForm.category)
+        : categoriesMap.get(currentForm.tag);
 
       // 1. Optimistic Update: Update the table row in state immediately (0ms)
       setItems((prev) =>
@@ -260,7 +273,7 @@ export default function MenuAdminPage() {
             ? {
                 ...it,
                 ...payload,
-                category: form.category ?? it.category,
+                category: currentForm.category ?? it.category,
                 category_name: matchedCat?.name ?? it.category_name,
                 category_slug: matchedCat?.slug ?? it.category_slug,
                 category_icon: matchedCat?.icon ?? it.category_icon,
@@ -270,11 +283,11 @@ export default function MenuAdminPage() {
       );
 
       // 2. Close the editor and show confirmation immediately
-      pristine.current = form;
+      pristine.current = currentForm;
       setEditing(null);
       setSavedSlug(targetSlug);
       setTimeout(() => setSavedSlug(null), 2500);
-      toast({ variant: "success", title: `${form.name} updated` });
+      toast({ variant: "success", title: `${currentForm.name} updated` });
 
       // 3. Persist to backend in the background with automatic rollback on error
       saveMutation.mutate(
@@ -442,13 +455,29 @@ export default function MenuAdminPage() {
     return filteredItems.slice(start, start + pageSize);
   }, [filteredItems, page, pageSize]);
 
-  // Statistics
-  const totalCount = items.length;
-  const liveCount = items.filter((i) => i.is_available).length;
-  const featuredCount = items.filter((i) => i.is_featured).length;
-  const sweetCount = items.filter((i) => i.tag === "sweet").length;
-  const savouryCount = items.filter((i) => i.tag === "savoury").length;
-  const chocCount = items.filter((i) => i.tag === "choc").length;
+  // Statistics — memoized to avoid redundant array filtering
+  const { totalCount, liveCount, featuredCount, sweetCount, savouryCount, chocCount } = useMemo(() => {
+    let live = 0;
+    let feat = 0;
+    let sweet = 0;
+    let savoury = 0;
+    let choc = 0;
+    for (const it of items) {
+      if (it.is_available) live++;
+      if (it.is_featured) feat++;
+      if (it.category_slug === "sweet" || it.tag === "sweet") sweet++;
+      else if (it.category_slug === "savoury" || it.tag === "savoury") savoury++;
+      else if (it.category_slug === "choc" || it.tag === "choc") choc++;
+    }
+    return {
+      totalCount: items.length,
+      liveCount: live,
+      featuredCount: feat,
+      sweetCount: sweet,
+      savouryCount: savoury,
+      chocCount: choc,
+    };
+  }, [items]);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -542,18 +571,13 @@ export default function MenuAdminPage() {
       {/* ========================================================================= */}
       {editing !== null && (
         <MenuDishEditor
+          key={editing || "new-dish"}
           editing={editing}
-          form={form}
-          setForm={setForm}
-          set={set}
-          step={step}
-          setStep={setStep}
+          initialForm={form}
           saving={saving}
-          closeForm={closeForm}
+          closeForm={() => setEditing(null)}
           submit={submit}
-          goToPhotos={goToPhotos}
           pendingPhotos={pendingPhotos}
-          setPendingPhotos={setPendingPhotos}
           setPhotoCounts={setPhotoCounts}
           formRef={formRef}
           photosRef={photosRef}
