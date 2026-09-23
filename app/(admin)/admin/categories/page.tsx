@@ -34,6 +34,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AdminError } from "@/components/ui/admin-error";
 import { useConfirm } from "@/components/ui/confirm";
 import { useToast } from "@/components/ui/toast";
+import { Modal, ModalHeader } from "@/components/ui/modal";
 import { AdminDataTable, AdminTablePagination, AdminTableSurface, type AdminTableColumn } from "@/components/admin/AdminTable";
 
 const PRESET_ICONS = [
@@ -637,38 +638,34 @@ export default function AdminCategoriesPage() {
       )}
 
       {/* CREATE / EDIT CATEGORY MODAL DIALOG */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div
-            className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-zinc-200 space-y-5 animate-in fade-in zoom-in-95 duration-150"
-            role="dialog"
-            aria-modal="true"
-          >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-900 text-lg">
-                  {formData.icon || "🥞"}
-                </span>
-                <h2 className="text-lg font-bold text-[#211a14]">
-                  {editingCategory ? "Edit Category" : "Add New Category"}
-                </h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => setModalOpen(false)}
-                className="p-1.5 text-zinc-400 hover:text-zinc-700 rounded-lg hover:bg-zinc-100"
-              >
-                <X className="h-4 w-4" />
-              </button>
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        variant="dialog"
+        size="lg"
+        ariaLabel={editingCategory ? "Edit Category" : "Add New Category"}
+      >
+        <ModalHeader
+          title={
+            <div className="flex items-center gap-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-900 text-lg">
+                {formData.icon || "🥞"}
+              </span>
+              <span className="text-lg font-bold text-[#211a14]">
+                {editingCategory ? "Edit Category" : "Add New Category"}
+              </span>
             </div>
+          }
+          onClose={() => setModalOpen(false)}
+        />
 
-            {formError && (
-              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 shrink-0" />
-                <span>{formError}</span>
-              </div>
-            )}
+        <div className="p-6 space-y-4">
+          {formError && (
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>{formError}</span>
+            </div>
+          )}
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               {/* Name & Slug */}
@@ -832,8 +829,7 @@ export default function AdminCategoriesPage() {
               </div>
             </form>
           </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 }

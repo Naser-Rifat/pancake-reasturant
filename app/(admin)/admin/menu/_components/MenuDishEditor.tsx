@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, type ChangeEvent, type Dispatch, type FormEvent, type RefObject, type SetStateAction } from "react";
-import { createPortal } from "react-dom";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Image as ImageIcon, Plus, Save, UtensilsCrossed, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Image as ImageIcon, Plus, Save, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Modal, ModalHeader, ModalFooter } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -53,11 +53,6 @@ export function MenuDishEditor({
   categories?: AdminCategory[];
 }) {
   const [cachedPhoto, setCachedPhoto] = useState<string>("");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (form.photo && form.photo !== form.image && !form.photo.includes("-cutout") && !form.photo.includes("cutout.png")) {
@@ -71,46 +66,26 @@ export function MenuDishEditor({
     (form.photo && (form.photo.includes("-cutout") || form.photo.includes("cutout.png")))
   );
 
-  if (!mounted) return null;
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-50 flex flex-col bg-white sm:bg-black/60 sm:backdrop-blur-xs sm:justify-center sm:items-center p-0 sm:p-4 md:p-6 overflow-hidden"
-      role="dialog"
-      aria-modal="true"
+  return (
+    <Modal
+      open={true}
+      onClose={closeForm}
+      variant="adaptive"
+      size="2xl"
+      containerRef={formRef}
+      ariaLabel={editing ? form.name || "Edit Dish" : "Create Dish"}
     >
-      {/* Desktop backdrop overlay dismiss */}
-      <div
-        className="hidden sm:block fixed inset-0 -z-10 cursor-pointer"
-        onClick={closeForm}
-      />
-
-      {/* Adaptive Sheet Modal: 100% full-screen on mobile, centered card on tablet/desktop */}
-      <div
-        ref={formRef}
-        className="relative w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-2xl lg:max-w-3xl bg-white rounded-none sm:rounded-2xl border-0 sm:border sm:border-zinc-200 shadow-none sm:shadow-2xl flex flex-col overflow-hidden"
-      >
-        {/* Sticky Top Navigation Bar */}
-        <div className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-3 bg-white/95 backdrop-blur-md border-b border-zinc-200 shrink-0">
-          <button
-            type="button"
-            onClick={closeForm}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-600 hover:text-zinc-900 py-2 px-2.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer"
-          >
-            <X className="h-4 w-4" />
-            <span>Cancel</span>
-          </button>
-
-          <div className="text-center min-w-0 px-2 flex-1">
-            <h3 className="text-sm sm:text-base font-bold text-[#211a14] truncate">
-              {editing ? form.name || "Edit Dish" : step === 1 ? "New Dish — Details" : "New Dish — Photos"}
-            </h3>
-            <div className="text-[10px] font-semibold text-zinc-500 flex items-center justify-center gap-1.5">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-600" />
-              <span>{editing ? "Catalog Item" : `Step ${step} of 2`}</span>
-            </div>
-          </div>
-
+      {/* Sticky Top Navigation Bar */}
+      <ModalHeader
+        onClose={closeForm}
+        title={editing ? form.name || "Edit Dish" : step === 1 ? "New Dish — Details" : "New Dish — Photos"}
+        description={
+          <span className="flex items-center justify-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-600" />
+            <span>{editing ? "Catalog Item" : `Step ${step} of 2`}</span>
+          </span>
+        }
+        action={
           <Button
             type="button"
             size="sm"
@@ -124,7 +99,8 @@ export function MenuDishEditor({
               <span className="flex items-center gap-1"><Save className="h-3.5 w-3.5" /> Save</span>
             )}
           </Button>
-        </div>
+        }
+      />
 
         {/* Scrollable Form Body */}
         <form
@@ -455,10 +431,7 @@ export function MenuDishEditor({
         </form>
 
         {/* Sticky Bottom Action Bar */}
-        <div
-          className="sticky bottom-0 z-20 flex items-center justify-between gap-3 px-4 sm:px-6 py-3 bg-white/95 backdrop-blur-md border-t border-zinc-200 shrink-0 shadow-lg"
-          style={{ paddingBottom: "max(14px, env(safe-area-inset-bottom, 14px))" }}
-        >
+        <ModalFooter>
           <div className="text-xs text-zinc-500 font-medium hidden sm:block">
             {!editing ? `Step ${step} of 2` : "All changes save to live menu"}
           </div>
@@ -508,9 +481,7 @@ export function MenuDishEditor({
               )}
             </Button>
           </div>
-        </div>
-      </div>
-    </div>,
-    document.body
+        </ModalFooter>
+    </Modal>
   );
 }
