@@ -276,68 +276,27 @@ export default function PhotoBoard({
 
   return (
     <div className="space-y-4">
-      {/* Upload Specifications & Quality Guide Bar */}
-      <details className="group rounded-xl border border-amber-300/80 bg-linear-to-r from-amber-50/90 via-amber-50/60 to-orange-50/40 p-3 shadow-2xs">
-        <summary className="flex items-center justify-between gap-2 cursor-pointer list-none select-none text-xs font-bold text-amber-950">
-          <div className="flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-200 text-amber-900 text-xs shrink-0">📷</span>
-            <span className="text-xs font-bold">Photo Sizing &amp; Ratio Guide</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300/60 hidden sm:inline-flex">
-              ✓ Auto Optimized
-            </span>
-            <span className="text-xs text-amber-800 font-bold group-open:rotate-180 transition-transform">▼</span>
-          </div>
-        </summary>
-
-        <div className="mt-3 space-y-2.5 pt-2 border-t border-amber-200/60">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-            <div className="bg-white/90 rounded-lg p-2.5 border border-amber-200/80 shadow-2xs flex flex-col">
-              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide flex items-center gap-1">
-                📐 Aspect Ratio
-              </span>
-              <span className="text-xs font-extrabold text-zinc-900 mt-0.5">4:3 or 1:1</span>
-              <span className="text-[10px] text-emerald-700 font-medium">✓ Validated on upload</span>
-            </div>
-
-            <div className="bg-white/90 rounded-lg p-2.5 border border-amber-200/80 shadow-2xs flex flex-col">
-              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide flex items-center gap-1">
-                🎯 Resolution
-              </span>
-              <span className="text-xs font-extrabold text-zinc-900 mt-0.5">1200 × 900 px</span>
-              <span className="text-[10px] text-emerald-700 font-medium">✓ Min 500×400px enforced</span>
-            </div>
-
-            <div className="bg-white/90 rounded-lg p-2.5 border border-amber-200/80 shadow-2xs flex flex-col">
-              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide flex items-center gap-1">
-                ⚖️ Max File Size
-              </span>
-              <span className="text-xs font-extrabold text-amber-700 mt-0.5">Max 5 MB</span>
-              <span className="text-[10px] text-emerald-700 font-medium">✓ Strictly checked</span>
-            </div>
-
-            <div className="bg-white/90 rounded-lg p-2.5 border border-amber-200/80 shadow-2xs flex flex-col">
-              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide flex items-center gap-1">
-                📁 File Formats
-              </span>
-              <span className="text-xs font-extrabold text-zinc-900 mt-0.5">JPG, WebP, PNG</span>
-              <span className="text-[10px] text-emerald-700 font-medium">✓ Pre-screened</span>
-            </div>
-          </div>
-
-          <div className="text-[11px] text-amber-950/90 font-medium flex items-center gap-1.5 pt-0.5">
-            <span>💡 <strong>Composition rule:</strong> Shoot at a 30°–45° diner angle with 10% breathing margin around the plate so circular cards don&apos;t clip the edges.</span>
-          </div>
+      {/* Photo Library Header & Sizing Specs */}
+      <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-[#211a14] flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5 text-[#763a12]" /> Dish Gallery &amp; Cutout Stickers
+          </span>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300/60 hidden sm:inline-block">
+            Auto-Optimized
+          </span>
         </div>
-      </details>
+        <span className="text-[11px] text-zinc-500 font-medium">
+          Recommended: 4:3 or 1:1 · Max 5MB · JPG, PNG, WebP
+        </span>
+      </div>
 
       <div
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         className={`rounded-2xl border transition-all p-4 sm:p-5 space-y-4 ${
-          dragging ? "border-[#763a12] bg-amber-50/30" : "border-zinc-200/90 bg-zinc-50/40"
+          dragging ? "border-[#763a12] bg-amber-50/30" : "border-zinc-200/90 bg-zinc-50/30"
         }`}
       >
         {photos === null ? (
@@ -353,7 +312,7 @@ export default function PhotoBoard({
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             {tiles.map((t) => {
               const isCut = t.url === cutoutUrl || t.url.includes("-cutout") || t.url.includes("cutout.png");
               const isMain = t.url === mainUrl;
