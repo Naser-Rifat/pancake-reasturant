@@ -2,7 +2,28 @@
 
 import { useEffect, useState, type ChangeEvent, type Dispatch, type FormEvent, type RefObject, type SetStateAction } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Clock, Eye, FileText, Flame, Image as ImageIcon, Plus, Save, Scissors, Sparkles, UtensilsCrossed } from "lucide-react";
+import Image from "next/image";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  Eye,
+  FileText,
+  Flame,
+  HelpCircle,
+  Image as ImageIcon,
+  Info,
+  Layers,
+  LayoutGrid,
+  Maximize2,
+  Plus,
+  Save,
+  Scissors,
+  Smartphone,
+  Sparkles,
+  UtensilsCrossed,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Modal, ModalHeader, ModalFooter } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
@@ -55,6 +76,7 @@ export function MenuDishEditor({
 }) {
   const [activeTab, setActiveTab] = useState<"details" | "photos">("details");
   const [cachedPhoto, setCachedPhoto] = useState<string>("");
+  const [previewMode, setPreviewMode] = useState<"card" | "detail">("card");
 
   useEffect(() => {
     if (form.photo && form.photo !== form.image && !form.photo.includes("-cutout") && !form.photo.includes("cutout.png")) {
@@ -68,6 +90,10 @@ export function MenuDishEditor({
     (form.photo && (form.photo.includes("-cutout") || form.photo.includes("cutout.png")))
   );
 
+  const activeImageUrl = isCutoutActive
+    ? form.image || form.photo || ""
+    : form.photo || form.image || "";
+
   // Active category helper
   const activeCategory = categories.find(
     (c) => String(c.id) === String(form.category) || c.slug === form.tag
@@ -75,8 +101,15 @@ export function MenuDishEditor({
 
   // Word and character count computations
   const charCount = form.description.length;
-  const wordCount = form.description.trim() ? form.description.trim().split(/\s+/).length : 0;
+  const trimmedDesc = form.description.trim();
+  const words = trimmedDesc ? trimmedDesc.split(/\s+/) : [];
+  const wordCount = words.length;
   const nameCharCount = form.name.length;
+
+  // Split description: First ~20 words fit into 2 lines on the Menu Grid Card
+  const CARD_WORD_LIMIT = 20;
+  const cardWords = words.slice(0, CARD_WORD_LIMIT).join(" ");
+  const overflowWords = words.length > CARD_WORD_LIMIT ? words.slice(CARD_WORD_LIMIT).join(" ") : "";
 
   // Synthetic item for customer live preview
   const previewItem: ApiMenuItem = {
@@ -192,11 +225,12 @@ export function MenuDishEditor({
                     {/* Dish Name with live character counter */}
                     <div className="space-y-1.5 sm:col-span-2">
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="mi-name" className="text-xs font-semibold text-[#211a14]">
-                          Dish Name *
+                        <Label htmlFor="mi-name" className="text-xs font-semibold text-[#211a14] flex items-center gap-1.5">
+                          <span>Dish Name *</span>
+                          <span className="text-[10px] font-normal text-zinc-400">(Public Menu Title)</span>
                         </Label>
-                        <span className={`text-[10px] font-bold ${nameCharCount > 50 ? "text-amber-700" : "text-zinc-400"}`}>
-                          {nameCharCount} / 60
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${nameCharCount > 50 ? "bg-amber-50 text-amber-800 border border-amber-200" : "text-zinc-400"}`}>
+                          {nameCharCount} / 60 chars
                         </span>
                       </div>
                       <Input
@@ -208,11 +242,14 @@ export function MenuDishEditor({
                         value={form.name}
                         onChange={set("name")}
                       />
-                      {nameCharCount > 45 && (
-                        <p className="text-[10px] text-amber-700 font-medium">
-                          💡 Tip: Concise dish names (&lt;40 chars) display cleanly on one line across mobile screens.
-                        </p>
-                      )}
+                      <div className="flex items-center justify-between text-[10px] text-zinc-500 px-0.5">
+                        <span>
+                          {nameCharCount > 45
+                            ? "⚠️ Long name: may wrap to 2 lines on smaller mobile screens."
+                            : "💡 Tip: 15–35 chars recommended for clean single-line display."}
+                        </span>
+                        <span className="text-zinc-400 font-mono">Max 60</span>
+                      </div>
                     </div>
 
                     {/* Price with Currency Adornment */}
@@ -300,29 +337,66 @@ export function MenuDishEditor({
                       </Select>
                     </div>
 
-                    {/* Description & Ingredients with live Word & Character limit counters */}
-                    <div className="space-y-1.5 sm:col-span-2">
+                    {/* Description & Ingredients with Public Website Visibility Guide & Live Breakdown */}
+                    <div className="space-y-2.5 sm:col-span-2 pt-1">
+                      {/* Explainer Box: Public Website Visibility Guide */}
+                      <div className="rounded-xl border border-amber-200/90 bg-linear-to-r from-amber-50/90 via-orange-50/40 to-amber-50/80 p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-[#763a12] flex items-center gap-1.5">
+                            <Info className="h-4 w-4 text-amber-700 shrink-0" /> Public Website Visibility Guide
+                          </span>
+                          <span className="text-[10px] font-bold text-amber-900 bg-amber-200/70 border border-amber-300/60 px-2 py-0.5 rounded-full">
+                            Standard: Max 280 chars (~45-50 words)
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                          <div className="bg-white/95 rounded-xl p-2.5 border border-amber-100/90 shadow-2xs space-y-1">
+                            <div className="flex items-center gap-1.5 font-bold text-zinc-900">
+                              <Smartphone className="h-3.5 w-3.5 text-amber-800 shrink-0" />
+                              <span>1. Menu Grid Card (Browse)</span>
+                            </div>
+                            <p className="text-[10.5px] text-zinc-600 leading-snug">
+                              Shows the <strong className="text-zinc-900">first ~18–22 words (2 lines)</strong> with automatic ellipsis (<code className="text-[9.5px] bg-zinc-100 px-1 rounded">...</code>). Keeps the customer grid neat and fast to browse.
+                            </p>
+                          </div>
+
+                          <div className="bg-white/95 rounded-xl p-2.5 border border-amber-100/90 shadow-2xs space-y-1">
+                            <div className="flex items-center gap-1.5 font-bold text-zinc-900">
+                              <Maximize2 className="h-3.5 w-3.5 text-emerald-800 shrink-0" />
+                              <span>2. Full Dish Page (Click/Modal)</span>
+                            </div>
+                            <p className="text-[10.5px] text-zinc-600 leading-snug">
+                              Shows <strong className="text-emerald-800">100% of your full text</strong> (all ingredients, tasting notes &amp; toppings) when a customer taps the dish to view or order.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Header with dual Word and Character counters */}
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="mi-desc" className="text-xs font-semibold text-[#211a14]">
-                          Description &amp; Ingredients *
+                        <Label htmlFor="mi-desc" className="text-xs font-semibold text-[#211a14] flex items-center gap-1.5">
+                          <span>Description &amp; Ingredients *</span>
+                          <span className="text-[10px] font-normal text-zinc-400">(Recommended: 20–35 words)</span>
                         </Label>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-zinc-500 font-medium">
+                          <span className="text-[10px] text-zinc-600 font-semibold bg-zinc-100 px-2 py-0.5 rounded-md border border-zinc-200">
                             {wordCount} {wordCount === 1 ? "word" : "words"}
                           </span>
                           <span
-                            className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                              charCount > 250
-                                ? "bg-amber-100 text-amber-800"
-                                : charCount > 200
-                                ? "bg-yellow-50 text-yellow-800"
-                                : "bg-zinc-100 text-zinc-600"
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                              charCount >= 280
+                                ? "bg-red-50 text-red-700 border-red-200"
+                                : charCount > 230
+                                ? "bg-amber-50 text-amber-800 border-amber-200"
+                                : "bg-zinc-100 text-zinc-700 border-zinc-200"
                             }`}
                           >
-                            {charCount} / 280
+                            {charCount} / 280 chars
                           </span>
                         </div>
                       </div>
+
                       <Textarea
                         id="mi-desc"
                         required
@@ -333,13 +407,54 @@ export function MenuDishEditor({
                         value={form.description}
                         onChange={set("description")}
                       />
-                      <div className="flex items-center justify-between text-[11px] text-zinc-400 px-0.5">
+
+                      {/* Live Excerpt Breakdown: Shows user exact split between Card and Details Page */}
+                      {wordCount > 0 && (
+                        <div className="bg-zinc-50/90 border border-zinc-200 rounded-xl p-2.5 space-y-1.5 text-[11px]">
+                          <div className="flex items-center justify-between text-[10px] font-bold text-zinc-500 uppercase tracking-wide">
+                            <span className="flex items-center gap-1 text-[#763a12]">
+                              <Layers className="h-3 w-3 text-amber-800" /> Live Text Breakdown:
+                            </span>
+                            <span className="text-zinc-400 font-normal">
+                              {overflowWords ? `${words.length} words total` : "Fits completely on card & page"}
+                            </span>
+                          </div>
+
+                          <div className="text-zinc-700 leading-relaxed text-[11px] bg-white p-2 rounded-lg border border-zinc-200/70">
+                            <span className="bg-amber-100/90 text-amber-950 font-bold px-1 py-0.5 rounded" title="This part appears on the Menu Grid Card">
+                              {cardWords}
+                            </span>
+                            {overflowWords && (
+                              <span className="text-zinc-400 ml-1 font-normal" title="This part appears on the Full Dish Page">
+                                {" "}{overflowWords} <span className="inline-block text-[9.5px] text-zinc-400 font-sans italic">(Visible in detail view)</span>
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] text-zinc-500 pt-0.5">
+                            <span className="flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-amber-400 inline-block" />
+                              <span>Highlighted = Menu Grid Card (First 2 lines)</span>
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-zinc-300 inline-block" />
+                              <span>Remaining = Full Dish Page</span>
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Dynamic Length Guidance Meter */}
+                      <div className="flex items-center justify-between text-[11px] text-zinc-500 px-0.5">
                         <span>
-                          {charCount < 40 && "💡 Add key toppings, batter flavor, or allergen notes for diners."}
-                          {charCount >= 40 && charCount <= 200 && "✓ Optimal description length for diner menus & cards."}
-                          {charCount > 200 && "⚠️ Long descriptions will be clamped to 2 lines on compact cards."}
+                          {wordCount === 0 && "💡 Add key toppings, batter flavor, or allergen notes for diners."}
+                          {wordCount > 0 && wordCount <= 12 && "🟡 Brief — Consider mentioning ingredients or toppings."}
+                          {wordCount > 12 && wordCount <= 35 && "✓ Perfect length! Appetizing on cards and rich on the details page."}
+                          {wordCount > 35 && "🔵 Rich storytelling — First 2 lines appear on card; full text on details page."}
                         </span>
-                        <span className="text-[10px] text-zinc-400">Max 280 chars</span>
+                        <span className="text-[10px] font-mono text-zinc-400">
+                          {280 - charCount} left
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -541,7 +656,7 @@ export function MenuDishEditor({
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                   </span>
                   <span className="text-xs font-bold text-[#211a14] uppercase tracking-wide flex items-center gap-1.5">
-                    <Eye className="h-3.5 w-3.5 text-[#763a12]" /> Live Storefront Card
+                    <Eye className="h-3.5 w-3.5 text-[#763a12]" /> Customer Live Preview
                   </span>
                 </div>
                 <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300/60">
@@ -549,37 +664,164 @@ export function MenuDishEditor({
                 </span>
               </div>
 
-              <p className="text-[11px] text-zinc-500">
-                Updates dynamically as you edit dish details, change prices, or switch food photography.
-              </p>
-
-              {/* Render DishCard Simulation */}
-              <div className="flex justify-center py-2">
-                <div className="w-full max-w-[320px] preview-phone-card">
-                  <DishCard
-                    item={previewItem}
-                    variant="tile"
-                    dealBadge={form.is_featured ? "⭐ House Favourite" : undefined}
-                    onAdd={() => {}}
-                  />
-                </div>
+              {/* Segmented Dual View Switcher: Card vs Full Details */}
+              <div className="bg-zinc-200/80 p-1 rounded-xl flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setPreviewMode("card")}
+                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                    previewMode === "card"
+                      ? "bg-white text-[#763a12] shadow-xs font-extrabold"
+                      : "text-zinc-600 hover:text-zinc-900"
+                  }`}
+                >
+                  <Smartphone className="h-3.5 w-3.5" />
+                  <span>Menu Grid Card</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewMode("detail")}
+                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                    previewMode === "detail"
+                      ? "bg-white text-[#763a12] shadow-xs font-extrabold"
+                      : "text-zinc-600 hover:text-zinc-900"
+                  }`}
+                >
+                  <Maximize2 className="h-3.5 w-3.5" />
+                  <span>Full Dish Page</span>
+                </button>
               </div>
+
+              {/* Preview Display Mode 1: Menu Grid Card */}
+              {previewMode === "card" && (
+                <div className="space-y-2">
+                  <div className="flex justify-center py-1">
+                    <div className="w-full max-w-[320px] preview-phone-card">
+                      <DishCard
+                        item={previewItem}
+                        variant="tile"
+                        dealBadge={form.is_featured ? "⭐ House Favourite" : undefined}
+                        onAdd={() => {}}
+                      />
+                    </div>
+                  </div>
+                  <div className="p-2 rounded-lg bg-amber-50/70 border border-amber-200/60 text-[10.5px] text-zinc-600 flex items-start gap-1.5">
+                    <Smartphone className="h-3.5 w-3.5 text-amber-800 shrink-0 mt-0.5" />
+                    <span>
+                      <strong className="text-zinc-900">Menu Grid View:</strong> Shows title, price, badges, and first ~18–22 words. Kept uniform with ellipsis (<code className="bg-white px-1 rounded">...</code>) so mobile grids scroll smoothly.
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Preview Display Mode 2: Full Customer Dish Details Modal/Page */}
+              {previewMode === "detail" && (
+                <div className="space-y-2">
+                  <div className="bg-white rounded-xl border border-zinc-200/90 shadow-2xs p-3.5 space-y-3">
+                    {/* Visual Asset Box */}
+                    <div className="relative aspect-16/10 w-full rounded-lg overflow-hidden bg-amber-50/50 flex items-center justify-center border border-zinc-100">
+                      {activeImageUrl ? (
+                        <Image
+                          src={activeImageUrl}
+                          alt={previewItem.name}
+                          fill
+                          className={isCutoutActive ? "object-contain p-3 drop-shadow-md" : "object-cover"}
+                          unoptimized
+                        />
+                      ) : (
+                        <span className="text-3xl">🥞</span>
+                      )}
+                      {form.is_featured && (
+                        <span className="absolute top-2 left-2 bg-[#763a12] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">
+                          ✨ House Favourite
+                        </span>
+                      )}
+                      <span className="absolute bottom-2 right-2 bg-black/60 text-white text-[9px] font-semibold px-2 py-0.5 rounded-md backdrop-blur-xs">
+                        {isCutoutActive ? "✂️ Cutout Sticker" : "📷 Full Photo"}
+                      </span>
+                    </div>
+
+                    {/* Dish Metadata & Price */}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 bg-amber-100/70 px-2 py-0.5 rounded-md">
+                          {previewItem.category_icon} {previewItem.category_name}
+                        </span>
+                        <span className="text-sm font-black text-[#763a12]">
+                          ${form.price ? form.price : "18.00"} AUD
+                        </span>
+                      </div>
+
+                      <h4 className="text-sm font-extrabold text-zinc-900 leading-snug">
+                        {form.name.trim() || "Classic Golden Buttermilk Stack"}
+                        {form.heat === "medium" && <span className="ml-1 text-xs" title="Medium Heat">🌶️</span>}
+                        {form.heat === "hot" && <span className="ml-1 text-xs" title="Hot &amp; Spicy">🔥</span>}
+                      </h4>
+
+                      {/* 100% Full Unclamped Description */}
+                      <div className="p-2.5 bg-emerald-50/60 rounded-xl border border-emerald-200/70 space-y-1">
+                        <div className="flex items-center justify-between text-[10px] font-bold text-emerald-900 uppercase tracking-wide">
+                          <span>Full Customer Description</span>
+                          <span className="text-emerald-700 font-semibold bg-white/80 px-1.5 py-0.5 rounded">
+                            ✓ 100% Visible to Diners
+                          </span>
+                        </div>
+                        <p className="text-xs text-zinc-800 leading-relaxed font-medium">
+                          {form.description.trim() || "Three fluffy buttermilk pancakes layered with whipped vanilla butter, warm organic maple syrup, and seasonal berries."}
+                        </p>
+                      </div>
+
+                      {/* Kitchen Badges */}
+                      {(form.prep_time || form.kcal || form.protein_g || form.heat !== "none") && (
+                        <div className="flex flex-wrap gap-1 pt-0.5">
+                          {form.prep_time && (
+                            <span className="text-[10px] font-semibold bg-zinc-100 text-zinc-700 px-2 py-0.5 rounded-full border border-zinc-200">
+                              ⏱️ {form.prep_time}
+                            </span>
+                          )}
+                          {form.kcal && (
+                            <span className="text-[10px] font-semibold bg-zinc-100 text-zinc-700 px-2 py-0.5 rounded-full border border-zinc-200">
+                              🔥 {form.kcal} kcal
+                            </span>
+                          )}
+                          {form.protein_g && (
+                            <span className="text-[10px] font-semibold bg-zinc-100 text-zinc-700 px-2 py-0.5 rounded-full border border-zinc-200">
+                              💪 {form.protein_g}g prot
+                            </span>
+                          )}
+                          {form.heat === "medium" && (
+                            <span className="text-[10px] font-semibold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-200">
+                              🌶️ Medium Heat
+                            </span>
+                          )}
+                          {form.heat === "hot" && (
+                            <span className="text-[10px] font-semibold bg-red-100 text-red-900 px-2 py-0.5 rounded-full border border-red-200">
+                              🔥 Hot &amp; Spicy
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Mock Add to Order CTA */}
+                      <div className="pt-1.5">
+                        <div className="w-full bg-[#763a12] text-white text-xs font-bold py-2 rounded-xl text-center shadow-xs flex items-center justify-center gap-1.5 opacity-95">
+                          <span>Add to Order — ${form.price ? form.price : "18.00"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-2 rounded-lg bg-emerald-50/70 border border-emerald-200/60 text-[10.5px] text-zinc-600 flex items-start gap-1.5">
+                    <Maximize2 className="h-3.5 w-3.5 text-emerald-800 shrink-0 mt-0.5" />
+                    <span>
+                      <strong className="text-zinc-900">Dish Detail Page:</strong> When diners tap on this dish to order, they see your complete 280-char description, all ingredients &amp; culinary details without any truncation.
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* Live Status & Nutritional Matrix */}
               <div className="space-y-2 pt-2 border-t border-zinc-200/80">
-                {/* Live Description Inspector Box */}
-                <div className="bg-white rounded-xl p-3 border border-zinc-200/90 shadow-2xs space-y-1">
-                  <div className="flex items-center justify-between text-[11px] text-zinc-500 font-semibold">
-                    <span className="flex items-center gap-1 text-[#763a12]">
-                      <FileText className="h-3 w-3" /> Full Menu Description:
-                    </span>
-                    <span className="text-[10px] text-zinc-400 font-medium">{wordCount} words</span>
-                  </div>
-                  <p className="text-xs text-zinc-700 leading-relaxed italic line-clamp-3">
-                    &ldquo;{form.description.trim() || "Three fluffy buttermilk pancakes layered with whipped vanilla butter, warm organic maple syrup, and seasonal berries."}&rdquo;
-                  </p>
-                </div>
-
                 <div className="grid grid-cols-2 gap-2 text-[11px]">
                   <div className="bg-white rounded-lg p-2.5 border border-zinc-100 shadow-2xs flex flex-col">
                     <span className="text-[10px] text-zinc-400 uppercase font-semibold">Storefront Asset</span>
