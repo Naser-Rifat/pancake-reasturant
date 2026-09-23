@@ -91,6 +91,7 @@ body {
   height: 248px !important;
   min-height: 248px !important;
   width: 100% !important;
+  min-width: 270px !important;
   max-width: 360px !important;
   border-radius: 28px !important;
   padding: 1.25rem 1.25rem 0 !important;
@@ -112,7 +113,7 @@ body {
 .preview-phone-card .dish-card .dc-body {
   position: relative !important;
   z-index: 5 !important;
-  max-width: calc(100% - 60px) !important;
+  max-width: calc(100% - 54px) !important;
   padding: 0 !important;
   margin: 0 !important;
 }
@@ -137,6 +138,7 @@ body {
   color: #92400e !important;
   border: 1px solid rgba(245, 158, 11, 0.45) !important;
   box-shadow: 0 1px 4px rgba(245, 158, 11, 0.15) !important;
+  white-space: nowrap !important;
 }
 
 .preview-phone-card .dish-card .dc-head {
@@ -145,6 +147,7 @@ body {
   gap: 0.5rem !important;
   min-height: 28px !important;
   margin-bottom: 0.32rem !important;
+  max-width: calc(100% - 46px) !important;
 }
 
 .preview-phone-card .dish-card .dc-head .dc-badge {
@@ -189,6 +192,9 @@ body {
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
   letter-spacing: -0.01em !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  hyphens: none !important;
 }
 
 .preview-phone-card .dish-card .dc-deal-pill {

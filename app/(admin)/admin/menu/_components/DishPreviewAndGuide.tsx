@@ -261,28 +261,28 @@ export function DishPreviewAndGuide({
           </div>
 
           {/* Sizing & Aspect Ratio Quick Cheatsheet Banner */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] bg-white p-2.5 rounded-xl border border-amber-200/80 shadow-2xs">
-            <div className="flex items-center gap-1.5 text-zinc-700 min-w-0">
-              <span className="font-bold text-amber-900 shrink-0">📱 Mobile:</span>
-              <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 truncate">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 text-[11px]">
+            <div className="inline-flex items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-amber-200/80 shadow-2xs shrink-0">
+              <span className="font-bold text-amber-900">📱 Mobile:</span>
+              <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 text-[10px]">
                 4:3 / 1:1
               </span>
             </div>
-            <div className="flex items-center gap-1.5 text-zinc-700 min-w-0">
-              <span className="font-bold text-amber-900 shrink-0">📱 Tablet:</span>
-              <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 truncate">
+            <div className="inline-flex items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-amber-200/80 shadow-2xs shrink-0">
+              <span className="font-bold text-amber-900">📱 Tablet:</span>
+              <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 text-[10px]">
                 2-Col Grid
               </span>
             </div>
-            <div className="flex items-center gap-1.5 text-zinc-700 min-w-0">
-              <span className="font-bold text-amber-900 shrink-0">💻 Desktop:</span>
-              <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 truncate">
+            <div className="inline-flex items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-amber-200/80 shadow-2xs shrink-0">
+              <span className="font-bold text-amber-900">💻 Desktop:</span>
+              <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 text-[10px]">
                 4-Col Grid
               </span>
             </div>
-            <div className="flex items-center gap-1.5 text-zinc-700 min-w-0">
-              <span className="font-bold text-amber-900 shrink-0">🎯 Standard:</span>
-              <span className="font-medium text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 truncate">
+            <div className="inline-flex items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-amber-200/80 shadow-2xs shrink-0">
+              <span className="font-bold text-amber-900">🎯 Ideal Spec:</span>
+              <span className="font-semibold text-zinc-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 text-[10px]">
                 1200×900 px
               </span>
             </div>
@@ -291,22 +291,22 @@ export function DishPreviewAndGuide({
       {/* Real-time Live Card Previews for Mobile, Tablet, Desktop */}
       {viewMode !== "guide" && (
         <div className="space-y-4">
-          <div className="flex flex-col items-center justify-center p-4 sm:p-6 bg-amber-900/5 rounded-2xl border border-amber-200/60 overflow-hidden">
-            <div className="text-[11px] font-semibold text-amber-900/70 mb-3 flex items-center gap-1.5">
+          <div className="flex flex-col items-center justify-center p-3 sm:p-6 bg-amber-900/5 rounded-2xl border border-amber-200/60 overflow-hidden">
+            <div className="text-[11px] font-semibold text-amber-900/70 mb-3 flex items-center gap-1.5 flex-wrap justify-center text-center">
               <span>Customer Storefront Presentation</span>
               <span className="text-zinc-400">•</span>
               <span className="uppercase text-[10px] font-bold tracking-wider px-2 py-0.5 bg-amber-100 text-amber-900 rounded-md">
                 {viewMode === "mobile"
-                  ? "📱 Mobile Smartphone View (375px Single Column)"
+                  ? "📱 Mobile Smartphone View (375px)"
                   : viewMode === "tablet"
-                  ? "📱 iPad / Tablet View (768px 2-Col Grid)"
-                  : "💻 Desktop View (1200px 4-Up Grid Tile)"}
+                  ? "📱 iPad / Tablet View (768px 2-Col)"
+                  : "💻 Desktop View (1200px 4-Col)"}
               </span>
             </div>
 
-            {/* Viewport Simulation: Mobile (360px card) */}
+            {/* Viewport Simulation: Mobile (340px card) */}
             {viewMode === "mobile" && (
-              <div className="w-full max-w-[360px] preview-phone-card transition-all duration-300">
+              <div className="w-full max-w-[340px] preview-phone-card transition-all duration-300">
                 <DishCard
                   item={previewItem}
                   variant="tile"
@@ -319,10 +319,13 @@ export function DishPreviewAndGuide({
             {/* Viewport Simulation: Tablet (iPad 2-Col Grid) */}
             {viewMode === "tablet" && (
               <div className="w-full max-w-[640px] transition-all duration-300">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <div className="text-[10px] font-semibold text-amber-900/60 mb-1">
-                      Current Dish Preview
+                <div className="flex sm:grid sm:grid-cols-2 gap-3.5 overflow-x-auto no-scrollbar pb-2 snap-x snap-mandatory px-1">
+                  <div className="w-[280px] sm:w-auto shrink-0 snap-center">
+                    <div className="text-[10px] font-semibold text-amber-900/70 mb-1.5 flex items-center justify-between">
+                      <span className="font-bold">Current Dish Preview</span>
+                      <span className="sm:hidden text-[9px] bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded-full">
+                        Card 1 of 2 · Swipe →
+                      </span>
                     </div>
                     <div className="preview-phone-card">
                       <DishCard
@@ -333,9 +336,12 @@ export function DishPreviewAndGuide({
                       />
                     </div>
                   </div>
-                  <div>
-                    <div className="text-[10px] font-semibold text-amber-900/60 mb-1">
-                      Adjacent Card Comparison
+                  <div className="w-[280px] sm:w-auto shrink-0 snap-center">
+                    <div className="text-[10px] font-semibold text-amber-900/70 mb-1.5 flex items-center justify-between">
+                      <span className="font-bold">Adjacent Card Comparison</span>
+                      <span className="sm:hidden text-[9px] text-zinc-400 font-medium">
+                        Card 2 of 2
+                      </span>
                     </div>
                     <div className="preview-phone-card">
                       <DishCard
@@ -357,9 +363,9 @@ export function DishPreviewAndGuide({
               </div>
             )}
 
-            {/* Viewport Simulation: Desktop (310px Boutique Diner Tile) */}
+            {/* Viewport Simulation: Desktop (290px Boutique Diner Tile) */}
             {viewMode === "desktop" && (
-              <div className="w-full max-w-[310px] preview-desktop-card transition-all duration-300">
+              <div className="w-full max-w-[290px] sm:max-w-[310px] preview-desktop-card transition-all duration-300">
                 <DishCard
                   item={previewItem}
                   variant="tile"
