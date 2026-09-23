@@ -90,7 +90,7 @@ export function MenuDishEditor({
             type="button"
             size="sm"
             loading={saving}
-            className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs px-3.5 h-8.5 cursor-pointer shrink-0"
+            className="bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-xs rounded-xl shadow-xs px-3.5 h-8.5 cursor-pointer shrink-0 sm:hidden"
             onClick={() => (!editing && step === 1 ? goToPhotos() : submit())}
           >
             {!editing && step === 1 ? (
@@ -301,101 +301,60 @@ export function MenuDishEditor({
               onPendingChange={setPendingPhotos}
             />
 
-            {/* Active Storefront Image Indicator & Mode Selector */}
+            {/* Active Storefront Asset Status & Quick Switch */}
             {(form.photo || form.image) && (
-              <div className="p-4 rounded-xl border border-amber-300/80 bg-linear-to-r from-amber-50/90 via-orange-50/50 to-amber-50/80 space-y-3 shadow-2xs">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`relative h-12 w-12 rounded-lg overflow-hidden border shadow-xs shrink-0 ${
-                        isCutoutActive
-                          ? "border-emerald-300 bg-transparency-grid p-1"
-                          : "border-amber-300 bg-white"
-                      }`}
-                    >
-                      <img
-                        src={isCutoutActive ? form.image || form.photo : form.photo || form.image}
-                        alt="Active storefront preview"
-                        className={`h-full w-full ${isCutoutActive ? "object-contain" : "object-cover"}`}
-                      />
+              <div className="p-3.5 rounded-xl border border-zinc-200/90 bg-zinc-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className={`relative h-11 w-11 rounded-lg overflow-hidden border shadow-2xs shrink-0 ${
+                      isCutoutActive
+                        ? "border-emerald-300 bg-transparency-grid p-1"
+                        : "border-zinc-200 bg-white"
+                    }`}
+                  >
+                    <img
+                      src={isCutoutActive ? form.image || form.photo : form.photo || form.image}
+                      alt="Active storefront preview"
+                      className={`h-full w-full ${isCutoutActive ? "object-contain" : "object-cover"}`}
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-zinc-900 flex items-center gap-2">
+                      <span>Live on Menu:</span>
+                      <span
+                        className={`font-bold px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wide inline-flex items-center gap-1 ${
+                          isCutoutActive
+                            ? "bg-emerald-100 text-emerald-950 border border-emerald-300"
+                            : "bg-amber-100 text-amber-950 border border-amber-300"
+                        }`}
+                      >
+                        {isCutoutActive ? "✂️ Transparent Cutout Sticker" : "📷 Original Photography"}
+                      </span>
                     </div>
-                    <div>
-                      <div className="text-xs font-bold text-amber-950 flex items-center gap-2">
-                        <span>⭐ Active Storefront Display:</span>
-                        <span
-                          className={`font-bold px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wide flex items-center gap-1 ${
-                            isCutoutActive
-                              ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
-                              : "bg-amber-200/80 text-amber-950 border border-amber-300"
-                          }`}
-                        >
-                          {isCutoutActive ? "✂️ Transparent Cutout Sticker" : "📷 Original Photography"}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-amber-900/80 mt-0.5">
-                        {isCutoutActive
-                          ? "Customers see a floating pancake sticker with white halo across menu & homepage cards."
-                          : "Customers see the full dining photograph framed inside the card."}
-                      </p>
-                    </div>
+                    <p className="text-[11px] text-zinc-500 truncate mt-0.5">
+                      {isCutoutActive
+                        ? "Customers see a floating pancake sticker with white halo across menu & homepage cards."
+                        : "Customers see the full dining photograph framed inside the card."}
+                    </p>
                   </div>
                 </div>
 
-                {/* 2-Way Quick Switch Buttons */}
-                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-amber-200/70">
-                  <span className="text-[11px] font-bold text-amber-900">Switch Presentation:</span>
-
+                {form.photo && form.image && (
                   <button
                     type="button"
                     onClick={() => {
-                      const targetPhoto = cachedPhoto || form.photo;
-                      if (targetPhoto) {
-                        setForm((f) => ({ ...f, photo: targetPhoto }));
+                      if (isCutoutActive) {
+                        const targetPhoto = cachedPhoto || form.photo;
+                        if (targetPhoto) setForm((f) => ({ ...f, photo: targetPhoto }));
+                      } else {
+                        if (form.image) setForm((f) => ({ ...f, photo: form.image }));
                       }
                     }}
-                    disabled={!isCutoutActive || (!cachedPhoto && (!form.photo || form.photo === form.image))}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      !isCutoutActive
-                        ? "bg-zinc-900 text-white shadow-xs cursor-default"
-                        : "bg-white hover:bg-amber-100 text-zinc-800 border border-amber-300 shadow-2xs"
-                    }`}
+                    className="shrink-0 text-xs font-bold text-[#763a12] hover:text-[#5e2d0d] bg-white hover:bg-amber-50 border border-zinc-200/90 rounded-lg px-3 py-1.5 shadow-2xs transition-colors cursor-pointer self-start sm:self-auto"
                   >
-                    <span>📷</span>
-                    <span>Show Full Photo</span>
-                    {!isCutoutActive && (
-                      <span className="text-[9px] bg-amber-400 text-amber-950 px-1 rounded font-extrabold ml-1">
-                        ACTIVE
-                      </span>
-                    )}
+                    Switch to {isCutoutActive ? "📷 Original Photo" : "✂️ Cutout Sticker"}
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (form.image) {
-                        setForm((f) => ({ ...f, photo: f.image }));
-                      }
-                    }}
-                    disabled={isCutoutActive || !form.image}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      isCutoutActive
-                        ? "bg-emerald-700 text-white shadow-xs cursor-default"
-                        : form.image
-                        ? "bg-white hover:bg-emerald-50 text-emerald-900 border border-emerald-300 shadow-2xs"
-                        : "bg-zinc-100 text-zinc-400 border border-zinc-200 cursor-not-allowed"
-                    }`}
-                  >
-                    <span>✂️</span>
-                    <span>Show Cutout Sticker</span>
-                    {isCutoutActive ? (
-                      <span className="text-[9px] bg-emerald-300 text-emerald-950 px-1 rounded font-extrabold ml-1">
-                        ACTIVE
-                      </span>
-                    ) : !form.image ? (
-                      <span className="text-[9px] text-zinc-400 font-normal ml-1">(No cutout yet)</span>
-                    ) : null}
-                  </button>
-                </div>
+                )}
               </div>
             )}
           </div>

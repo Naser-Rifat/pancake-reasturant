@@ -7,7 +7,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
-import { Scissors, Star, Trash2, UploadCloud } from "lucide-react";
+import { Check, Scissors, Sparkles, Star, Trash2, UploadCloud } from "lucide-react";
 import { UploadButton } from "@/components/ui/upload-button";
 import { useToast } from "@/components/ui/toast";
 import { cloudinaryReady, uploadToCloudinary } from "@/lib/cloudinary";
@@ -336,14 +336,14 @@ export default function PhotoBoard({
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
-        className={`grid gap-4 rounded-xl border border-dashed p-5 transition-colors ${
-          dragging ? "border-zinc-900 bg-zinc-50" : "border-zinc-300 bg-zinc-50/40"
+        className={`rounded-2xl border transition-all p-4 sm:p-5 space-y-4 ${
+          dragging ? "border-[#763a12] bg-amber-50/30" : "border-zinc-200/90 bg-zinc-50/40"
         }`}
       >
         {photos === null ? (
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : tiles.length === 0 ? (
-          <div className="grid justify-items-center gap-2 py-6 text-center">
+          <div className="grid justify-items-center gap-2 py-8 text-center">
             <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-900">
               <UploadCloud className="h-6 w-6" />
             </div>
@@ -353,30 +353,26 @@ export default function PhotoBoard({
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {tiles.map((t) => {
               const isCut = t.url === cutoutUrl || t.url.includes("-cutout") || t.url.includes("cutout.png");
               const isMain = t.url === mainUrl;
               return (
                 <div
                   key={t.key}
-                  className={`relative overflow-hidden rounded-xl transition-all duration-200 ${
-                    isCut
-                      ? isMain
-                        ? "border-2 border-emerald-600 bg-emerald-50/30 shadow-md ring-2 ring-emerald-600/20"
-                        : "border border-emerald-300 bg-white hover:border-emerald-400 shadow-xs"
-                      : isMain
-                      ? "border-2 border-zinc-900 bg-white shadow-md ring-2 ring-zinc-900/10"
-                      : "border border-zinc-200 bg-white hover:border-zinc-300 shadow-xs"
+                  className={`group relative overflow-hidden rounded-2xl transition-all duration-200 bg-white flex flex-col justify-between ${
+                    isMain
+                      ? "border-2 border-[#763a12] ring-4 ring-[#763a12]/10 shadow-sm"
+                      : "border border-zinc-200/90 hover:border-zinc-300 hover:shadow-xs"
                   }`}
                 >
-                  <div className={`relative aspect-square ${isCut ? "bg-transparency-grid" : "bg-muted"}`}>
+                  <div className={`relative aspect-4/3 w-full overflow-hidden ${isCut ? "bg-transparency-grid" : "bg-zinc-100"}`}>
                     <Image
                       src={t.url}
                       alt=""
                       fill
-                      sizes="250px"
-                      className={isCut ? "object-contain p-2.5" : "object-cover"}
+                      sizes="(max-width: 640px) 100vw, 320px"
+                      className={isCut ? "object-contain p-3" : "object-cover"}
                       onLoad={(e) => {
                         const img = e.currentTarget;
                         if (img.naturalWidth && img.naturalHeight) {
@@ -396,8 +392,23 @@ export default function PhotoBoard({
                         }
                       }}
                     />
+
+                    {/* Top Status Badges */}
+                    <div className="absolute left-2.5 top-2.5 flex flex-wrap gap-1">
+                      {isMain ? (
+                        <span className="rounded-full bg-[#763a12] text-white px-2.5 py-1 text-[10px] font-bold tracking-wide uppercase shadow-sm flex items-center gap-1.5 backdrop-blur-md">
+                          <Star className="h-3 w-3 fill-amber-300 text-amber-300" /> Active on Menu
+                        </span>
+                      ) : isCut ? (
+                        <span className="rounded-full bg-emerald-700 text-white px-2.5 py-1 text-[10px] font-bold tracking-wide uppercase shadow-sm flex items-center gap-1.5 backdrop-blur-md">
+                          <Scissors className="h-3 w-3" /> Cutout Sticker
+                        </span>
+                      ) : null}
+                    </div>
+
+                    {/* Bottom Specs Badge */}
                     {dimensions[t.url] && (
-                      <div className="absolute right-1.5 bottom-1.5 rounded bg-black/75 backdrop-blur-xs px-1.5 py-0.5 text-[9px] font-mono font-medium text-white shadow-xs flex items-center gap-1 z-10 pointer-events-none">
+                      <div className="absolute right-2.5 bottom-2.5 rounded-md bg-black/70 backdrop-blur-xs px-2 py-0.5 text-[9px] font-mono font-medium text-white shadow-xs flex items-center gap-1 z-10 pointer-events-none">
                         <span>{dimensions[t.url].w}×{dimensions[t.url].h}</span>
                         <span className="text-zinc-400">·</span>
                         <span className={dimensions[t.url].isStandard ? "text-emerald-300 font-semibold" : "text-amber-300"}>
@@ -406,111 +417,102 @@ export default function PhotoBoard({
                       </div>
                     )}
                   </div>
-                  <div className="absolute left-1.5 top-1.5 flex flex-wrap gap-1">
-                    {isCut ? (
-                      <span className="rounded bg-emerald-700/95 backdrop-blur-xs px-2 py-0.5 text-[10px] font-bold uppercase text-white shadow-xs flex items-center gap-1">
-                        <Scissors className="h-2.5 w-2.5" /> Cutout Sticker
-                      </span>
-                    ) : (
-                      isMain && (
-                        <span className="rounded bg-zinc-900/90 backdrop-blur-xs px-2 py-0.5 text-[10px] font-bold uppercase text-white shadow-xs flex items-center gap-1">
-                          <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" /> Active on Site
-                        </span>
-                      )
-                    )}
-                  </div>
 
-                  {/* Tier 1: Primary Action - Full Width Storefront Display Toggle */}
-                  <div className="border-t border-zinc-200">
+                  {/* Unified Card Controls Footer */}
+                  <div className="p-3.5 bg-zinc-50/70 border-t border-zinc-100 flex flex-col gap-2.5">
+                    {/* Primary Button: Storefront Selection Toggle */}
                     <button
                       type="button"
-                      className={`w-full min-h-[36px] flex items-center justify-center gap-1.5 py-2 px-2.5 text-xs font-bold transition-colors cursor-pointer ${
-                        isCut
-                          ? isMain
-                            ? "bg-emerald-700 text-white"
-                            : "bg-emerald-50 hover:bg-emerald-100 text-emerald-900"
-                          : isMain
-                          ? "bg-zinc-900 text-white"
-                          : "bg-white hover:bg-amber-50/80 text-zinc-700 hover:text-amber-950"
+                      className={`w-full h-9 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                        isMain
+                          ? "bg-[#763a12] text-white shadow-2xs"
+                          : "bg-white hover:bg-amber-50/70 text-zinc-700 hover:text-[#763a12] border border-zinc-200/90 hover:border-[#763a12]/30 shadow-2xs"
                       }`}
                       onClick={() => onSetMain(isMain ? "" : t.url)}
-                      title={isMain ? "Currently displayed on public site — click to toggle" : `Click to display this ${isCut ? "transparent cutout" : "photo"} on the public site`}
+                      title={isMain ? "Currently displayed on public site — click to unset" : `Click to display this ${isCut ? "transparent cutout" : "photo"} on the public site`}
                     >
-                      {isCut ? (
-                        <Scissors className={`h-3.5 w-3.5 shrink-0 ${isMain ? "text-white" : "text-emerald-700"}`} />
+                      {isMain ? (
+                        <>
+                          <Check className="h-3.5 w-3.5 text-amber-300 stroke-[3]" />
+                          <span>Selected for Storefront</span>
+                        </>
+                      ) : isCut ? (
+                        <>
+                          <Scissors className="h-3.5 w-3.5 text-emerald-700" />
+                          <span>Display Cutout on Site</span>
+                        </>
                       ) : (
-                        <Star className={`h-3.5 w-3.5 shrink-0 ${isMain ? "fill-amber-400 text-amber-400" : "text-zinc-400"}`} />
+                        <>
+                          <Star className="h-3.5 w-3.5 text-zinc-400" />
+                          <span>Display Photo on Site</span>
+                        </>
                       )}
-                      <span className="whitespace-nowrap">
-                        {isCut
-                          ? isMain
-                            ? "Active Cutout"
-                            : "Show Cutout"
-                          : isMain
-                          ? "Active Photo"
-                          : "Show Photo"}
-                      </span>
                     </button>
-                  </div>
 
-                  {/* Tier 2: Secondary Actions */}
-                  {isCut ? (
-                    <div className="border-t border-zinc-200 text-[11px] bg-zinc-50/60">
-                      <button
-                        type="button"
-                        className="w-full min-h-[34px] flex items-center justify-center gap-1.5 py-1.5 px-2 font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer"
-                        onClick={() => {
-                          onSetCutout("");
-                          if (t.url === mainUrl) onSetMain("");
-                          setPreservedUrls((prev) => prev.filter((u) => u !== t.url));
-                          toast({ variant: "info", title: "Cutout removed" });
-                        }}
-                        title="Remove this cutout sticker"
-                      >
-                        <Trash2 className="h-3.5 w-3.5 shrink-0 text-red-500" />
-                        <span className="whitespace-nowrap">Remove Cutout</span>
-                      </button>
+                    {/* Secondary Utility Actions */}
+                    <div className="flex items-center justify-between pt-0.5 text-[11px] px-1">
+                      {isCut ? (
+                        <>
+                          <span className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
+                            <Sparkles className="h-3 w-3" /> Transparent sticker
+                          </span>
+                          <button
+                            type="button"
+                            className="font-semibold text-zinc-400 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer"
+                            onClick={() => {
+                              onSetCutout("");
+                              if (t.url === mainUrl) onSetMain("");
+                              setPreservedUrls((prev) => prev.filter((u) => u !== t.url));
+                              toast({ variant: "info", title: "Cutout removed" });
+                            }}
+                            title="Remove this cutout sticker"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            <span>Remove Cutout</span>
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            className="font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 transition-colors cursor-pointer"
+                            onClick={() => makeCutout(t.url)}
+                            title="Remove background of this photo to create a transparent sticker"
+                          >
+                            <Scissors className="h-3.5 w-3.5 text-emerald-600" />
+                            <span>Make Cutout</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="font-semibold text-zinc-400 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer"
+                            onClick={() => {
+                              if (t.photo) return remove(t.photo);
+                              if (pending.includes(t.url)) {
+                                onPendingChange?.((prev) => prev.filter((u) => u !== t.url));
+                                if (t.url === mainUrl) onSetMain("");
+                                if (t.url === cutoutUrl) onSetCutout("");
+                                return;
+                              }
+                              setPreservedUrls((prev) => prev.filter((u) => u !== t.url));
+                              if (t.url === mainUrl) onSetMain("");
+                              if (t.url === cutoutUrl) onSetCutout("");
+                            }}
+                            title="Delete this photo"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            <span>Delete</span>
+                          </button>
+                        </>
+                      )}
                     </div>
-                  ) : (
-                    <div className="grid grid-cols-2 divide-x divide-zinc-200 border-t border-zinc-200 text-[11px] bg-zinc-50/60">
-                      <button
-                        type="button"
-                        className="min-h-[34px] flex items-center justify-center gap-1 py-1.5 px-1 font-semibold text-emerald-800 hover:bg-emerald-50 hover:text-emerald-950 transition-colors cursor-pointer"
-                        onClick={() => makeCutout(t.url)}
-                        title="Remove background of this photo to create a transparent sticker"
-                      >
-                        <Scissors className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
-                        <span className="whitespace-nowrap">Make Cutout</span>
-                      </button>
-                      <button
-                        type="button"
-                        className="min-h-[34px] flex items-center justify-center gap-1 py-1.5 px-1 font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors disabled:opacity-40 cursor-pointer"
-                        onClick={() => {
-                          if (t.photo) return remove(t.photo);
-                          if (pending.includes(t.url)) {
-                            onPendingChange?.((prev) => prev.filter((u) => u !== t.url));
-                            if (t.url === mainUrl) onSetMain("");
-                            if (t.url === cutoutUrl) onSetCutout("");
-                            return;
-                          }
-                          setPreservedUrls((prev) => prev.filter((u) => u !== t.url));
-                          if (t.url === mainUrl) onSetMain("");
-                          if (t.url === cutoutUrl) onSetCutout("");
-                        }}
-                        title="Delete this photo"
-                      >
-                        <Trash2 className="h-3.5 w-3.5 shrink-0 text-red-500" />
-                        <span className="whitespace-nowrap">Delete</span>
-                      </button>
-                    </div>
-                  )}
+                  </div>
                 </div>
               );
             })}
           </div>
         )}
 
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-dashed border-zinc-200">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-zinc-200/80">
           <div className="flex items-center gap-3">
             <UploadButton multiple label="Add photos" onUploaded={add} />
             <span className="text-xs text-zinc-600 font-medium">
