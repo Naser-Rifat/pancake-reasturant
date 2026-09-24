@@ -227,7 +227,36 @@ export default function MenuAdminPage() {
       setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const submit = async (savedForm?: FormState, photosList?: string[]) => {
-    const currentForm = savedForm || form;
+    const liveDesc = typeof document !== "undefined" ? (document.getElementById("mi-desc") as HTMLTextAreaElement | null)?.value : undefined;
+    const livePrice = typeof document !== "undefined" ? (document.getElementById("mi-price") as HTMLInputElement | null)?.value : undefined;
+    const liveName = typeof document !== "undefined" ? (document.getElementById("mi-name") as HTMLInputElement | null)?.value : undefined;
+    const liveHeatEl = typeof document !== "undefined" ? (document.getElementById("mi-heat") as HTMLSelectElement | null) : null;
+    const liveTagEl = typeof document !== "undefined" ? (document.getElementById("mi-tag") as HTMLSelectElement | null) : null;
+
+    const baseForm = savedForm || form;
+
+    let resolvedCategory = baseForm.category;
+    let resolvedTag = baseForm.tag;
+    if (liveTagEl && liveTagEl.value) {
+      const val = liveTagEl.value;
+      const matched = categories.find((c) => String(c.id) === val || c.slug === val);
+      if (matched) {
+        resolvedCategory = matched.id;
+        resolvedTag = matched.slug;
+      } else {
+        resolvedTag = val;
+      }
+    }
+
+    const currentForm: FormState = {
+      ...baseForm,
+      name: liveName && liveName.trim() ? liveName : baseForm.name,
+      price: livePrice && livePrice.trim() ? livePrice : baseForm.price,
+      description: liveDesc !== undefined && liveDesc.trim() ? liveDesc : baseForm.description,
+      heat: liveHeatEl && liveHeatEl.value ? (liveHeatEl.value as "none" | "medium" | "hot") : baseForm.heat,
+      tag: resolvedTag,
+      category: resolvedCategory,
+    };
     const currentPendingPhotos = photosList || pendingPhotos;
     const missing = (["name", "price", "description"] as const).find((k) => !currentForm[k].trim());
     if (missing) {
@@ -594,7 +623,7 @@ export default function MenuAdminPage() {
           <div className="relative flex-1 min-w-[240px]">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
             <Input
-              className="pl-10 h-11 text-xs font-bold border-zinc-300 rounded-lg bg-white text-[#211a14] placeholder:text-zinc-400"
+              className="pl-10 h-11 text-base sm:text-xs font-bold border-zinc-300 rounded-lg bg-white text-[#211a14] placeholder:text-zinc-400"
               placeholder="Search dishes by name, ingredients, or price..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

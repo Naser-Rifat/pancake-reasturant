@@ -134,7 +134,7 @@ export function Modal({
     <ModalContext.Provider value={{ onClose, titleId, variant }}>
       <div
         className={cn(
-          "fixed inset-0 z-50 flex overflow-hidden",
+          "fixed inset-0 z-50 flex overflow-hidden h-[100dvh] max-h-[100dvh]",
           isAdaptive
             ? "flex-col bg-white sm:bg-black/60 sm:backdrop-blur-xs sm:justify-center sm:items-center p-0 sm:p-4 md:p-6"
             : "items-center justify-center p-4 bg-black/60 backdrop-blur-xs",
@@ -164,7 +164,7 @@ export function Modal({
             "relative w-full flex flex-col bg-white overflow-hidden",
             isAdaptive
               ? cn(
-                  "h-full rounded-none border-0 shadow-none",
+                  "h-[100dvh] max-h-[100dvh] rounded-none border-0 shadow-none",
                   "sm:h-auto sm:max-h-[90vh] sm:rounded-2xl sm:border sm:border-zinc-200 sm:shadow-2xl",
                   SIZE_CLASSES[size]
                 )
@@ -294,12 +294,12 @@ export function ModalFooter({
   return (
     <div
       className={cn(
-        "z-20 flex items-center justify-between gap-3 px-4 sm:px-6 py-3 bg-white/95 backdrop-blur-md border-t border-zinc-200 shrink-0 shadow-lg",
+        "z-30 flex items-center justify-between gap-3 px-4 sm:px-6 py-3 bg-white border-t border-zinc-200 shrink-0 shadow-lg",
         sticky && "sticky bottom-0",
         className
       )}
       style={{
-        paddingBottom: "max(14px, env(safe-area-inset-bottom, 14px))",
+        paddingBottom: "max(1rem, env(safe-area-inset-bottom, 1rem))",
         ...style,
       }}
       {...props}

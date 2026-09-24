@@ -140,7 +140,7 @@ export function AdminTablePagination({
           value={pageSize}
           onChange={(event) => onPageSizeChange(Number(event.target.value))}
           aria-label={pageSizeAriaLabel}
-          className="h-8 cursor-pointer rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20"
+          className="h-8 cursor-pointer rounded-xl border border-zinc-300 bg-white px-2.5 py-1 text-base sm:text-xs font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#763a12]/20"
         >
           {pageSizeOptions.map((option) => {
             const value = typeof option === "number" ? option : option.value;

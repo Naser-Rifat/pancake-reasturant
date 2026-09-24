@@ -163,33 +163,85 @@ export function MenuDishEditor({
 
   const handleCardAdd = useCallback(() => {}, []);
 
-  const validate = useCallback((): boolean => {
-    const missing = (["name", "price", "description"] as const).find((k) => !form[k].trim());
+  const getLatestFormData = useCallback((): FormState => {
+    if (typeof document === "undefined") return form;
+
+    const nameEl = document.getElementById("mi-name") as HTMLInputElement | null;
+    const priceEl = document.getElementById("mi-price") as HTMLInputElement | null;
+    const descEl = document.getElementById("mi-desc") as HTMLTextAreaElement | null;
+    const heatEl = document.getElementById("mi-heat") as HTMLSelectElement | null;
+    const tagEl = document.getElementById("mi-tag") as HTMLSelectElement | null;
+
+    let nextCategory = form.category;
+    let nextTag = form.tag;
+    if (tagEl && tagEl.value) {
+      const val = tagEl.value;
+      const matched = categories.find((c) => String(c.id) === val || c.slug === val);
+      if (matched) {
+        nextCategory = matched.id;
+        nextTag = matched.slug;
+      } else {
+        nextTag = val;
+      }
+    }
+
+    return {
+      ...form,
+      name: nameEl && nameEl.value !== undefined ? nameEl.value : form.name,
+      price: priceEl && priceEl.value !== undefined ? priceEl.value : form.price,
+      description: descEl && descEl.value !== undefined ? descEl.value : form.description,
+      heat: heatEl && heatEl.value !== undefined ? (heatEl.value as "none" | "medium" | "hot") : form.heat,
+      tag: nextTag,
+      category: nextCategory,
+    };
+  }, [form, categories]);
+
+  const validate = useCallback((targetForm: FormState): boolean => {
+    const missing = (["name", "price", "description"] as const).find((k) => !targetForm[k].trim());
     if (missing) {
       const el = document.getElementById(`mi-${missing === "description" ? "desc" : missing}`);
       el?.focus();
       toast({ variant: "error", title: `Add the ${missing === "description" ? "description" : missing} first` });
       return false;
     }
-    const price = Number(form.price);
+    const price = Number(targetForm.price);
     if (!Number.isFinite(price) || price < 0) {
       document.getElementById("mi-price")?.focus();
       toast({ variant: "error", title: "Enter a valid price", description: "Numbers only, e.g. 18.50" });
       return false;
     }
     return true;
-  }, [form, toast]);
+  }, [toast]);
 
   const handleGoToPhotos = useCallback(() => {
-    if (!validate()) return;
+    const latestForm = getLatestFormData();
+    if (!validate(latestForm)) return;
+    setForm(latestForm);
     setStep(2);
-  }, [validate]);
+  }, [getLatestFormData, validate]);
 
   const handleSubmit = useCallback((e?: FormEvent) => {
     e?.preventDefault();
-    if (!validate()) return;
-    submit(form, pendingPhotos);
-  }, [form, pendingPhotos, submit, validate]);
+
+    // If new dish and currently in step 1, advance to photos rather than saving prematurely
+    if (!editing && step === 1) {
+      handleGoToPhotos();
+      return;
+    }
+
+    // 1. Force blur on the active element so iOS keyboard commits pending text & composition
+    if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    // 2. Read live DOM values directly (eliminates iOS Safari async blur/onChange race condition)
+    const latestForm = getLatestFormData();
+
+    if (!validate(latestForm)) return;
+
+    setForm(latestForm);
+    submit(latestForm, pendingPhotos);
+  }, [editing, step, handleGoToPhotos, getLatestFormData, validate, submit, pendingPhotos]);
 
   const handleClose = useCallback(async () => {
     const dirty = JSON.stringify(pristineRef.current) !== JSON.stringify(form);
@@ -309,7 +361,7 @@ export function MenuDishEditor({
                         id="mi-name"
                         required
                         maxLength={60}
-                        className="border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                        className="border-zinc-300 text-[#211a14] font-bold text-base sm:text-sm h-11 sm:h-10 rounded-xl"
                         placeholder="e.g. Classic Golden Buttermilk Stack"
                         value={form.name}
                         onChange={set("name")}
@@ -340,7 +392,7 @@ export function MenuDishEditor({
                           id="mi-price"
                           required
                           inputMode="decimal"
-                          className="pl-7 border-zinc-300 text-[#211a14] font-bold text-sm h-10 rounded-xl"
+                          className="pl-7 border-zinc-300 text-[#211a14] font-bold text-base sm:text-sm h-11 sm:h-10 rounded-xl"
                           placeholder="18.50"
                           value={form.price}
                           onChange={set("price")}
@@ -355,7 +407,7 @@ export function MenuDishEditor({
                       </Label>
                       <Select
                         id="mi-heat"
-                        className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
+                        className="h-11 sm:h-10 text-base sm:text-xs border-zinc-300 font-bold rounded-xl"
                         value={form.heat}
                         onChange={set("heat")}
                       >
@@ -381,7 +433,7 @@ export function MenuDishEditor({
                       </div>
                       <Select
                         id="mi-tag"
-                        className="h-10 text-xs border-zinc-300 font-bold rounded-xl"
+                        className="h-11 sm:h-10 text-base sm:text-xs border-zinc-300 font-bold rounded-xl"
                         value={form.category ? String(form.category) : form.tag}
                         onChange={(e) => {
                           const val = e.target.value;
@@ -439,7 +491,7 @@ export function MenuDishEditor({
                         required
                         maxLength={280}
                         rows={3}
-                        className="border-zinc-300 text-[#211a14] font-medium text-xs rounded-xl focus:border-[#763a12]"
+                        className="border-zinc-300 text-[#211a14] font-medium text-base sm:text-xs rounded-xl focus:border-[#763a12]"
                         placeholder="e.g. Three fluffy buttermilk pancakes layered with whipped vanilla butter, warm organic maple syrup, and seasonal berries."
                         value={form.description}
                         onChange={set("description")}
@@ -671,10 +723,16 @@ export function MenuDishEditor({
             Cancel
           </Button>
           <Button
-            type="button"
+            type={!editing && step === 1 ? "button" : "submit"}
+            form={!editing && step === 1 ? undefined : "menu-dish-editor-form"}
             loading={saving}
-            className="w-full sm:w-auto bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-sm sm:text-xs rounded-xl shadow-xs h-11 sm:h-10 px-6 cursor-pointer"
-            onClick={() => (!editing && step === 1 ? handleGoToPhotos() : handleSubmit())}
+            className="w-full sm:w-auto bg-[#763a12] hover:bg-[#5e2d0d] text-white font-bold text-base sm:text-xs rounded-xl shadow-xs h-12 sm:h-10 px-6 cursor-pointer touch-manipulation"
+            onClick={(e) => {
+              if (!editing && step === 1) {
+                e.preventDefault();
+                handleGoToPhotos();
+              }
+            }}
           >
             {!editing && step === 1 ? (
               <>

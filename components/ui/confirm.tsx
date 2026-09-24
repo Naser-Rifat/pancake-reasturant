@@ -107,6 +107,9 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) close(false);
           }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) close(false);
+          }}
         >
           <div
             role="dialog"
