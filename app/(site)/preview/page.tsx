@@ -8,7 +8,7 @@ import CertIcon from "@/components/CertIcon";
 import HeroShowcase from "@/components/HeroShowcase";
 import MenuClient from "@/components/MenuClient";
 import { countdownBadge, type ApiMenuItem } from "@/lib/api";
-import { addressLocality } from "@/lib/format";
+import { addressLocality, formatFooterTagline } from "@/lib/format";
 import clubStyles from "@/app/(site)/join-our-club/club.module.css";
 import {
   type AdminSiteSettings,
@@ -760,7 +760,7 @@ export default function PreviewPage() {
                 className="f-brand-logo"
               />
               <p className="f-brand-tag">
-                {site.footer_tagline || `Fluffy stacks · made to order · ${locality}`}
+                {formatFooterTagline(site.footer_tagline, site.address)}
               </p>
             </div>
           </div>

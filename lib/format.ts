@@ -20,19 +20,69 @@ export function addressPrimaryLine(address: string | null | undefined): string {
 }
 
 export function addressLocality(address: string | null | undefined): string {
-  const cleaned = cleanAddress(address);
-  const parts = cleaned.split(",").map((part) => part.trim()).filter(Boolean);
-  if (!parts.length) return "";
+  if (!address) return "";
+  let clean = cleanAddress(address);
+  // Strip Australian 4-digit postcodes
+  clean = clean.replace(/\b\d{4}\b/g, "").trim();
+  // Strip Australian state names and abbreviations (e.g. Victoria, VIC, New South Wales, NSW)
+  const statesPattern =
+    /\b(VIC(TORIA)?|NSW|NEW SOUTH WALES|QLD|QUEENSLAND|SA|SOUTH AUSTRALIA|WA|WESTERN AUSTRALIA|TAS(MANIA)?|ACT|NT)\b/gi;
+  clean = clean.replace(statesPattern, "").trim();
+  // Strip trailing & leading commas/spaces
+  clean = clean.replace(/^[, ]+|[, ]+$/g, "");
 
-  const statePattern = /\b(VIC|NSW|QLD|SA|WA|TAS|ACT|NT)\b/i;
-  const stateIndex = parts.findIndex((part) => statePattern.test(part));
-  if (stateIndex >= 0) {
-    const localityInStatePart = parts[stateIndex].replace(statePattern, "").replace(/\b\d{4}\b/g, "").trim();
-    if (localityInStatePart) return localityInStatePart;
-    if (stateIndex > 0) return parts[stateIndex - 1];
+  const parts = clean.split(",").map((p) => p.trim()).filter(Boolean);
+  const streetSuffixPattern =
+    /\b(?:Street|St|Road|Rd|Avenue|Ave|Drive|Dr|Highway|Hwy|Lane|Ln|Court|Ct|Place|Pl|Boulevard|Blvd|Way|Parade|Pde|Close|Cl|Crescent|Cres)\b/i;
+
+  if (parts.length > 1) {
+    const lastPart = parts[parts.length - 1];
+    if (streetSuffixPattern.test(lastPart)) {
+      const match = lastPart.match(
+        /\b(?:Street|St|Road|Rd|Avenue|Ave|Drive|Dr|Highway|Hwy|Lane|Ln|Court|Ct|Place|Pl|Boulevard|Blvd|Way|Parade|Pde|Close|Cl|Crescent|Cres)\s+(.+)$/i
+      );
+      if (match && match[1]) return match[1].trim();
+    } else {
+      return lastPart;
+    }
   }
 
-  return parts.length > 1 ? parts[parts.length - 1] : parts[0];
+  const single = parts[0] || clean;
+  const match = single.match(
+    /\b(?:Street|St|Road|Rd|Avenue|Ave|Drive|Dr|Highway|Hwy|Lane|Ln|Court|Ct|Place|Pl|Boulevard|Blvd|Way|Parade|Pde|Close|Cl|Crescent|Cres)\s+(.+)$/i
+  );
+  if (match && match[1]) return match[1].trim();
+
+  return single;
+}
+
+/**
+ * Resolves the footer brand tagline dynamically:
+ * - If tagline is default or contains an outdated hardcoded location (e.g. Geelong West),
+ *   it dynamically updates with the restaurant's actual current locality (e.g. Meredith).
+ * - Always keeps the locality synchronized with the live address.
+ */
+export function formatFooterTagline(
+  rawTagline: string | null | undefined,
+  address: string | null | undefined
+): string {
+  const locality = addressLocality(address);
+  const defaultBase = "Fluffy stacks · made to order";
+  const tagline = (rawTagline || "").trim();
+
+  // If tagline is empty or follows the default pattern "Fluffy stacks · made to order [· anything]"
+  if (!tagline || /^Fluffy stacks · made to order(\s*·\s*.*)?$/i.test(tagline)) {
+    return locality ? `${defaultBase} · ${locality}` : defaultBase;
+  }
+
+  // If custom tagline already explicitly includes the current locality
+  if (locality && tagline.toLowerCase().includes(locality.toLowerCase())) {
+    return tagline;
+  }
+
+  // If custom tagline ended with an old location like "· Geelong West", replace it with the new locality
+  const stripped = tagline.replace(/\s*·\s*(Geelong(\s+West)?|Australia)\s*$/i, "").trim();
+  return locality ? `${stripped} · ${locality}` : stripped;
 }
 
 export function addressRegion(address: string | null | undefined): string {

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import { formatTime, getHours, getSite, telHref } from "@/lib/api";
-import { addressLocality } from "@/lib/format";
+import { addressLocality, formatFooterTagline } from "@/lib/format";
 import BackToTop from "@/components/BackToTop";
 
 const LINKS = [
@@ -17,7 +17,6 @@ const LINKS = [
 export default async function Footer() {
   const [site, hours] = await Promise.all([getSite(), getHours()]);
   const directions = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address)}`;
-  const locality = addressLocality(site.address);
 
   return (
     <footer className="site-footer">
@@ -34,9 +33,7 @@ export default async function Footer() {
               className="f-brand-logo"
             />
             <p className="f-brand-tag">
-              {site.footer_tagline || (site.address
-                ? `Fluffy stacks · made to order · ${locality}`
-                : "Fluffy stacks · made to order")}
+              {formatFooterTagline(site.footer_tagline, site.address)}
             </p>
 
             <div className="f-actions">
