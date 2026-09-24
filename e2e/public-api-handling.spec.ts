@@ -108,7 +108,7 @@ test("review submission surfaces an API validation error", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Leave a Guestbook Note" }).click();
   await page.getByPlaceholder("Your name *").fill("Alex");
-  await page.getByPlaceholder(/Suburb/).fill("Geelong West");
+  await page.getByPlaceholder(/Suburb/).fill("Meredith");
   await page.locator(".rev-form textarea").fill("Nice");
   await page.getByRole("button", { name: /Post to Guestbook/ }).click();
 

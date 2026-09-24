@@ -1,3 +1,5 @@
+import { addressLocality } from "./format";
+
 // Typed client for the Django REST backend.
 // Server components use the read helpers (with graceful fallbacks so the
 // storefront renders even when the API is down); client components use the
@@ -329,10 +331,36 @@ export async function getCategories(): Promise<ApiCategory[]> {
   return cats ?? FALLBACK_CATEGORIES;
 }
 
+/**
+ * Sanitizes any remaining historical references to the old demo address (18 Pakington St / Geelong West)
+ * ensuring public storefront HTML, structured data, and search engine crawlers always see the true location.
+ */
+export function cleanLegacyLocationText(text: string | null | undefined, locality = "Meredith"): string {
+  if (!text) return "";
+  return text
+    .replace(/18\s+Pakington\s+St(reet)?(,\s*Geelong\s*West)?(\s*VIC)?(\s*3218)?(,\s*Australia)?/gi, `55 Wallace Street, ${locality} VIC 3333`)
+    .replace(/Loved the vibe on Pakington Street\.?/gi, "Loved the warm vibe and great service.")
+    .replace(/on Pakington Street/gi, `in ${locality}`)
+    .replace(/Pakington\s+St(reet)?/gi, locality)
+    .replace(/Geelong\s+West/gi, locality)
+    .replace(/East\s+Geelong/gi, locality)
+    .replace(/Geelong\s+regulars/gi, "local regulars")
+    .replace(/Geelong\s+favourite/gi, `${locality} favourite`)
+    .replace(/in\s+Geelong/gi, `in ${locality}`)
+    .replace(/City of Greater Geelong/gi, "Local council inspection")
+    .replace(/Greater\s+Geelong/gi, locality)
+    .replace(/\bGeelong\b/gi, locality);
+}
+
 export async function getReviews(): Promise<ApiReview[]> {
   const { FALLBACK_REVIEWS } = await import("./fallback-data");
   const data = await get<{ results: ApiReview[] } | null>("/reviews/", null);
-  return data?.results ?? FALLBACK_REVIEWS;
+  const reviews = data?.results ?? FALLBACK_REVIEWS;
+  return reviews.map((r) => ({
+    ...r,
+    quote: cleanLegacyLocationText(r.quote),
+    suburb: cleanLegacyLocationText(r.suburb),
+  }));
 }
 
 export async function getGallery(): Promise<ApiGalleryPhoto[]> {
@@ -347,7 +375,12 @@ export async function getHours(): Promise<ApiOpeningHours[]> {
 
 export async function getCertifications(): Promise<ApiCertification[]> {
   const { FALLBACK_CERTS } = await import("./fallback-data");
-  return get("/certifications/", FALLBACK_CERTS);
+  const certs = await get("/certifications/", FALLBACK_CERTS);
+  return certs.map((c) => ({
+    ...c,
+    title: cleanLegacyLocationText(c.title),
+    subtitle: cleanLegacyLocationText(c.subtitle),
+  }));
 }
 
 export interface ApiHomeStep {
@@ -363,7 +396,12 @@ export async function getCampaigns(): Promise<ApiAnnouncement[]> {
   const { FALLBACK_CAMPAIGNS } = await import("./fallback-data");
   // An empty response is valid: staff may deliberately remove every offer.
   // The generic helper already uses fallback data only when the API fails.
-  return get<ApiAnnouncement[]>("/campaigns/", FALLBACK_CAMPAIGNS);
+  const campaigns = await get<ApiAnnouncement[]>("/campaigns/", FALLBACK_CAMPAIGNS);
+  return campaigns.map((c) => ({
+    ...c,
+    details: cleanLegacyLocationText(c.details),
+    message: cleanLegacyLocationText(c.message),
+  }));
 }
 
 export async function getHomeSteps(): Promise<ApiHomeStep[]> {
@@ -378,7 +416,19 @@ export function lines(value: string): string[] {
 
 export async function getSite(): Promise<ApiSiteSettings> {
   const { FALLBACK_SITE } = await import("./fallback-data");
-  return get("/site/", FALLBACK_SITE);
+  const site = await get("/site/", FALLBACK_SITE);
+  const locality = addressLocality(site.address) || "Meredith";
+
+  return {
+    ...site,
+    about_text: cleanLegacyLocationText(site.about_text, locality),
+    about_points: cleanLegacyLocationText(site.about_points, locality),
+    marquee_words: cleanLegacyLocationText(site.marquee_words, locality),
+    club_hero_kicker: cleanLegacyLocationText(site.club_hero_kicker, locality),
+    club_bento_3_badge: cleanLegacyLocationText(site.club_bento_3_badge, locality),
+    club_benefit_2_desc: cleanLegacyLocationText(site.club_benefit_2_desc, locality),
+    map_embed: /18\s+Pakington|Geelong/i.test(site.map_embed) ? "" : site.map_embed,
+  };
 }
 
 export async function getAnnouncement(): Promise<ApiAnnouncement | null> {
@@ -391,7 +441,12 @@ export async function getAnnouncement(): Promise<ApiAnnouncement | null> {
       PUBLIC_READ_TIMEOUT_MS
     );
     if (!res.ok) return null; // includes 204 = deliberately no announcement
-    return (await res.json()) as ApiAnnouncement;
+    const ann = (await res.json()) as ApiAnnouncement;
+    return {
+      ...ann,
+      details: cleanLegacyLocationText(ann.details),
+      message: cleanLegacyLocationText(ann.message),
+    };
   } catch {
     return null;
   }
