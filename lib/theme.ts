@@ -1,81 +1,201 @@
-// Custom-theme derivation: turns the two client-picked colours into the full
-// V1 token set, enforcing WCAG contrast so no possible choice can make the
-// site unreadable. Runs server-side in the (site) root layout.
+/**
+ * Custom Theme Derivation & Dynamic CSS Variable Generation
+ *
+ * Derives the complete client token palette from two user-selected colors (primary & accent).
+ * Enforces strict WCAG 2.1 AA accessibility contrast standards so custom color choices
+ * remain beautifully readable and compliant across surfaces, text, and backdrops.
+ *
+ * Runs server-side in the site root layout with O(1) in-memory memoization.
+ */
 
 import type { CSSProperties } from "react";
 
-type RGB = { r: number; g: number; b: number };
-
-const INK: RGB = { r: 0x21, g: 0x1a, b: 0x14 }; // --ink (fixed text colour)
-const CREAM: RGB = { r: 0xf8, g: 0xf2, b: 0xe0 }; // --cream page background
-
-function parse(hex: string): RGB | null {
-  const m = /^#([0-9a-f]{6})$/i.exec(hex.trim());
-  if (!m) return null;
-  const n = parseInt(m[1], 16);
-  return { r: n >> 16, g: (n >> 8) & 255, b: n & 255 };
+/** RGB Color model representation [0, 255] */
+export interface RGB {
+  readonly r: number;
+  readonly g: number;
+  readonly b: number;
 }
 
-const clamp255 = (c: number) => Math.max(0, Math.min(255, Math.round(c)));
-const toHex = ({ r, g, b }: RGB) =>
-  "#" + [r, g, b].map((c) => clamp255(c).toString(16).padStart(2, "0")).join("");
+/** Strongly typed custom CSS variable tokens injected into document styles */
+export interface CustomThemeVariables extends CSSProperties {
+  "--yellow": string;
+  "--yellow-deep": string;
+  "--pink": string;
+  "--pink-deep": string;
+  "--berry": string;
+  "--blush": string;
+  [key: `--${string}`]: string | undefined;
+}
 
-function luminance({ r, g, b }: RGB) {
-  const lin = (c: number) => {
-    const s = c / 255;
+// Fixed brand reference colors
+const INK: RGB = Object.freeze({ r: 0x21, g: 0x1a, b: 0x14 }); // --ink (#211a14) fixed text color
+const CREAM: RGB = Object.freeze({ r: 0xf8, g: 0xf2, b: 0xe0 }); // --cream (#f8f2e0) page background
+
+// Pre-computed constant luminances (eliminates redundant loop recalculations)
+const LUM_INK: number = relativeLuminance(INK);
+const LUM_CREAM: number = relativeLuminance(CREAM);
+
+// Lightweight in-memory LRU cache to ensure O(1) repeated layout renders
+const THEME_CACHE = new Map<string, CustomThemeVariables>();
+const MAX_CACHE_SIZE = 64;
+
+/**
+ * Parses a hex string (#RGB, #RRGGBB, RGB, RRGGBB) into an RGB object.
+ * Returns null if the format is invalid.
+ */
+export function parseHexColor(rawHex: string): RGB | null {
+  if (!rawHex || typeof rawHex !== "string") return null;
+  const clean = rawHex.trim().replace(/^#/, "");
+
+  // Support 3-character shorthand (#abc -> #aabbcc)
+  if (/^[0-9a-fA-F]{3}$/.test(clean)) {
+    const r = parseInt(clean[0] + clean[0], 16);
+    const g = parseInt(clean[1] + clean[1], 16);
+    const b = parseInt(clean[2] + clean[2], 16);
+    return { r, g, b };
+  }
+
+  // Support standard 6-character hex
+  if (/^[0-9a-fA-F]{6}$/.test(clean)) {
+    const n = parseInt(clean, 16);
+    return {
+      r: (n >> 16) & 255,
+      g: (n >> 8) & 255,
+      b: n & 255,
+    };
+  }
+
+  return null;
+}
+
+/** Clamps a number to valid 8-bit integer channel [0, 255] */
+const clampByte = (val: number): number => Math.max(0, Math.min(255, Math.round(val)));
+
+/** Converts an RGB object to a standard 6-character hex string (#rrggbb) */
+export function rgbToHex({ r, g, b }: RGB): string {
+  return (
+    "#" +
+    clampByte(r).toString(16).padStart(2, "0") +
+    clampByte(g).toString(16).padStart(2, "0") +
+    clampByte(b).toString(16).padStart(2, "0")
+  );
+}
+
+/**
+ * Calculates WCAG 2.1 relative luminance for an sRGB color.
+ * Normalized value ranges from 0.0 (darkest black) to 1.0 (brightest white).
+ */
+export function relativeLuminance({ r, g, b }: RGB): number {
+  const linearize = (channel: number): number => {
+    const s = channel / 255;
     return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
   };
-  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  return 0.2126 * linearize(r) + 0.7152 * linearize(g) + 0.0722 * linearize(b);
 }
 
-function contrast(a: RGB, b: RGB) {
-  const la = luminance(a);
-  const lb = luminance(b);
-  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+/**
+ * Calculates the WCAG contrast ratio between two relative luminance values.
+ * Returns a ratio between 1.0 and 21.0.
+ */
+export function contrastFromLuminance(lumA: number, lumB: number): number {
+  const lighter = Math.max(lumA, lumB);
+  const darker = Math.min(lumA, lumB);
+  return (lighter + 0.05) / (darker + 0.05);
 }
 
-const lighten = (c: RGB, amt: number): RGB => ({
-  r: c.r + (255 - c.r) * amt,
-  g: c.g + (255 - c.g) * amt,
-  b: c.b + (255 - c.b) * amt,
+/** Calculates the WCAG contrast ratio between two RGB colors directly */
+export function calculateContrastRatio(colorA: RGB, colorB: RGB): number {
+  return contrastFromLuminance(relativeLuminance(colorA), relativeLuminance(colorB));
+}
+
+/** Linearly lightens an RGB color towards white (255, 255, 255) by a ratio [0, 1] */
+export const lightenRgb = (c: RGB, factor: number): RGB => ({
+  r: c.r + (255 - c.r) * factor,
+  g: c.g + (255 - c.g) * factor,
+  b: c.b + (255 - c.b) * factor,
 });
-const darken = (c: RGB, amt: number): RGB => ({
-  r: c.r * (1 - amt),
-  g: c.g * (1 - amt),
-  b: c.b * (1 - amt),
+
+/** Linearly darkens an RGB color towards black (0, 0, 0) by a ratio [0, 1] */
+export const darkenRgb = (c: RGB, factor: number): RGB => ({
+  r: c.r * (1 - factor),
+  g: c.g * (1 - factor),
+  b: c.b * (1 - factor),
 });
 
-/** Surfaces carry ink text — lighten until AA body-text contrast holds. */
-function ensureSurface(c: RGB): RGB {
-  let out = c;
-  for (let i = 0; i < 24 && contrast(out, INK) < 4.5; i++) out = lighten(out, 0.08);
-  return out;
+/**
+ * Surfaces carry --ink (#211a14) text.
+ * Iteratively lightens the color until WCAG AA body-text contrast (>= 4.5:1) holds.
+ */
+function ensureSurfaceContrast(color: RGB): RGB {
+  let current = color;
+  for (let i = 0; i < 24; i++) {
+    const lum = relativeLuminance(current);
+    if (contrastFromLuminance(lum, LUM_INK) >= 4.5) break;
+    current = lightenRgb(current, 0.08);
+  }
+  return current;
 }
 
-/** Script accent is large display text — darken until it reads on both the
- *  custom surface and the cream page background. */
-function ensureScript(c: RGB, surface: RGB): RGB {
-  let out = c;
-  for (let i = 0; i < 24 && (contrast(out, surface) < 3 || contrast(out, CREAM) < 4.5); i++)
-    out = darken(out, 0.08);
-  return out;
+/**
+ * Script accent is large display text.
+ * Iteratively darkens the color until it achieves:
+ * - >= 3.0:1 contrast against the custom surface
+ * - >= 4.5:1 contrast against the cream background
+ */
+function ensureScriptContrast(color: RGB, surfaceColor: RGB): RGB {
+  let current = color;
+  const surfaceLum = relativeLuminance(surfaceColor);
+  for (let i = 0; i < 24; i++) {
+    const currentLum = relativeLuminance(current);
+    const surfaceContrast = contrastFromLuminance(currentLum, surfaceLum);
+    const creamContrast = contrastFromLuminance(currentLum, LUM_CREAM);
+    if (surfaceContrast >= 3.0 && creamContrast >= 4.5) break;
+    current = darkenRgb(current, 0.08);
+  }
+  return current;
 }
 
-/** Full token set for theme === "custom"; null when a hex is malformed
- *  (the site then just renders the golden defaults). */
-export function customThemeStyle(primaryHex: string, accentHex: string): CSSProperties | null {
-  const p0 = parse(primaryHex);
-  const a0 = parse(accentHex);
+/**
+ * Derives the complete CSS custom properties token set for custom themes.
+ * Returns null if any hex color is malformed, gracefully falling back to defaults.
+ *
+ * @param primaryHex Primary brand color in hex (e.g. "#f59e0b" or "f59e0b")
+ * @param accentHex Accent brand color in hex (e.g. "#ec4899" or "ec4899")
+ */
+export function customThemeStyle(
+  primaryHex: string,
+  accentHex: string
+): CustomThemeVariables | null {
+  const p0 = parseHexColor(primaryHex);
+  const a0 = parseHexColor(accentHex);
   if (!p0 || !a0) return null;
-  const primary = ensureSurface(p0);
-  const accent = ensureSurface(a0);
-  const script = ensureScript(darken(a0, 0.45), primary);
-  return {
-    "--yellow": toHex(primary),
-    "--yellow-deep": toHex(darken(primary, 0.12)),
-    "--pink": toHex(accent),
-    "--pink-deep": toHex(darken(accent, 0.12)),
-    "--berry": toHex(script),
-    "--blush": toHex(lighten(primary, 0.45)),
-  } as CSSProperties;
+
+  // Cache key based on normalized RGB values
+  const cacheKey = `${p0.r},${p0.g},${p0.b}:${a0.r},${a0.g},${a0.b}`;
+  const cached = THEME_CACHE.get(cacheKey);
+  if (cached) return cached;
+
+  // Derive WCAG-guaranteed surface and script colors
+  const primary = ensureSurfaceContrast(p0);
+  const accent = ensureSurfaceContrast(a0);
+  const script = ensureScriptContrast(darkenRgb(a0, 0.45), primary);
+
+  const tokens: CustomThemeVariables = {
+    "--yellow": rgbToHex(primary),
+    "--yellow-deep": rgbToHex(darkenRgb(primary, 0.12)),
+    "--pink": rgbToHex(accent),
+    "--pink-deep": rgbToHex(darkenRgb(accent, 0.12)),
+    "--berry": rgbToHex(script),
+    "--blush": rgbToHex(lightenRgb(primary, 0.45)),
+  };
+
+  // Enforce bounded cache size
+  if (THEME_CACHE.size >= MAX_CACHE_SIZE) {
+    const oldestKey = THEME_CACHE.keys().next().value;
+    if (oldestKey) THEME_CACHE.delete(oldestKey);
+  }
+  THEME_CACHE.set(cacheKey, tokens);
+
+  return tokens;
 }

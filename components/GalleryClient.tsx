@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { ZoomIn, Sparkles, Heart } from "lucide-react";
 import type { ApiGalleryPhoto } from "@/lib/api";
@@ -31,21 +31,29 @@ export default function GalleryClient({ photos, location }: { photos: ApiGallery
   const [current, setCurrent] = useState<number | null>(null); // index into `visible`, or null
   const [touchX, setTouchX] = useState<number | null>(null);
 
-  const visible = album === "all" ? photos : photos.filter((p) => p.album === album);
+  const visible: ApiGalleryPhoto[] = useMemo(
+    () => (album === "all" ? photos : photos.filter((p) => p.album === album)),
+    [album, photos]
+  );
 
-  const show = (i: number) =>
-    setCurrent(((i % visible.length) + visible.length) % visible.length);
+  const show = useCallback(
+    (i: number) => {
+      if (visible.length === 0) return;
+      setCurrent(((i % visible.length) + visible.length) % visible.length);
+    },
+    [visible.length]
+  );
 
   useEffect(() => {
+    if (current === null) return;
     const onKey = (e: KeyboardEvent) => {
-      if (current === null) return;
       if (e.key === "Escape") setCurrent(null);
       if (e.key === "ArrowLeft") show(current - 1);
       if (e.key === "ArrowRight") show(current + 1);
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  });
+  }, [current, show]);
 
   const photo = current !== null ? visible[current] : null;
 
@@ -57,7 +65,7 @@ export default function GalleryClient({ photos, location }: { photos: ApiGallery
     return () => {
       document.body.style.overflow = prev;
     };
-  }, [current === null]);
+  }, [current]);
 
   return (
     <>
