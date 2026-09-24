@@ -1,13 +1,13 @@
 # The Pancake Club
 
-> The Pancake Club is a pancake restaurant in Geelong West, Victoria. Customers
+> The Pancake Club is a pancake restaurant in Meredith, Victoria. Customers
 > can view the current menu, request a table, and order pickup when online
 > ordering is available.
 
 ## About
 
 - Cuisine: Pancakes, breakfast, dessert
-- Location: Geelong West, Victoria, Australia
+- Location: 55 Wallace Street, Meredith, Victoria 3333, Australia
 - Price range: $$ (mid-range)
 - Dine-in with table bookings, plus online pickup ordering
 
