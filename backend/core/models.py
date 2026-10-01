@@ -552,7 +552,7 @@ class SiteSettings(models.Model):
     )
     club_bento_3_badge = models.CharField(max_length=60, blank=True, default="☕ Our local parlour")
     club_bento_3_title = models.CharField(max_length=60, blank=True, default="Our Parlour")
-    club_bento_3_sub = models.CharField(max_length=80, blank=True, default="Open 7 days")
+    club_bento_3_sub = models.CharField(max_length=80, blank=True, default="")
 
     club_pass_title = models.CharField(max_length=80, blank=True, default="FOUNDING MEMBER PASS · NO. 0824")
     club_pass_sub = models.CharField(max_length=120, blank=True, default="Priority Seasonal Tastings · Secret Drops · Free Forever")

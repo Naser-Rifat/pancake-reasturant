@@ -75,7 +75,7 @@ export const DEFAULT_SITE: AdminSiteSettings = {
   club_bento_3_img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80",
   club_bento_3_badge: "☕ Our local parlour",
   club_bento_3_title: "Our Parlour",
-  club_bento_3_sub: "Open 7 days",
+  club_bento_3_sub: "",
   club_pass_title: "FOUNDING MEMBER PASS · NO. 0824",
   club_pass_sub: "Priority Seasonal Tastings · Secret Drops · Free Forever",
   club_pass_badge: "ALL WELCOME",

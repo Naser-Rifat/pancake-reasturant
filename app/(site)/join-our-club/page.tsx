@@ -35,7 +35,7 @@ export default async function JoinOurClubPage() {
   const bento3Img = site.club_bento_3_img !== undefined ? site.club_bento_3_img : "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80";
   const bento3Badge = site.club_bento_3_badge || (locality ? `☕ ${locality}` : "☕ Our local parlour");
   const bento3Title = site.club_bento_3_title || "Our Parlour";
-  const bento3Sub = site.club_bento_3_sub || "Open 7 days";
+  const bento3Sub = site.club_bento_3_sub || "";
 
   const passTitle = site.club_pass_title || "FOUNDING MEMBER PASS · NO. 0824";
   const passSub = site.club_pass_sub || "Priority Seasonal Tastings · Secret Drops · Free Forever";

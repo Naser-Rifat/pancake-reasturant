@@ -923,7 +923,7 @@ export default function PreviewPage() {
                 </div>
                 <div className={clubStyles.bentoCaption}>
                   <span className={clubStyles.bentoCaptionTitle}>{site.club_bento_3_title || "Our Parlour"}</span>
-                  <span className={clubStyles.bentoCaptionSub}>{site.club_bento_3_sub || "Open 7 days"}</span>
+                  <span className={clubStyles.bentoCaptionSub}>{site.club_bento_3_sub || ""}</span>
                 </div>
               </div>
             </div>
