@@ -53,8 +53,7 @@ export default function TopRibbon({
             {displayAddress && <MapPin size={13} className="top-ribbon-pin" aria-hidden="true" />}
             {displayAddress && <span className="top-ribbon-addr-full">{displayAddress}</span>}
             {displayAddress && <span className="top-ribbon-addr-short">{shortAddress}</span>}
-            {displayAddress && <span className="top-ribbon-dot" aria-hidden="true">·</span>}
-            <span className="top-ribbon-hours">Open Daily 11am – 9pm</span>
+
           </Link>
         </div>
 

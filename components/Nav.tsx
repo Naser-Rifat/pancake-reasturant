@@ -470,10 +470,7 @@ export default function Nav({
                   <span className="m-store-text">{displayAddress}</span>
                 </div>
               )}
-              <div className="mobile-nav-store-item">
-                <span className="m-store-icon">⏰</span>
-                <span className="m-store-text">Open Daily · 11:00 AM – 9:00 PM</span>
-              </div>
+
             </div>
           </div>
         </div>
